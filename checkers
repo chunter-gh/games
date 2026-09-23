@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>3D Checkers</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: white;
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(ellipse at top, #254c70 0%, #10243b 48%, #050d18 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+.app {
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+}
+
+h1 {
+    margin: 4px 0 3px;
+    font-size: clamp(30px, 8vw, 46px);
+    letter-spacing: 4px;
+    font-weight: 900;
+    text-shadow: 0 3px 0 #091522, 0 7px 14px #000;
+}
+
+.subtitle {
+    color: #b8d6ed;
+    letter-spacing: 4px;
+    font-size: 11px;
+    margin-bottom: 14px;
+}
+
+.status {
+    min-height: 42px;
+    margin: 0 auto 12px;
+    padding: 11px 8px;
+    border: 1px solid #6085a7;
+    border-radius: 13px;
+    background: linear-gradient(#1e3e5d, #0b1c30);
+    box-shadow: inset 0 2px 4px #ffffff20, 0 5px 12px #0008;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.board-frame {
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 9px;
+    border-radius: 17px;
+    background: linear-gradient(135deg, #d4e0e7, #526a7b 35%, #172b3d 70%, #8ca4b5);
+    box-shadow:
+        0 12px 24px #0009,
+        inset 0 2px 4px #fff9,
+        inset 0 -5px 8px #0009;
+}
+
+.board {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    overflow: hidden;
+    border-radius: 7px;
+    border: 2px solid #111d2a;
+}
+
+.square {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    user-select: none;
+}
+
+.light {
+    background: linear-gradient(145deg, #f0e3c7, #c9b38c);
+    box-shadow: inset 1px 1px 2px #fff8, inset -2px -2px 3px #927e5c55;
+}
+
+.dark {
+    background: linear-gradient(145deg, #24415b, #101f31);
+    box-shadow: inset 1px 1px 2px #8ca8c422, inset -2px -2px 4px #0008;
+}
+
+.square.selected {
+    background: linear-gradient(145deg, #4e9de4, #14518d);
+    box-shadow: inset 0 0 0 3px #a9e1ff, inset 0 0 16px #9ad9ff;
+}
+
+.square.destination::before {
+    content: "";
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: #8be6ff;
+    box-shadow: 0 0 8px 4px #42c8ff99;
+    z-index: 2;
+}
+
+.square.capture-destination::before {
+    width: 55%;
+    height: 55%;
+    background: transparent;
+    border: 3px solid #ffdb65;
+    box-shadow: 0 0 9px 3px #ffbf3f99;
+}
+
+.piece {
+    position: relative;
+    width: 82%;
+    height: 82%;
+    border-radius: 50%;
+    z-index: 3;
+    cursor: pointer;
+    transition: transform .12s ease;
+    animation: pieceDrop .2s ease-out;
+}
+
+.piece:active {
+    transform: scale(.93);
+}
+
+.black-piece {
+    background:
+        radial-gradient(ellipse at 30% 22%, #8d9cac 0%, #46586b 16%, #1c2b3b 43%, #070d15 72%, #02050a 100%);
+    border: 2px solid #050a10;
+    box-shadow:
+        inset 0 3px 4px #ffffff75,
+        inset 0 -6px 8px #000e,
+        0 4px 3px #000b,
+        0 1px 0 2px #64778a;
+}
+
+.white-piece {
+    background:
+        radial-gradient(ellipse at 30% 22%, #ffffff 0%, #fff9e8 20%, #e1d7c0 48%, #a69b84 78%, #756a58 100%);
+    border: 2px solid #8d8069;
+    box-shadow:
+        inset 0 3px 5px #fff,
+        inset 0 -6px 8px #7e725d77,
+        0 4px 3px #000b,
+        0 1px 0 2px #e9dfca;
+}
+
+.piece.king::after {
+    content: "K";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(17px, 5vw, 29px);
+    font-weight: 900;
+    color: #ffdf75;
+    text-shadow: 0 2px 2px #4b3100, 0 0 7px #ffbf39;
+}
+
+.piece.white-piece.king::after {
+    color: #8c5810;
+    text-shadow: 0 1px 0 #fff7cf, 0 0 5px #f2b94c;
+}
+
+.piece.selected-piece {
+    animation: selectedPulse .7s ease-in-out infinite alternate;
+}
+
+@keyframes pieceDrop {
+    from { transform: translateY(-8px) scale(.8); opacity: .3; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes selectedPulse {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.07); filter: brightness(1.25); }
+}
+
+.controls {
+    display: flex;
+    gap: 9px;
+    margin-top: 14px;
+}
+
+button {
+    flex: 1;
+    min-height: 47px;
+    border: 1px solid #9cc9e9aa;
+    border-radius: 13px;
+    color: white;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    background:
+        linear-gradient(180deg, #ffffff35, #ffffff05 45%, #0003),
+        linear-gradient(135deg, #367fb5, #123b62);
+    box-shadow:
+        inset 0 2px 2px #ffffff55,
+        inset 0 -4px 7px #0005,
+        0 5px 10px #0007;
+    cursor: pointer;
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 3px 7px #0006, 0 2px 4px #0006;
+}
+
+.home-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #b7d7ee;
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: #000b;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-box {
+    width: 100%;
+    max-width: 420px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 22px;
+    border: 1px solid #7899b8;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #23425f, #0a192b);
+    box-shadow: 0 15px 40px #000b, inset 0 2px 3px #ffffff25;
+    text-align: left;
+}
+
+.modal-box h2 {
+    margin-top: 0;
+    text-align: center;
+    letter-spacing: 3px;
+}
+
+.modal-box li {
+    margin: 10px 0;
+    line-height: 1.4;
+    color: #e0edf8;
+}
+
+.modal-box button {
+    width: 100%;
+    margin-top: 12px;
+}
+
+@media (max-height: 720px) {
+    .subtitle { margin-bottom: 8px; }
+    .status { margin-bottom: 8px; }
+    .controls { margin-top: 9px; }
+    .board-frame { padding: 6px; }
+    button { min-height: 40px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+    <h1>CHECKERS</h1>
+    <div class="subtitle">SHINY BOARD • CLASSIC BATTLE</div>
+
+    <div class="status" id="status">WHITE'S TURN</div>
+
+    <div class="board-frame">
+        <div class="board" id="board"></div>
+    </div>
+
+    <div class="controls">
+        <button onclick="newGame()">NEW GAME</button>
+        <button onclick="clearSelection()">CLEAR</button>
+        <button onclick="showRules()">RULES</button>
+    </div>
+
+    <a class="home-link" href="index.html">← GAME MENU</a>
+</div>
+
+<div class="modal" id="rulesModal">
+    <div class="modal-box">
+        <h2>CHECKERS RULES</h2>
+        <ul>
+            <li>White moves first.</li>
+            <li>Regular pieces move diagonally forward onto empty dark squares.</li>
+            <li>If a capture is available, you must capture.</li>
+            <li>Capture by jumping diagonally over an adjacent opponent into an empty square.</li>
+            <li>If another jump is available with the same piece, you must continue jumping.</li>
+            <li>When a regular piece reaches the opposite end, it becomes a king.</li>
+            <li>Kings can move and capture diagonally forward or backward.</li>
+            <li>You win by capturing all opposing pieces or leaving your opponent with no legal moves.</li>
+        </ul>
+        <button onclick="hideRules()">CLOSE</button>
+    </div>
+</div>
+
+<script>
+const boardElement = document.getElementById("board");
+const statusElement = document.getElementById("status");
+const rulesModal = document.getElementById("rulesModal");
+
+let board = [];
+let turn = "white";
+let selected = null;
+let forcedPiece = null;
+let gameOver = false;
+
+function setup() {
+    board = Array.from({ length: 8 }, () => Array(8).fill(null));
+
+    // Black pieces start at the top.
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 8; c++) {
+            if ((r + c) % 2 === 1) {
+                board[r][c] = { color: "black", king: false };
+            }
+        }
+    }
+
+    // White pieces start at the bottom.
+    for (let r = 5; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            if ((r + c) % 2 === 1) {
+                board[r][c] = { color: "white", king: false };
+            }
+        }
+    }
+
+    turn = "white";
+    selected = null;
+    forcedPiece = null;
+    gameOver = false;
+
+    draw();
+    updateStatus();
+}
+
+function inside(r, c) {
+    return r >= 0 && r < 8 && c >= 0 && c < 8;
+}
+
+function directions(piece) {
+    if (piece.king) {
+        return [
+            [-1, -1], [-1, 1],
+            [1, -1], [1, 1]
+        ];
+    }
+
+    return piece.color === "white"
+        ? [[-1, -1], [-1, 1]]
+        : [[1, -1], [1, 1]];
+}
+
+// Returns all moves for one piece, without applying
+// the global mandatory-capture restriction.
+function rawMoves(r, c) {
+    const piece = board[r][c];
+    if (!piece) return [];
+
+    const moves = [];
+
+    for (const [dr, dc] of directions(piece)) {
+        const nr = r + dr;
+        const nc = c + dc;
+
+        if (inside(nr, nc) && board[nr][nc] === null) {
+            moves.push({
+                r: nr,
+                c: nc,
+                capture: null
+            });
+        }
+
+        const jr = r + dr * 2;
+        const jc = c + dc * 2;
+
+        if (
+            inside(nr, nc) &&
+            inside(jr, jc) &&
+            board[nr][nc] &&
+            board[nr][nc].color !== piece.color &&
+            board[jr][jc] === null
+        ) {
+            moves.push({
+                r: jr,
+                c: jc,
+                capture: { r: nr, c: nc }
+            });
+        }
+    }
+
+    return moves;
+}
+
+function hasCapture(color) {
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const piece = board[r][c];
+
+            if (piece && piece.color === color) {
+                if (rawMoves(r, c).some(move => move.capture)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+function legalMoves(r, c) {
+    const piece = board[r][c];
+    if (!piece || piece.color !== turn) return [];
+
+    let moves = rawMoves(r, c);
+
+    // During a multiple jump, only the forced piece may move
+    // and it must continue capturing.
+    if (forcedPiece) {
+        if (forcedPiece.r !== r || forcedPiece.c !== c) return [];
+        return moves.filter(move => move.capture);
+    }
+
+    // Captures are mandatory.
+    if (hasCapture(turn)) {
+        moves = moves.filter(move => move.capture);
+    }
+
+    return moves;
+}
+
+function draw() {
+    boardElement.innerHTML = "";
+
+    const destinations = selected
+        ? legalMoves(selected.r, selected.c)
+        : [];
+
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const square = document.createElement("div");
+            square.className = "square " + ((r + c) % 2 === 0 ? "light" : "dark");
+
+            if (selected && selected.r === r && selected.c === c) {
+                square.classList.add("selected");
+            }
+
+            const destination = destinations.find(move => move.r === r && move.c === c);
+
+            if (destination) {
+                square.classList.add("destination");
+                if (destination.capture) {
+                    square.classList.add("capture-destination");
+                }
+            }
+
+            const piece = board[r][c];
+
+            if (piece) {
+                const pieceElement = document.createElement("div");
+                pieceElement.className =
+                    "piece " + (piece.color === "black" ? "black-piece" : "white-piece");
+
+                if (piece.king) pieceElement.classList.add("king");
+
+                if (selected && selected.r === r && selected.c === c) {
+                    pieceElement.classList.add("selected-piece");
+                }
+
+                square.appendChild(pieceElement);
+            }
+
+            square.addEventListener("click", () => clickSquare(r, c));
+            boardElement.appendChild(square);
+        }
+    }
+}
+
+function clickSquare(r, c) {
+    if (gameOver) return;
+
+    // If a piece is already selected, try moving to this square.
+    if (selected) {
+        const moves = legalMoves(selected.r, selected.c);
+        const move = moves.find(item => item.r === r && item.c === c);
+
+        if (move) {
+            makeMove(selected.r, selected.c, move);
+            return;
+        }
+    }
+
+    const piece = board[r][c];
+
+    // Select only a piece belonging to the current player.
+    if (piece && piece.color === turn) {
+        if (forcedPiece &&
+            (forcedPiece.r !== r || forcedPiece.c !== c)) {
+            return;
+        }
+
+        if (legalMoves(r, c).length > 0) {
+            selected = { r, c };
+            draw();
+            updateStatus();
+            return;
+        }
+    }
+
+    if (!forcedPiece) {
+        selected = null;
+        draw();
+        updateStatus();
+    }
+}
+
+function makeMove(fromR, fromC, move) {
+    const piece = board[fromR][fromC];
+
+    board[move.r][move.c] = piece;
+    board[fromR][fromC] = null;
+
+    if (move.capture) {
+        board[move.capture.r][move.capture.c] = null;
+    }
+
+    let becameKing = false;
+
+    if (!piece.king) {
+        if (
+            (piece.color === "white" && move.r === 0) ||
+            (piece.color === "black" && move.r === 7)
+        ) {
+            piece.king = true;
+            becameKing = true;
+        }
+    }
+
+    // American checkers: if a man becomes a king during a jump,
+    // its turn ends rather than continuing as a king.
+    if (move.capture && !becameKing) {
+        const furtherCaptures = rawMoves(move.r, move.c)
+            .filter(nextMove => nextMove.capture);
+
+        if (furtherCaptures.length > 0) {
+            selected = { r: move.r, c: move.c };
+            forcedPiece = { r: move.r, c: move.c };
+
+            draw();
+            updateStatus();
+            return;
+        }
+    }
+
+    selected = null;
+    forcedPiece = null;
+    turn = turn === "white" ? "black" : "white";
+
+    if (checkGameOver()) {
+        draw();
+        updateStatus();
+        return;
+    }
+
+    draw();
+    updateStatus();
+}
+
+function checkGameOver() {
+    const opponent = turn;
+
+    let piecesRemain = false;
+    let movesRemain = false;
+
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const piece = board[r][c];
+
+            if (piece && piece.color === opponent) {
+                piecesRemain = true;
+
+                if (legalMoves(r, c).length > 0) {
+                    movesRemain = true;
+                }
+            }
+        }
+    }
+
+    if (!piecesRemain || !movesRemain) {
+        gameOver = true;
+        turn = turn === "white" ? "black" : "white";
+        return true;
+    }
+
+    return false;
+}
+
+function updateStatus() {
+    if (gameOver) {
+        statusElement.textContent =
+            turn.toUpperCase() + " WINS!";
+        return;
+    }
+
+    if (forcedPiece) {
+        statusElement.textContent =
+            turn.toUpperCase() + " — JUMP AGAIN!";
+        return;
+    }
+
+    if (hasCapture(turn)) {
+        statusElement.textContent =
+            turn.toUpperCase() + " — CAPTURE REQUIRED";
+        return;
+    }
+
+    statusElement.textContent = turn.toUpperCase() + "'S TURN";
+}
+
+function clearSelection() {
+    if (forcedPiece) return;
+
+    selected = null;
+    draw();
+    updateStatus();
+}
+
+function newGame() {
+    setup();
+}
+
+function showRules() {
+    rulesModal.style.display = "flex";
+}
+
+function hideRules() {
+    rulesModal.style.display = "none";
+}
+
+rulesModal.addEventListener("click", event => {
+    if (event.target === rulesModal) {
+        hideRules();
+    }
+});
+
+setup();
+</script>
+</body>
+</html>
