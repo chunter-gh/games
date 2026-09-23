@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>Online Checkers</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top, #233b63, #07101e 70%);
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game {
+    width: min(96vw, 650px);
+    text-align: center;
+    padding: 12px;
+}
+
+h1 {
+    margin: 5px 0 2px;
+    font-size: clamp(28px, 7vw, 44px);
+    letter-spacing: 3px;
+    text-shadow:
+        0 3px 8px #000,
+        0 0 15px #79bfff;
+}
+
+#status {
+    min-height: 28px;
+    margin: 5px 0 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#board {
+    width: min(92vw, 600px);
+    height: min(92vw, 600px);
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+
+    border: 7px solid #151515;
+    border-radius: 10px;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.7),
+        inset 0 0 12px rgba(255,255,255,.2);
+}
+
+.square {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.light {
+    background: #d9d9d9;
+}
+
+.dark {
+    background:
+        linear-gradient(135deg, #8b1010, #4a0505);
+}
+
+.selected {
+    box-shadow:
+        inset 0 0 0 5px #ffe600,
+        inset 0 0 18px #fff000;
+}
+
+.possible {
+    box-shadow:
+        inset 0 0 0 4px #35ff72,
+        inset 0 0 15px #20ff55;
+}
+
+.forced {
+    box-shadow:
+        inset 0 0 0 5px #00eaff,
+        inset 0 0 18px #00eaff;
+}
+
+/* -------------------------------------------------
+   CHECKER PIECES
+------------------------------------------------- */
+
+.piece {
+    width: 78%;
+    height: 78%;
+
+    border-radius: 50%;
+
+    position: relative;
+
+    border: 3px solid rgba(0,0,0,.65);
+
+    box-shadow:
+        0 5px 5px rgba(0,0,0,.7),
+        inset 0 5px 8px rgba(255,255,255,.4),
+        inset 0 -6px 8px rgba(0,0,0,.45);
+
+    transition:
+        transform .12s ease,
+        box-shadow .12s ease;
+}
+
+.piece:active {
+    transform: scale(.94);
+}
+
+.red-piece {
+    background:
+        radial-gradient(circle at 35% 28%,
+        #ff7777 0%,
+        #d40000 28%,
+        #8b0000 65%,
+        #420000 100%);
+}
+
+.black-piece {
+    background:
+        radial-gradient(circle at 35% 28%,
+        #777 0%,
+        #292929 25%,
+        #080808 65%,
+        #000 100%);
+}
+
+/* Bottom rim gives the pieces the short classic look */
+.piece::after {
+    content: "";
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: -7px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.65);
+    z-index: -1;
+}
+
+/* -------------------------------------------------
+   KINGS
+------------------------------------------------- */
+
+.king::before {
+    content: "♛";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -53%);
+
+    font-size: clamp(20px, 6vw, 36px);
+
+    color: #ffd700;
+
+    text-shadow:
+        0 2px 2px #000,
+        0 0 5px #fff;
+}
+
+/* -------------------------------------------------
+   BUTTONS
+------------------------------------------------- */
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+
+    padding: 12px 22px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    color: white;
+
+    background:
+        linear-gradient(#347cc5, #12365e);
+
+    box-shadow:
+        0 4px 8px rgba(0,0,0,.5),
+        inset 0 1px 1px rgba(255,255,255,.4);
+
+    cursor: pointer;
+}
+
+button:active {
+    transform: translateY(2px);
+}
+
+#rules {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    background: rgba(0,0,0,.75);
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 100;
+}
+
+.rules-box {
+    max-width: 450px;
+
+    background:
+        linear-gradient(145deg, #182d4b, #091321);
+
+    border: 2px solid #4f8fd0;
+
+    border-radius: 15px;
+
+    padding: 22px;
+
+    text-align: left;
+
+    box-shadow: 0 15px 50px #000;
+}
+
+.rules-box h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.rules-box li {
+    margin: 9px 0;
+    line-height: 1.35;
+}
+
+#connection {
+    font-size: 13px;
+    opacity: .75;
+    margin-top: 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <h1>CHECKERS</h1>
+
+    <div id="status">Connecting...</div>
+
+    <div id="board"></div>
+
+    <div class="controls">
+        <button onclick="newGame()">NEW GAME</button>
+        <button onclick="showRules()">RULES</button>
+        <button onclick="goHome()">MENU</button>
+    </div>
+
+    <div id="connection">
+        Connecting to game server...
+    </div>
+
+</div>
+
+
+<!-- RULES -->
+
+<div id="rules">
+
+    <div class="rules-box">
+
+        <h2>CHECKERS RULES</h2>
+
+        <ul>
+            <li>Red and Black play against each other.</li>
+            <li>Red moves first.</li>
+            <li>Pieces move diagonally forward.</li>
+            <li>Captures are mandatory.</li>
+            <li>Jump over an opponent to capture it.</li>
+            <li>Multiple jumps are allowed.</li>
+            <li>Reaching the opposite end makes a king.</li>
+            <li>Kings can move and capture in both directions.</li>
+            <li>Capture all opponent pieces or block all legal moves to win.</li>
+        </ul>
+
+        <button onclick="hideRules()">CLOSE</button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SERVER
+========================================================= */
+
+const SERVER =
+    "wss://games-z5k2.onrender.com/checkers";
+
+let socket;
+
+
+/* =========================================================
+   LOCAL GAME STATE
+========================================================= */
+
+let myColor = null;
+
+let board = [];
+
+let currentPlayer = "red";
+
+let gameOver = false;
+
+let winner = null;
+
+let forcedPiece = null;
+
+let selected = null;
+
+
+/* =========================================================
+   CONNECT
+========================================================= */
+
+function connect() {
+
+    socket = new WebSocket(SERVER);
+
+    socket.onopen = () => {
+
+        document.getElementById("connection")
+            .textContent = "Connected to game server.";
+
+    };
+
+    socket.onmessage = event => {
+
+        try {
+
+            const data = JSON.parse(event.data);
+
+            /* ---------------------------------------------
+               PLAYER ASSIGNMENT
+            --------------------------------------------- */
+
+            if (data.type === "assign") {
+
+                myColor = data.color;
+
+                updateStatus();
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               GAME STATE
+            --------------------------------------------- */
+
+            if (data.type === "state") {
+
+                board = data.board;
+
+                currentPlayer = data.currentPlayer;
+
+                gameOver = data.gameOver;
+
+                winner = data.winner;
+
+                forcedPiece = data.forcedPiece;
+
+                selected = null;
+
+                render();
+
+                updateStatus();
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               ERROR
+            --------------------------------------------- */
+
+            if (data.type === "error") {
+
+                document.getElementById("status")
+                    .textContent = data.message;
+
+            }
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
+
+    socket.onclose = () => {
+
+        document.getElementById("connection")
+            .textContent =
+            "Disconnected from server.";
+
+        document.getElementById("status")
+            .textContent =
+            "Connection lost.";
+
+    };
+
+
+    socket.onerror = () => {
+
+        document.getElementById("connection")
+            .textContent =
+            "Connection error.";
+
+    };
+}
+
+
+/* =========================================================
+   RENDER BOARD
+========================================================= */
+
+function render() {
+
+    const boardElement =
+        document.getElementById("board");
+
+    boardElement.innerHTML = "";
+
+
+    for (let row = 0; row < 8; row++) {
+
+        for (let col = 0; col < 8; col++) {
+
+            const square =
+                document.createElement("div");
+
+            square.className =
+                "square " +
+                ((row + col) % 2 === 0
+                    ? "light"
+                    : "dark");
+
+
+            /* Selected square */
+
+            if (
+                selected &&
+                selected.row === row &&
+                selected.col === col
+            ) {
+
+                square.classList.add("selected");
+            }
+
+
+            /* Forced multiple-jump piece */
+
+            if (
+                forcedPiece &&
+                forcedPiece.row === row &&
+                forcedPiece.col === col
+            ) {
+
+                if (
+                    board[row] &&
+                    board[row][col]
+                ) {
+
+                    square.classList.add("forced");
+                }
+            }
+
+
+            square.addEventListener(
+                "click",
+                () => squareClicked(row, col)
+            );
+
+
+            const piece =
+                board[row] &&
+                board[row][col];
+
+
+            if (piece) {
+
+                const pieceElement =
+                    document.createElement("div");
+
+                pieceElement.className =
+                    "piece " +
+                    (piece.color === "red"
+                        ? "red-piece"
+                        : "black-piece");
+
+
+                if (piece.king) {
+                    pieceElement.classList.add("king");
+                }
+
+
+                square.appendChild(pieceElement);
+            }
+
+
+            boardElement.appendChild(square);
+        }
+    }
+}
+
+
+/* =========================================================
+   CLICK SQUARE
+========================================================= */
+
+function squareClicked(row, col) {
+
+    if (!socket ||
+        socket.readyState !== WebSocket.OPEN) {
+        return;
+    }
+
+    if (gameOver) {
+        return;
+    }
+
+    /* Only your own turn */
+
+    if (currentPlayer !== myColor) {
+        return;
+    }
+
+
+    const piece =
+        board[row] &&
+        board[row][col];
+
+
+    /* -----------------------------------------------------
+       If nothing selected, select one of our pieces
+    ----------------------------------------------------- */
+
+    if (!selected) {
+
+        if (
+            piece &&
+            piece.color === myColor
+        ) {
+
+            /* During multiple jump,
+               only forced piece can be selected */
+
+            if (forcedPiece) {
+
+                if (
+                    forcedPiece.row !== row ||
+                    forcedPiece.col !== col
+                ) {
+                    return;
+                }
+            }
+
+            selected = {
+                row,
+                col
+            };
+
+            render();
+
+        }
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       Clicking our selected piece again
+       deselects it unless forced
+    ----------------------------------------------------- */
+
+    if (
+        selected.row === row &&
+        selected.col === col
+    ) {
+
+        if (!forcedPiece) {
+
+            selected = null;
+            render();
+        }
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       Clicking another own piece
+       changes selection
+    ----------------------------------------------------- */
+
+    if (
+        piece &&
+        piece.color === myColor &&
+        !forcedPiece
+    ) {
+
+        selected = {
+            row,
+            col
+        };
+
+        render();
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       Try move
+    ----------------------------------------------------- */
+
+    sendMove(
+        selected.row,
+        selected.col,
+        row,
+        col
+    );
+}
+
+
+/* =========================================================
+   SEND MOVE
+========================================================= */
+
+function sendMove(
+    fromRow,
+    fromCol,
+    toRow,
+    toCol
+) {
+
+    if (!socket ||
+        socket.readyState !== WebSocket.OPEN) {
+        return;
+    }
+
+    socket.send(JSON.stringify({
+
+        type: "move",
+
+        fromRow: fromRow,
+        fromCol: fromCol,
+
+        toRow: toRow,
+        toCol: toCol
+    }));
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function updateStatus() {
+
+    const status =
+        document.getElementById("status");
+
+
+    if (gameOver) {
+
+        if (winner === myColor) {
+
+            status.textContent =
+                "YOU WIN!";
+
+        } else {
+
+            status.textContent =
+                winner.toUpperCase() + " WINS!";
+        }
+
+        return;
+    }
+
+
+    if (!myColor) {
+
+        status.textContent =
+            "Waiting for player...";
+
+        return;
+    }
+
+
+    if (currentPlayer === myColor) {
+
+        if (forcedPiece) {
+
+            status.textContent =
+                "Your turn — continue the jump.";
+
+        } else {
+
+            status.textContent =
+                "Your turn — " +
+                capitalize(myColor) + ".";
+        }
+
+    } else {
+
+        status.textContent =
+            "Opponent's turn.";
+    }
+}
+
+
+/* =========================================================
+   NEW GAME
+========================================================= */
+
+function newGame() {
+
+    if (!socket ||
+        socket.readyState !== WebSocket.OPEN) {
+        return;
+    }
+
+    socket.send(JSON.stringify({
+        type: "new_game"
+    }));
+}
+
+
+/* =========================================================
+   RULES
+========================================================= */
+
+function showRules() {
+
+    document.getElementById("rules")
+        .style.display = "flex";
+}
+
+
+function hideRules() {
+
+    document.getElementById("rules")
+        .style.display = "none";
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function goHome() {
+
+    location.href = "index.html";
+}
+
+
+/* =========================================================
+   CAPITALIZE
+========================================================= */
+
+function capitalize(text) {
+
+    return text.charAt(0).toUpperCase()
+        + text.slice(1);
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+connect();
+
+</script>
+
+</body>
+</html>
