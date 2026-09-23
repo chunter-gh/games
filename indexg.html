@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>Game Room</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background:
+        radial-gradient(circle at 50% 15%, #244b72 0%, #10243c 45%, #06101d 100%);
+    color: white;
+}
+
+/* -------------------------
+   MAIN SCREEN
+------------------------- */
+
+.game-room {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Stars / atmosphere */
+
+.glow {
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.12), transparent 70%);
+    left: 50%;
+    top: -130px;
+    transform: translateX(-50%);
+}
+
+/* -------------------------
+   TITLE
+------------------------- */
+
+.title-area {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding-top: 28px;
+}
+
+.title {
+    margin: 0;
+    font-size: clamp(38px, 11vw, 62px);
+    font-weight: 900;
+    letter-spacing: 4px;
+
+    color: #fff;
+
+    text-shadow:
+        0 3px 0 #14283e,
+        0 6px 12px rgba(0,0,0,.8),
+        0 0 20px rgba(120,200,255,.45);
+}
+
+.subtitle {
+    margin-top: 5px;
+    font-size: 13px;
+    letter-spacing: 5px;
+    color: #b9d7ee;
+}
+
+/* -------------------------
+   GAME BUTTONS
+------------------------- */
+
+.menu {
+    position: absolute;
+    z-index: 20;
+
+    width: min(88%, 420px);
+
+    left: 50%;
+    top: 38%;
+    transform: translate(-50%, -50%);
+}
+
+.game-button {
+    position: relative;
+
+    width: 100%;
+    height: 82px;
+
+    margin: 16px 0;
+
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.28),
+            rgba(255,255,255,.05) 45%,
+            rgba(0,0,0,.18)
+        ),
+        linear-gradient(135deg, #28699e, #123557);
+
+    box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.35),
+        inset 0 -7px 12px rgba(0,0,0,.25),
+        0 10px 20px rgba(0,0,0,.45);
+
+    color: white;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 25px;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.game-button:active {
+    transform: scale(.96);
+
+    box-shadow:
+        inset 0 5px 12px rgba(0,0,0,.35),
+        0 4px 8px rgba(0,0,0,.4);
+}
+
+.icon {
+    width: 55px;
+    font-size: 38px;
+    text-align: center;
+
+    filter:
+        drop-shadow(0 4px 4px rgba(0,0,0,.65));
+}
+
+.button-text {
+    text-align: left;
+    margin-left: 15px;
+}
+
+.button-title {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 1px;
+
+    text-shadow: 0 2px 4px #000;
+}
+
+.button-subtitle {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #c9e5fa;
+}
+
+/* -------------------------
+   GROUND
+------------------------- */
+
+.ground {
+    position: absolute;
+
+    left: -10%;
+    bottom: 0;
+
+    width: 120%;
+    height: 115px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #182e26,
+            #091610
+        );
+
+    border-top:
+        2px solid rgba(130,190,130,.25);
+
+    box-shadow:
+        0 -12px 30px rgba(0,0,0,.25);
+}
+
+/* -------------------------
+   GIRAFFE
+------------------------- */
+
+.giraffe-wrapper {
+    position: absolute;
+
+    z-index: 10;
+
+    bottom: 45px;
+    left: -230px;
+
+    width: 210px;
+    height: 250px;
+
+    animation:
+        giraffeWalk 15s linear infinite;
+}
+
+@keyframes giraffeWalk {
+    0% {
+        left: -230px;
+    }
+
+    100% {
+        left: calc(100% + 30px);
+    }
+}
+
+/* Whole body bounce */
+
+.giraffe {
+    position: relative;
+
+    width: 210px;
+    height: 250px;
+
+    animation:
+        bodyBounce .42s ease-in-out infinite alternate;
+}
+
+@keyframes bodyBounce {
+    from {
+        transform: translateY(1px);
+    }
+
+    to {
+        transform: translateY(-4px);
+    }
+}
+
+/* Body */
+
+.body {
+    position: absolute;
+
+    left: 35px;
+    top: 105px;
+
+    width: 125px;
+    height: 75px;
+
+    border-radius: 52% 48% 45% 48%;
+
+    background:
+        radial-gradient(
+            circle at 35% 28%,
+            #f5d66f 0 10%,
+            #d9a93e 11% 100%
+        );
+
+    border: 3px solid #8b6424;
+
+    box-shadow:
+        inset -12px -12px 15px rgba(90,55,10,.28),
+        8px 12px 15px rgba(0,0,0,.35);
+}
+
+/* Giraffe patches */
+
+.patch {
+    position: absolute;
+
+    background: #9b6928;
+
+    border: 1px solid rgba(80,45,10,.3);
+}
+
+.p1 {
+    width: 27px;
+    height: 24px;
+    border-radius: 45%;
+    left: 65px;
+    top: 116px;
+}
+
+.p2 {
+    width: 19px;
+    height: 27px;
+    border-radius: 50%;
+    left: 111px;
+    top: 142px;
+}
+
+.p3 {
+    width: 24px;
+    height: 18px;
+    border-radius: 50%;
+    left: 42px;
+    top: 153px;
+}
+
+.p4 {
+    width: 16px;
+    height: 18px;
+    border-radius: 45%;
+    left: 87px;
+    top: 112px;
+}
+
+/* Neck */
+
+.neck {
+    position: absolute;
+
+    left: 125px;
+    top: 32px;
+
+    width: 42px;
+    height: 115px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #c89432,
+            #efd16b 48%,
+            #b77d26
+        );
+
+    border: 3px solid #815c20;
+
+    transform:
+        rotate(-7deg);
+
+    transform-origin: bottom center;
+
+    box-shadow:
+        inset -7px 0 8px rgba(80,45,5,.22);
+}
+
+/* Neck patches */
+
+.neck::before,
+.neck::after {
+    content: "";
+
+    position: absolute;
+
+    background: #996528;
+
+    border-radius: 45%;
+}
+
+.neck::before {
+    width: 18px;
+    height: 20px;
+    top: 18px;
+    left: 5px;
+}
+
+.neck::after {
+    width: 14px;
+    height: 17px;
+    top: 55px;
+    right: 4px;
+}
+
+/* Head */
+
+.head {
+    position: absolute;
+
+    left: 135px;
+    top: 5px;
+
+    width: 67px;
+    height: 55px;
+
+    border-radius: 48% 55% 42% 48%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0ce67,
+            #c58b2e
+        );
+
+    border: 3px solid #80591e;
+
+    transform:
+        rotate(-8deg);
+
+    box-shadow:
+        inset -8px -8px 12px rgba(80,45,5,.2),
+        5px 7px 10px rgba(0,0,0,.35);
+}
+
+/* Muzzle */
+
+.muzzle {
+    position: absolute;
+
+    right: -14px;
+    top: 27px;
+
+    width: 28px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: #dcae4d;
+
+    border: 2px solid #875e20;
+}
+
+.muzzle::after {
+    content: "";
+
+    position: absolute;
+
+    right: 5px;
+    top: 6px;
+
+    width: 5px;
+    height: 3px;
+
+    border-radius: 50%;
+
+    background: #392613;
+
+    box-shadow: 10px 0 #392613;
+}
+
+/* Eye */
+
+.eye {
+    position: absolute;
+
+    right: 18px;
+    top: 18px;
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.35);
+}
+
+/* Ears */
+
+.ear {
+    position: absolute;
+
+    width: 27px;
+    height: 18px;
+
+    background: #c08b2e;
+
+    border: 3px solid #80591e;
+
+    border-radius: 80% 20% 70% 25%;
+}
+
+.ear.left {
+    left: -12px;
+    top: 7px;
+    transform: rotate(25deg);
+}
+
+.ear.right {
+    right: 8px;
+    top: -8px;
+    transform: rotate(-25deg);
+}
+
+/* Horns */
+
+.horn {
+    position: absolute;
+
+    width: 8px;
+    height: 19px;
+
+    background: #795524;
+
+    border-radius: 5px;
+
+    top: -14px;
+}
+
+.horn.one {
+    left: 18px;
+}
+
+.horn.two {
+    left: 42px;
+}
+
+/* Mane */
+
+.mane {
+    position: absolute;
+
+    left: 119px;
+    top: 42px;
+
+    width: 11px;
+    height: 85px;
+
+    background:
+        repeating-linear-gradient(
+            180deg,
+            #633d18 0 7px,
+            transparent 7px 12px
+        );
+}
+
+/* Tail */
+
+.tail {
+    position: absolute;
+
+    left: 28px;
+    top: 112px;
+
+    width: 55px;
+    height: 65px;
+
+    border-left: 7px solid #b17c29;
+
+    border-radius: 50%;
+
+    transform: rotate(20deg);
+
+    transform-origin: top;
+}
+
+.tail-tip {
+    position: absolute;
+
+    left: -11px;
+    bottom: -4px;
+
+    width: 20px;
+    height: 24px;
+
+    border-radius: 50% 50% 45% 45%;
+
+    background: #54341a;
+}
+
+/* Legs */
+
+.leg {
+    position: absolute;
+
+    top: 164px;
+
+    width: 22px;
+    height: 82px;
+
+    border-radius: 12px 12px 8px 8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #b77f28,
+            #e4bd57,
+            #a86f20
+        );
+
+    border: 3px solid #7d581e;
+
+    transform-origin: top center;
+}
+
+/* back legs */
+
+.leg.back1 {
+    left: 52px;
+    animation: legBack1 .42s ease-in-out infinite alternate;
+}
+
+.leg.back2 {
+    left: 83px;
+    animation: legBack2 .42s ease-in-out infinite alternate;
+}
+
+/* front legs */
+
+.leg.front1 {
+    left: 119px;
+    animation: legFront1 .42s ease-in-out infinite alternate;
+}
+
+.leg.front2 {
+    left: 145px;
+    animation: legFront2 .42s ease-in-out infinite alternate;
+}
+
+@keyframes legBack1 {
+    from { transform: rotate(14deg); }
+    to   { transform: rotate(-14deg); }
+}
+
+@keyframes legBack2 {
+    from { transform: rotate(-14deg); }
+    to   { transform: rotate(14deg); }
+}
+
+@keyframes legFront1 {
+    from { transform: rotate(-14deg); }
+    to   { transform: rotate(14deg); }
+}
+
+@keyframes legFront2 {
+    from { transform: rotate(14deg); }
+    to   { transform: rotate(-14deg); }
+}
+
+/* Hooves */
+
+.leg::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: -3px;
+    left: -3px;
+
+    width: 22px;
+    height: 12px;
+
+    border-radius: 4px;
+
+    background: #54351a;
+}
+
+/* -------------------------
+   FOOTER
+------------------------- */
+
+.footer {
+    position: absolute;
+
+    z-index: 30;
+
+    bottom: 10px;
+    left: 0;
+
+    width: 100%;
+
+    text-align: center;
+
+    color: rgba(255,255,255,.35);
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-room">
+
+    <div class="glow"></div>
+
+    <div class="title-area">
+        <h1 class="title">GAME ROOM</h1>
+        <div class="subtitle">CHOOSE YOUR GAME</div>
+    </div>
+
+    <!-- GAME MENU -->
+
+    <div class="menu">
+
+        <button
+            class="game-button"
+            onclick="location.href='ttt.html'">
+
+            <div class="icon">⭕</div>
+
+            <div class="button-text">
+                <div class="button-title">
+                    TIC-TAC-TOE
+                </div>
+
+                <div class="button-subtitle">
+                    Classic X vs O
+                </div>
+            </div>
+
+        </button>
+
+
+        <button
+            class="game-button"
+            onclick="location.href='checkers.html'">
+
+            <div class="icon">⛀</div>
+
+            <div class="button-text">
+                <div class="button-title">
+                    CHECKERS
+                </div>
+
+                <div class="button-subtitle">
+                    Jump • Capture • King
+                </div>
+            </div>
+
+        </button>
+
+    </div>
+
+
+    <!-- ANIMATED GIRAFFE -->
+
+    <div class="giraffe-wrapper">
+
+        <div class="giraffe">
+
+            <div class="tail">
+                <div class="tail-tip"></div>
+            </div>
+
+            <div class="body"></div>
+
+            <div class="patch p1"></div>
+            <div class="patch p2"></div>
+            <div class="patch p3"></div>
+            <div class="patch p4"></div>
+
+            <div class="leg back1"></div>
+            <div class="leg back2"></div>
+            <div class="leg front1"></div>
+            <div class="leg front2"></div>
+
+            <div class="neck"></div>
+
+            <div class="mane"></div>
+
+            <div class="head">
+
+                <div class="ear left"></div>
+                <div class="ear right"></div>
+
+                <div class="horn one"></div>
+                <div class="horn two"></div>
+
+                <div class="eye"></div>
+
+                <div class="muzzle"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="ground"></div>
+
+    <div class="footer">
+        TWO PLAYERS • ONE SCREEN • LET'S PLAY
+    </div>
+
+</div>
+
+</body>
+</html>
