@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>3D Tic-Tac-Toe</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at center, #182b40 0%, #07111d 65%, #02060a 100%);
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.game {
+    width: min(94vw, 500px);
+    text-align: center;
+}
+
+h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    letter-spacing: 3px;
+    text-shadow: 0 3px 8px #000;
+}
+
+#status {
+    min-height: 28px;
+    margin-bottom: 14px;
+    font-size: 17px;
+    color: #dcecff;
+}
+
+.board {
+    width: 100%;
+    max-width: 390px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+    perspective: 700px;
+}
+
+.cell {
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    position: relative;
+    border-radius: 12px;
+
+    background:
+        linear-gradient(145deg, #344c65, #101c29);
+
+    border: 2px solid #425b73;
+
+    box-shadow:
+        inset 3px 3px 7px rgba(255,255,255,.12),
+        inset -5px -5px 10px rgba(0,0,0,.65),
+        0 6px 10px rgba(0,0,0,.5);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.cell:active {
+    transform: translateY(2px);
+}
+
+.cell.touch {
+    animation: touchGlow .35s ease-out;
+}
+
+@keyframes touchGlow {
+    0% {
+        box-shadow:
+            inset 3px 3px 7px rgba(255,255,255,.12),
+            inset -5px -5px 10px rgba(0,0,0,.65),
+            0 0 0 rgba(80,180,255,0);
+    }
+
+    35% {
+        box-shadow:
+            inset 3px 3px 7px rgba(255,255,255,.18),
+            inset -5px -5px 10px rgba(0,0,0,.65),
+            0 0 28px rgba(70,180,255,.95);
+    }
+
+    100% {
+        box-shadow:
+            inset 3px 3px 7px rgba(255,255,255,.12),
+            inset -5px -5px 10px rgba(0,0,0,.65),
+            0 6px 10px rgba(0,0,0,.5);
+    }
+}
+
+.cell.win {
+    animation: winningGlow 1s infinite alternate;
+}
+
+@keyframes winningGlow {
+    from {
+        box-shadow:
+            inset 3px 3px 7px rgba(255,255,255,.12),
+            inset -5px -5px 10px rgba(0,0,0,.65),
+            0 0 8px rgba(255,215,80,.5);
+    }
+
+    to {
+        box-shadow:
+            inset 3px 3px 7px rgba(255,255,255,.12),
+            inset -5px -5px 10px rgba(0,0,0,.65),
+            0 0 28px rgba(255,215,80,1);
+    }
+}
+
+.piece {
+    font-size: clamp(52px, 16vw, 88px);
+    line-height: 1;
+    font-weight: bold;
+    user-select: none;
+    animation: pieceDrop .32s cubic-bezier(.2,1.5,.4,1);
+}
+
+@keyframes pieceDrop {
+    0% {
+        transform: translateY(-35px) scale(.45) rotateX(60deg);
+        opacity: 0;
+    }
+
+    70% {
+        transform: translateY(5px) scale(1.08) rotateX(-5deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0) scale(1) rotateX(0);
+        opacity: 1;
+    }
+}
+
+.x {
+    color: #58b9ff;
+    text-shadow:
+        0 3px 0 #125080,
+        0 6px 12px rgba(0,0,0,.8),
+        0 0 18px rgba(60,170,255,.7);
+}
+
+.o {
+    color: #ff6b6b;
+    text-shadow:
+        0 3px 0 #8c2222,
+        0 6px 12px rgba(0,0,0,.8),
+        0 0 18px rgba(255,70,70,.65);
+}
+
+button {
+    margin-top: 22px;
+    padding: 13px 28px;
+    border: 0;
+    border-radius: 10px;
+
+    background: linear-gradient(145deg, #365875, #17293b);
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    box-shadow:
+        inset 2px 2px 5px rgba(255,255,255,.12),
+        inset -3px -3px 6px rgba(0,0,0,.6),
+        0 5px 10px rgba(0,0,0,.45);
+}
+
+button:active {
+    transform: translateY(2px);
+}
+
+#connection {
+    margin-top: 13px;
+    font-size: 13px;
+    color: #8fa8bd;
+}
+
+.help {
+    margin-top: 12px;
+    color: #8195a8;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<h1>3D TIC-TAC-TOE</h1>
+
+<div id="status">Connecting...</div>
+
+<div class="board" id="board"></div>
+
+<button onclick="newGame()">NEW GAME</button>
+
+<div id="connection">Connecting to game server...</div>
+
+<div class="help">
+Player 1 = X &nbsp; • &nbsp; Player 2 = O
+</div>
+
+</div>
+
+<script>
+
+const SERVER_URL = "wss://games-z5k2.onrender.com";
+
+let socket = null;
+let mySymbol = "";
+let board = Array(9).fill(null);
+let currentPlayer = "X";
+let gameOver = false;
+let players = { X: false, O: false };
+
+function createBoard() {
+
+    const boardElement = document.getElementById("board");
+    boardElement.innerHTML = "";
+
+    for (let i = 0; i < 9; i++) {
+
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.index = i;
+
+        cell.addEventListener("click", () => play(i));
+
+        boardElement.appendChild(cell);
+    }
+}
+
+function connectToServer() {
+
+    document.getElementById("connection").textContent =
+        "Connecting to game server...";
+
+    socket = new WebSocket(SERVER_URL);
+
+    socket.onopen = function() {
+
+        document.getElementById("connection").textContent =
+            "Connected to game server";
+    };
+
+    socket.onmessage = function(event) {
+
+        try {
+            const message = JSON.parse(event.data);
+
+            if (message.type === "assign") {
+                mySymbol = message.symbol;
+                updateStatus();
+                return;
+            }
+
+            if (message.type === "state") {
+
+                board = message.board;
+                currentPlayer = message.currentPlayer;
+                gameOver = message.gameOver;
+                players = message.players;
+
+                drawBoard();
+
+                if (message.winner) {
+                    showWinner(message.winner);
+                } else if (message.draw) {
+                    document.getElementById("status").textContent =
+                        "DRAW GAME";
+                } else {
+                    updateStatus();
+                }
+
+                return;
+            }
+
+            if (message.type === "error") {
+
+                document.getElementById("connection").textContent =
+                    message.message;
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    socket.onclose = function() {
+
+        document.getElementById("connection").textContent =
+            "Disconnected from game server";
+
+        document.getElementById("status").textContent =
+            "Disconnected";
+    };
+
+    socket.onerror = function() {
+
+        document.getElementById("connection").textContent =
+            "Server connection error";
+    };
+}
+
+function play(index) {
+
+    if (!socket ||
+        socket.readyState !== WebSocket.OPEN) return;
+
+    if (!mySymbol) return;
+
+    if (!players.X || !players.O) return;
+
+    if (gameOver) return;
+
+    if (currentPlayer !== mySymbol) return;
+
+    if (board[index] !== null) return;
+
+    socket.send(JSON.stringify({
+        type: "move",
+        index: index,
+        symbol: mySymbol
+    }));
+}
+
+function drawBoard() {
+
+    const cells = document.querySelectorAll(".cell");
+
+    cells.forEach((cell, index) => {
+
+        cell.innerHTML = "";
+        cell.classList.remove("win");
+
+        if (board[index]) {
+
+            const piece = document.createElement("div");
+
+            piece.className =
+                "piece " +
+                (board[index] === "X" ? "x" : "o");
+
+            piece.textContent = board[index];
+
+            cell.appendChild(piece);
+        }
+    });
+}
+
+function updateStatus() {
+
+    const status = document.getElementById("status");
+
+    if (!players.X || !players.O) {
+
+        status.textContent =
+            mySymbol === "X"
+            ? "Waiting for Player 2..."
+            : "Waiting for Player 1...";
+
+        return;
+    }
+
+    if (gameOver) return;
+
+    if (currentPlayer === mySymbol) {
+
+        status.textContent =
+            "YOUR TURN — " + mySymbol;
+
+    } else {
+
+        status.textContent =
+            "OPPONENT'S TURN — " +
+            (mySymbol === "X" ? "O" : "X");
+    }
+}
+
+function showWinner(winner) {
+
+    document.getElementById("status").textContent =
+        winner + " WINS!";
+
+    const wins = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]
+    ];
+
+    for (const [a,b,c] of wins) {
+
+        if (
+            board[a] &&
+            board[a] === board[b] &&
+            board[a] === board[c]
+        ) {
+
+            const cells = document.querySelectorAll(".cell");
+
+            cells[a].classList.add("win");
+            cells[b].classList.add("win");
+            cells[c].classList.add("win");
+
+            break;
+        }
+    }
+}
+
+function newGame() {
+
+    if (!socket ||
+        socket.readyState !== WebSocket.OPEN) return;
+
+    socket.send(JSON.stringify({
+        type: "new_game"
+    }));
+}
+
+createBoard();
+connectToServer();
+
+</script>
+
+</body>
+</html>
