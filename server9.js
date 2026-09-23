@@ -1,27 +1,42 @@
-const http = require("http");const fs = require("fs");
-const path = require("path");
-const WebSocket = require("ws");
-
-const PORT = process.env.PORT || 3000;
-
 const server = http.createServer((req, res) => {
-if (req.url === "/" || req.url === "/index.html") {
-const file = path.join(__dirname, "index.html");
 
-fs.readFile(file, (err, data) => {
-if (err) {
-res.writeHead(500, {
-"Content-Type": "text/plain"
-});
-res.end("Could not load index.html");
-return;
-}
+    let file;
 
-res.writeHead(200, {
-"Content-Type": "text/html; charset=utf-8"
-});
+    if (req.url === "/" || req.url === "/index.html") {
+        file = "index.html";
+    } 
+    else if (req.url === "/ttt.html") {
+        file = "ttt.html";
+    } 
+    else if (req.url === "/checkers.html") {
+        file = "checkers.html";
+    } 
+    else {
+        res.writeHead(404, {
+            "Content-Type": "text/plain"
+        });
 
-res.end(data);
+        res.end("Page not found.");
+        return;
+    }
+
+    fs.readFile(path.join(__dirname, file), (err, data) => {
+
+        if (err) {
+            res.writeHead(404, {
+                "Content-Type": "text/plain"
+            });
+
+            res.end(file + " not found.");
+            return;
+        }
+
+        res.writeHead(200, {
+            "Content-Type": "text/html"
+        });
+
+        res.end(data);
+    });
 });
 
 return;
