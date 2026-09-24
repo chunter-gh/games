@@ -1,1231 +1,1273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Checkers</title>
+<title>Shiny Checkers</title>
 
 <style>
-
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     margin: 0;
-    background:
-        radial-gradient(circle at center, #333, #050505);
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
     min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at 50% 15%, #3d4654 0%, #141821 42%, #050609 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 18px;
+}
+
+.game {
+    width: min(96vw, 760px);
+    text-align: center;
 }
 
 h1 {
-    margin: 12px 0 4px 0;
-    font-size: 30px;
+    margin: 0 0 4px;
+    font-size: clamp(32px, 7vw, 58px);
+    letter-spacing: 4px;
+    text-shadow:
+        0 3px 5px #000,
+        0 0 18px rgba(255,255,255,.18);
 }
 
-#status {
-    font-size: 18px;
-    margin: 8px;
-    min-height: 24px;
+.subtitle {
+    color: #c9ced6;
+    margin-bottom: 16px;
+    font-size: 14px;
+    letter-spacing: 2px;
 }
 
-#board {
-    width: min(92vw, 600px);
-    height: min(92vw, 600px);
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
 
-    margin: 15px auto;
+button, select {
+    min-height: 44px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 10px;
+    padding: 9px 14px;
+    color: white;
+    background: linear-gradient(#343b47, #171b22);
+    box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.18),
+        0 3px 8px rgba(0,0,0,.5);
+    font-size: 14px;
+    cursor: pointer;
+}
 
+button:hover, select:hover {
+    background: linear-gradient(#444c59, #1b2028);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+select {
+    min-width: 125px;
+}
+
+.status {
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #202630, #0b0d11);
+    border: 1px solid rgba(255,255,255,.13);
+    box-shadow:
+        inset 0 1px 5px rgba(255,255,255,.05),
+        0 5px 15px rgba(0,0,0,.4);
+    font-weight: bold;
+    letter-spacing: .5px;
+}
+
+.board-wrap {
+    padding: 9px;
+    border-radius: 18px;
+    background:
+        linear-gradient(135deg, #555b65, #090b0e 35%, #424750 50%, #08090b);
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.75),
+        inset 0 2px 3px rgba(255,255,255,.25),
+        inset 0 -3px 5px rgba(0,0,0,.8);
+}
+
+.board {
+    width: min(88vw, 690px);
+    aspect-ratio: 1;
+    margin: auto;
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-
-    border: 8px solid #b8860b;
-    border-radius: 8px;
-
+    overflow: hidden;
+    border-radius: 7px;
+    border: 3px solid #090909;
     box-shadow:
-        0 0 20px black,
-        inset 0 0 10px #000;
-
+        inset 0 0 10px rgba(0,0,0,.9),
+        0 2px 8px #000;
     touch-action: manipulation;
 }
 
 .square {
     position: relative;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
-    user-select: none;
-    -webkit-user-select: none;
-
-    touch-action: manipulation;
+    aspect-ratio: 1;
 }
 
 .light {
     background:
-        linear-gradient(
-            135deg,
-            #f5e1b8,
-            #c9a875
-        );
+        linear-gradient(135deg,
+            #f34b4b 0%,
+            #a90d16 42%,
+            #560308 100%);
 }
 
 .dark {
     background:
+        linear-gradient(135deg,
+            #16191e 0%,
+            #050608 45%,
+            #24272d 100%);
+}
+
+.square::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
         linear-gradient(
             135deg,
-            #8b0000,
-            #3d0000
+            rgba(255,255,255,.20),
+            transparent 30%,
+            transparent 70%,
+            rgba(0,0,0,.20)
         );
 }
 
+.square.selected {
+    box-shadow:
+        inset 0 0 0 4px #ffe84a,
+        inset 0 0 20px rgba(255,235,50,.7);
+}
 
-/* =========================================================
-   PIECES
-   ========================================================= */
+.square.move-target {
+    cursor: pointer;
+}
+
+.square.move-target::before {
+    content: "";
+    position: absolute;
+    width: 25%;
+    height: 25%;
+    border-radius: 50%;
+    background: rgba(255,255,255,.8);
+    box-shadow:
+        0 0 12px rgba(255,255,255,.9),
+        0 0 3px #fff;
+    z-index: 3;
+}
+
+.square.capture-target {
+    box-shadow:
+        inset 0 0 0 4px #fff,
+        inset 0 0 22px rgba(255,255,255,.6);
+}
 
 .piece {
-    width: 78%;
-    height: 78%;
-
-    border-radius: 50%;
-
     position: relative;
-
-    border: 3px solid #111;
+    width: 76%;
+    height: 76%;
+    border-radius: 50%;
+    z-index: 4;
+    cursor: pointer;
 
     box-shadow:
-        inset 0 5px 8px rgba(255,255,255,.35),
-        inset 0 -8px 12px rgba(0,0,0,.65),
-        0 5px 8px rgba(0,0,0,.7);
+        0 7px 7px rgba(0,0,0,.75),
+        0 2px 3px rgba(0,0,0,.9),
+        inset 0 4px 5px rgba(255,255,255,.55),
+        inset 0 -7px 10px rgba(0,0,0,.55);
 
     transition:
-        transform .12s,
-        box-shadow .12s;
-
-    cursor: pointer;
+        transform .12s ease,
+        box-shadow .12s ease;
 }
 
 .piece:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px) scale(1.03);
 }
 
-
-/* RED */
-
-.red {
+.piece.red {
     background:
         radial-gradient(
-            circle at 35% 25%,
-            #ff7777,
-            #d40000 45%,
-            #650000 100%
+            circle at 32% 23%,
+            #fff 0%,
+            #ffb0b0 4%,
+            #ff3c3c 11%,
+            #e00012 35%,
+            #9b000a 65%,
+            #4b0005 100%
         );
+    border: 3px solid #ff6a6a;
 }
 
-
-/* BLACK */
-
-.black {
+.piece.black {
     background:
         radial-gradient(
-            circle at 35% 25%,
-            #777,
-            #222 45%,
+            circle at 32% 23%,
+            #fff 0%,
+            #c9c9c9 3%,
+            #686868 9%,
+            #242424 28%,
+            #080808 60%,
             #000 100%
         );
+    border: 3px solid #777;
 }
 
-
-/* =========================================================
-   SELECTED PIECE
-   ========================================================= */
-
-.selected {
-    box-shadow:
-        0 0 0 5px yellow,
-        0 0 20px yellow,
-        inset 0 5px 8px rgba(255,255,255,.4),
-        inset 0 -8px 12px rgba(0,0,0,.7);
-
-    transform: scale(1.08);
-}
-
-
-/* =========================================================
-   KING
-   ========================================================= */
-
-.king::after {
-    content: "♛";
-
+.piece::before {
+    content: "";
     position: absolute;
+    left: 13%;
+    right: 13%;
+    top: 10%;
+    height: 17%;
+    border-radius: 50%;
+    background: linear-gradient(
+        rgba(255,255,255,.65),
+        rgba(255,255,255,0)
+    );
+    filter: blur(1px);
+}
 
+.piece::after {
+    content: "";
+    position: absolute;
+    left: 9%;
+    right: 9%;
+    bottom: 8%;
+    height: 17%;
+    border-radius: 50%;
+    border-bottom: 3px solid rgba(0,0,0,.4);
+}
+
+.king {
+    box-shadow:
+        0 7px 7px rgba(0,0,0,.8),
+        inset 0 4px 5px rgba(255,255,255,.6),
+        inset 0 -8px 10px rgba(0,0,0,.6),
+        0 0 8px rgba(255,215,0,.35);
+}
+
+.king::marker {
+    display: none;
+}
+
+.king-symbol {
+    position: absolute;
+    z-index: 8;
     left: 50%;
     top: 50%;
-
-    transform: translate(-50%, -53%);
-
-    font-size: 34px;
-
-    color: #ffd700;
-
-    text-shadow:
-        1px 1px 2px black,
-        0 0 5px #fff000;
-}
-
-
-/* =========================================================
-   POSSIBLE MOVE
-   ========================================================= */
-
-.possible {
-    box-shadow:
-        inset 0 0 0 6px #ffff00,
-        inset 0 0 20px #ffff00;
-}
-
-.possible::after {
-    content: "";
-
-    position: absolute;
-
-    width: 30%;
-    height: 30%;
-
+    transform: translate(-50%, -52%);
+    width: 55%;
+    height: 55%;
     border-radius: 50%;
-
-    background: #ffff00;
-
+    border: 3px solid rgba(255,255,255,.85);
+    color: #fff;
+    font-size: clamp(14px, 3vw, 25px);
+    font-weight: 900;
+    line-height: 1.3;
+    text-shadow: 0 2px 3px #000;
     box-shadow:
-        0 0 12px #ffff00,
-        0 0 25px #ffff00;
-
-    pointer-events: none;
+        inset 0 2px 3px rgba(255,255,255,.35),
+        0 1px 3px #000;
 }
 
-
-/* =========================================================
-   BUTTON
-   ========================================================= */
-
-button {
-    font-size: 18px;
-
-    padding: 10px 22px;
-
-    border-radius: 8px;
-
-    border: 2px solid #b8860b;
-
-    background:
-        linear-gradient(
-            #444,
-            #111
-        );
-
-    color: white;
-
-    cursor: pointer;
+.black .king-symbol {
+    color: #ffd92f;
+    border-color: #ffd92f;
 }
 
-button:active {
-    transform: scale(.96);
+.red .king-symbol {
+    color: #fff;
 }
 
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #c7ccd3;
+}
+
+.dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    vertical-align: -2px;
+    margin-right: 5px;
+    box-shadow: 0 2px 4px #000;
+}
+
+.red-dot {
+    background: radial-gradient(circle at 30% 25%, #fff, #e00012 45%, #500);
+}
+
+.black-dot {
+    background: radial-gradient(circle at 30% 25%, #aaa, #111 45%, #000);
+}
+
+.computer-thinking {
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: .65; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 500px) {
+    body {
+        padding: 9px;
+    }
+
+    .board-wrap {
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .board {
+        width: 94vw;
+    }
+
+    h1 {
+        font-size: 34px;
+        letter-spacing: 2px;
+    }
+
+    .controls {
+        gap: 6px;
+    }
+
+    button, select {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
 </style>
 </head>
 
-
 <body>
 
-<h1>CHECKERS</h1>
+<div class="game">
 
-<div id="status">
-    Connecting...
+    <h1>CHECKERS</h1>
+    <div class="subtitle">CLASSIC • GLOSSY • TWO WAYS TO PLAY</div>
+
+    <div class="controls">
+        <button id="twoPlayerBtn" type="button">👥 2 PLAYERS</button>
+        <button id="computerBtn" type="button">🤖 VS COMPUTER</button>
+
+        <select id="difficulty" aria-label="Computer difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+
+        <button id="newGameBtn" type="button">NEW GAME</button>
+    </div>
+
+    <div id="status" class="status" aria-live="polite">
+        Red's turn
+    </div>
+
+    <div class="board-wrap">
+        <div id="board" class="board"></div>
+    </div>
+
+    <div class="legend">
+        <span><span class="dot red-dot"></span>RED</span>
+        <span><span class="dot black-dot"></span>BLACK</span>
+    </div>
+
 </div>
 
-<div id="board"></div>
-
-<button id="newGame">
-    NEW GAME
-</button>
-
-
 <script>
+(() => {
+    "use strict";
 
-const boardElement =
-    document.getElementById("board");
+    const boardElement = document.getElementById("board");
+    const statusElement = document.getElementById("status");
+    const twoPlayerBtn = document.getElementById("twoPlayerBtn");
+    const computerBtn = document.getElementById("computerBtn");
+    const difficultySelect = document.getElementById("difficulty");
+    const newGameBtn = document.getElementById("newGameBtn");
 
-const statusElement =
-    document.getElementById("status");
+    const SIZE = 8;
 
-const newGameButton =
-    document.getElementById("newGame");
+    let board = [];
+    let currentPlayer = "red";
+    let selected = null;
+    let forcedPiece = null;
+    let gameOver = false;
+    let mode = "computer";
+    let computerThinking = false;
 
+    /*
+       Piece:
+       {
+           color: "red" | "black",
+           king: true | false
+       }
+    */
 
-/* =========================================================
-   CONNECTION
-   ========================================================= */
+    function createStartingBoard() {
+        const newBoard = Array.from(
+            { length: SIZE },
+            () => Array(SIZE).fill(null)
+        );
 
-const socket =
-    new WebSocket(
-        "wss://games-z5k2.onrender.com/checkers"
-    );
+        // Black starts at the top.
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                if ((row + col) % 2 === 1) {
+                    newBoard[row][col] = {
+                        color: "black",
+                        king: false
+                    };
+                }
+            }
+        }
 
+        // Red starts at the bottom.
+        for (let row = 5; row < 8; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                if ((row + col) % 2 === 1) {
+                    newBoard[row][col] = {
+                        color: "red",
+                        king: false
+                    };
+                }
+            }
+        }
 
-/* =========================================================
-   LOCAL GAME STATE
-   ========================================================= */
-
-let myColor = null;
-
-let board = [];
-
-let currentPlayer = null;
-
-let gameOver = false;
-
-let winner = null;
-
-let forcedPiece = null;
-
-let selectedRow = null;
-
-let selectedCol = null;
-
-
-/* =========================================================
-   CONNECTION OPEN
-   ========================================================= */
-
-socket.addEventListener(
-    "open",
-    () => {
-
-        statusElement.textContent =
-            "Connected — waiting for players...";
+        return newBoard;
     }
-);
 
+    function resetGame() {
+        board = createStartingBoard();
+        currentPlayer = "red";
+        selected = null;
+        forcedPiece = null;
+        gameOver = false;
+        computerThinking = false;
 
-/* =========================================================
-   ASSIGN PLAYER
-   ========================================================= */
-
-socket.addEventListener(
-    "message",
-    event => {
-
-        let data;
-
-        try {
-            data = JSON.parse(event.data);
-        }
-        catch (error) {
-            return;
-        }
-
-
-        /* -------------------------------------------------
-           PLAYER ASSIGNMENT
-           ------------------------------------------------- */
-
-        if (data.type === "assign") {
-
-            myColor = data.color;
-
-            statusElement.textContent =
-                "You are " +
-                myColor.toUpperCase();
-
-            return;
-        }
-
-
-        /* -------------------------------------------------
-           ERROR
-           ------------------------------------------------- */
-
-        if (data.type === "error") {
-
-            statusElement.textContent =
-                data.message;
-
-            return;
-        }
-
-
-        /* -------------------------------------------------
-           GAME STATE
-           ------------------------------------------------- */
-
-        if (data.type === "state") {
-
-            board =
-                data.board;
-
-            currentPlayer =
-                data.currentPlayer;
-
-            gameOver =
-                data.gameOver;
-
-            winner =
-                data.winner;
-
-            forcedPiece =
-                data.forcedPiece;
-
-            selectedRow = null;
-            selectedCol = null;
-
-            drawBoard();
-
-            updateStatus();
-
-            return;
-        }
+        statusElement.classList.remove("computer-thinking");
+        updateStatus();
+        render();
     }
-);
 
+    function inside(row, col) {
+        return row >= 0 &&
+               row < SIZE &&
+               col >= 0 &&
+               col < SIZE;
+    }
 
-/* =========================================================
-   DRAW BOARD
-   ========================================================= */
+    function directionsFor(piece) {
+        if (!piece) return [];
 
-function drawBoard() {
+        if (piece.king) {
+            return [
+                [-1, -1],
+                [-1, 1],
+                [1, -1],
+                [1, 1]
+            ];
+        }
 
-    boardElement.innerHTML = "";
+        if (piece.color === "red") {
+            return [
+                [-1, -1],
+                [-1, 1]
+            ];
+        }
 
+        return [
+            [1, -1],
+            [1, 1]
+        ];
+    }
 
-    for (
-        let row = 0;
-        row < 8;
-        row++
-    ) {
+    function getSimpleMoves(row, col) {
+        const piece = board[row][col];
+        if (!piece) return [];
 
-        for (
-            let col = 0;
-            col < 8;
-            col++
-        ) {
+        const moves = [];
 
-            const square =
-                document.createElement("div");
+        for (const [dr, dc] of directionsFor(piece)) {
+            const nr = row + dr;
+            const nc = col + dc;
 
-            square.className =
-                "square " +
-                (
-                    (row + col) % 2 === 0
-                        ? "light"
-                        : "dark"
-                );
+            if (inside(nr, nc) && !board[nr][nc]) {
+                moves.push({
+                    from: { row, col },
+                    to: { row: nr, col: nc },
+                    capture: null
+                });
+            }
+        }
 
+        return moves;
+    }
 
-            square.dataset.row = row;
-            square.dataset.col = col;
+    function getCaptures(row, col) {
+        const piece = board[row][col];
+        if (!piece) return [];
 
+        const moves = [];
 
-            /*
-             * TOUCH / CLICK
-             */
+        for (const [dr, dc] of directionsFor(piece)) {
+            const middleRow = row + dr;
+            const middleCol = col + dc;
+            const landingRow = row + dr * 2;
+            const landingCol = col + dc * 2;
 
-            square.addEventListener(
-                "pointerdown",
-                function(event) {
-
-                    event.preventDefault();
-
-                    handleSquareTap(
-                        row,
-                        col
-                    );
-                }
-            );
-
-
-            const piece =
-                board[row] &&
-                board[row][col];
-
-
-            if (piece) {
-
-                const pieceElement =
-                    document.createElement("div");
-
-                pieceElement.className =
-                    "piece " +
-                    piece.color;
-
-
-                if (piece.king) {
-
-                    pieceElement.classList.add(
-                        "king"
-                    );
-                }
-
-
-                /*
-                 * SELECTED PIECE
-                 */
-
-                if (
-                    selectedRow === row &&
-                    selectedCol === col
-                ) {
-
-                    pieceElement.classList.add(
-                        "selected"
-                    );
-                }
-
-
-                square.appendChild(
-                    pieceElement
-                );
+            if (!inside(landingRow, landingCol) ||
+                !inside(middleRow, middleCol)) {
+                continue;
             }
 
-
-            boardElement.appendChild(
-                square
-            );
-        }
-    }
-
-
-    /*
-     * IMPORTANT:
-     * Draw possible destinations AFTER
-     * the board has been created.
-     */
-
-    if (
-        selectedRow !== null &&
-        selectedCol !== null
-    ) {
-
-        highlightMoves(
-            selectedRow,
-            selectedCol
-        );
-    }
-}
-
-
-/* =========================================================
-   HANDLE TAP
-   ========================================================= */
-
-function handleSquareTap(
-    row,
-    col
-) {
-
-    if (gameOver) {
-        return;
-    }
-
-
-    if (!myColor) {
-        return;
-    }
-
-
-    /*
-     * Only the player whose turn it is
-     * can select a piece.
-     */
-
-    if (
-        currentPlayer !== myColor
-    ) {
-        return;
-    }
-
-
-    const piece =
-        board[row][col];
-
-
-    /* -----------------------------------------------------
-       NOTHING SELECTED YET
-       ----------------------------------------------------- */
-
-    if (
-        selectedRow === null
-    ) {
-
-        if (
-            piece &&
-            piece.color === myColor
-        ) {
-
-            selectPiece(
-                row,
-                col
-            );
-        }
-
-        return;
-    }
-
-
-    /* -----------------------------------------------------
-       TAP ANOTHER OWN PIECE
-       ----------------------------------------------------- */
-
-    if (
-        piece &&
-        piece.color === myColor
-    ) {
-
-        selectPiece(
-            row,
-            col
-        );
-
-        return;
-    }
-
-
-    /* -----------------------------------------------------
-       TAP DESTINATION
-       ----------------------------------------------------- */
-
-    if (
-        isLegalDestination(
-            selectedRow,
-            selectedCol,
-            row,
-            col
-        )
-    ) {
-
-        sendMove(
-            selectedRow,
-            selectedCol,
-            row,
-            col
-        );
-
-        return;
-    }
-
-
-    /*
-     * Anything else clears selection.
-     */
-
-    selectedRow = null;
-    selectedCol = null;
-
-    drawBoard();
-}
-
-
-/* =========================================================
-   SELECT PIECE
-   ========================================================= */
-
-function selectPiece(
-    row,
-    col
-) {
-
-    selectedRow = row;
-    selectedCol = col;
-
-    drawBoard();
-}
-
-
-/* =========================================================
-   HIGHLIGHT POSSIBLE MOVES
-   ========================================================= */
-
-function highlightMoves(
-    fromRow,
-    fromCol
-) {
-
-    const destinations =
-        getLegalDestinations(
-            fromRow,
-            fromCol
-        );
-
-
-    for (
-        const destination
-        of destinations
-    ) {
-
-        const square =
-            getSquare(
-                destination.row,
-                destination.col
-            );
-
-
-        if (square) {
-
-            square.classList.add(
-                "possible"
-            );
-        }
-    }
-}
-
-
-/* =========================================================
-   GET LEGAL DESTINATIONS
-   ========================================================= */
-
-function getLegalDestinations(
-    row,
-    col
-) {
-
-    const piece =
-        board[row][col];
-
-
-    if (!piece) {
-        return [];
-    }
-
-
-    if (
-        piece.color !== myColor
-    ) {
-
-        return [];
-    }
-
-
-    /*
-     * Forced multi-jump:
-     * only the forced piece may move.
-     */
-
-    if (forcedPiece) {
-
-        if (
-            forcedPiece.row !== row ||
-            forcedPiece.col !== col
-        ) {
-
-            return [];
-        }
-    }
-
-
-    const destinations = [];
-
-
-    /*
-     * Check whether ANY capture exists.
-     */
-
-    const playerMustCapture =
-        playerHasCapture(
-            myColor
-        );
-
-
-    /*
-     * CAPTURES
-     */
-
-    if (
-        playerMustCapture ||
-        forcedPiece
-    ) {
-
-        const captures =
-            getCaptures(
-                row,
-                col
-            );
-
-
-        for (
-            const capture
-            of captures
-        ) {
-
-            destinations.push({
-                row: capture.row,
-                col: capture.col
-            });
-        }
-
-
-        return destinations;
-    }
-
-
-    /*
-     * NORMAL MOVEMENT
-     */
-
-    const directions =
-        getDirections(piece);
-
-
-    for (
-        const direction
-        of directions
-    ) {
-
-        const newRow =
-            row + direction.dr;
-
-        const newCol =
-            col + direction.dc;
-
-
-        if (
-            insideBoard(
-                newRow,
-                newCol
-            ) &&
-            board[newRow][newCol] === null
-        ) {
-
-            destinations.push({
-
-                row: newRow,
-
-                col: newCol
-            });
-        }
-    }
-
-
-    return destinations;
-}
-
-
-/* =========================================================
-   GET DIRECTIONS
-   ========================================================= */
-
-function getDirections(
-    piece
-) {
-
-    const directions = [];
-
-
-    /*
-     * RED starts at bottom and moves UP.
-     */
-
-    if (
-        piece.king ||
-        piece.color === "red"
-    ) {
-
-        directions.push(
-            { dr: -1, dc: -1 },
-            { dr: -1, dc: 1 }
-        );
-    }
-
-
-    /*
-     * BLACK starts at top and moves DOWN.
-     */
-
-    if (
-        piece.king ||
-        piece.color === "black"
-    ) {
-
-        directions.push(
-            { dr: 1, dc: -1 },
-            { dr: 1, dc: 1 }
-        );
-    }
-
-
-    return directions;
-}
-
-
-/* =========================================================
-   GET CAPTURES
-   ========================================================= */
-
-function getCaptures(
-    row,
-    col
-) {
-
-    const piece =
-        board[row][col];
-
-
-    if (!piece) {
-        return [];
-    }
-
-
-    const directions =
-        getDirections(piece);
-
-
-    const captures = [];
-
-
-    for (
-        const direction
-        of directions
-    ) {
-
-        const middleRow =
-            row + direction.dr;
-
-        const middleCol =
-            col + direction.dc;
-
-        const landingRow =
-            row + direction.dr * 2;
-
-        const landingCol =
-            col + direction.dc * 2;
-
-
-        if (
-            !insideBoard(
-                middleRow,
-                middleCol
-            )
-        ) {
-            continue;
-        }
-
-
-        if (
-            !insideBoard(
-                landingRow,
-                landingCol
-            )
-        ) {
-            continue;
-        }
-
-
-        const middlePiece =
-            board[middleRow][middleCol];
-
-
-        const landingPiece =
-            board[landingRow][landingCol];
-
-
-        if (
-            middlePiece &&
-            middlePiece.color !== piece.color &&
-            landingPiece === null
-        ) {
-
-            captures.push({
-
-                row: landingRow,
-
-                col: landingCol,
-
-                captureRow: middleRow,
-
-                captureCol: middleCol
-            });
-        }
-    }
-
-
-    return captures;
-}
-
-
-/* =========================================================
-   DOES PLAYER HAVE CAPTURE?
-   ========================================================= */
-
-function playerHasCapture(
-    color
-) {
-
-    for (
-        let row = 0;
-        row < 8;
-        row++
-    ) {
-
-        for (
-            let col = 0;
-            col < 8;
-            col++
-        ) {
-
-            const piece =
-                board[row][col];
-
+            const middlePiece = board[middleRow][middleCol];
 
             if (
-                piece &&
-                piece.color === color
+                middlePiece &&
+                middlePiece.color !== piece.color &&
+                !board[landingRow][landingCol]
             ) {
+                moves.push({
+                    from: { row, col },
+                    to: { row: landingRow, col: landingCol },
+                    capture: {
+                        row: middleRow,
+                        col: middleCol
+                    }
+                });
+            }
+        }
+
+        return moves;
+    }
+
+    function allMovesFor(color) {
+        const captures = [];
+        const moves = [];
+
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                const piece = board[row][col];
+
+                if (!piece || piece.color !== color) continue;
+
+                captures.push(...getCaptures(row, col));
+                moves.push(...getSimpleMoves(row, col));
+            }
+        }
+
+        return captures.length > 0 ? captures : moves;
+    }
+
+    function legalMovesForPiece(row, col) {
+        const piece = board[row][col];
+
+        if (!piece || piece.color !== currentPlayer) {
+            return [];
+        }
+
+        if (forcedPiece &&
+            (forcedPiece.row !== row || forcedPiece.col !== col)) {
+            return [];
+        }
+
+        const captures = getCaptures(row, col);
+
+        if (captures.length) {
+            return captures;
+        }
+
+        if (forcedPiece) {
+            return [];
+        }
+
+        const allCaptures = [];
+
+        for (let r = 0; r < SIZE; r++) {
+            for (let c = 0; c < SIZE; c++) {
+                const p = board[r][c];
+
+                if (p && p.color === currentPlayer) {
+                    allCaptures.push(...getCaptures(r, c));
+                }
+            }
+        }
+
+        if (allCaptures.length) {
+            return [];
+        }
+
+        return getSimpleMoves(row, col);
+    }
+
+    function performMove(move) {
+        const piece = board[move.from.row][move.from.col];
+
+        if (!piece) return;
+
+        board[move.from.row][move.from.col] = null;
+        board[move.to.row][move.to.col] = piece;
+
+        if (move.capture) {
+            board[move.capture.row][move.capture.col] = null;
+        }
+
+        let becameKing = false;
+
+        if (
+            !piece.king &&
+            (
+                (piece.color === "red" && move.to.row === 0) ||
+                (piece.color === "black" && move.to.row === 7)
+            )
+        ) {
+            piece.king = true;
+            becameKing = true;
+        }
+
+        // A capture can lead to another jump.
+        if (move.capture && !becameKing) {
+            const nextCaptures = getCaptures(
+                move.to.row,
+                move.to.col
+            );
+
+            if (nextCaptures.length) {
+                forcedPiece = {
+                    row: move.to.row,
+                    col: move.to.col
+                };
+
+                selected = {
+                    row: move.to.row,
+                    col: move.to.col
+                };
+
+                render();
+                updateStatus();
+                return;
+            }
+        }
+
+        forcedPiece = null;
+        selected = null;
+
+        currentPlayer = currentPlayer === "red" ? "black" : "red";
+
+        checkGameEnd();
+        render();
+        updateStatus();
+
+        if (
+            !gameOver &&
+            mode === "computer" &&
+            currentPlayer === "black"
+        ) {
+            computerMove();
+        }
+    }
+
+    function checkGameEnd() {
+        const pieces = countPieces(currentPlayer);
+        const moves = allMovesFor(currentPlayer);
+
+        if (pieces === 0 || moves.length === 0) {
+            gameOver = true;
+
+            const winner =
+                currentPlayer === "red" ? "BLACK" : "RED";
+
+            statusElement.textContent =
+                `🏆 ${winner} WINS!`;
+        }
+    }
+
+    function countPieces(color) {
+        let count = 0;
+
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                if (board[row][col]?.color === color) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    function render() {
+        boardElement.innerHTML = "";
+
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                const square = document.createElement("div");
+
+                square.className =
+                    "square " +
+                    ((row + col) % 2 === 0 ? "light" : "dark");
+
+                square.dataset.row = row;
+                square.dataset.col = col;
 
                 if (
-                    getCaptures(
-                        row,
-                        col
-                    ).length > 0
+                    selected &&
+                    selected.row === row &&
+                    selected.col === col
                 ) {
-
-                    return true;
+                    square.classList.add("selected");
                 }
+
+                const piece = board[row][col];
+
+                if (piece) {
+                    const pieceElement =
+                        document.createElement("div");
+
+                    pieceElement.className =
+                        `piece ${piece.color}`;
+
+                    if (piece.king) {
+                        pieceElement.classList.add("king");
+
+                        const kingSymbol =
+                            document.createElement("div");
+
+                        kingSymbol.className = "king-symbol";
+                        kingSymbol.textContent = "K";
+
+                        pieceElement.appendChild(kingSymbol);
+                    }
+
+                    square.appendChild(pieceElement);
+                }
+
+                if (
+                    selected &&
+                    legalMovesForPiece(
+                        selected.row,
+                        selected.col
+                    ).some(
+                        move =>
+                            move.to.row === row &&
+                            move.to.col === col
+                    )
+                ) {
+                    square.classList.add("move-target");
+
+                    if (
+                        board[row][col] === null
+                    ) {
+                        // normal target
+                    }
+                }
+
+                boardElement.appendChild(square);
             }
         }
     }
 
+    function updateStatus() {
+        if (gameOver) return;
 
-    return false;
-}
+        if (computerThinking) {
+            statusElement.textContent =
+                "🤖 Computer is thinking...";
+            statusElement.classList.add("computer-thinking");
+            return;
+        }
 
+        statusElement.classList.remove("computer-thinking");
 
-/* =========================================================
-   IS LEGAL DESTINATION
-   ========================================================= */
+        if (forcedPiece) {
+            statusElement.textContent =
+                `${capitalize(currentPlayer)} must continue the jump!`;
+            return;
+        }
 
-function isLegalDestination(
-    fromRow,
-    fromCol,
-    toRow,
-    toCol
-) {
+        if (mode === "computer") {
+            statusElement.textContent =
+                currentPlayer === "red"
+                    ? "🔴 Your turn"
+                    : "⚫ Computer's turn";
+        } else {
+            statusElement.textContent =
+                `${currentPlayer === "red" ? "🔴 Red" : "⚫ Black"}'s turn`;
+        }
+    }
 
-    const destinations =
-        getLegalDestinations(
-            fromRow,
-            fromCol
+    function capitalize(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function handleSquareClick(row, col) {
+        if (gameOver || computerThinking) return;
+
+        if (mode === "computer" && currentPlayer === "black") {
+            return;
+        }
+
+        const piece = board[row][col];
+
+        // Selecting a piece.
+        if (!selected) {
+            if (piece && piece.color === currentPlayer) {
+                const legal = legalMovesForPiece(row, col);
+
+                if (legal.length) {
+                    selected = { row, col };
+                    render();
+                }
+            }
+
+            return;
+        }
+
+        // Clicking another own piece changes selection.
+        if (
+            piece &&
+            piece.color === currentPlayer &&
+            !forcedPiece
+        ) {
+            const legal = legalMovesForPiece(row, col);
+
+            if (legal.length) {
+                selected = { row, col };
+                render();
+            }
+
+            return;
+        }
+
+        const moves = legalMovesForPiece(
+            selected.row,
+            selected.col
         );
 
+        const chosen = moves.find(
+            move =>
+                move.to.row === row &&
+                move.to.col === col
+        );
 
-    return destinations.some(
-        destination =>
-            destination.row === toRow &&
-            destination.col === toCol
-    );
-}
-
-
-/* =========================================================
-   SEND MOVE
-   ========================================================= */
-
-function sendMove(
-    fromRow,
-    fromCol,
-    toRow,
-    toCol
-) {
-
-    if (
-        socket.readyState !==
-        WebSocket.OPEN
-    ) {
-
-        return;
+        if (chosen) {
+            performMove(chosen);
+        }
     }
 
+    boardElement.addEventListener("click", event => {
+        const square =
+            event.target.closest(".square");
 
-    socket.send(
-        JSON.stringify({
+        if (!square) return;
 
-            type: "move",
-
-            fromRow: fromRow,
-
-            fromCol: fromCol,
-
-            toRow: toRow,
-
-            toCol: toCol
-        })
-    );
-
+        handleSquareClick(
+            Number(square.dataset.row),
+            Number(square.dataset.col)
+        );
+    });
 
     /*
-     * Clear local selection.
-     * Server state will redraw the board.
-     */
+       COMPUTER AI
+       Easy:
+         Random legal move.
 
-    selectedRow = null;
-    selectedCol = null;
-}
+       Medium:
+         Captures + simple positional evaluation.
 
+       Hard:
+         Minimax with alpha-beta pruning.
+    */
 
-/* =========================================================
-   GET SQUARE
-   ========================================================= */
-
-function getSquare(
-    row,
-    col
-) {
-
-    return document.querySelector(
-        '.square[data-row="' +
-        row +
-        '"][data-col="' +
-        col +
-        '"]'
-    );
-}
-
-
-/* =========================================================
-   INSIDE BOARD
-   ========================================================= */
-
-function insideBoard(
-    row,
-    col
-) {
-
-    return (
-        row >= 0 &&
-        row < 8 &&
-        col >= 0 &&
-        col < 8
-    );
-}
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-function updateStatus() {
-
-    if (!myColor) {
-
-        statusElement.textContent =
-            "Connecting...";
-
-        return;
-    }
-
-
-    if (gameOver) {
-
-        if (winner) {
-
-            statusElement.textContent =
-                winner.toUpperCase() +
-                " WINS!";
-        }
-        else {
-
-            statusElement.textContent =
-                "GAME OVER";
+    function computerMove() {
+        if (
+            gameOver ||
+            mode !== "computer" ||
+            currentPlayer !== "black"
+        ) {
+            return;
         }
 
-        return;
+        computerThinking = true;
+        updateStatus();
+
+        const delay =
+            difficultySelect.value === "easy"
+                ? 350
+                : 500;
+
+        setTimeout(() => {
+            if (gameOver || currentPlayer !== "black") {
+                computerThinking = false;
+                return;
+            }
+
+            let move;
+
+            if (difficultySelect.value === "easy") {
+                move = chooseEasyMove();
+            } else if (difficultySelect.value === "medium") {
+                move = chooseMediumMove();
+            } else {
+                move = chooseHardMove();
+            }
+
+            if (!move) {
+                computerThinking = false;
+                checkGameEnd();
+                updateStatus();
+                return;
+            }
+
+            computerThinking = false;
+            performMove(move);
+        }, delay);
     }
 
+    function chooseEasyMove() {
+        const moves = allMovesFor("black");
 
-    if (
-        !board ||
-        board.length !== 8
-    ) {
+        if (!moves.length) return null;
 
-        statusElement.textContent =
-            "Waiting for game...";
-
-        return;
+        return moves[
+            Math.floor(Math.random() * moves.length)
+        ];
     }
 
+    function chooseMediumMove() {
+        const moves = allMovesFor("black");
 
-    if (
-        currentPlayer === myColor
-    ) {
+        if (!moves.length) return null;
 
-        statusElement.textContent =
-            "YOUR TURN — " +
-            myColor.toUpperCase();
+        let bestScore = -Infinity;
+        let bestMoves = [];
+
+        for (const move of moves) {
+            const score = evaluateMove(move);
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMoves = [move];
+            } else if (score === bestScore) {
+                bestMoves.push(move);
+            }
+        }
+
+        return bestMoves[
+            Math.floor(Math.random() * bestMoves.length)
+        ];
     }
-    else {
 
-        statusElement.textContent =
-            currentPlayer.toUpperCase() +
-            " TURN";
+    function evaluateMove(move) {
+        let score = 0;
+
+        if (move.capture) {
+            score += 100;
+        }
+
+        if (move.to.row === 7) {
+            score += 50;
+        }
+
+        if (move.to.col >= 2 && move.to.col <= 5) {
+            score += 10;
+        }
+
+        const piece = board[
+            move.from.row
+        ][move.from.col];
+
+        if (piece?.king) {
+            score += 20;
+        }
+
+        return score + Math.random() * 3;
     }
-}
 
+    function cloneBoard(source) {
+        return source.map(row =>
+            row.map(piece =>
+                piece
+                    ? {
+                        color: piece.color,
+                        king: piece.king
+                    }
+                    : null
+            )
+        );
+    }
 
-/* =========================================================
-   NEW GAME
-   ========================================================= */
+    function applyMoveToBoard(source, move) {
+        const copy = cloneBoard(source);
 
-newGameButton.addEventListener(
-    "click",
-    () => {
+        const piece =
+            copy[move.from.row][move.from.col];
+
+        copy[move.from.row][move.from.col] = null;
+        copy[move.to.row][move.to.col] = piece;
+
+        if (move.capture) {
+            copy[move.capture.row][move.capture.col] = null;
+        }
 
         if (
-            socket.readyState ===
-            WebSocket.OPEN
+            !piece.king &&
+            (
+                (piece.color === "red" && move.to.row === 0) ||
+                (piece.color === "black" && move.to.row === 7)
+            )
         ) {
-
-            socket.send(
-                JSON.stringify({
-                    type: "new_game"
-                })
-            );
+            piece.king = true;
         }
+
+        return copy;
     }
-);
 
+    function getMovesForBoard(source, color) {
+        const captures = [];
+        const moves = [];
 
-/* =========================================================
-   CONNECTION CLOSED
-   ========================================================= */
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                const piece = source[row][col];
 
-socket.addEventListener(
-    "close",
-    () => {
+                if (!piece || piece.color !== color) continue;
 
-        statusElement.textContent =
-            "Connection closed.";
+                const directions =
+                    directionsFor(piece);
+
+                for (const [dr, dc] of directions) {
+                    const nr = row + dr;
+                    const nc = col + dc;
+
+                    if (
+                        inside(nr, nc) &&
+                        !source[nr][nc]
+                    ) {
+                        moves.push({
+                            from: { row, col },
+                            to: { row: nr, col: nc },
+                            capture: null
+                        });
+                    }
+
+                    const mr = row + dr;
+                    const mc = col + dc;
+                    const lr = row + dr * 2;
+                    const lc = col + dc * 2;
+
+                    if (
+                        inside(lr, lc) &&
+                        source[mr][mc] &&
+                        source[mr][mc].color !== color &&
+                        !source[lr][lc]
+                    ) {
+                        captures.push({
+                            from: { row, col },
+                            to: { row: lr, col: lc },
+                            capture: {
+                                row: mr,
+                                col: mc
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return captures.length ? captures : moves;
     }
-);
 
+    function evaluateBoard(source) {
+        let score = 0;
 
-/* =========================================================
-   CONNECTION ERROR
-   ========================================================= */
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                const piece = source[row][col];
 
-socket.addEventListener(
-    "error",
-    () => {
+                if (!piece) continue;
 
-        statusElement.textContent =
-            "Connection error.";
+                let value = piece.king ? 175 : 100;
+
+                if (!piece.king) {
+                    if (piece.color === "black") {
+                        value += row * 4;
+                    } else {
+                        value += (7 - row) * 4;
+                    }
+                }
+
+                if (col >= 2 && col <= 5) {
+                    value += 4;
+                }
+
+                if (piece.color === "black") {
+                    score += value;
+                } else {
+                    score -= value;
+                }
+            }
+        }
+
+        return score;
     }
-);
 
+    function chooseHardMove() {
+        const moves = getMovesForBoard(
+            board,
+            "black"
+        );
+
+        if (!moves.length) return null;
+
+        let bestScore = -Infinity;
+        let bestMove = moves[0];
+
+        for (const move of moves) {
+            const next = applyMoveToBoard(
+                board,
+                move
+            );
+
+            const score = minimax(
+                next,
+                "red",
+                4,
+                -Infinity,
+                Infinity
+            );
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+        }
+
+        return bestMove;
+    }
+
+    function minimax(
+        position,
+        player,
+        depth,
+        alpha,
+        beta
+    ) {
+        const moves =
+            getMovesForBoard(position, player);
+
+        if (depth === 0 || moves.length === 0) {
+            return evaluateBoard(position);
+        }
+
+        if (player === "black") {
+            let best = -Infinity;
+
+            for (const move of moves) {
+                const next =
+                    applyMoveToBoard(position, move);
+
+                best = Math.max(
+                    best,
+                    minimax(
+                        next,
+                        "red",
+                        depth - 1,
+                        alpha,
+                        beta
+                    )
+                );
+
+                alpha = Math.max(alpha, best);
+
+                if (beta <= alpha) break;
+            }
+
+            return best;
+        }
+
+        let best = Infinity;
+
+        for (const move of moves) {
+            const next =
+                applyMoveToBoard(position, move);
+
+            best = Math.min(
+                best,
+                minimax(
+                    next,
+                    "black",
+                    depth - 1,
+                    alpha,
+                    beta
+                )
+            );
+
+            beta = Math.min(beta, best);
+
+            if (beta <= alpha) break;
+        }
+
+        return best;
+    }
+
+    twoPlayerBtn.addEventListener("click", () => {
+        mode = "two-player";
+        resetGame();
+    });
+
+    computerBtn.addEventListener("click", () => {
+        mode = "computer";
+        resetGame();
+    });
+
+    difficultySelect.addEventListener("change", () => {
+        if (mode === "computer") {
+            resetGame();
+        }
+    });
+
+    newGameBtn.addEventListener("click", resetGame);
+
+    resetGame();
+
+})();
 </script>
 
 </body>
