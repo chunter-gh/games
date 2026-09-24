@@ -3,115 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Game Room</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
 
-/* =========================================================
-   PAGE
-========================================================= */
-
-html,
-body {
+html, body {
     margin: 0;
-    padding: 0;
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
+}
 
+body {
     font-family: Arial, Helvetica, sans-serif;
+    color: white;
 
     background:
         radial-gradient(
-            circle at center,
-            #173d68 0%,
-            #092542 45%,
-            #041425 100%
+            circle at 50% 0%,
+            #263b72 0%,
+            #101a39 42%,
+            #060b19 100%
         );
-
-    color: white;
 }
 
 .game-room {
-    position: relative;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    position: relative;
     overflow: hidden;
+
+    padding:
+        clamp(10px, 3vh, 35px)
+        clamp(10px, 4vw, 50px);
 }
 
-
 /* =========================================================
-   TITLE
-========================================================= */
+   HEADER
+   ========================================================= */
+
+.header {
+    text-align: center;
+    flex-shrink: 0;
+}
 
 .title {
-    position: absolute;
-    top: 8%;
-    width: 100%;
+    margin: 0;
 
-    text-align: center;
+    font-size:
+        clamp(32px, 7vw, 72px);
 
-    font-size: clamp(38px, 7vw, 72px);
+    letter-spacing:
+        clamp(4px, 1vw, 12px);
+
     font-weight: 900;
 
-    letter-spacing: 5px;
-
     text-shadow:
-        0 4px 12px rgba(0,0,0,.7);
+        0 4px 8px rgba(0,0,0,.7),
+        0 0 25px rgba(255,255,255,.12);
 }
 
 .subtitle {
-    position: absolute;
-    top: 17%;
-    width: 100%;
+    margin-top: 4px;
 
-    text-align: center;
+    font-size:
+        clamp(10px, 1.8vw, 17px);
 
-    font-size: 16px;
-    letter-spacing: 4px;
+    letter-spacing:
+        clamp(2px, .5vw, 5px);
 
-    color: #a9c9e8;
+    opacity: .72;
 }
 
-
 /* =========================================================
-   GAME MENU
-========================================================= */
+   GAME BUTTON AREA
+   ========================================================= */
 
-.game-menu {
-    position: absolute;
+.games {
+    flex: 1;
 
-    top: 28%;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: min(560px, 88%);
+    width: min(100%, 760px);
 
     display: flex;
     flex-direction: column;
 
-    gap: 16px;
+    justify-content: center;
+    align-items: center;
 
-    z-index: 20;
+    gap:
+        clamp(8px, 2vh, 18px);
+
+    min-height: 0;
+
+    position: relative;
+    z-index: 10;
 }
 
 .game-button {
-    width: 100%;
-    min-height: 82px;
+    width: min(100%, 650px);
 
-    border: 2px solid rgba(255,255,255,.22);
+    height:
+        clamp(62px, 11vh, 105px);
 
-    border-radius: 18px;
+    min-height: 58px;
+
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius:
+        clamp(12px, 2vw, 20px);
 
     background:
         linear-gradient(
-            135deg,
-            rgba(33,75,116,.95),
-            rgba(8,32,57,.97)
+            145deg,
+            #394e82,
+            #18264d
         );
 
     color: white;
@@ -119,21 +131,19 @@ body {
     display: flex;
     align-items: center;
 
-    padding: 14px 20px;
-
-    box-sizing: border-box;
+    padding:
+        0 clamp(14px, 3vw, 30px);
 
     cursor: pointer;
 
-    text-align: left;
-
     box-shadow:
-        0 10px 24px rgba(0,0,0,.4),
-        inset 0 1px 0 rgba(255,255,255,.08);
+        0 8px 18px rgba(0,0,0,.45),
+        inset 0 1px 2px rgba(255,255,255,.16),
+        inset 0 -2px 4px rgba(0,0,0,.3);
 
     transition:
         transform .18s ease,
-        border-color .18s ease,
+        box-shadow .18s ease,
         background .18s ease;
 }
 
@@ -142,1155 +152,539 @@ body {
         translateY(-3px)
         scale(1.015);
 
-    border-color:
-        rgba(255,255,255,.5);
-
     background:
         linear-gradient(
-            135deg,
-            rgba(42,91,139,.98),
-            rgba(10,39,67,.98)
+            145deg,
+            #4c649f,
+            #223665
         );
+
+    box-shadow:
+        0 12px 24px rgba(0,0,0,.55),
+        0 0 20px rgba(100,140,255,.12),
+        inset 0 1px 2px rgba(255,255,255,.2);
 }
 
 .game-button:active {
     transform:
         translateY(1px)
-        scale(.99);
+        scale(.995);
 }
 
-
-/*
-   MORE SPACE FOR THE ICONS.
-
-   This moves ALL game words farther
-   to the right so emojis/icons don't
-   cover them.
-*/
+/* =========================================================
+   BUTTON ICONS
+   ========================================================= */
 
 .icon {
-    width: 92px;
-    min-width: 92px;
-    flex: 0 0 92px;
+    width:
+        clamp(52px, 9vw, 82px);
 
-    font-size: 38px;
+    height:
+        clamp(52px, 9vw, 82px);
 
-    text-align: center;
+    flex-shrink: 0;
 
-    margin-right: 25px;
+    margin-right:
+        clamp(14px, 3vw, 28px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size:
+        clamp(28px, 5vw, 52px);
+
+    filter:
+        drop-shadow(0 3px 3px rgba(0,0,0,.55));
 }
 
 .button-text {
+    text-align: left;
     flex: 1;
-
-    padding-left: 8px;
 }
 
 .button-title {
-    font-size: 22px;
+    font-size:
+        clamp(18px, 3vw, 30px);
 
     font-weight: 900;
 
-    letter-spacing: 2px;
-
-    white-space: nowrap;
+    letter-spacing:
+        clamp(1px, .3vw, 3px);
 }
 
-.button-subtitle {
-    margin-top: 5px;
+.button-description {
+    margin-top: 4px;
 
-    font-size: 13px;
+    font-size:
+        clamp(9px, 1.5vw, 14px);
 
-    color: #9dbbd7;
+    opacity: .62;
 
-    letter-spacing: 1px;
+    letter-spacing:
+        clamp(.5px, .15vw, 1.5px);
 }
-
 
 /* =========================================================
    FOOTER
-========================================================= */
+   ========================================================= */
 
 .footer {
-    position: absolute;
-
-    bottom: 5%;
-
-    width: 100%;
+    flex-shrink: 0;
 
     text-align: center;
 
-    font-size: 12px;
+    font-size:
+        clamp(8px, 1.3vw, 12px);
 
-    letter-spacing: 3px;
+    letter-spacing:
+        clamp(1px, .3vw, 3px);
 
-    color: #7698b8;
+    opacity: .38;
 
-    z-index: 20;
+    padding-top:
+        clamp(5px, 1vh, 12px);
 }
-
 
 /* =========================================================
    GIRAFFE
-========================================================= */
-
-.giraffe-wrapper {
-    position: absolute;
-
-    z-index: 10;
-
-    width: 190px;
-    height: 230px;
-
-    bottom: 38px;
-
-    left: -220px;
-
-    animation:
-        giraffeWalk 15s linear infinite;
-}
-
-
-/*
-   Giraffe is now visibly taller/larger.
-*/
+   ========================================================= */
 
 .giraffe {
-    position: relative;
+    position: absolute;
 
-    width: 190px;
-    height: 230px;
+    bottom:
+        clamp(4px, 2vh, 20px);
+
+    left: -180px;
+
+    width: 135px;
+    height: 150px;
+
+    z-index: 3;
 
     animation:
-        giraffeBounce .55s ease-in-out infinite alternate;
+        giraffeWalk
+        24s
+        linear
+        infinite;
 }
 
-@keyframes giraffeWalk {
-
-    0% {
-        left: -220px;
-    }
-
-    100% {
-        left: calc(100% + 220px);
-    }
-}
-
-@keyframes giraffeBounce {
-
-    from {
-        transform:
-            scale(1.18)
-            translateY(2px);
-    }
-
-    to {
-        transform:
-            scale(1.18)
-            translateY(-3px);
-    }
-}
-
-
-/* BODY */
-
-.giraffe .body {
+.giraffe-body {
     position: absolute;
 
-    left: 43px;
-    top: 88px;
+    left: 35px;
+    bottom: 22px;
 
-    width: 105px;
-    height: 70px;
+    width: 70px;
+    height: 52px;
 
-    background: #e1b34e;
+    border-radius: 45%;
 
-    border-radius:
-        48% 48% 42% 45%;
+    background:
+        linear-gradient(
+            135deg,
+            #ffd75a,
+            #d99319
+        );
 
-    border: 4px solid #8b6428;
+    border: 2px solid #8b5a0b;
 
     box-shadow:
-        inset -8px -8px 10px rgba(90,50,10,.18);
+        inset 0 5px 7px rgba(255,255,255,.3),
+        0 4px 5px rgba(0,0,0,.35);
 }
 
-
-/* NECK */
-
-.giraffe .neck {
+.giraffe-neck {
     position: absolute;
 
-    left: 110px;
-    top: 20px;
+    left: 78px;
+    bottom: 58px;
 
-    width: 37px;
-    height: 108px;
+    width: 27px;
+    height: 80px;
 
-    background: #e1b34e;
+    border-radius: 16px 16px 8px 8px;
 
-    border: 4px solid #8b6428;
+    background:
+        linear-gradient(
+            90deg,
+            #d8931a,
+            #ffd65b,
+            #c47a0d
+        );
 
-    border-radius:
-        20px 20px 13px 13px;
+    border: 2px solid #8b5a0b;
+
+    transform: rotate(-7deg);
+}
+
+.giraffe-head {
+    position: absolute;
+
+    left: 75px;
+    bottom: 128px;
+
+    width: 62px;
+    height: 35px;
+
+    border-radius: 50% 48% 42% 45%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffda63,
+            #d98e14
+        );
+
+    border: 2px solid #8b5a0b;
 
     transform:
         rotate(-4deg);
 }
 
-.giraffe .neck::before,
-.giraffe .neck::after {
-    content: "";
-
+.giraffe-ear {
     position: absolute;
 
-    width: 13px;
-    height: 15px;
+    width: 15px;
+    height: 10px;
 
-    background: #9b6c28;
+    background: #e5a326;
 
-    border-radius: 35%;
-}
+    border: 2px solid #8b5a0b;
 
-.giraffe .neck::before {
-    left: 6px;
-    top: 24px;
-}
+    border-radius: 70% 20%;
 
-.giraffe .neck::after {
-    right: 5px;
-    top: 62px;
-}
-
-
-/* HEAD */
-
-.giraffe .head {
-    position: absolute;
-
-    left: 91px;
-    top: 3px;
-
-    width: 77px;
-    height: 58px;
-
-    background: #e1b34e;
-
-    border: 4px solid #8b6428;
-
-    border-radius:
-        48% 55% 45% 48%;
-
-    transform:
-        rotate(-8deg);
-
-    transform-origin:
-        65% 70%;
-}
-
-
-/* SNOUT */
-
-.giraffe .snout {
-    position: absolute;
-
-    right: -19px;
-    top: 25px;
-
-    width: 40px;
-    height: 25px;
-
-    background: #e1b34e;
-
-    border: 4px solid #8b6428;
-
-    border-radius: 50%;
-}
-
-
-/* NOSE */
-
-.giraffe .nose {
-    position: absolute;
-
-    right: -16px;
-    top: 32px;
-
-    width: 13px;
-    height: 9px;
-
-    background: #392818;
-
-    border-radius: 50%;
-}
-
-
-/* EYE */
-
-.giraffe .eye {
-    position: absolute;
-
-    right: 20px;
-    top: 19px;
-
-    width: 9px;
-    height: 9px;
-
-    background: #111;
-
-    border-radius: 50%;
-}
-
-
-/* HORNS */
-
-.giraffe .horn {
-    position: absolute;
-
-    top: -20px;
-
-    width: 9px;
-    height: 24px;
-
-    background: #e1b34e;
-
-    border:
-        3px solid #8b6428;
-
-    border-radius: 8px;
-}
-
-.giraffe .horn.one {
-    left: 20px;
-}
-
-.giraffe .horn.two {
-    left: 45px;
-}
-
-.giraffe .horn::after {
-    content: "";
-
-    position: absolute;
-
-    left: -2px;
     top: -7px;
-
-    width: 9px;
-    height: 9px;
-
-    background: #5b4022;
-
-    border-radius: 50%;
 }
 
-
-/* EARS */
-
-.giraffe .ear {
-    position: absolute;
-
-    top: -3px;
-
-    width: 23px;
-    height: 14px;
-
-    background: #d49f3e;
-
-    border:
-        3px solid #8b6428;
-
-    border-radius:
-        70% 30% 70% 30%;
-}
-
-.giraffe .ear.one {
-    left: 2px;
-
-    transform:
-        rotate(-25deg);
-}
-
-.giraffe .ear.two {
-    left: 57px;
-
-    transform:
-        rotate(25deg);
-}
-
-
-/* LEGS */
-
-.giraffe .leg {
-    position: absolute;
-
-    top: 145px;
-
-    width: 18px;
-    height: 73px;
-
-    background: #e1b34e;
-
-    border:
-        4px solid #8b6428;
-
-    border-radius:
-        10px 10px 5px 5px;
-
-    transform-origin:
-        top center;
-}
-
-.giraffe .leg.one {
-    left: 53px;
-
-    animation:
-        giraffeLeg1 .55s ease-in-out infinite alternate;
-}
-
-.giraffe .leg.two {
-    left: 79px;
-
-    animation:
-        giraffeLeg2 .55s ease-in-out infinite alternate;
-}
-
-.giraffe .leg.three {
-    left: 107px;
-
-    animation:
-        giraffeLeg2 .55s ease-in-out infinite alternate;
-}
-
-.giraffe .leg.four {
-    left: 130px;
-
-    animation:
-        giraffeLeg1 .55s ease-in-out infinite alternate;
-}
-
-@keyframes giraffeLeg1 {
-
-    from {
-        transform: rotate(7deg);
-    }
-
-    to {
-        transform: rotate(-7deg);
-    }
-}
-
-@keyframes giraffeLeg2 {
-
-    from {
-        transform: rotate(-7deg);
-    }
-
-    to {
-        transform: rotate(7deg);
-    }
-}
-
-
-/* TAIL */
-
-.giraffe .tail {
-    position: absolute;
-
-    left: 42px;
-    top: 92px;
-
-    width: 40px;
-    height: 34px;
-
-    border-top:
-        5px solid #8b6428;
-
-    border-left:
-        5px solid #8b6428;
-
-    border-radius:
-        70% 0 0 0;
-
-    transform-origin:
-        right bottom;
-
-    animation:
-        giraffeTail .5s ease-in-out infinite alternate;
-}
-
-@keyframes giraffeTail {
-
-    from {
-        transform:
-            rotate(-10deg);
-    }
-
-    to {
-        transform:
-            rotate(16deg);
-    }
-}
-
-
-/* SPOTS */
-
-.giraffe .spot {
-    position: absolute;
-
-    background: #9b6c28;
-
-    border-radius: 35%;
-}
-
-.giraffe .spot.one {
-    left: 60px;
-    top: 102px;
-
-    width: 22px;
-    height: 18px;
-}
-
-.giraffe .spot.two {
-    left: 94px;
-    top: 125px;
-
-    width: 17px;
-    height: 20px;
-}
-
-.giraffe .spot.three {
-    left: 120px;
-    top: 99px;
-
-    width: 20px;
-    height: 16px;
-}
-
-.giraffe .spot.four {
-    left: 80px;
-    top: 91px;
-
-    width: 14px;
-    height: 14px;
-}
-
-
-/* =========================================================
-   GIRAFFE REACTION
-========================================================= */
-
-.giraffe-wrapper.look {
-    z-index: 12;
-}
-
-
-/*
-   Because the dog is behind the giraffe,
-   the giraffe looks BACK toward him.
-*/
-
-.giraffe-wrapper.look .head {
-    transform:
-        rotate(-28deg)
-        translateY(4px);
-
-    transition:
-        transform .3s ease;
-}
-
-
-/*
-   Giraffe suddenly speeds up.
-*/
-
-.giraffe-wrapper.frightened {
-    animation:
-        giraffeEscape 6s linear forwards;
-}
-
-@keyframes giraffeEscape {
-
-    0% {
-        left: 25%;
-    }
-
-    12% {
-        left: 29%;
-    }
-
-    100% {
-        left: calc(100% + 220px);
-    }
-}
-
-
-/* =========================================================
-   BULLDOG
-========================================================= */
-
-.bulldog-wrapper {
-    position: absolute;
-
-    z-index: 11;
-
-    width: 190px;
-    height: 150px;
-
-    bottom: 45px;
-
-    /*
-       DOG STARTS ON LEFT
-       AND WALKS RIGHT.
-    */
-
-    left: -210px;
-
-    animation:
-        bulldogWalk 18s linear infinite;
-}
-
-
-/*
-   IMPORTANT:
-
-   The dog's HEAD is on the RIGHT side
-   of his body.
-
-   Therefore he walks LEFT -> RIGHT
-   and is facing forward.
-*/
-
-@keyframes bulldogWalk {
-
-    0% {
-        left: -210px;
-    }
-
-    35% {
-        left: 18%;
-    }
-
-    48% {
-        left: 38%;
-    }
-
-    60% {
-        left: 55%;
-    }
-
-    75% {
-        left: 72%;
-    }
-
-    100% {
-        left: calc(100% + 210px);
-    }
-}
-
-
-/* DOG BODY */
-
-.bulldog {
-    position: relative;
-
-    width: 190px;
-    height: 150px;
-
-    animation:
-        dogBounce .32s ease-in-out infinite alternate;
-}
-
-@keyframes dogBounce {
-
-    from {
-        transform:
-            translateY(1px);
-    }
-
-    to {
-        transform:
-            translateY(-3px);
-    }
-}
-
-
-/* BODY */
-
-.dog-body {
-    position: absolute;
-
-    /*
-       BODY IS BEHIND THE HEAD.
-    */
-
-    left: 35px;
-    top: 58px;
-
-    width: 105px;
-    height: 62px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #d6c6ae,
-            #a9957c
-        );
-
-    border:
-        4px solid #594b3d;
-
-    border-radius:
-        48% 45% 40% 50%;
-
-    box-shadow:
-        inset -8px -8px 10px rgba(50,40,30,.22),
-        7px 9px 12px rgba(0,0,0,.35);
-}
-
-
-/* CHEST */
-
-.dog-chest {
-    position: absolute;
-
-    left: 43px;
-    top: 65px;
-
-    width: 43px;
-    height: 50px;
-
-    background: #eee4d4;
-
-    border:
-        2px solid #776856;
-
-    border-radius:
-        50% 55% 45% 50%;
-}
-
-
-/* =========================================================
-   DOG HEAD
-========================================================= */
-
-.dog-head {
-    position: absolute;
-
-    /*
-       HEAD IS NOW CLEARLY ON THE
-       FRONT / RIGHT SIDE.
-    */
-
-    left: 100px;
-    top: 20px;
-
-    width: 83px;
-    height: 72px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #cdbba1,
-            #9d8970
-        );
-
-    border:
-        4px solid #594b3d;
-
-    border-radius:
-        45% 48% 42% 50%;
-
-    box-shadow:
-        inset -8px -8px 10px rgba(50,40,30,.2),
-        6px 8px 12px rgba(0,0,0,.35);
-
-    transform-origin:
-        35% 65%;
-}
-
-
-/* FACE */
-
-.dog-face {
-    position: absolute;
-
-    left: 25px;
-    top: 16px;
-
-    width: 48px;
-    height: 48px;
-
-    background: #eee4d4;
-
-    border-radius: 48%;
-
-    border:
-        2px solid #9a8872;
-}
-
-
-/* EARS */
-
-.dog-ear {
-    position: absolute;
-
-    width: 35px;
-    height: 39px;
-
-    background: #655444;
-
-    border:
-        4px solid #493d32;
-
-    border-radius:
-        45% 55% 45% 60%;
-
-    z-index: -1;
-}
-
-.dog-ear.left {
-    left: -18px;
-    top: 7px;
-
-    transform:
-        rotate(28deg);
-}
-
-.dog-ear.right {
-    right: -16px;
-    top: 8px;
-
-    transform:
-        rotate(-28deg);
-}
-
-
-/* EYES */
-
-.dog-eye {
-    position: absolute;
-
-    width: 10px;
-    height: 10px;
-
-    border-radius: 50%;
-
-    background: #111;
-
-    top: 28px;
-
-    box-shadow:
-        0 0 0 3px rgba(255,255,255,.25);
-}
-
-.dog-eye.left {
-    left: 21px;
-}
-
-.dog-eye.right {
-    right: 19px;
-}
-
-
-/* MUZZLE */
-
-.dog-muzzle {
-    position: absolute;
-
-    left: 19px;
-    top: 42px;
-
-    width: 55px;
-    height: 32px;
-
-    background: #d9c9b3;
-
-    border:
-        3px solid #756451;
-
-    border-radius: 48%;
-}
-
-
-/* NOSE */
-
-.dog-nose {
-    position: absolute;
-
-    left: 35px;
-    top: 42px;
-
-    width: 25px;
-    height: 17px;
-
-    background: #211b18;
-
-    border-radius:
-        48% 48% 55% 55%;
-
-    z-index: 3;
-}
-
-.dog-nose::after {
-    content: "";
-
-    position: absolute;
-
-    left: 10px;
-    top: 12px;
-
-    width: 5px;
-    height: 10px;
-
-    background: #211b18;
-
-    border-radius: 50%;
-}
-
-
-/* JOWLS */
-
-.jowl {
-    position: absolute;
-
-    top: 54px;
-
-    width: 25px;
-    height: 24px;
-
-    background: #e4d7c4;
-
-    border:
-        2px solid #877661;
-
-    border-radius: 50%;
-}
-
-.jowl.left {
+.giraffe-ear.one {
     left: 9px;
 }
 
-.jowl.right {
+.giraffe-ear.two {
     right: 8px;
 }
 
-
-/* TONGUE */
-
-.dog-tongue {
+.giraffe-eye {
     position: absolute;
 
-    left: 38px;
-    top: 65px;
+    right: 14px;
+    top: 9px;
 
-    width: 17px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
 
-    background: #d96f7d;
+    border-radius: 50%;
 
-    border:
-        2px solid #944852;
-
-    border-radius:
-        5px 5px 50% 50%;
-
-    z-index: 4;
-
-    transform-origin:
-        top center;
-
-    animation:
-        tongueOut 5s ease-in-out infinite;
+    background: #111;
 }
 
-@keyframes tongueOut {
-
-    0%,
-    45%,
-    85%,
-    100% {
-        height: 4px;
-        transform: rotate(0deg);
-    }
-
-    50%,
-    75% {
-        height: 28px;
-        transform: rotate(4deg);
-    }
-}
-
-
-/* =========================================================
-   DOG TAIL
-========================================================= */
-
-/*
-   TAIL IS NOW ON THE LEFT/BACK SIDE
-   OF THE DOG.
-*/
-
-.dog-tail {
+.giraffe-leg {
     position: absolute;
 
-    left: 8px;
-    top: 59px;
+    width: 10px;
+    height: 45px;
 
-    width: 43px;
-    height: 40px;
-
-    border-top:
-        9px solid #75604b;
-
-    border-left:
-        8px solid #75604b;
-
-    border-radius:
-        70% 20% 0 30%;
-
-    transform-origin:
-        right bottom;
-
-    animation:
-        dogTailWag .35s ease-in-out infinite alternate;
-}
-
-@keyframes dogTailWag {
-
-    from {
-        transform:
-            rotate(-18deg);
-    }
-
-    to {
-        transform:
-            rotate(22deg);
-    }
-}
-
-
-/* =========================================================
-   DOG LEGS
-========================================================= */
-
-.dog-leg {
-    position: absolute;
-
-    top: 103px;
-
-    width: 21px;
-    height: 46px;
+    bottom: -15px;
 
     background:
         linear-gradient(
             90deg,
-            #8d7963,
-            #c6b49b,
-            #806d58
+            #d38a13,
+            #f6c648
         );
 
-    border:
-        3px solid #594b3d;
+    border: 2px solid #8b5a0b;
+
+    transform-origin: top;
+}
+
+.giraffe-leg.one {
+    left: 47px;
+    animation: legA .55s ease-in-out infinite alternate;
+}
+
+.giraffe-leg.two {
+    left: 67px;
+    animation: legB .55s ease-in-out infinite alternate;
+}
+
+.giraffe-leg.three {
+    left: 88px;
+    animation: legB .55s ease-in-out infinite alternate;
+}
+
+.giraffe-leg.four {
+    left: 105px;
+    animation: legA .55s ease-in-out infinite alternate;
+}
+
+.giraffe-spots {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: inherit;
+
+    background:
+        radial-gradient(
+            circle at 25% 30%,
+            #a96d10 0 7px,
+            transparent 8px
+        ),
+        radial-gradient(
+            circle at 65% 55%,
+            #a96d10 0 8px,
+            transparent 9px
+        ),
+        radial-gradient(
+            circle at 42% 75%,
+            #a96d10 0 6px,
+            transparent 7px
+        );
+
+    opacity: .65;
+}
+
+/* =========================================================
+   BULLDOG
+   ========================================================= */
+
+.bulldog {
+    position: absolute;
+
+    bottom:
+        clamp(5px, 2vh, 20px);
+
+    left: -180px;
+
+    width: 145px;
+    height: 85px;
+
+    z-index: 4;
+
+    animation:
+        bulldogWalk
+        28s
+        linear
+        infinite;
+}
+
+.dog-body {
+    position: absolute;
+
+    left: 38px;
+    bottom: 18px;
+
+    width: 78px;
+    height: 50px;
+
+    border-radius: 42%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #d5d5d5,
+            #777,
+            #3d3d3d
+        );
+
+    border: 2px solid #222;
+
+    box-shadow:
+        inset 0 5px 7px rgba(255,255,255,.22),
+        0 5px 6px rgba(0,0,0,.45);
+}
+
+.dog-head {
+    position: absolute;
+
+    left: 98px;
+    bottom: 37px;
+
+    width: 55px;
+    height: 50px;
 
     border-radius:
-        10px 10px 7px 7px;
+        45%
+        48%
+        42%
+        44%;
 
-    transform-origin:
-        top center;
+    background:
+        linear-gradient(
+            145deg,
+            #e0e0e0,
+            #858585,
+            #424242
+        );
+
+    border: 2px solid #222;
+
+    box-shadow:
+        inset 0 4px 6px rgba(255,255,255,.25),
+        0 4px 5px rgba(0,0,0,.45);
+}
+
+.dog-muzzle {
+    position: absolute;
+
+    left: 34px;
+    top: 23px;
+
+    width: 28px;
+    height: 21px;
+
+    border-radius: 45%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #777,
+            #303030
+        );
+}
+
+.dog-nose {
+    position: absolute;
+
+    left: 50px;
+    top: 19px;
+
+    width: 12px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #111;
+}
+
+.dog-eye {
+    position: absolute;
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    top: 15px;
+}
+
+.dog-eye.one {
+    left: 13px;
+}
+
+.dog-eye.two {
+    left: 32px;
+}
+
+.dog-ear {
+    position: absolute;
+
+    width: 19px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: #505050;
+
+    border: 2px solid #222;
+
+    top: -8px;
+}
+
+.dog-ear.one {
+    left: 5px;
+}
+
+.dog-ear.two {
+    right: 5px;
+}
+
+.dog-leg {
+    position: absolute;
+
+    width: 13px;
+    height: 38px;
+
+    bottom: -15px;
+
+    border-radius: 6px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #444,
+            #999,
+            #333
+        );
+
+    border: 2px solid #222;
+
+    transform-origin: top;
 }
 
 .dog-leg.one {
-    left: 42px;
-
-    animation:
-        dogLeg1 .32s ease-in-out infinite alternate;
+    left: 50px;
+    animation: dogLegA .42s ease-in-out infinite alternate;
 }
 
 .dog-leg.two {
-    left: 68px;
-
-    animation:
-        dogLeg2 .32s ease-in-out infinite alternate;
+    left: 73px;
+    animation: dogLegB .42s ease-in-out infinite alternate;
 }
 
 .dog-leg.three {
-    left: 101px;
-
-    animation:
-        dogLeg2 .32s ease-in-out infinite alternate;
+    left: 92px;
+    animation: dogLegB .42s ease-in-out infinite alternate;
 }
 
 .dog-leg.four {
-    left: 125px;
+    left: 108px;
+    animation: dogLegA .42s ease-in-out infinite alternate;
+}
+
+.dog-tail {
+    position: absolute;
+
+    left: 22px;
+    bottom: 53px;
+
+    width: 30px;
+    height: 13px;
+
+    border-top: 7px solid #777;
+
+    border-radius: 50%;
+
+    transform-origin: right center;
 
     animation:
-        dogLeg1 .32s ease-in-out infinite alternate;
+        tailWag
+        .32s
+        ease-in-out
+        infinite alternate;
 }
-
-@keyframes dogLeg1 {
-
-    from {
-        transform:
-            rotate(9deg);
-    }
-
-    to {
-        transform:
-            rotate(-9deg);
-    }
-}
-
-@keyframes dogLeg2 {
-
-    from {
-        transform:
-            rotate(-9deg);
-    }
-
-    to {
-        transform:
-            rotate(9deg);
-    }
-}
-
 
 /* =========================================================
-   DOG / GIRAFFE INTERACTION
-========================================================= */
+   ANIMATIONS
+   ========================================================= */
 
-.bulldog-wrapper.bark {
-    animation-play-state:
-        paused;
-}
-
-
-/*
-   DOG GETS EXCITED DURING CHASE.
-*/
-
-.bulldog-wrapper.chase {
-    animation:
-        bulldogChase 5s linear forwards;
-}
-
-.bulldog-wrapper.chase .bulldog {
-    animation:
-        dogBounce .18s ease-in-out infinite alternate;
-}
-
-
-/*
-   DOG CHASES TO THE RIGHT.
-*/
-
-@keyframes bulldogChase {
+@keyframes giraffeWalk {
 
     0% {
-        left: 40%;
+        left: -180px;
     }
 
-    25% {
-        left: 48%;
+    45% {
+        left: 35%;
+    }
+
+    50% {
+        left: 45%;
     }
 
     55% {
@@ -1298,220 +692,184 @@ body {
     }
 
     100% {
-        left: 78%;
+        left: calc(100% + 180px);
     }
 }
 
-
-/*
-   GIRAFFE RUNS FASTER.
-*/
-
-.giraffe-wrapper.frightened {
-    animation:
-        giraffeEscape 5s linear forwards;
-}
-
-@keyframes giraffeEscape {
+@keyframes bulldogWalk {
 
     0% {
-        left: 35%;
+        left: -180px;
     }
 
-    15% {
-        left: 40%;
+    30% {
+        left: 10%;
+    }
+
+    55% {
+        left: 32%;
+    }
+
+    75% {
+        left: 55%;
     }
 
     100% {
-        left: calc(100% + 220px);
+        left: calc(100% + 180px);
     }
 }
 
+@keyframes tailWag {
 
-/*
-   GIRAFFE LOOKS BACK AT THE DOG.
-*/
+    from {
+        transform: rotate(-20deg);
+    }
 
-.giraffe-wrapper.look .head {
-    transform:
-        rotate(-30deg)
-        translateY(4px);
-
-    transition:
-        transform .3s ease;
+    to {
+        transform: rotate(25deg);
+    }
 }
 
+@keyframes legA {
 
-/*
-   GIRAFFE LOOKS FORWARD AGAIN
-   WHEN IT RUNS.
-*/
+    from {
+        transform: rotate(18deg);
+    }
 
-.giraffe-wrapper.frightened .head {
-    transform:
-        rotate(-5deg);
-
-    transition:
-        transform .25s ease;
+    to {
+        transform: rotate(-18deg);
+    }
 }
 
+@keyframes legB {
+
+    from {
+        transform: rotate(-18deg);
+    }
+
+    to {
+        transform: rotate(18deg);
+    }
+}
+
+@keyframes dogLegA {
+
+    from {
+        transform: rotate(15deg);
+    }
+
+    to {
+        transform: rotate(-15deg);
+    }
+}
+
+@keyframes dogLegB {
+
+    from {
+        transform: rotate(-15deg);
+    }
+
+    to {
+        transform: rotate(15deg);
+    }
+}
 
 /* =========================================================
-   BARK BUBBLE
-========================================================= */
+   SHORT WINDOWS
+   ========================================================= */
 
-.bark-bubble {
-    position: absolute;
+@media (max-height: 600px) {
 
-    left: 128px;
-    top: -35px;
-
-    padding:
-        6px 11px;
-
-    border-radius:
-        14px;
-
-    background: white;
-
-    color: #222;
-
-    font-weight: 900;
-
-    font-size: 14px;
-
-    box-shadow:
-        0 4px 8px rgba(0,0,0,.4);
-
-    opacity: 0;
-
-    transform:
-        scale(.5);
-
-    pointer-events: none;
-}
-
-.bulldog-wrapper.bark .bark-bubble {
-    animation:
-        barkPop .7s ease-out forwards;
-}
-
-@keyframes barkPop {
-
-    0% {
-        opacity: 0;
-
-        transform:
-            scale(.5);
+    .game-room {
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
 
-    25% {
-        opacity: 1;
-
-        transform:
-            scale(1.2);
+    .title {
+        font-size: clamp(25px, 6vw, 42px);
     }
 
-    60% {
-        opacity: 1;
-
-        transform:
-            scale(1);
+    .subtitle {
+        margin-top: 0;
     }
 
-    100% {
-        opacity: 0;
-
-        transform:
-            scale(.9)
-            translateY(-10px);
-    }
-}
-
-
-/* =========================================================
-   SECOND LITTLE BARK
-========================================================= */
-
-.bulldog-wrapper.second-bark .bark-bubble {
-    animation:
-        barkPop .7s ease-out forwards;
-}
-
-
-/* =========================================================
-   MOBILE BUTTON FIX
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .game-menu {
-        width: 92%;
+    .games {
+        gap: 5px;
     }
 
     .game-button {
-        padding:
-            12px 12px;
+        height: clamp(50px, 14vh, 70px);
+        min-height: 48px;
+    }
+
+    .button-description {
+        display: none;
     }
 
     .icon {
-        width: 75px;
-        min-width: 75px;
-        flex-basis: 75px;
-
-        font-size: 31px;
-
-        margin-right: 18px;
+        width: 48px;
+        height: 48px;
+        font-size: 30px;
     }
 
-    .button-text {
-        padding-left: 8px;
+    .footer {
+        display: none;
     }
 
-    .button-title {
-        font-size: 17px;
-        letter-spacing: 1px;
-    }
-
-    .button-subtitle {
-        font-size: 11px;
+    .giraffe,
+    .bulldog {
+        transform: scale(.75);
+        transform-origin: bottom;
     }
 }
 
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .game-button {
+        padding: 0 10px;
+    }
+
+    .icon {
+        margin-right: 10px;
+        width: 44px;
+    }
+
+    .button-title {
+        font-size: 16px;
+    }
+}
 </style>
 </head>
-
 
 <body>
 
 <div class="game-room">
 
+    <div class="header">
 
-    <!-- =====================================================
-         TITLE
-    ====================================================== -->
+        <h1 class="title">
+            GAME ROOM
+        </h1>
 
-    <div class="title">
-        GAME ROOM
+        <div class="subtitle">
+            CHOOSE YOUR GAME
+        </div>
+
     </div>
 
-    <div class="subtitle">
-        CHOOSE YOUR GAME
-    </div>
 
-
-    <!-- =====================================================
-         GAME BUTTONS
-    ====================================================== -->
-
-    <div class="game-menu">
-
+    <div class="games">
 
         <!-- TIC TAC TOE -->
 
         <button
             class="game-button"
-            onclick="location.href='ttt.html'">
+            onclick="location.href='ttt.html'"
+        >
 
             <div class="icon">
                 ❌⭕
@@ -1523,8 +881,8 @@ body {
                     TIC-TAC-TOE
                 </div>
 
-                <div class="button-subtitle">
-                    Classic • Two Players
+                <div class="button-description">
+                    CLASSIC TWO PLAYER
                 </div>
 
             </div>
@@ -1536,7 +894,8 @@ body {
 
         <button
             class="game-button"
-            onclick="location.href='checkers.html'">
+            onclick="location.href='checkers.html'"
+        >
 
             <div class="icon">
                 🔴⚫
@@ -1548,8 +907,8 @@ body {
                     CHECKERS
                 </div>
 
-                <div class="button-subtitle">
-                    Classic • Two Players
+                <div class="button-description">
+                    CLASSIC • TWO PLAYER • COMPUTER
                 </div>
 
             </div>
@@ -1561,10 +920,11 @@ body {
 
         <button
             class="game-button"
-            onclick="location.href='carrierstrike.html'">
+            onclick="location.href='carrierstrike.html'"
+        >
 
             <div class="icon">
-                ⚓
+                🚢
             </div>
 
             <div class="button-text">
@@ -1573,309 +933,120 @@ body {
                     CARRIER STRIKE
                 </div>
 
-                <div class="button-subtitle">
-                    Hunt • Strike • Destroy
+                <div class="button-description">
+                    NAVAL BATTLE
                 </div>
 
             </div>
 
         </button>
 
-
     </div>
 
-
-    <!-- =====================================================
-         GIRAFFE
-    ====================================================== -->
-
-    <div
-        class="giraffe-wrapper"
-        id="giraffeWrapper">
-
-        <div class="giraffe">
-
-            <div class="body"></div>
-
-            <div class="neck"></div>
-
-            <div class="head">
-
-                <div class="horn one"></div>
-                <div class="horn two"></div>
-
-                <div class="ear one"></div>
-                <div class="ear two"></div>
-
-                <div class="eye"></div>
-
-                <div class="snout"></div>
-
-                <div class="nose"></div>
-
-            </div>
-
-            <div class="spot one"></div>
-            <div class="spot two"></div>
-            <div class="spot three"></div>
-            <div class="spot four"></div>
-
-            <div class="leg one"></div>
-            <div class="leg two"></div>
-            <div class="leg three"></div>
-            <div class="leg four"></div>
-
-            <div class="tail"></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         BULLDOG
-    ====================================================== -->
-
-    <div
-        class="bulldog-wrapper"
-        id="bulldogWrapper">
-
-        <div class="bulldog">
-
-            <!-- BACK OF DOG -->
-            <div class="dog-tail"></div>
-
-            <!-- BODY -->
-            <div class="dog-body"></div>
-
-            <div class="dog-chest"></div>
-
-            <!-- LEGS -->
-            <div class="dog-leg one"></div>
-            <div class="dog-leg two"></div>
-            <div class="dog-leg three"></div>
-            <div class="dog-leg four"></div>
-
-            <!-- FRONT OF DOG -->
-            <div class="dog-head">
-
-                <div class="dog-ear left"></div>
-                <div class="dog-ear right"></div>
-
-                <div class="dog-face"></div>
-
-                <div class="dog-eye left"></div>
-                <div class="dog-eye right"></div>
-
-                <div class="dog-muzzle"></div>
-
-                <div class="jowl left"></div>
-                <div class="jowl right"></div>
-
-                <div class="dog-nose"></div>
-
-                <div class="dog-tongue"></div>
-
-            </div>
-
-        </div>
-
-        <div class="bark-bubble">
-            WOOF!
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
 
     <div class="footer">
         TWO PLAYERS • ONE SCREEN • LET'S PLAY
     </div>
 
 
+    <!-- GIRAFFE -->
+
+    <div class="giraffe">
+
+        <div class="giraffe-neck">
+            <div class="giraffe-spots"></div>
+        </div>
+
+        <div class="giraffe-head">
+
+            <div class="giraffe-ear one"></div>
+            <div class="giraffe-ear two"></div>
+
+            <div class="giraffe-eye"></div>
+
+        </div>
+
+        <div class="giraffe-body">
+            <div class="giraffe-spots"></div>
+        </div>
+
+        <div class="giraffe-leg one"></div>
+        <div class="giraffe-leg two"></div>
+        <div class="giraffe-leg three"></div>
+        <div class="giraffe-leg four"></div>
+
+    </div>
+
+
+    <!-- BULLDOG -->
+
+    <div class="bulldog">
+
+        <div class="dog-body"></div>
+
+        <div class="dog-head">
+
+            <div class="dog-ear one"></div>
+            <div class="dog-ear two"></div>
+
+            <div class="dog-eye one"></div>
+            <div class="dog-eye two"></div>
+
+            <div class="dog-muzzle"></div>
+
+        </div>
+
+        <div class="dog-nose"></div>
+
+        <div class="dog-tail"></div>
+
+        <div class="dog-leg one"></div>
+        <div class="dog-leg two"></div>
+        <div class="dog-leg three"></div>
+        <div class="dog-leg four"></div>
+
+    </div>
+
 </div>
 
 
 <script>
 
-/* =========================================================
-   DOG + GIRAFFE INTERACTION
-========================================================= */
+/*
+   Keep the entire Game Room fitted to the current
+   available browser window.
 
-(function () {
+   This is intentionally lightweight:
+   no fixed page height,
+   no vertical scrolling,
+   no server changes.
+*/
 
-    const giraffe =
-        document.getElementById("giraffeWrapper");
+function fitGameRoom() {
 
-    const bulldog =
-        document.getElementById("bulldogWrapper");
+    const room =
+        document.querySelector(".game-room");
 
+    if (!room) return;
 
-    if (!giraffe || !bulldog) {
-        return;
-    }
+    room.style.height =
+        window.innerHeight + "px";
+}
 
+window.addEventListener(
+    "resize",
+    fitGameRoom
+);
 
-    let busy = false;
+if (window.visualViewport) {
 
-
-    function checkAnimals() {
-
-        if (busy) {
-            return;
-        }
-
-
-        const g =
-            giraffe.getBoundingClientRect();
-
-        const b =
-            bulldog.getBoundingClientRect();
-
-
-        /*
-         * The dog is approaching the giraffe
-         * from behind.
-         */
-
-        const dogFront =
-            b.right;
-
-        const giraffeBack =
-            g.left;
-
-
-        const distance =
-            giraffeBack - dogFront;
-
-
-        /*
-         * They are close enough.
-         */
-
-        const close =
-            distance > -35 &&
-            distance < 115;
-
-
-        /*
-         * Make sure they are actually
-         * on the same level.
-         */
-
-        const sameLevel =
-            b.bottom > g.top + 45 &&
-            b.top < g.bottom;
-
-
-        if (!close || !sameLevel) {
-            return;
-        }
-
-
-        /*
-         * START THE EVENT
-         */
-
-        busy = true;
-
-
-        /* DOG BARKS */
-
-        bulldog.classList.add("bark");
-
-
-        /*
-         * GIRAFFE HEARS IT.
-         *
-         * It turns its head back.
-         */
-
-        setTimeout(function () {
-
-            giraffe.classList.add("look");
-
-        }, 300);
-
-
-        /*
-         * DOG BARKS AGAIN A MOMENT LATER.
-         */
-
-        setTimeout(function () {
-
-            bulldog.classList.remove("bark");
-
-            bulldog.classList.add("second-bark");
-
-            setTimeout(function () {
-
-                bulldog.classList.remove("second-bark");
-
-            }, 700);
-
-        }, 950);
-
-
-        /*
-         * GIRAFFE PANICS AND TAKES OFF.
-         */
-
-        setTimeout(function () {
-
-            giraffe.classList.remove("look");
-
-            giraffe.classList.add("frightened");
-
-        }, 1500);
-
-
-        /*
-         * DOG CHASES.
-         */
-
-        setTimeout(function () {
-
-            bulldog.classList.remove("bark");
-
-            bulldog.classList.add("chase");
-
-        }, 1650);
-
-
-        /*
-         * AFTER A FEW SECONDS,
-         * THE DOG GIVES UP.
-         */
-
-        setTimeout(function () {
-
-            bulldog.classList.remove("chase");
-
-            giraffe.classList.remove("frightened");
-
-            busy = false;
-
-        }, 6000);
-
-    }
-
-
-    /*
-     * Check frequently enough
-     * to catch the animals as
-     * they pass one another.
-     */
-
-    setInterval(
-        checkAnimals,
-        100
+    window.visualViewport.addEventListener(
+        "resize",
+        fitGameRoom
     );
+}
 
-})();
+fitGameRoom();
 
 </script>
 
