@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,12 +28,18 @@ body {
     color: white;
 }
 
+/* -------------------------
+   MAIN SCREEN
+------------------------- */
+
 .game-room {
     width: 100%;
     height: 100%;
     position: relative;
     overflow: hidden;
 }
+
+/* Stars / atmosphere */
 
 .glow {
     position: absolute;
@@ -90,7 +95,7 @@ body {
     width: min(88%, 420px);
 
     left: 50%;
-    top: 42%;
+    top: 38%;
     transform: translate(-50%, -50%);
 }
 
@@ -98,9 +103,9 @@ body {
     position: relative;
 
     width: 100%;
-    height: 72px;
+    height: 82px;
 
-    margin: 11px 0;
+    margin: 16px 0;
 
     border: 1px solid rgba(255,255,255,.35);
     border-radius: 22px;
@@ -225,6 +230,8 @@ body {
     }
 }
 
+/* Whole body bounce */
+
 .giraffe {
     position: relative;
 
@@ -300,4 +307,1056 @@ body {
 
 .p3 {
     width: 24px;
-```
+    height: 18px;
+    border-radius: 50%;
+    left: 42px;
+    top: 153px;
+}
+
+.p4 {
+    width: 16px;
+    height: 18px;
+    border-radius: 45%;
+    left: 87px;
+    top: 112px;
+}
+
+/* Neck */
+
+.neck {
+    position: absolute;
+
+    left: 125px;
+    top: 32px;
+
+    width: 42px;
+    height: 115px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #c89432,
+            #efd16b 48%,
+            #b77d26
+        );
+
+    border: 3px solid #815c20;
+
+    transform:
+        rotate(-7deg);
+
+    transform-origin: bottom center;
+
+    box-shadow:
+        inset -7px 0 8px rgba(80,45,5,.22);
+}
+
+/* Neck patches */
+
+.neck::before,
+.neck::after {
+    content: "";
+
+    position: absolute;
+
+    background: #996528;
+
+    border-radius: 45%;
+}
+
+.neck::before {
+    width: 18px;
+    height: 20px;
+    top: 18px;
+    left: 5px;
+}
+
+.neck::after {
+    width: 14px;
+    height: 17px;
+    top: 55px;
+    right: 4px;
+}
+
+/* Head */
+
+.head {
+    position: absolute;
+
+    left: 135px;
+    top: 5px;
+
+    width: 67px;
+    height: 55px;
+
+    border-radius: 48% 55% 42% 48%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0ce67,
+            #c58b2e
+        );
+
+    border: 3px solid #80591e;
+
+    transform:
+        rotate(-8deg);
+
+    box-shadow:
+        inset -8px -8px 12px rgba(80,45,5,.2),
+        5px 7px 10px rgba(0,0,0,.35);
+}
+
+/* Muzzle */
+
+.muzzle {
+    position: absolute;
+
+    right: -14px;
+    top: 27px;
+
+    width: 28px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: #dcae4d;
+
+    border: 2px solid #875e20;
+}
+
+.muzzle::after {
+    content: "";
+
+    position: absolute;
+
+    right: 5px;
+    top: 6px;
+
+    width: 5px;
+    height: 3px;
+
+    border-radius: 50%;
+
+    background: #392613;
+
+    box-shadow: 10px 0 #392613;
+}
+
+/* Eye */
+
+.eye {
+    position: absolute;
+
+    right: 18px;
+    top: 18px;
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.35);
+}
+
+/* Ears */
+
+.ear {
+    position: absolute;
+
+    width: 27px;
+    height: 18px;
+
+    background: #c08b2e;
+
+    border: 3px solid #80591e;
+
+    border-radius: 80% 20% 70% 25%;
+}
+
+.ear.left {
+    left: -12px;
+    top: 7px;
+    transform: rotate(25deg);
+}
+
+.ear.right {
+    right: 8px;
+    top: -8px;
+    transform: rotate(-25deg);
+}
+
+/* Horns */
+
+.horn {
+    position: absolute;
+
+    width: 8px;
+    height: 19px;
+
+    background: #795524;
+
+    border-radius: 5px;
+
+    top: -14px;
+}
+
+.horn.one {
+    left: 18px;
+}
+
+.horn.two {
+    left: 42px;
+}
+
+/* Mane */
+
+.mane {
+    position: absolute;
+
+    left: 119px;
+    top: 42px;
+
+    width: 11px;
+    height: 85px;
+
+    background:
+        repeating-linear-gradient(
+            180deg,
+            #633d18 0 7px,
+            transparent 7px 12px
+        );
+}
+
+/* Tail */
+
+.tail {
+    position: absolute;
+
+    left: 28px;
+    top: 112px;
+
+    width: 55px;
+    height: 65px;
+
+    border-left: 7px solid #b17c29;
+
+    border-radius: 50%;
+
+    transform: rotate(20deg);
+
+    transform-origin: top;
+}
+
+.tail-tip {
+    position: absolute;
+
+    left: -11px;
+    bottom: -4px;
+
+    width: 20px;
+    height: 24px;
+
+    border-radius: 50% 50% 45% 45%;
+
+    background: #54341a;
+}
+
+/* Legs */
+
+.leg {
+    position: absolute;
+
+    top: 164px;
+
+    width: 22px;
+    height: 82px;
+
+    border-radius: 12px 12px 8px 8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #b77f28,
+            #e4bd57,
+            #a86f20
+        );
+
+    border: 3px solid #7d581e;
+
+    transform-origin: top center;
+}
+
+/* back legs */
+
+.leg.back1 {
+    left: 52px;
+    animation: legBack1 .42s ease-in-out infinite alternate;
+}
+
+.leg.back2 {
+    left: 83px;
+    animation: legBack2 .42s ease-in-out infinite alternate;
+}
+
+/* front legs */
+
+.leg.front1 {
+    left: 119px;
+    animation: legFront1 .42s ease-in-out infinite alternate;
+}
+
+.leg.front2 {
+    left: 145px;
+    animation: legFront2 .42s ease-in-out infinite alternate;
+}
+
+@keyframes legBack1 {
+    from { transform: rotate(14deg); }
+    to   { transform: rotate(-14deg); }
+}
+
+@keyframes legBack2 {
+    from { transform: rotate(-14deg); }
+    to   { transform: rotate(14deg); }
+}
+
+@keyframes legFront1 {
+    from { transform: rotate(-14deg); }
+    to   { transform: rotate(14deg); }
+}
+
+@keyframes legFront2 {
+    from { transform: rotate(14deg); }
+    to   { transform: rotate(-14deg); }
+}
+
+/* Hooves */
+
+.leg::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: -3px;
+    left: -3px;
+
+    width: 22px;
+    height: 12px;
+
+    border-radius: 4px;
+
+    background: #54351a;
+}
+
+
+/* =========================================================
+   BULLDOG
+   CSS / HTML ONLY — NO IMAGE
+========================================================= */
+
+.bulldog-wrapper {
+    position: absolute;
+    z-index: 11;
+
+    width: 190px;
+    height: 150px;
+
+    bottom: 45px;
+    right: -210px;
+
+    animation: bulldogWalk 24s linear infinite;
+}
+
+@keyframes bulldogWalk {
+    0% {
+        right: -210px;
+    }
+
+    48% {
+        right: 48%;
+    }
+
+    54% {
+        right: 44%;
+    }
+
+    60% {
+        right: 38%;
+    }
+
+    100% {
+        right: calc(100% + 210px);
+    }
+}
+
+.bulldog {
+    position: relative;
+    width: 190px;
+    height: 150px;
+
+    animation: dogBounce .32s ease-in-out infinite alternate;
+}
+
+@keyframes dogBounce {
+    from {
+        transform: translateY(1px);
+    }
+
+    to {
+        transform: translateY(-3px);
+    }
+}
+
+/* Dog body */
+
+.dog-body {
+    position: absolute;
+
+    left: 42px;
+    top: 58px;
+
+    width: 105px;
+    height: 62px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #d6c6ae,
+            #a9957c
+        );
+
+    border: 4px solid #594b3d;
+
+    border-radius: 48% 45% 40% 50%;
+
+    box-shadow:
+        inset -8px -8px 10px rgba(50,40,30,.22),
+        7px 9px 12px rgba(0,0,0,.35);
+}
+
+/* White chest */
+
+.dog-chest {
+    position: absolute;
+
+    left: 93px;
+    top: 65px;
+
+    width: 43px;
+    height: 50px;
+
+    background: #eee4d4;
+
+    border-radius: 50% 55% 45% 50%;
+
+    border: 2px solid #776856;
+}
+
+/* Dog head */
+
+.dog-head {
+    position: absolute;
+
+    left: 82px;
+    top: 20px;
+
+    width: 83px;
+    height: 72px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #cdbba1,
+            #9d8970
+        );
+
+    border: 4px solid #594b3d;
+
+    border-radius: 45% 48% 42% 50%;
+
+    box-shadow:
+        inset -8px -8px 10px rgba(50,40,30,.2),
+        6px 8px 12px rgba(0,0,0,.35);
+}
+
+/* Bulldog white face */
+
+.dog-face {
+    position: absolute;
+
+    left: 25px;
+    top: 16px;
+
+    width: 48px;
+    height: 48px;
+
+    background: #eee4d4;
+
+    border-radius: 48%;
+
+    border: 2px solid #9a8872;
+}
+
+/* Bulldog ears */
+
+.dog-ear {
+    position: absolute;
+
+    width: 35px;
+    height: 39px;
+
+    background: #655444;
+
+    border: 4px solid #493d32;
+
+    border-radius: 45% 55% 45% 60%;
+
+    z-index: -1;
+}
+
+.dog-ear.left {
+    left: -18px;
+    top: 7px;
+    transform: rotate(28deg);
+}
+
+.dog-ear.right {
+    right: -16px;
+    top: 8px;
+    transform: rotate(-28deg);
+}
+
+/* Eyes */
+
+.dog-eye {
+    position: absolute;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    top: 28px;
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.25);
+}
+
+.dog-eye.left {
+    left: 21px;
+}
+
+.dog-eye.right {
+    right: 19px;
+}
+
+/* Bulldog muzzle */
+
+.dog-muzzle {
+    position: absolute;
+
+    left: 19px;
+    top: 42px;
+
+    width: 55px;
+    height: 32px;
+
+    background: #d9c9b3;
+
+    border: 3px solid #756451;
+
+    border-radius: 48%;
+}
+
+/* Nose */
+
+.dog-nose {
+    position: absolute;
+
+    left: 35px;
+    top: 42px;
+
+    width: 25px;
+    height: 17px;
+
+    background: #211b18;
+
+    border-radius: 48% 48% 55% 55%;
+
+    z-index: 3;
+}
+
+.dog-nose::after {
+    content: "";
+
+    position: absolute;
+
+    left: 10px;
+    top: 12px;
+
+    width: 5px;
+    height: 10px;
+
+    background: #211b18;
+
+    border-radius: 50%;
+}
+
+/* Jowls */
+
+.jowl {
+    position: absolute;
+
+    top: 54px;
+
+    width: 25px;
+    height: 24px;
+
+    background: #e4d7c4;
+
+    border: 2px solid #877661;
+
+    border-radius: 50%;
+}
+
+.jowl.left {
+    left: 9px;
+}
+
+.jowl.right {
+    right: 8px;
+}
+
+/* Tongue */
+
+.dog-tongue {
+    position: absolute;
+
+    left: 38px;
+    top: 65px;
+
+    width: 17px;
+    height: 28px;
+
+    background: #d96f7d;
+
+    border: 2px solid #944852;
+
+    border-radius: 5px 5px 50% 50%;
+
+    z-index: 4;
+
+    transform-origin: top center;
+
+    animation:
+        tongueOut 4.5s ease-in-out infinite;
+}
+
+@keyframes tongueOut {
+
+    0%, 48% {
+        height: 4px;
+        top: 65px;
+        transform: rotate(0deg);
+    }
+
+    52%, 78% {
+        height: 28px;
+        top: 65px;
+        transform: rotate(3deg);
+    }
+
+    84%, 100% {
+        height: 4px;
+        top: 65px;
+        transform: rotate(0deg);
+    }
+}
+
+/* Bulldog tail */
+
+.dog-tail {
+    position: absolute;
+
+    left: 30px;
+    top: 59px;
+
+    width: 43px;
+    height: 40px;
+
+    border-top: 9px solid #75604b;
+
+    border-left: 8px solid #75604b;
+
+    border-radius: 70% 20% 0 30%;
+
+    transform-origin: right bottom;
+
+    animation:
+        dogTailWag .35s ease-in-out infinite alternate;
+}
+
+@keyframes dogTailWag {
+    from {
+        transform: rotate(-18deg);
+    }
+
+    to {
+        transform: rotate(22deg);
+    }
+}
+
+/* Dog legs */
+
+.dog-leg {
+    position: absolute;
+
+    top: 103px;
+
+    width: 21px;
+    height: 46px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #8d7963,
+            #c6b49b,
+            #806d58
+        );
+
+    border: 3px solid #594b3d;
+
+    border-radius: 10px 10px 7px 7px;
+
+    transform-origin: top center;
+}
+
+.dog-leg.one {
+    left: 56px;
+    animation: dogLeg1 .32s ease-in-out infinite alternate;
+}
+
+.dog-leg.two {
+    left: 82px;
+    animation: dogLeg2 .32s ease-in-out infinite alternate;
+}
+
+.dog-leg.three {
+    left: 116px;
+    animation: dogLeg2 .32s ease-in-out infinite alternate;
+}
+
+.dog-leg.four {
+    left: 139px;
+    animation: dogLeg1 .32s ease-in-out infinite alternate;
+}
+
+@keyframes dogLeg1 {
+    from { transform: rotate(9deg); }
+    to   { transform: rotate(-9deg); }
+}
+
+@keyframes dogLeg2 {
+    from { transform: rotate(-9deg); }
+    to   { transform: rotate(9deg); }
+}
+
+/* -------------------------
+   DOG ENCOUNTER
+------------------------- */
+
+.giraffe-wrapper.meeting .giraffe {
+    transform:
+        scaleX(-1)
+        translateY(-4px);
+}
+
+.giraffe-wrapper.meeting {
+    animation-play-state: running;
+}
+
+.bulldog-wrapper.meeting .bulldog-head {
+    transform: rotate(-8deg) translateY(-4px);
+    transition: transform .25s ease;
+}
+
+
+/* -------------------------
+   FOOTER
+------------------------- */
+
+.footer {
+    position: absolute;
+
+    z-index: 30;
+
+    bottom: 10px;
+    left: 0;
+
+    width: 100%;
+
+    text-align: center;
+
+    color: rgba(255,255,255,.35);
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-room">
+
+    <div class="glow"></div>
+
+    <div class="title-area">
+        <h1 class="title">GAME ROOM</h1>
+        <div class="subtitle">CHOOSE YOUR GAME</div>
+    </div>
+
+
+    <!-- GAME MENU -->
+
+    <div class="menu">
+
+        <button
+            class="game-button"
+            onclick="location.href='ttt.html'">
+
+            <div class="icon">⭕</div>
+
+            <div class="button-text">
+                <div class="button-title">
+                    TIC-TAC-TOE
+                </div>
+
+                <div class="button-subtitle">
+                    Classic X vs O
+                </div>
+            </div>
+
+        </button>
+
+
+        <button
+            class="game-button"
+            onclick="location.href='checkers.html'">
+
+            <div class="icon">⛀</div>
+
+            <div class="button-text">
+                <div class="button-title">
+                    CHECKERS
+                </div>
+
+                <div class="button-subtitle">
+                    Jump • Capture • King
+                </div>
+            </div>
+
+        </button>
+
+
+        <button
+            class="game-button"
+            onclick="location.href='carrierstrike.html'">
+
+            <div class="icon">⚓</div>
+
+            <div class="button-text">
+                <div class="button-title">
+                    CARRIER STRIKE
+                </div>
+
+                <div class="button-subtitle">
+                    Hunt • Strike • Destroy
+                </div>
+            </div>
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         ORIGINAL GIRAFFE
+         LEFT UNCHANGED
+    ================================================= -->
+
+    <div class="giraffe-wrapper" id="giraffeWrapper">
+
+        <div class="giraffe">
+
+            <div class="tail">
+                <div class="tail-tip"></div>
+            </div>
+
+            <div class="body"></div>
+
+            <div class="patch p1"></div>
+            <div class="patch p2"></div>
+            <div class="patch p3"></div>
+            <div class="patch p4"></div>
+
+            <div class="leg back1"></div>
+            <div class="leg back2"></div>
+            <div class="leg front1"></div>
+            <div class="leg front2"></div>
+
+            <div class="neck"></div>
+
+            <div class="mane"></div>
+
+            <div class="head">
+
+                <div class="ear left"></div>
+                <div class="ear right"></div>
+
+                <div class="horn one"></div>
+                <div class="horn two"></div>
+
+                <div class="eye"></div>
+
+                <div class="muzzle"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         BULLDOG
+    ================================================= -->
+
+    <div class="bulldog-wrapper" id="bulldogWrapper">
+
+        <div class="bulldog">
+
+            <div class="dog-tail"></div>
+
+            <div class="dog-body"></div>
+
+            <div class="dog-chest"></div>
+
+            <div class="dog-leg one"></div>
+            <div class="dog-leg two"></div>
+            <div class="dog-leg three"></div>
+            <div class="dog-leg four"></div>
+
+            <div class="dog-head">
+
+                <div class="dog-ear left"></div>
+                <div class="dog-ear right"></div>
+
+                <div class="dog-face"></div>
+
+                <div class="dog-eye left"></div>
+                <div class="dog-eye right"></div>
+
+                <div class="dog-muzzle"></div>
+
+                <div class="jowl left"></div>
+                <div class="jowl right"></div>
+
+                <div class="dog-nose"></div>
+
+                <div class="dog-tongue"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="ground"></div>
+
+    <div class="footer">
+        TWO PLAYERS • ONE SCREEN • LET'S PLAY
+    </div>
+
+</div>
+
+
+<script>
+
+/*
+   SMALL OPTIONAL INTERACTION
+
+   The page works normally even if this
+   interaction is removed.
+
+   When the bulldog gets close to the giraffe,
+   they briefly react to each other.
+*/
+
+(function () {
+
+    const giraffe =
+        document.getElementById("giraffeWrapper");
+
+    const bulldog =
+        document.getElementById("bulldogWrapper");
+
+    if (!giraffe || !bulldog) {
+        return;
+    }
+
+    let lastMeeting = 0;
+
+    function checkAnimals() {
+
+        const g =
+            giraffe.getBoundingClientRect();
+
+        const b =
+            bulldog.getBoundingClientRect();
+
+        const closeEnough =
+            b.left < g.right + 35 &&
+            b.right > g.left - 35 &&
+            b.top < g.bottom &&
+            b.bottom > g.top + 45;
+
+        const now = Date.now();
+
+        if (closeEnough && now - lastMeeting > 5000) {
+
+            lastMeeting = now;
+
+            giraffe.classList.add("meeting");
+            bulldog.classList.add("meeting");
+
+            setTimeout(function () {
+
+                giraffe.classList.remove("meeting");
+                bulldog.classList.remove("meeting");
+
+            }, 1600);
+        }
+
+        setTimeout(checkAnimals, 250);
+    }
+
+    checkAnimals();
+
+})();
+
+</script>
+
+</body>
+</html>
