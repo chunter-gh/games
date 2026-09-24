@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shiny Checkers</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Game Room - Checkers</title>
 
 <style>
 * {
@@ -11,64 +12,83 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
     margin: 0;
-    min-height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
     background:
-        radial-gradient(circle at 50% 15%, #3d4654 0%, #141821 42%, #050609 100%);
+        radial-gradient(circle at 50% 0%, #263b72 0%, #101a39 42%, #060b19 100%);
     color: white;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 18px;
 }
 
 .game {
-    width: min(96vw, 760px);
-    text-align: center;
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 10px;
+    overflow: hidden;
 }
 
 h1 {
-    margin: 0 0 4px;
-    font-size: clamp(32px, 7vw, 58px);
+    margin: 0;
+    font-size: clamp(22px, 4vw, 40px);
     letter-spacing: 4px;
     text-shadow:
-        0 3px 5px #000,
-        0 0 18px rgba(255,255,255,.18);
+        0 2px 4px #000,
+        0 0 15px rgba(255,255,255,.15);
+    flex-shrink: 0;
 }
 
 .subtitle {
-    color: #c9ced6;
-    margin-bottom: 16px;
-    font-size: 14px;
+    margin: 1px 0 5px;
+    font-size: clamp(10px, 1.7vw, 15px);
     letter-spacing: 2px;
+    opacity: .75;
+    flex-shrink: 0;
 }
 
 .controls {
     display: flex;
-    justify-content: center;
-    gap: 9px;
     flex-wrap: wrap;
-    margin-bottom: 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    flex-shrink: 0;
 }
 
-button, select {
-    min-height: 44px;
-    border: 1px solid rgba(255,255,255,.25);
-    border-radius: 10px;
-    padding: 9px 14px;
+button,
+select {
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 8px;
+    background:
+        linear-gradient(145deg, #394e82, #18264d);
     color: white;
-    background: linear-gradient(#343b47, #171b22);
+    font-weight: bold;
+    padding: 6px 10px;
+    font-size: clamp(10px, 1.6vw, 14px);
     box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.18),
-        0 3px 8px rgba(0,0,0,.5);
-    font-size: 14px;
+        0 3px 7px rgba(0,0,0,.45),
+        inset 0 1px 1px rgba(255,255,255,.15);
+}
+
+button {
     cursor: pointer;
 }
 
-button:hover, select:hover {
-    background: linear-gradient(#444c59, #1b2028);
+button:hover {
+    background:
+        linear-gradient(145deg, #4c649f, #223665);
 }
 
 button:active {
@@ -76,50 +96,51 @@ button:active {
 }
 
 select {
-    min-width: 125px;
+    cursor: pointer;
 }
 
 .status {
-    min-height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 14px;
-    padding: 9px 14px;
-    border-radius: 12px;
-    background: linear-gradient(145deg, #202630, #0b0d11);
-    border: 1px solid rgba(255,255,255,.13);
-    box-shadow:
-        inset 0 1px 5px rgba(255,255,255,.05),
-        0 5px 15px rgba(0,0,0,.4);
+    min-height: 24px;
+    padding: 3px 12px;
+    margin-bottom: 4px;
+    border-radius: 20px;
+    background: rgba(0,0,0,.30);
+    border: 1px solid rgba(255,255,255,.14);
+    font-size: clamp(11px, 1.8vw, 16px);
     font-weight: bold;
-    letter-spacing: .5px;
+    text-align: center;
+    flex-shrink: 0;
 }
 
-.board-wrap {
-    padding: 9px;
-    border-radius: 18px;
-    background:
-        linear-gradient(135deg, #555b65, #090b0e 35%, #424750 50%, #08090b);
-    box-shadow:
-        0 12px 35px rgba(0,0,0,.75),
-        inset 0 2px 3px rgba(255,255,255,.25),
-        inset 0 -3px 5px rgba(0,0,0,.8);
+.board-area {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .board {
-    width: min(88vw, 690px);
-    aspect-ratio: 1;
-    margin: auto;
+    width: var(--board-size);
+    height: var(--board-size);
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    overflow: hidden;
-    border-radius: 7px;
-    border: 3px solid #090909;
+    grid-template-rows: repeat(8, 1fr);
+
+    border-radius: 12px;
+    padding: 5px;
+
+    background:
+        linear-gradient(145deg, #080b12, #222838 45%, #05070c);
+
     box-shadow:
-        inset 0 0 10px rgba(0,0,0,.9),
-        0 2px 8px #000;
-    touch-action: manipulation;
+        0 12px 30px rgba(0,0,0,.65),
+        0 0 0 2px rgba(255,255,255,.10),
+        inset 0 2px 3px rgba(255,255,255,.18),
+        inset 0 -4px 8px rgba(0,0,0,.75);
+
+    flex-shrink: 0;
 }
 
 .square {
@@ -127,249 +148,361 @@ select {
     display: flex;
     justify-content: center;
     align-items: center;
-    aspect-ratio: 1;
+    overflow: visible;
 }
 
 .light {
     background:
         linear-gradient(135deg,
-            #f34b4b 0%,
-            #a90d16 42%,
-            #560308 100%);
+            #b52a2a 0%,
+            #7d1117 42%,
+            #48080d 100%);
+    box-shadow:
+        inset 1px 1px 2px rgba(255,255,255,.16),
+        inset -2px -2px 4px rgba(0,0,0,.30);
 }
 
 .dark {
     background:
         linear-gradient(135deg,
-            #16191e 0%,
-            #050608 45%,
-            #24272d 100%);
-}
-
-.square::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.20),
-            transparent 30%,
-            transparent 70%,
-            rgba(0,0,0,.20)
-        );
+            #121722 0%,
+            #070a10 45%,
+            #020307 100%);
+    box-shadow:
+        inset 1px 1px 2px rgba(255,255,255,.09),
+        inset -2px -2px 4px rgba(0,0,0,.55);
 }
 
 .square.selected {
     box-shadow:
-        inset 0 0 0 4px #ffe84a,
-        inset 0 0 20px rgba(255,235,50,.7);
+        inset 0 0 0 3px #ffd84a,
+        inset 0 0 15px rgba(255,216,74,.45);
 }
 
-.square.move-target {
-    cursor: pointer;
-}
-
-.square.move-target::before {
+.square.move-target::after {
     content: "";
     position: absolute;
-    width: 25%;
-    height: 25%;
+    width: 24%;
+    height: 24%;
     border-radius: 50%;
-    background: rgba(255,255,255,.8);
+    background: rgba(255,216,74,.85);
     box-shadow:
-        0 0 12px rgba(255,255,255,.9),
-        0 0 3px #fff;
-    z-index: 3;
+        0 0 10px rgba(255,216,74,.9);
+    pointer-events: none;
 }
 
-.square.capture-target {
+.square.capture-target::after {
+    content: "";
+    position: absolute;
+    width: 31%;
+    height: 31%;
+    border-radius: 50%;
+    border: 3px solid #ffd84a;
     box-shadow:
-        inset 0 0 0 4px #fff,
-        inset 0 0 22px rgba(255,255,255,.6);
+        0 0 12px rgba(255,216,74,.9);
+    pointer-events: none;
 }
+
+/* =========================================================
+   CLASSIC CHECKER PIECE
+   ========================================================= */
 
 .piece {
     position: relative;
-    width: 76%;
-    height: 76%;
+    width: 82%;
+    height: 82%;
     border-radius: 50%;
-    z-index: 4;
+    z-index: 5;
     cursor: pointer;
 
+    transform: translateY(-1%);
+
     box-shadow:
-        0 7px 7px rgba(0,0,0,.75),
-        0 2px 3px rgba(0,0,0,.9),
-        inset 0 4px 5px rgba(255,255,255,.55),
-        inset 0 -7px 10px rgba(0,0,0,.55);
+        0 5px 5px rgba(0,0,0,.65),
+        0 2px 2px rgba(0,0,0,.75);
 
     transition:
         transform .12s ease,
-        box-shadow .12s ease;
+        filter .12s ease;
 }
 
 .piece:hover {
-    transform: translateY(-2px) scale(1.03);
+    transform: translateY(-4%) scale(1.04);
 }
 
 .piece.red {
     background:
         radial-gradient(
-            circle at 32% 23%,
-            #fff 0%,
-            #ffb0b0 4%,
-            #ff3c3c 11%,
-            #e00012 35%,
-            #9b000a 65%,
-            #4b0005 100%
+            circle at 32% 24%,
+            #ffb0b0 0%,
+            #ff5959 8%,
+            #e71925 23%,
+            #a90712 52%,
+            #69050b 77%,
+            #340207 100%
         );
-    border: 3px solid #ff6a6a;
+
+    border: 2px solid #51040a;
+
+    box-shadow:
+        0 5px 6px rgba(0,0,0,.72),
+        inset 0 3px 3px rgba(255,255,255,.45),
+        inset 0 -5px 6px rgba(0,0,0,.45),
+        0 0 7px rgba(255,30,30,.20);
 }
 
 .piece.black {
     background:
         radial-gradient(
-            circle at 32% 23%,
-            #fff 0%,
-            #c9c9c9 3%,
-            #686868 9%,
-            #242424 28%,
-            #080808 60%,
-            #000 100%
+            circle at 32% 24%,
+            #9fa8b8 0%,
+            #515a69 7%,
+            #242b37 22%,
+            #10151d 48%,
+            #070a0f 74%,
+            #020306 100%
         );
-    border: 3px solid #777;
+
+    border: 2px solid #010205;
+
+    box-shadow:
+        0 5px 6px rgba(0,0,0,.80),
+        inset 0 3px 3px rgba(255,255,255,.30),
+        inset 0 -5px 7px rgba(0,0,0,.72),
+        0 0 7px rgba(255,255,255,.10);
 }
 
+/* Classic concentric raised ridges */
 .piece::before {
     content: "";
     position: absolute;
-    left: 13%;
-    right: 13%;
+    left: 10%;
     top: 10%;
-    height: 17%;
+    width: 80%;
+    height: 80%;
     border-radius: 50%;
-    background: linear-gradient(
-        rgba(255,255,255,.65),
-        rgba(255,255,255,0)
-    );
-    filter: blur(1px);
+    pointer-events: none;
+
+    border: 2px solid rgba(255,255,255,.20);
+
+    box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,.24),
+        inset 0 0 0 5px rgba(255,255,255,.10),
+        inset 0 0 0 7px rgba(0,0,0,.20);
 }
 
+/* Smaller inner stepped ring */
 .piece::after {
     content: "";
     position: absolute;
-    left: 9%;
-    right: 9%;
-    bottom: 8%;
-    height: 17%;
+    left: 23%;
+    top: 23%;
+    width: 54%;
+    height: 54%;
     border-radius: 50%;
-    border-bottom: 3px solid rgba(0,0,0,.4);
-}
+    pointer-events: none;
 
-.king {
+    border: 1px solid rgba(255,255,255,.22);
+
     box-shadow:
-        0 7px 7px rgba(0,0,0,.8),
-        inset 0 4px 5px rgba(255,255,255,.6),
-        inset 0 -8px 10px rgba(0,0,0,.6),
-        0 0 8px rgba(255,215,0,.35);
+        inset 0 0 0 2px rgba(0,0,0,.20),
+        0 1px 1px rgba(255,255,255,.16);
 }
 
-.king::marker {
+/* Extra bottom rim gives the classic puck/stacked-ring appearance */
+.piece .rim {
+    position: absolute;
+    left: 5%;
+    top: 42%;
+    width: 90%;
+    height: 48%;
+    border-radius: 0 0 50% 50%;
+    border-bottom: 3px solid rgba(0,0,0,.35);
+    pointer-events: none;
+}
+
+/* Gloss highlight */
+.piece .shine {
+    position: absolute;
+    left: 19%;
+    top: 10%;
+    width: 35%;
+    height: 18%;
+    border-radius: 50%;
+    transform: rotate(-22deg);
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,.48),
+        rgba(255,255,255,0)
+    );
+    filter: blur(.4px);
+    pointer-events: none;
+}
+
+/* =========================================================
+   KINGS = TWO CLASSIC PIECES STACKED
+   ========================================================= */
+
+.piece.king {
+    transform: translateY(-5%);
+}
+
+.piece.king::marker {
     display: none;
 }
 
-.king-symbol {
+/*
+   The king's second checker is created behind the main checker.
+   No K letter is used.
+*/
+.piece.king .king-stack {
     position: absolute;
-    z-index: 8;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -52%);
-    width: 55%;
-    height: 55%;
+    left: 0;
+    top: 11%;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    border: 3px solid rgba(255,255,255,.85);
-    color: #fff;
-    font-size: clamp(14px, 3vw, 25px);
-    font-weight: 900;
-    line-height: 1.3;
-    text-shadow: 0 2px 3px #000;
+    z-index: -1;
+}
+
+.piece.red.king .king-stack {
+    background:
+        radial-gradient(
+            circle at 32% 24%,
+            #ff8585 0%,
+            #d71922 24%,
+            #8d0710 58%,
+            #470308 100%
+        );
+    border: 2px solid #4b0308;
     box-shadow:
-        inset 0 2px 3px rgba(255,255,255,.35),
-        0 1px 3px #000;
+        0 4px 5px rgba(0,0,0,.75),
+        inset 0 2px 3px rgba(255,255,255,.25);
 }
 
-.black .king-symbol {
-    color: #ffd92f;
-    border-color: #ffd92f;
+.piece.black.king .king-stack {
+    background:
+        radial-gradient(
+            circle at 32% 24%,
+            #737d8e 0%,
+            #343b48 23%,
+            #11161e 58%,
+            #030407 100%
+        );
+    border: 2px solid #010204;
+    box-shadow:
+        0 4px 5px rgba(0,0,0,.78),
+        inset 0 2px 3px rgba(255,255,255,.20);
 }
 
-.red .king-symbol {
-    color: #fff;
+.piece.king .king-stack::before {
+    content: "";
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.14);
+    box-shadow:
+        inset 0 0 0 3px rgba(0,0,0,.25);
 }
+
+/* ========================================================= */
 
 .legend {
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 22px;
-    margin-top: 14px;
-    font-size: 13px;
-    color: #c7ccd3;
+    gap: 14px;
+    min-height: 20px;
+    margin-top: 3px;
+    font-size: clamp(9px, 1.4vw, 12px);
+    opacity: .72;
+    flex-shrink: 0;
+}
+
+.legend span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .dot {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    vertical-align: -2px;
-    margin-right: 5px;
-    box-shadow: 0 2px 4px #000;
+    display: inline-block;
+    box-shadow: 0 1px 2px #000;
 }
 
-.red-dot {
-    background: radial-gradient(circle at 30% 25%, #fff, #e00012 45%, #500);
+.dot.red {
+    background: #d71922;
 }
 
-.black-dot {
-    background: radial-gradient(circle at 30% 25%, #aaa, #111 45%, #000);
+.dot.black {
+    background: #111;
+    border: 1px solid #555;
 }
 
-.computer-thinking {
-    animation: pulse 1s infinite alternate;
+.footer {
+    min-height: 15px;
+    margin-top: 2px;
+    font-size: clamp(7px, 1.1vw, 10px);
+    letter-spacing: 1px;
+    opacity: .35;
+    flex-shrink: 0;
 }
 
-@keyframes pulse {
-    from { opacity: .65; }
-    to { opacity: 1; }
-}
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
-@media (max-width: 500px) {
-    body {
-        padding: 9px;
-    }
-
-    .board-wrap {
-        padding: 5px;
-        border-radius: 12px;
-    }
-
-    .board {
-        width: 94vw;
+@media (max-width: 600px) {
+    .game {
+        padding: 5px 5px;
     }
 
     h1 {
-        font-size: 34px;
         letter-spacing: 2px;
     }
 
-    .controls {
-        gap: 6px;
+    .subtitle {
+        letter-spacing: 1px;
     }
 
-    button, select {
-        padding: 8px 10px;
-        font-size: 13px;
+    .controls {
+        gap: 4px;
+        margin-bottom: 3px;
+    }
+
+    button,
+    select {
+        padding: 5px 7px;
+        border-radius: 6px;
+    }
+
+    .status {
+        margin-bottom: 2px;
+    }
+
+    .board {
+        padding: 3px;
+        border-radius: 8px;
+    }
+
+    .piece {
+        width: 84%;
+        height: 84%;
+    }
+
+    .legend {
+        margin-top: 1px;
+        gap: 8px;
+    }
+
+    .footer {
+        display: none;
     }
 }
 </style>
@@ -380,192 +513,454 @@ select {
 <div class="game">
 
     <h1>CHECKERS</h1>
-    <div class="subtitle">CLASSIC • GLOSSY • TWO WAYS TO PLAY</div>
 
-    <div class="controls">
-        <button id="twoPlayerBtn" type="button">👥 2 PLAYERS</button>
-        <button id="computerBtn" type="button">🤖 VS COMPUTER</button>
-
-        <select id="difficulty" aria-label="Computer difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-
-        <button id="newGameBtn" type="button">NEW GAME</button>
+    <div class="subtitle">
+        CLASSIC • GLOSSY • TWO PLAYER
     </div>
 
-    <div id="status" class="status" aria-live="polite">
+    <div class="controls">
+
+        <button id="twoPlayerBtn">
+            2 PLAYERS
+        </button>
+
+        <button id="computerBtn">
+            VS COMPUTER
+        </button>
+
+        <select id="difficulty">
+            <option value="easy">EASY</option>
+            <option value="medium" selected>MEDIUM</option>
+            <option value="hard">HARD</option>
+        </select>
+
+        <button id="newGameBtn">
+            NEW GAME
+        </button>
+
+        <button id="menuBtn">
+            GAME ROOM
+        </button>
+
+    </div>
+
+    <div class="status" id="status">
         Red's turn
     </div>
 
-    <div class="board-wrap">
-        <div id="board" class="board"></div>
+    <div class="board-area" id="boardArea">
+        <div class="board" id="board"></div>
     </div>
 
     <div class="legend">
-        <span><span class="dot red-dot"></span>RED</span>
-        <span><span class="dot black-dot"></span>BLACK</span>
+        <span>
+            <i class="dot red"></i>
+            RED
+        </span>
+
+        <span>
+            <i class="dot black"></i>
+            BLACK
+        </span>
+
+        <span>
+            STACKED = KING
+        </span>
+    </div>
+
+    <div class="footer">
+        GAME ROOM • CHECKERS
     </div>
 
 </div>
 
 <script>
-(() => {
-    "use strict";
+"use strict";
 
-    const boardElement = document.getElementById("board");
-    const statusElement = document.getElementById("status");
-    const twoPlayerBtn = document.getElementById("twoPlayerBtn");
-    const computerBtn = document.getElementById("computerBtn");
-    const difficultySelect = document.getElementById("difficulty");
-    const newGameBtn = document.getElementById("newGameBtn");
+/* =========================================================
+   CHECKERS GAME
+   ========================================================= */
 
-    const SIZE = 8;
+const boardElement = document.getElementById("board");
+const boardArea = document.getElementById("boardArea");
+const statusElement = document.getElementById("status");
 
-    let board = [];
-    let currentPlayer = "red";
-    let selected = null;
-    let forcedPiece = null;
-    let gameOver = false;
-    let mode = "computer";
-    let computerThinking = false;
+const twoPlayerBtn = document.getElementById("twoPlayerBtn");
+const computerBtn = document.getElementById("computerBtn");
+const difficultySelect = document.getElementById("difficulty");
+const newGameBtn = document.getElementById("newGameBtn");
+const menuBtn = document.getElementById("menuBtn");
 
-    /*
-       Piece:
-       {
-           color: "red" | "black",
-           king: true | false
-       }
-    */
+let board = [];
+let currentPlayer = "r";
+let selected = null;
+let legalTargets = [];
+let forcedPiece = null;
+let gameOver = false;
 
-    function createStartingBoard() {
-        const newBoard = Array.from(
-            { length: SIZE },
-            () => Array(SIZE).fill(null)
+let gameMode = "2p";
+let computerThinking = false;
+
+const SIZE = 8;
+
+/*
+    r = red
+    b = black
+    uppercase = king
+
+    Red starts at the bottom and moves upward.
+    Black starts at the top and moves downward.
+*/
+
+/* =========================================================
+   BOARD SETUP
+   ========================================================= */
+
+function createInitialBoard() {
+
+    board = Array.from(
+        { length: SIZE },
+        () => Array(SIZE).fill(null)
+    );
+
+    // Black pieces at top
+    for (let row = 0; row < 3; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if ((row + col) % 2 === 1) {
+                board[row][col] = "b";
+            }
+        }
+    }
+
+    // Red pieces at bottom
+    for (let row = 5; row < 8; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if ((row + col) % 2 === 1) {
+                board[row][col] = "r";
+            }
+        }
+    }
+}
+
+/* =========================================================
+   RENDER BOARD
+   ========================================================= */
+
+function render() {
+
+    boardElement.innerHTML = "";
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const square = document.createElement("div");
+
+            square.className =
+                "square " +
+                ((row + col) % 2 === 0 ? "light" : "dark");
+
+            square.dataset.row = row;
+            square.dataset.col = col;
+
+            if (
+                selected &&
+                selected.row === row &&
+                selected.col === col
+            ) {
+                square.classList.add("selected");
+            }
+
+            const target = legalTargets.find(
+                move =>
+                    move.row === row &&
+                    move.col === col
+            );
+
+            if (target) {
+
+                if (target.capture) {
+                    square.classList.add("capture-target");
+                } else {
+                    square.classList.add("move-target");
+                }
+            }
+
+            const piece = board[row][col];
+
+            if (piece) {
+
+                const pieceElement =
+                    document.createElement("div");
+
+                const color =
+                    piece.toLowerCase();
+
+                const king =
+                    piece === piece.toUpperCase();
+
+                pieceElement.className =
+                    "piece " +
+                    (color === "r" ? "red" : "black") +
+                    (king ? " king" : "");
+
+                const rim =
+                    document.createElement("div");
+
+                rim.className = "rim";
+
+                const shine =
+                    document.createElement("div");
+
+                shine.className = "shine";
+
+                pieceElement.appendChild(rim);
+                pieceElement.appendChild(shine);
+
+                if (king) {
+
+                    const stack =
+                        document.createElement("div");
+
+                    stack.className = "king-stack";
+
+                    pieceElement.appendChild(stack);
+                }
+
+                square.appendChild(pieceElement);
+            }
+
+            square.addEventListener(
+                "click",
+                () => handleSquareClick(row, col)
+            );
+
+            boardElement.appendChild(square);
+        }
+    }
+}
+
+/* =========================================================
+   RESPONSIVE BOARD SIZE
+   ========================================================= */
+
+function fitBoard() {
+
+    const areaRect =
+        boardArea.getBoundingClientRect();
+
+    const availableWidth =
+        areaRect.width - 4;
+
+    const availableHeight =
+        areaRect.height - 4;
+
+    let size =
+        Math.min(
+            availableWidth,
+            availableHeight
         );
 
-        // Black starts at the top.
-        for (let row = 0; row < 3; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                if ((row + col) % 2 === 1) {
-                    newBoard[row][col] = {
-                        color: "black",
-                        king: false
-                    };
-                }
-            }
-        }
+    /*
+       Don't let a desktop board become absurdly large.
+       But allow a large monitor to use more of the screen.
+    */
+    size = Math.min(size, 760);
 
-        // Red starts at the bottom.
-        for (let row = 5; row < 8; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                if ((row + col) % 2 === 1) {
-                    newBoard[row][col] = {
-                        color: "red",
-                        king: false
-                    };
-                }
-            }
-        }
+    /*
+       On extremely small screens, use whatever space exists.
+    */
+    size = Math.max(size, 0);
 
-        return newBoard;
+    boardElement.style.setProperty(
+        "--board-size",
+        size + "px"
+    );
+}
+
+window.addEventListener("resize", fitBoard);
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener(
+        "resize",
+        fitBoard
+    );
+}
+
+const resizeObserver =
+    new ResizeObserver(fitBoard);
+
+resizeObserver.observe(boardArea);
+
+/* =========================================================
+   GAME START
+   ========================================================= */
+
+function startGame() {
+
+    createInitialBoard();
+
+    currentPlayer = "r";
+    selected = null;
+    legalTargets = [];
+    forcedPiece = null;
+    gameOver = false;
+    computerThinking = false;
+
+    updateStatus();
+    render();
+
+    requestAnimationFrame(fitBoard);
+}
+
+/* =========================================================
+   PIECE HELPERS
+   ========================================================= */
+
+function isRed(piece) {
+    return piece && piece.toLowerCase() === "r";
+}
+
+function isBlack(piece) {
+    return piece && piece.toLowerCase() === "b";
+}
+
+function isKing(piece) {
+    return piece && piece === piece.toUpperCase();
+}
+
+function belongsTo(piece, player) {
+
+    if (!piece) {
+        return false;
     }
 
-    function resetGame() {
-        board = createStartingBoard();
-        currentPlayer = "red";
-        selected = null;
-        forcedPiece = null;
-        gameOver = false;
-        computerThinking = false;
+    return piece.toLowerCase() === player;
+}
 
-        statusElement.classList.remove("computer-thinking");
-        updateStatus();
-        render();
-    }
+/* =========================================================
+   DIRECTIONS
+   ========================================================= */
 
-    function inside(row, col) {
-        return row >= 0 &&
-               row < SIZE &&
-               col >= 0 &&
-               col < SIZE;
-    }
+function getDirections(piece) {
 
-    function directionsFor(piece) {
-        if (!piece) return [];
-
-        if (piece.king) {
-            return [
-                [-1, -1],
-                [-1, 1],
-                [1, -1],
-                [1, 1]
-            ];
-        }
-
-        if (piece.color === "red") {
-            return [
-                [-1, -1],
-                [-1, 1]
-            ];
-        }
+    if (isKing(piece)) {
 
         return [
+            [-1, -1],
+            [-1, 1],
             [1, -1],
             [1, 1]
         ];
     }
 
-    function getSimpleMoves(row, col) {
-        const piece = board[row][col];
-        if (!piece) return [];
+    /*
+       Red moves upward.
+       Black moves downward.
+    */
 
-        const moves = [];
+    if (piece.toLowerCase() === "r") {
 
-        for (const [dr, dc] of directionsFor(piece)) {
-            const nr = row + dr;
-            const nc = col + dc;
-
-            if (inside(nr, nc) && !board[nr][nc]) {
-                moves.push({
-                    from: { row, col },
-                    to: { row: nr, col: nc },
-                    capture: null
-                });
-            }
-        }
-
-        return moves;
+        return [
+            [-1, -1],
+            [-1, 1]
+        ];
     }
 
-    function getCaptures(row, col) {
-        const piece = board[row][col];
-        if (!piece) return [];
+    return [
+        [1, -1],
+        [1, 1]
+    ];
+}
 
-        const moves = [];
+function inside(row, col) {
 
-        for (const [dr, dc] of directionsFor(piece)) {
-            const middleRow = row + dr;
-            const middleCol = col + dc;
-            const landingRow = row + dr * 2;
-            const landingCol = col + dc * 2;
+    return (
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    );
+}
 
-            if (!inside(landingRow, landingCol) ||
-                !inside(middleRow, middleCol)) {
-                continue;
-            }
+/* =========================================================
+   SIMPLE MOVES
+   ========================================================= */
 
-            const middlePiece = board[middleRow][middleCol];
+function getSimpleMoves(row, col) {
+
+    const piece = board[row][col];
+
+    if (!piece) {
+        return [];
+    }
+
+    const moves = [];
+
+    for (const [dr, dc] of getDirections(piece)) {
+
+        const nr = row + dr;
+        const nc = col + dc;
+
+        if (
+            inside(nr, nc) &&
+            !board[nr][nc]
+        ) {
+
+            moves.push({
+                row: nr,
+                col: nc,
+                capture: null
+            });
+        }
+    }
+
+    return moves;
+}
+
+/* =========================================================
+   CAPTURE MOVES
+   ========================================================= */
+
+function getCaptureMoves(row, col) {
+
+    const piece = board[row][col];
+
+    if (!piece) {
+        return [];
+    }
+
+    const moves = [];
+
+    for (const [dr, dc] of getDirections(piece)) {
+
+        const middleRow = row + dr;
+        const middleCol = col + dc;
+
+        const landingRow = row + dr * 2;
+        const landingCol = col + dc * 2;
+
+        if (
+            inside(landingRow, landingCol) &&
+            board[middleRow]?.[middleCol] &&
+            !board[landingRow][landingCol]
+        ) {
+
+            const middlePiece =
+                board[middleRow][middleCol];
 
             if (
-                middlePiece &&
-                middlePiece.color !== piece.color &&
-                !board[landingRow][landingCol]
+                middlePiece.toLowerCase() !==
+                piece.toLowerCase()
             ) {
+
                 moves.push({
-                    from: { row, col },
-                    to: { row: landingRow, col: landingCol },
+                    row: landingRow,
+                    col: landingCol,
                     capture: {
                         row: middleRow,
                         col: middleCol
@@ -573,701 +968,1258 @@ select {
                 });
             }
         }
-
-        return moves;
     }
 
-    function allMovesFor(color) {
-        const captures = [];
-        const moves = [];
+    return moves;
+}
 
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                const piece = board[row][col];
+/* =========================================================
+   ALL MOVES FOR A PLAYER
+   ========================================================= */
 
-                if (!piece || piece.color !== color) continue;
+function getAllMoves(player) {
 
-                captures.push(...getCaptures(row, col));
-                moves.push(...getSimpleMoves(row, col));
+    const captures = [];
+    const simple = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece = board[row][col];
+
+            if (!belongsTo(piece, player)) {
+                continue;
             }
-        }
 
-        return captures.length > 0 ? captures : moves;
-    }
+            for (const move of getCaptureMoves(row, col)) {
 
-    function legalMovesForPiece(row, col) {
-        const piece = board[row][col];
-
-        if (!piece || piece.color !== currentPlayer) {
-            return [];
-        }
-
-        if (forcedPiece &&
-            (forcedPiece.row !== row || forcedPiece.col !== col)) {
-            return [];
-        }
-
-        const captures = getCaptures(row, col);
-
-        if (captures.length) {
-            return captures;
-        }
-
-        if (forcedPiece) {
-            return [];
-        }
-
-        const allCaptures = [];
-
-        for (let r = 0; r < SIZE; r++) {
-            for (let c = 0; c < SIZE; c++) {
-                const p = board[r][c];
-
-                if (p && p.color === currentPlayer) {
-                    allCaptures.push(...getCaptures(r, c));
-                }
-            }
-        }
-
-        if (allCaptures.length) {
-            return [];
-        }
-
-        return getSimpleMoves(row, col);
-    }
-
-    function performMove(move) {
-        const piece = board[move.from.row][move.from.col];
-
-        if (!piece) return;
-
-        board[move.from.row][move.from.col] = null;
-        board[move.to.row][move.to.col] = piece;
-
-        if (move.capture) {
-            board[move.capture.row][move.capture.col] = null;
-        }
-
-        let becameKing = false;
-
-        if (
-            !piece.king &&
-            (
-                (piece.color === "red" && move.to.row === 0) ||
-                (piece.color === "black" && move.to.row === 7)
-            )
-        ) {
-            piece.king = true;
-            becameKing = true;
-        }
-
-        // A capture can lead to another jump.
-        if (move.capture && !becameKing) {
-            const nextCaptures = getCaptures(
-                move.to.row,
-                move.to.col
-            );
-
-            if (nextCaptures.length) {
-                forcedPiece = {
-                    row: move.to.row,
-                    col: move.to.col
-                };
-
-                selected = {
-                    row: move.to.row,
-                    col: move.to.col
-                };
-
-                render();
-                updateStatus();
-                return;
-            }
-        }
-
-        forcedPiece = null;
-        selected = null;
-
-        currentPlayer = currentPlayer === "red" ? "black" : "red";
-
-        checkGameEnd();
-        render();
-        updateStatus();
-
-        if (
-            !gameOver &&
-            mode === "computer" &&
-            currentPlayer === "black"
-        ) {
-            computerMove();
-        }
-    }
-
-    function checkGameEnd() {
-        const pieces = countPieces(currentPlayer);
-        const moves = allMovesFor(currentPlayer);
-
-        if (pieces === 0 || moves.length === 0) {
-            gameOver = true;
-
-            const winner =
-                currentPlayer === "red" ? "BLACK" : "RED";
-
-            statusElement.textContent =
-                `🏆 ${winner} WINS!`;
-        }
-    }
-
-    function countPieces(color) {
-        let count = 0;
-
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                if (board[row][col]?.color === color) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    function render() {
-        boardElement.innerHTML = "";
-
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                const square = document.createElement("div");
-
-                square.className =
-                    "square " +
-                    ((row + col) % 2 === 0 ? "light" : "dark");
-
-                square.dataset.row = row;
-                square.dataset.col = col;
-
-                if (
-                    selected &&
-                    selected.row === row &&
-                    selected.col === col
-                ) {
-                    square.classList.add("selected");
-                }
-
-                const piece = board[row][col];
-
-                if (piece) {
-                    const pieceElement =
-                        document.createElement("div");
-
-                    pieceElement.className =
-                        `piece ${piece.color}`;
-
-                    if (piece.king) {
-                        pieceElement.classList.add("king");
-
-                        const kingSymbol =
-                            document.createElement("div");
-
-                        kingSymbol.className = "king-symbol";
-                        kingSymbol.textContent = "K";
-
-                        pieceElement.appendChild(kingSymbol);
-                    }
-
-                    square.appendChild(pieceElement);
-                }
-
-                if (
-                    selected &&
-                    legalMovesForPiece(
-                        selected.row,
-                        selected.col
-                    ).some(
-                        move =>
-                            move.to.row === row &&
-                            move.to.col === col
-                    )
-                ) {
-                    square.classList.add("move-target");
-
-                    if (
-                        board[row][col] === null
-                    ) {
-                        // normal target
-                    }
-                }
-
-                boardElement.appendChild(square);
+                captures.push({
+                    from: { row, col },
+                    to: {
+                        row: move.row,
+                        col: move.col
+                    },
+                    capture: move.capture
+                });
             }
         }
     }
-
-    function updateStatus() {
-        if (gameOver) return;
-
-        if (computerThinking) {
-            statusElement.textContent =
-                "🤖 Computer is thinking...";
-            statusElement.classList.add("computer-thinking");
-            return;
-        }
-
-        statusElement.classList.remove("computer-thinking");
-
-        if (forcedPiece) {
-            statusElement.textContent =
-                `${capitalize(currentPlayer)} must continue the jump!`;
-            return;
-        }
-
-        if (mode === "computer") {
-            statusElement.textContent =
-                currentPlayer === "red"
-                    ? "🔴 Your turn"
-                    : "⚫ Computer's turn";
-        } else {
-            statusElement.textContent =
-                `${currentPlayer === "red" ? "🔴 Red" : "⚫ Black"}'s turn`;
-        }
-    }
-
-    function capitalize(text) {
-        return text.charAt(0).toUpperCase() + text.slice(1);
-    }
-
-    function handleSquareClick(row, col) {
-        if (gameOver || computerThinking) return;
-
-        if (mode === "computer" && currentPlayer === "black") {
-            return;
-        }
-
-        const piece = board[row][col];
-
-        // Selecting a piece.
-        if (!selected) {
-            if (piece && piece.color === currentPlayer) {
-                const legal = legalMovesForPiece(row, col);
-
-                if (legal.length) {
-                    selected = { row, col };
-                    render();
-                }
-            }
-
-            return;
-        }
-
-        // Clicking another own piece changes selection.
-        if (
-            piece &&
-            piece.color === currentPlayer &&
-            !forcedPiece
-        ) {
-            const legal = legalMovesForPiece(row, col);
-
-            if (legal.length) {
-                selected = { row, col };
-                render();
-            }
-
-            return;
-        }
-
-        const moves = legalMovesForPiece(
-            selected.row,
-            selected.col
-        );
-
-        const chosen = moves.find(
-            move =>
-                move.to.row === row &&
-                move.to.col === col
-        );
-
-        if (chosen) {
-            performMove(chosen);
-        }
-    }
-
-    boardElement.addEventListener("click", event => {
-        const square =
-            event.target.closest(".square");
-
-        if (!square) return;
-
-        handleSquareClick(
-            Number(square.dataset.row),
-            Number(square.dataset.col)
-        );
-    });
 
     /*
-       COMPUTER AI
-       Easy:
-         Random legal move.
-
-       Medium:
-         Captures + simple positional evaluation.
-
-       Hard:
-         Minimax with alpha-beta pruning.
+       Checkers requires captures whenever one exists.
     */
 
-    function computerMove() {
+    if (captures.length > 0) {
+        return captures;
+    }
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece = board[row][col];
+
+            if (!belongsTo(piece, player)) {
+                continue;
+            }
+
+            for (const move of getSimpleMoves(row, col)) {
+
+                simple.push({
+                    from: { row, col },
+                    to: {
+                        row: move.row,
+                        col: move.col
+                    },
+                    capture: null
+                });
+            }
+        }
+    }
+
+    return simple;
+}
+
+/* =========================================================
+   CLICK HANDLING
+   ========================================================= */
+
+function handleSquareClick(row, col) {
+
+    if (gameOver || computerThinking) {
+        return;
+    }
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === "b"
+    ) {
+        return;
+    }
+
+    const piece = board[row][col];
+
+    /*
+       If a piece is already selected,
+       see whether this click is a legal target.
+    */
+
+    if (selected) {
+
+        const target =
+            legalTargets.find(
+                move =>
+                    move.row === row &&
+                    move.col === col
+            );
+
+        if (target) {
+
+            makeHumanMove(
+                selected.row,
+                selected.col,
+                target
+            );
+
+            return;
+        }
+    }
+
+    /*
+       Selecting a piece.
+    */
+
+    if (
+        piece &&
+        belongsTo(piece, currentPlayer)
+    ) {
+
+        /*
+           During multiple jumps, only the
+           same piece can continue moving.
+        */
         if (
-            gameOver ||
-            mode !== "computer" ||
-            currentPlayer !== "black"
+            forcedPiece &&
+            (
+                forcedPiece.row !== row ||
+                forcedPiece.col !== col
+            )
         ) {
             return;
         }
 
-        computerThinking = true;
-        updateStatus();
+        const captures =
+            getCaptureMoves(row, col);
 
-        const delay =
-            difficultySelect.value === "easy"
-                ? 350
-                : 500;
+        const allCaptures =
+            getAllMoves(currentPlayer)
+                .filter(move => move.capture);
 
-        setTimeout(() => {
-            if (gameOver || currentPlayer !== "black") {
-                computerThinking = false;
-                return;
-            }
-
-            let move;
-
-            if (difficultySelect.value === "easy") {
-                move = chooseEasyMove();
-            } else if (difficultySelect.value === "medium") {
-                move = chooseMediumMove();
-            } else {
-                move = chooseHardMove();
-            }
-
-            if (!move) {
-                computerThinking = false;
-                checkGameEnd();
-                updateStatus();
-                return;
-            }
-
-            computerThinking = false;
-            performMove(move);
-        }, delay);
-    }
-
-    function chooseEasyMove() {
-        const moves = allMovesFor("black");
-
-        if (!moves.length) return null;
-
-        return moves[
-            Math.floor(Math.random() * moves.length)
-        ];
-    }
-
-    function chooseMediumMove() {
-        const moves = allMovesFor("black");
-
-        if (!moves.length) return null;
-
-        let bestScore = -Infinity;
-        let bestMoves = [];
-
-        for (const move of moves) {
-            const score = evaluateMove(move);
-
-            if (score > bestScore) {
-                bestScore = score;
-                bestMoves = [move];
-            } else if (score === bestScore) {
-                bestMoves.push(move);
-            }
-        }
-
-        return bestMoves[
-            Math.floor(Math.random() * bestMoves.length)
-        ];
-    }
-
-    function evaluateMove(move) {
-        let score = 0;
-
-        if (move.capture) {
-            score += 100;
-        }
-
-        if (move.to.row === 7) {
-            score += 50;
-        }
-
-        if (move.to.col >= 2 && move.to.col <= 5) {
-            score += 10;
-        }
-
-        const piece = board[
-            move.from.row
-        ][move.from.col];
-
-        if (piece?.king) {
-            score += 20;
-        }
-
-        return score + Math.random() * 3;
-    }
-
-    function cloneBoard(source) {
-        return source.map(row =>
-            row.map(piece =>
-                piece
-                    ? {
-                        color: piece.color,
-                        king: piece.king
-                    }
-                    : null
-            )
-        );
-    }
-
-    function applyMoveToBoard(source, move) {
-        const copy = cloneBoard(source);
-
-        const piece =
-            copy[move.from.row][move.from.col];
-
-        copy[move.from.row][move.from.col] = null;
-        copy[move.to.row][move.to.col] = piece;
-
-        if (move.capture) {
-            copy[move.capture.row][move.capture.col] = null;
-        }
-
+        /*
+           If any capture exists, this piece must
+           have a capture available to be selected.
+        */
         if (
-            !piece.king &&
-            (
-                (piece.color === "red" && move.to.row === 0) ||
-                (piece.color === "black" && move.to.row === 7)
-            )
+            allCaptures.length > 0 &&
+            captures.length === 0
         ) {
-            piece.king = true;
+            return;
         }
 
-        return copy;
+        selected = {
+            row,
+            col
+        };
+
+        legalTargets =
+            captures.length > 0
+                ? captures
+                : getSimpleMoves(row, col);
+
+        render();
     }
+}
 
-    function getMovesForBoard(source, color) {
-        const captures = [];
-        const moves = [];
+/* =========================================================
+   HUMAN MOVE
+   ========================================================= */
 
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                const piece = source[row][col];
+function makeHumanMove(row, col, target) {
 
-                if (!piece || piece.color !== color) continue;
+    movePiece(
+        row,
+        col,
+        target.row,
+        target.col,
+        target.capture
+    );
 
-                const directions =
-                    directionsFor(piece);
+    /*
+       Check for another jump.
+    */
 
-                for (const [dr, dc] of directions) {
-                    const nr = row + dr;
-                    const nc = col + dc;
+    if (target.capture) {
 
-                    if (
-                        inside(nr, nc) &&
-                        !source[nr][nc]
-                    ) {
-                        moves.push({
-                            from: { row, col },
-                            to: { row: nr, col: nc },
-                            capture: null
-                        });
-                    }
-
-                    const mr = row + dr;
-                    const mc = col + dc;
-                    const lr = row + dr * 2;
-                    const lc = col + dc * 2;
-
-                    if (
-                        inside(lr, lc) &&
-                        source[mr][mc] &&
-                        source[mr][mc].color !== color &&
-                        !source[lr][lc]
-                    ) {
-                        captures.push({
-                            from: { row, col },
-                            to: { row: lr, col: lc },
-                            capture: {
-                                row: mr,
-                                col: mc
-                            }
-                        });
-                    }
-                }
-            }
-        }
-
-        return captures.length ? captures : moves;
-    }
-
-    function evaluateBoard(source) {
-        let score = 0;
-
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
-                const piece = source[row][col];
-
-                if (!piece) continue;
-
-                let value = piece.king ? 175 : 100;
-
-                if (!piece.king) {
-                    if (piece.color === "black") {
-                        value += row * 4;
-                    } else {
-                        value += (7 - row) * 4;
-                    }
-                }
-
-                if (col >= 2 && col <= 5) {
-                    value += 4;
-                }
-
-                if (piece.color === "black") {
-                    score += value;
-                } else {
-                    score -= value;
-                }
-            }
-        }
-
-        return score;
-    }
-
-    function chooseHardMove() {
-        const moves = getMovesForBoard(
-            board,
-            "black"
-        );
-
-        if (!moves.length) return null;
-
-        let bestScore = -Infinity;
-        let bestMove = moves[0];
-
-        for (const move of moves) {
-            const next = applyMoveToBoard(
-                board,
-                move
+        const moreCaptures =
+            getCaptureMoves(
+                target.row,
+                target.col
             );
 
-            const score = minimax(
-                next,
-                "red",
+        if (moreCaptures.length > 0) {
+
+            selected = {
+                row: target.row,
+                col: target.col
+            };
+
+            forcedPiece = {
+                row: target.row,
+                col: target.col
+            };
+
+            legalTargets = moreCaptures;
+
+            updateStatus(
+                "Multiple jump — continue!"
+            );
+
+            render();
+
+            return;
+        }
+    }
+
+    finishTurn();
+}
+
+/* =========================================================
+   MOVE PIECE
+   ========================================================= */
+
+function movePiece(
+    fromRow,
+    fromCol,
+    toRow,
+    toCol,
+    capture
+) {
+
+    let piece =
+        board[fromRow][fromCol];
+
+    board[fromRow][fromCol] = null;
+
+    board[toRow][toCol] = piece;
+
+    if (capture) {
+
+        board[capture.row][capture.col] =
+            null;
+    }
+
+    /*
+       Promotion.
+    */
+
+    if (
+        piece === "r" &&
+        toRow === 0
+    ) {
+        board[toRow][toCol] = "R";
+    }
+
+    if (
+        piece === "b" &&
+        toRow === 7
+    ) {
+        board[toRow][toCol] = "B";
+    }
+}
+
+/* =========================================================
+   FINISH TURN
+   ========================================================= */
+
+function finishTurn() {
+
+    selected = null;
+    legalTargets = [];
+    forcedPiece = null;
+
+    currentPlayer =
+        currentPlayer === "r"
+            ? "b"
+            : "r";
+
+    if (checkGameOver()) {
+        return;
+    }
+
+    updateStatus();
+    render();
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === "b"
+    ) {
+
+        computerMove();
+    }
+}
+
+/* =========================================================
+   GAME OVER
+   ========================================================= */
+
+function checkGameOver() {
+
+    const redPieces = countPieces("r");
+    const blackPieces = countPieces("b");
+
+    if (redPieces === 0) {
+
+        gameOver = true;
+        updateStatus("BLACK WINS!");
+        render();
+        return true;
+    }
+
+    if (blackPieces === 0) {
+
+        gameOver = true;
+        updateStatus("RED WINS!");
+        render();
+        return true;
+    }
+
+    const moves =
+        getAllMoves(currentPlayer);
+
+    if (moves.length === 0) {
+
+        gameOver = true;
+
+        const winner =
+            currentPlayer === "r"
+                ? "BLACK"
+                : "RED";
+
+        updateStatus(
+            winner + " WINS!"
+        );
+
+        render();
+
+        return true;
+    }
+
+    return false;
+}
+
+function countPieces(player) {
+
+    let count = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if (
+                belongsTo(
+                    board[row][col],
+                    player
+                )
+            ) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function updateStatus(custom) {
+
+    if (custom) {
+
+        statusElement.textContent =
+            custom;
+
+        return;
+    }
+
+    if (gameOver) {
+        return;
+    }
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === "b"
+    ) {
+
+        statusElement.textContent =
+            "Computer's turn";
+
+        return;
+    }
+
+    statusElement.textContent =
+        currentPlayer === "r"
+            ? "Red's turn"
+            : "Black's turn";
+}
+
+/* =========================================================
+   COMPUTER
+   ========================================================= */
+
+function computerMove() {
+
+    if (gameOver) {
+        return;
+    }
+
+    computerThinking = true;
+
+    updateStatus("Computer is thinking...");
+
+    render();
+
+    /*
+       Small delay makes the computer feel
+       like it is actually playing.
+    */
+
+    setTimeout(() => {
+
+        let moves =
+            getAllMoves("b");
+
+        if (moves.length === 0) {
+
+            computerThinking = false;
+
+            checkGameOver();
+
+            return;
+        }
+
+        let chosen;
+
+        if (difficultySelect.value === "easy") {
+
+            chosen =
+                chooseEasyMove(moves);
+
+        } else if (
+            difficultySelect.value === "medium"
+        ) {
+
+            chosen =
+                chooseMediumMove(moves);
+
+        } else {
+
+            chosen =
+                chooseHardMove(moves);
+        }
+
+        performComputerMove(chosen);
+
+    }, 450);
+}
+
+/* =========================================================
+   EASY AI
+   ========================================================= */
+
+function chooseEasyMove(moves) {
+
+    return moves[
+        Math.floor(
+            Math.random() * moves.length
+        )
+    ];
+}
+
+/* =========================================================
+   MEDIUM AI
+   ========================================================= */
+
+function chooseMediumMove(moves) {
+
+    const captures =
+        moves.filter(
+            move => move.capture
+        );
+
+    if (captures.length > 0) {
+
+        /*
+           Prefer captures that promote.
+        */
+
+        const promotions =
+            captures.filter(
+                move =>
+                    move.to.row === 7 &&
+                    board[
+                        move.from.row
+                    ][move.from.col] === "b"
+            );
+
+        if (promotions.length > 0) {
+            return promotions[
+                Math.floor(
+                    Math.random() *
+                    promotions.length
+                )
+            ];
+        }
+
+        return captures[
+            Math.floor(
+                Math.random() *
+                captures.length
+            )
+        ];
+    }
+
+    /*
+       Prefer moving toward promotion.
+    */
+
+    const scored =
+        moves.map(move => {
+
+            let score =
+                move.to.row * 2;
+
+            if (isSafeSquare(
+                move.to.row,
+                move.to.col,
+                "b"
+            )) {
+                score += 3;
+            }
+
+            return {
+                move,
+                score
+            };
+        });
+
+    scored.sort(
+        (a, b) => b.score - a.score
+    );
+
+    const top =
+        scored.slice(
+            0,
+            Math.min(3, scored.length)
+        );
+
+    return top[
+        Math.floor(
+            Math.random() * top.length
+        )
+    ].move;
+}
+
+/* =========================================================
+   HARD AI
+   ========================================================= */
+
+function chooseHardMove(moves) {
+
+    /*
+       Clone current position and use minimax.
+    */
+
+    let bestScore = -Infinity;
+    let bestMoves = [];
+
+    for (const move of moves) {
+
+        const snapshot =
+            cloneBoard(board);
+
+        applyMoveToBoard(
+            board,
+            move
+        );
+
+        let score =
+            minimax(
+                board,
                 4,
+                false,
                 -Infinity,
                 Infinity
             );
 
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = move;
-            }
-        }
+        board = snapshot;
 
-        return bestMove;
+        if (score > bestScore) {
+
+            bestScore = score;
+            bestMoves = [move];
+
+        } else if (
+            score === bestScore
+        ) {
+
+            bestMoves.push(move);
+        }
     }
 
-    function minimax(
-        position,
-        player,
-        depth,
-        alpha,
-        beta
+    return bestMoves[
+        Math.floor(
+            Math.random() *
+            bestMoves.length
+        )
+    ];
+}
+
+/* =========================================================
+   MINIMAX
+   ========================================================= */
+
+function minimax(
+    position,
+    depth,
+    maximizing,
+    alpha,
+    beta
+) {
+
+    const blackMoves =
+        getMovesFromPosition(
+            position,
+            "b"
+        );
+
+    const redMoves =
+        getMovesFromPosition(
+            position,
+            "r"
+        );
+
+    if (
+        depth === 0 ||
+        blackMoves.length === 0 ||
+        redMoves.length === 0
     ) {
-        const moves =
-            getMovesForBoard(position, player);
 
-        if (depth === 0 || moves.length === 0) {
-            return evaluateBoard(position);
-        }
+        return evaluatePosition(
+            position
+        );
+    }
 
-        if (player === "black") {
-            let best = -Infinity;
+    if (maximizing) {
 
-            for (const move of moves) {
-                const next =
-                    applyMoveToBoard(position, move);
+        let best = -Infinity;
 
-                best = Math.max(
-                    best,
-                    minimax(
-                        next,
-                        "red",
-                        depth - 1,
-                        alpha,
-                        beta
-                    )
+        for (const move of blackMoves) {
+
+            const next =
+                cloneBoard(position);
+
+            applyMoveToBoard(
+                next,
+                move
+            );
+
+            const value =
+                minimax(
+                    next,
+                    depth - 1,
+                    false,
+                    alpha,
+                    beta
                 );
 
-                alpha = Math.max(alpha, best);
+            best =
+                Math.max(best, value);
 
-                if (beta <= alpha) break;
+            alpha =
+                Math.max(alpha, best);
+
+            if (beta <= alpha) {
+                break;
             }
-
-            return best;
         }
+
+        return best;
+
+    } else {
 
         let best = Infinity;
 
-        for (const move of moves) {
-            const next =
-                applyMoveToBoard(position, move);
+        for (const move of redMoves) {
 
-            best = Math.min(
-                best,
-                minimax(
-                    next,
-                    "black",
-                    depth - 1,
-                    alpha,
-                    beta
-                )
+            const next =
+                cloneBoard(position);
+
+            applyMoveToBoard(
+                next,
+                move
             );
 
-            beta = Math.min(beta, best);
+            const value =
+                minimax(
+                    next,
+                    depth - 1,
+                    true,
+                    alpha,
+                    beta
+                );
 
-            if (beta <= alpha) break;
+            best =
+                Math.min(best, value);
+
+            beta =
+                Math.min(beta, best);
+
+            if (beta <= alpha) {
+                break;
+            }
         }
 
         return best;
     }
+}
 
-    twoPlayerBtn.addEventListener("click", () => {
-        mode = "two-player";
-        resetGame();
-    });
+/* =========================================================
+   AI MOVE GENERATION ON ARBITRARY BOARD
+   ========================================================= */
 
-    computerBtn.addEventListener("click", () => {
-        mode = "computer";
-        resetGame();
-    });
+function getMovesFromPosition(
+    position,
+    player
+) {
 
-    difficultySelect.addEventListener("change", () => {
-        if (mode === "computer") {
-            resetGame();
+    const captures = [];
+    const simple = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece =
+                position[row][col];
+
+            if (
+                !belongsTo(piece, player)
+            ) {
+                continue;
+            }
+
+            const dirs =
+                getDirections(piece);
+
+            for (const [dr, dc] of dirs) {
+
+                const mr =
+                    row + dr;
+
+                const mc =
+                    col + dc;
+
+                const lr =
+                    row + dr * 2;
+
+                const lc =
+                    col + dc * 2;
+
+                if (
+                    inside(lr, lc) &&
+                    position[mr]?.[mc] &&
+                    !position[lr][lc] &&
+                    position[mr][mc]
+                        .toLowerCase() !==
+                    piece.toLowerCase()
+                ) {
+
+                    captures.push({
+                        from: {
+                            row,
+                            col
+                        },
+                        to: {
+                            row: lr,
+                            col: lc
+                        },
+                        capture: {
+                            row: mr,
+                            col: mc
+                        }
+                    });
+                }
+            }
         }
-    });
+    }
 
-    newGameBtn.addEventListener("click", resetGame);
+    if (captures.length > 0) {
+        return captures;
+    }
 
-    resetGame();
+    for (let row = 0; row < SIZE; row++) {
 
-})();
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece =
+                position[row][col];
+
+            if (
+                !belongsTo(piece, player)
+            ) {
+                continue;
+            }
+
+            for (
+                const [dr, dc]
+                of getDirections(piece)
+            ) {
+
+                const nr =
+                    row + dr;
+
+                const nc =
+                    col + dc;
+
+                if (
+                    inside(nr, nc) &&
+                    !position[nr][nc]
+                ) {
+
+                    simple.push({
+                        from: {
+                            row,
+                            col
+                        },
+                        to: {
+                            row: nr,
+                            col: nc
+                        },
+                        capture: null
+                    });
+                }
+            }
+        }
+    }
+
+    return simple;
+}
+
+/* =========================================================
+   APPLY AI/MINIMAX MOVE
+   ========================================================= */
+
+function applyMoveToBoard(
+    position,
+    move
+) {
+
+    let piece =
+        position[
+            move.from.row
+        ][
+            move.from.col
+        ];
+
+    position[
+        move.from.row
+    ][
+        move.from.col
+    ] = null;
+
+    position[
+        move.to.row
+    ][
+        move.to.col
+    ] = piece;
+
+    if (move.capture) {
+
+        position[
+            move.capture.row
+        ][
+            move.capture.col
+        ] = null;
+    }
+
+    /*
+       Promotion.
+    */
+
+    if (
+        piece === "b" &&
+        move.to.row === 7
+    ) {
+
+        position[
+            move.to.row
+        ][
+            move.to.col
+        ] = "B";
+    }
+
+    if (
+        piece === "r" &&
+        move.to.row === 0
+    ) {
+
+        position[
+            move.to.row
+        ][
+            move.to.col
+        ] = "R";
+    }
+}
+
+/* =========================================================
+   EVALUATION
+   ========================================================= */
+
+function evaluatePosition(position) {
+
+    let score = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece =
+                position[row][col];
+
+            if (!piece) {
+                continue;
+            }
+
+            const king =
+                isKing(piece);
+
+            let value =
+                king ? 5 : 3;
+
+            /*
+               Position value.
+            */
+
+            if (!king) {
+
+                if (piece === "b") {
+                    value += row * 0.15;
+                }
+
+                if (piece === "r") {
+                    value +=
+                        (7 - row) * 0.15;
+                }
+            }
+
+            /*
+               Center control.
+            */
+
+            if (
+                col >= 2 &&
+                col <= 5 &&
+                row >= 2 &&
+                row <= 5
+            ) {
+                value += .3;
+            }
+
+            if (piece.toLowerCase() === "b") {
+                score += value;
+            } else {
+                score -= value;
+            }
+        }
+    }
+
+    return score;
+}
+
+/* =========================================================
+   SAFETY CHECK
+   ========================================================= */
+
+function isSafeSquare(
+    row,
+    col,
+    player
+) {
+
+    const enemy =
+        player === "r"
+            ? "b"
+            : "r";
+
+    /*
+       Check whether an enemy can capture
+       this location.
+    */
+
+    for (let r = 0; r < SIZE; r++) {
+
+        for (let c = 0; c < SIZE; c++) {
+
+            const piece =
+                board[r][c];
+
+            if (
+                !belongsTo(
+                    piece,
+                    enemy
+                )
+            ) {
+                continue;
+            }
+
+            for (
+                const move
+                of getCaptureMoves(r, c)
+            ) {
+
+                if (
+                    move.row === row &&
+                    move.col === col
+                ) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+/* =========================================================
+   CLONE
+   ========================================================= */
+
+function cloneBoard(position) {
+
+    return position.map(
+        row => row.slice()
+    );
+}
+
+/* =========================================================
+   COMPUTER MOVE EXECUTION
+   ========================================================= */
+
+function performComputerMove(move) {
+
+    movePiece(
+        move.from.row,
+        move.from.col,
+        move.to.row,
+        move.to.col,
+        move.capture
+    );
+
+    /*
+       Computer can make multiple jumps.
+    */
+
+    if (move.capture) {
+
+        const moreCaptures =
+            getCaptureMoves(
+                move.to.row,
+                move.to.col
+            );
+
+        if (moreCaptures.length > 0) {
+
+            /*
+               Choose the first available continuation,
+               with the same difficulty logic.
+            */
+
+            let continuation;
+
+            if (
+                difficultySelect.value === "easy"
+            ) {
+
+                continuation =
+                    moreCaptures[
+                        Math.floor(
+                            Math.random() *
+                            moreCaptures.length
+                        )
+                    ];
+
+            } else {
+
+                continuation =
+                    moreCaptures[
+                        Math.floor(
+                            Math.random() *
+                            moreCaptures.length
+                        )
+                    ];
+            }
+
+            setTimeout(() => {
+
+                performComputerContinuation(
+                    move.to.row,
+                    move.to.col,
+                    continuation
+                );
+
+            }, 250);
+
+            return;
+        }
+    }
+
+    computerThinking = false;
+
+    finishTurn();
+}
+
+/* =========================================================
+   COMPUTER MULTIPLE JUMP
+   ========================================================= */
+
+function performComputerContinuation(
+    row,
+    col,
+    move
+) {
+
+    movePiece(
+        row,
+        col,
+        move.row,
+        move.col,
+        move.capture
+    );
+
+    if (move.capture) {
+
+        const more =
+            getCaptureMoves(
+                move.row,
+                move.col
+            );
+
+        if (more.length > 0) {
+
+            const next =
+                more[
+                    Math.floor(
+                        Math.random() *
+                        more.length
+                    )
+                ];
+
+            setTimeout(() => {
+
+                performComputerContinuation(
+                    move.row,
+                    move.col,
+                    next
+                );
+
+            }, 250);
+
+            return;
+        }
+    }
+
+    computerThinking = false;
+
+    finishTurn();
+}
+
+/* =========================================================
+   MODE BUTTONS
+   ========================================================= */
+
+twoPlayerBtn.addEventListener(
+    "click",
+    () => {
+
+        gameMode = "2p";
+
+        twoPlayerBtn.style.outline =
+            "2px solid #ffd84a";
+
+        computerBtn.style.outline =
+            "none";
+
+        startGame();
+    }
+);
+
+computerBtn.addEventListener(
+    "click",
+    () => {
+
+        gameMode = "computer";
+
+        computerBtn.style.outline =
+            "2px solid #ffd84a";
+
+        twoPlayerBtn.style.outline =
+            "none";
+
+        startGame();
+    }
+);
+
+difficultySelect.addEventListener(
+    "change",
+    () => {
+
+        /*
+           Difficulty applies to new and
+           subsequent computer moves.
+        */
+    }
+);
+
+newGameBtn.addEventListener(
+    "click",
+    startGame
+);
+
+menuBtn.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "index.html";
+    }
+);
+
+/* =========================================================
+   START
+   ========================================================= */
+
+twoPlayerBtn.style.outline =
+    "2px solid #ffd84a";
+
+startGame();
+
+requestAnimationFrame(() => {
+    fitBoard();
+});
+
 </script>
 
 </body>
