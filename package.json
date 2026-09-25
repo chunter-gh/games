@@ -1,9 +1,9 @@
 {
   "name": "tictactoe-server",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "server11.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server11.js"
   },
   "dependencies": {
     "ws": "^8.18.0"
