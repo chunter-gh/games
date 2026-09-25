@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Othello</title>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{font-family:Georgia,"Times New Roman",serif;background:radial-gradient(circle at 50% 18%,#26302d 0%,#121816 42%,#050807 100%);color:#f1eee6}
+.game{width:100%;height:100%;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:clamp(6px,1.5vh,18px) 10px 6px;overflow:hidden}
+.title{flex:0 0 auto;margin:0;font-size:clamp(28px,5vw,54px);line-height:1;letter-spacing:.14em;text-transform:uppercase;color:#f5f2e9;text-shadow:0 2px 2px #000,0 4px 12px rgba(0,0,0,.8)}
+.subtitle{flex:0 0 auto;margin-top:5px;margin-bottom:clamp(5px,1vh,12px);font-size:clamp(10px,1.5vw,16px);letter-spacing:.24em;color:#aaa69c;text-transform:uppercase}
+.table{width:100%;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;padding-bottom:2px;overflow:hidden}
+.score-row{flex:0 0 auto;width:min(94vw,760px);display:flex;align-items:stretch;justify-content:center;gap:clamp(6px,1.4vw,14px);margin-bottom:clamp(5px,1vh,10px)}
+.score-panel{min-width:0;flex:1 1 0;max-width:350px;border-radius:10px;padding:clamp(5px,1vh,10px) 12px;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.15);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -5px 12px rgba(0,0,0,.32),0 5px 14px rgba(0,0,0,.45)}
+.score-panel.black{background:linear-gradient(145deg,#343434,#111,#272727)}
+.score-panel.ivory{background:linear-gradient(145deg,#f6f0df,#cfc5ad,#f0e8d5);color:#191816}
+.score-label{font-size:clamp(10px,1.6vw,15px);letter-spacing:.15em;text-transform:uppercase;font-weight:bold}
+.score-value{font-size:clamp(22px,4vw,38px);font-weight:bold;line-height:1}
+.turn{flex:0 0 auto;min-height:24px;text-align:center;font-size:clamp(11px,1.7vw,16px);letter-spacing:.12em;text-transform:uppercase;color:#d6d0c1;margin-bottom:clamp(4px,.8vh,8px)}
+.board-shadow{width:var(--board-size,500px);height:var(--board-size,500px);flex:0 1 auto;position:relative;flex-shrink:1;max-width:96vw;max-height:76vh;filter:drop-shadow(0 16px 16px rgba(0,0,0,.7)) drop-shadow(0 3px 3px rgba(0,0,0,.75))}
+.board-wrap{width:100%;height:100%;position:relative}
+.board{position:absolute;inset:0;padding:clamp(7px,1.2%,13px);border-radius:15px;background:linear-gradient(135deg,#e6ded0 0%,#7c766d 5%,#292b2a 9%,#0d0f0e 17%,#333532 50%,#0b0d0c 83%,#68645d 94%,#e0d7c8 100%);box-shadow:inset 0 2px 2px rgba(255,255,255,.55),inset 0 -4px 6px rgba(0,0,0,.9),inset 3px 0 4px rgba(255,255,255,.16),inset -3px 0 4px rgba(0,0,0,.8);border:1px solid #070807}
+.board:before{content:"";position:absolute;inset:3px;border-radius:12px;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.24),transparent 13%,transparent 74%,rgba(0,0,0,.38));z-index:5}
+.grid{width:100%;height:100%;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);overflow:hidden;border-radius:5px;border:2px solid #171a18;background:linear-gradient(135deg,#536c57,#29412f 45%,#1e3325 100%);box-shadow:inset 0 0 25px rgba(0,0,0,.8),0 2px 3px rgba(0,0,0,.8)}
+.cell{position:relative;min-width:0;min-height:0;border-right:1px solid rgba(7,18,10,.72);border-bottom:1px solid rgba(7,18,10,.72);background:radial-gradient(ellipse at 35% 25%,rgba(122,157,123,.2),transparent 48%),linear-gradient(135deg,rgba(89,122,91,.16),rgba(12,34,20,.16));display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cell:after{content:"";position:absolute;inset:2px;pointer-events:none;background:repeating-linear-gradient(93deg,transparent 0,transparent 7px,rgba(255,255,255,.015) 8px,transparent 10px);opacity:.65}
+.cell.legal{cursor:pointer}
+.cell.legal:before{content:"";position:absolute;width:19%;height:19%;min-width:5px;min-height:5px;border-radius:50%;background:rgba(230,225,199,.45);box-shadow:0 0 8px rgba(255,245,205,.45),inset 0 1px 2px rgba(255,255,255,.5);z-index:1}
+.cell.legal:hover:before{background:rgba(255,250,220,.8);box-shadow:0 0 12px rgba(255,245,205,.85)}
+.stone{position:absolute;width:82%;height:82%;border-radius:50%;z-index:2;transform-style:preserve-3d;box-shadow:0 5px 5px rgba(0,0,0,.68),0 9px 10px rgba(0,0,0,.32)}
+.stone.black{background:radial-gradient(ellipse at 29% 21%,rgba(255,255,255,.28) 0%,rgba(255,255,255,.08) 12%,transparent 28%),radial-gradient(ellipse at 70% 78%,rgba(0,0,0,.9) 0%,transparent 45%),linear-gradient(135deg,#0b0c0c 0%,#383b39 25%,#090a0a 53%,#242624 76%,#020303 100%);border:1px solid #080909;box-shadow:0 4px 4px rgba(0,0,0,.85),0 8px 8px rgba(0,0,0,.4),inset 2px 2px 4px rgba(255,255,255,.18),inset -4px -5px 7px rgba(0,0,0,.9)}
+.stone.black:before{content:"";position:absolute;inset:8%;border-radius:50%;background:repeating-radial-gradient(ellipse at 42% 35%,transparent 0,transparent 7px,rgba(255,255,255,.035) 8px,transparent 10px);opacity:.9}
+.stone.black:after{content:"";position:absolute;left:14%;top:9%;width:32%;height:17%;border-radius:50%;background:rgba(255,255,255,.16);filter:blur(3px);transform:rotate(-25deg)}
+.stone.white{background:radial-gradient(ellipse at 29% 21%,rgba(255,255,255,.95) 0%,rgba(255,255,255,.4) 13%,transparent 28%),radial-gradient(ellipse at 70% 78%,rgba(112,99,75,.55) 0%,transparent 44%),linear-gradient(135deg,#fffdf2 0%,#d9cfbb 25%,#fff9e9 52%,#c9bda7 78%,#f5eddb 100%);border:1px solid #aaa08d;box-shadow:0 4px 4px rgba(0,0,0,.7),0 8px 8px rgba(0,0,0,.35),inset 2px 2px 4px rgba(255,255,255,.95),inset -4px -5px 7px rgba(92,78,57,.38)}
+.stone.white:before{content:"";position:absolute;inset:8%;border-radius:50%;background:repeating-radial-gradient(ellipse at 42% 35%,transparent 0,transparent 8px,rgba(100,88,67,.075) 9px,transparent 11px);opacity:.9}
+.stone.white:after{content:"";position:absolute;left:14%;top:9%;width:34%;height:17%;border-radius:50%;background:rgba(255,255,255,.7);filter:blur(3px);transform:rotate(-25deg)}
+.stone.flip{animation:stoneFlip .38s ease-in-out}
+@keyframes stoneFlip{0%{transform:rotateY(0) scale(1)}45%{transform:rotateY(90deg) scale(.94)}100%{transform:rotateY(180deg) scale(1)}}
+.message{flex:0 0 auto;width:min(94vw,760px);min-height:26px;margin-top:clamp(4px,.8vh,8px);text-align:center;font-size:clamp(10px,1.6vw,15px);color:#c7c1b5;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.controls{flex:0 0 auto;width:min(96vw,760px);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px;margin-top:5px}
+button,select{font-family:Georgia,"Times New Roman",serif;font-size:clamp(10px,1.6vw,14px);letter-spacing:.08em;text-transform:uppercase;border-radius:7px;border:1px solid #69645b;min-height:34px;padding:7px 12px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 3px 6px rgba(0,0,0,.55)}
+button{color:#eee9dc;background:linear-gradient(180deg,#41423f,#171917)}
+button:hover{background:linear-gradient(180deg,#555650,#242623)}
+button:active{transform:translateY(1px);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+button:disabled{opacity:.42;cursor:default}
+select{color:#211f1b;background:linear-gradient(180deg,#f0e9d9,#c9bea8)}
+.hidden{display:none!important}
+@media(max-height:700px){.game{padding-top:4px}.title{font-size:clamp(24px,4.5vw,42px)}.subtitle{margin-top:2px;margin-bottom:4px}.score-row{margin-bottom:3px}.turn{min-height:18px;margin-bottom:2px}.message{min-height:19px;margin-top:2px}.controls{margin-top:2px}button,select{min-height:29px;padding:4px 9px}}
+</style>
+</head>
+
+<body>
+<div class="game" id="game">
+<h1 class="title">Othello</h1>
+<div class="subtitle">Onyx &amp; Ivory Edition</div>
+
+<div class="table">
+
+<div class="score-row">
+<div class="score-panel black"><span class="score-label">Onyx</span><span class="score-value" id="blackScore">2</span></div>
+<div class="score-panel ivory"><span class="score-label">Ivory</span><span class="score-value" id="whiteScore">2</span></div>
+</div>
+
+<div class="turn" id="turnDisplay">Onyx to Move</div>
+
+<div class="board-shadow" id="boardShadow">
+<div class="board-wrap">
+<div class="board">
+<div class="grid" id="board"></div>
+</div>
+</div>
+</div>
+
+<div class="message" id="message"></div>
+
+<div class="controls">
+<button id="twoPlayerButton">2 Players</button>
+<button id="computerButton">VS Computer</button>
+<select id="difficulty">
+<option value="easy">Easy</option>
+<option value="medium" selected>Medium</option>
+<option value="hard">Hard</option>
+</select>
+<button id="newGameButton">New Game</button>
+<button id="menuButton">Menu</button>
+</div>
+
+</div>
+</div>
+
+<script>
+"use strict";
+
+const SIZE=8;
+const EMPTY="";
+const BLACK="B";
+const WHITE="W";
+
+const DIRECTIONS=[
+[-1,-1],[-1,0],[-1,1],
+[0,-1],[0,1],
+[1,-1],[1,0],[1,1]
+];
+
+const gameElement=document.getElementById("game");
+const boardShadowElement=document.getElementById("boardShadow");
+const boardElement=document.getElementById("board");
+const blackScoreElement=document.getElementById("blackScore");
+const whiteScoreElement=document.getElementById("whiteScore");
+const turnElement=document.getElementById("turnDisplay");
+const messageElement=document.getElementById("message");
+const controlsElement=document.querySelector(".controls");
+const twoPlayerButton=document.getElementById("twoPlayerButton");
+const computerButton=document.getElementById("computerButton");
+const difficultyElement=document.getElementById("difficulty");
+const newGameButton=document.getElementById("newGameButton");
+const menuButton=document.getElementById("menuButton");
+
+const params=new URLSearchParams(window.location.search);
+const roomId=params.get("room");
+
+const rawPlayer=String(params.get("player")||"").trim().toLowerCase();
+
+const playerNumber=
+(rawPlayer==="2"||
+ rawPlayer==="player2"||
+ rawPlayer==="player 2"||
+ rawPlayer==="p2") ? "2" : "1";
+
+const onlineMode=!!roomId;
+
+const clientId=
+(window.crypto&&typeof window.crypto.randomUUID==="function")
+?window.crypto.randomUUID()
+:(Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
+
+const myColor=playerNumber==="2"?WHITE:BLACK;
+
+let boardState=createInitialBoard();
+let currentPlayer=BLACK;
+let gameOver=false;
+let computerMode=!onlineMode;
+let computerThinking=false;
+let flipping=false;
+let socket=null;
+let socketOpen=false;
+let opponentConnected=false;
+let lastMove=null;
+let animationTimer=null;
+
+function createInitialBoard(){
+    const b=Array.from({length:SIZE},()=>Array(SIZE).fill(EMPTY));
+    b[3][3]=WHITE;
+    b[3][4]=BLACK;
+    b[4][3]=BLACK;
+    b[4][4]=WHITE;
+    return b;
+}
+
+function cloneBoard(b){
+    return b.map(row=>row.slice());
+}
+
+function inside(r,c){
+    return r>=0&&r<SIZE&&c>=0&&c<SIZE;
+}
+
+function opponentOf(color){
+    return color===BLACK?WHITE:BLACK;
+}
+
+function getFlipsForMove(row,col,color,position=boardState){
+    if(!inside(row,col)||position[row][col]!==EMPTY)return [];
+
+    const opponent=opponentOf(color);
+    const flips=[];
+
+    for(const [dr,dc] of DIRECTIONS){
+        let r=row+dr;
+        let c=col+dc;
+        const line=[];
+
+        while(inside(r,c)&&position[r][c]===opponent){
+            line.push([r,c]);
+            r+=dr;
+            c+=dc;
+        }
+
+        if(line.length&&inside(r,c)&&position[r][c]===color){
+            flips.push(...line);
+        }
+    }
+
+    return flips;
+}
+
+function getValidMoves(color,position=boardState){
+    const moves=[];
+
+    for(let r=0;r<SIZE;r++){
+        for(let c=0;c<SIZE;c++){
+            if(position[r][c]!==EMPTY)continue;
+
+            const flips=getFlipsForMove(r,c,color,position);
+
+            if(flips.length){
+                moves.push({row:r,col:c,flips});
+            }
+        }
+    }
+
+    return moves;
+}
+
+function applyMove(position,move,color){
+    const next=cloneBoard(position);
+
+    next[move.row][move.col]=color;
+
+    for(const [r,c] of move.flips){
+        next[r][c]=color;
+    }
+
+    return next;
+}
+
+function getScore(color){
+    let n=0;
+
+    for(let r=0;r<SIZE;r++){
+        for(let c=0;c<SIZE;c++){
+            if(boardState[r][c]===color)n++;
+        }
+    }
+
+    return n;
+}
+
+/* =========================================================
+   SIMPLE CHECKERS-STYLE NETWORK STATE
+   ========================================================= */
+
+function getBoardState(){
+    return {
+        board:cloneBoard(boardState),
+        currentPlayer,
+        gameOver
+    };
+}
+
+function applyBoardState(state){
+    if(!state||
+       !Array.isArray(state.board)||
+       state.board.length!==SIZE){
+        return false;
+    }
+
+    const nextBoard=state.board.map(row=>{
+        if(!Array.isArray(row)){
+            return Array(SIZE).fill(EMPTY);
+        }
+
+        const result=row.slice(0,SIZE).map(v=>
+            v===BLACK||v===WHITE?v:EMPTY
+        );
+
+        while(result.length<SIZE)result.push(EMPTY);
+
+        return result;
+    });
+
+    while(nextBoard.length<SIZE){
+        nextBoard.push(Array(SIZE).fill(EMPTY));
+    }
+
+    boardState=nextBoard;
+
+    if(state.currentPlayer===BLACK||
+       state.currentPlayer===WHITE){
+        currentPlayer=state.currentPlayer;
+    }
+
+    if(typeof state.gameOver==="boolean"){
+        gameOver=state.gameOver;
+    }
+
+    lastMove=null;
+    flipping=false;
+
+    return true;
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function renderBoard(legalMoves=[]){
+    boardElement.innerHTML="";
+
+    const legalSet=new Set(
+        legalMoves.map(m=>m.row+","+m.col)
+    );
+
+    for(let r=0;r<SIZE;r++){
+        for(let c=0;c<SIZE;c++){
+
+            const cell=document.createElement("div");
+            cell.className="cell";
+            cell.dataset.row=String(r);
+            cell.dataset.col=String(c);
+
+            if(legalSet.has(r+","+c)){
+                cell.classList.add("legal");
+            }
+
+            const value=boardState[r][c];
+
+            if(value===BLACK||value===WHITE){
+                const stone=document.createElement("div");
+                stone.className="stone "+(value===BLACK?"black":"white");
+
+                if(lastMove&&
+                   lastMove.row===r&&
+                   lastMove.col===c){
+                    stone.classList.add("flip");
+                }
+
+                cell.appendChild(stone);
+            }
+
+            boardElement.appendChild(cell);
+        }
+    }
+}
+
+function renderScores(){
+    blackScoreElement.textContent=String(getScore(BLACK));
+    whiteScoreElement.textContent=String(getScore(WHITE));
+}
+
+function updateTurnDisplay(){
+
+    if(gameOver){
+        turnElement.textContent="Game Over";
+        return;
+    }
+
+    if(onlineMode){
+        turnElement.textContent=
+            currentPlayer===myColor
+            ?"Your Turn"
+            :"Opponent's Turn";
+        return;
+    }
+
+    if(computerMode&&currentPlayer===WHITE){
+        turnElement.textContent="Computer Thinking";
+        return;
+    }
+
+    turnElement.textContent=
+        currentPlayer===BLACK
+        ?"Onyx to Move"
+        :"Ivory to Move";
+}
+
+function updateOnlineStatus(){
+    if(!onlineMode)return;
+
+    if(gameOver){
+        showGameResult();
+        return;
+    }
+
+    if(!opponentConnected){
+        updateMessage("Waiting for opponent...");
+        return;
+    }
+
+    updateMessage(
+        currentPlayer===myColor
+        ?"Your turn."
+        :"Waiting for opponent."
+    );
+}
+
+function updateMessage(text){
+    messageElement.textContent=text;
+}
+
+function showGameResult(){
+    const b=getScore(BLACK);
+    const w=getScore(WHITE);
+
+    if(b>w){
+        updateMessage("Onyx wins "+b+" - "+w);
+    }else if(w>b){
+        updateMessage("Ivory wins "+w+" - "+b);
+    }else{
+        updateMessage("Draw "+b+" - "+w);
+    }
+
+    updateTurnDisplay();
+}
+
+/* =========================================================
+   GAME START
+   ========================================================= */
+
+function resetGame(){
+    if(animationTimer){
+        clearTimeout(animationTimer);
+        animationTimer=null;
+    }
+
+    boardState=createInitialBoard();
+    currentPlayer=BLACK;
+    gameOver=false;
+    computerThinking=false;
+    flipping=false;
+    lastMove=null;
+
+    renderScores();
+    renderBoard(getValidMoves(currentPlayer));
+    updateTurnDisplay();
+
+    if(onlineMode){
+        updateOnlineStatus();
+    }else{
+        updateMessage("Onyx begins.");
+    }
+}
+
+/* =========================================================
+   MOVE
+   ========================================================= */
+
+function makeMove(move){
+
+    if(gameOver||flipping||!move)return;
+
+    if(onlineMode){
+        if(!opponentConnected)return;
+        if(currentPlayer!==myColor)return;
+    }
+
+    if(!onlineMode&&computerMode&&currentPlayer===WHITE){
+        return;
+    }
+
+    const validMove=getValidMoves(currentPlayer).find(
+        m=>m.row===move.row&&m.col===move.col
+    );
+
+    if(!validMove)return;
+
+    const movingColor=currentPlayer;
+
+    boardState=applyMove(
+        boardState,
+        validMove,
+        movingColor
+    );
+
+    lastMove={
+        row:validMove.row,
+        col:validMove.col
+    };
+
+    let nextPlayer=opponentOf(movingColor);
+    let nextMoves=getValidMoves(nextPlayer);
+    let forcedPass=false;
+
+    if(nextMoves.length===0){
+
+        const moverMoves=getValidMoves(movingColor);
+
+        if(moverMoves.length===0){
+            gameOver=true;
+            nextMoves=[];
+        }else{
+            nextPlayer=movingColor;
+            nextMoves=moverMoves;
+            forcedPass=true;
+        }
+    }
+
+    currentPlayer=nextPlayer;
+
+    renderScores();
+    renderBoard(gameOver?[]:nextMoves);
+    updateTurnDisplay();
+
+    /*
+     * THE ONLY ONLINE MOVE PACKET.
+     * The complete resulting position is sent.
+     */
+    if(onlineMode&&socketOpen){
+        sendSocket({
+            type:"othelloMove",
+            game:"othello",
+            room:roomId,
+            player:playerNumber,
+            clientId,
+            move:{
+                row:validMove.row,
+                col:validMove.col,
+                color:movingColor,
+                flips:validMove.flips
+            },
+            state:getBoardState()
+        });
+    }
+
+    flipping=true;
+
+    animationTimer=setTimeout(()=>{
+        animationTimer=null;
+        flipping=false;
+
+        if(gameOver){
+            showGameResult();
+            return;
+        }
+
+        if(forcedPass){
+            updateMessage(
+                onlineMode
+                ?"Opponent has no legal move. Turn passed."
+                :(currentPlayer===BLACK?"Onyx":"Ivory")+
+                 " has no legal move. Turn passed."
+            );
+        }else{
+            updateMessage("");
+        }
+
+        updateTurnDisplay();
+        renderBoard(nextMoves);
+
+        if(!onlineMode&&
+           computerMode&&
+           currentPlayer===WHITE){
+            computerTurn();
+        }
+
+    },390);
+}
+
+/* =========================================================
+   SOCKET
+   ========================================================= */
+
+function getSocketUrl(){
+    const protocol=location.protocol==="https:"?"wss:":"ws:";
+    return protocol+"//"+location.host+"/othello";
+}
+
+function sendSocket(data){
+    if(!socket||socket.readyState!==WebSocket.OPEN){
+        return false;
+    }
+
+    try{
+        socket.send(JSON.stringify(data));
+        return true;
+    }catch(e){
+        return false;
+    }
+}
+
+function connectToRoom(){
+
+    if(!onlineMode)return;
+
+    updateMessage("Connecting to room...");
+
+    socket=new WebSocket(getSocketUrl());
+
+    socket.addEventListener("open",()=>{
+        socketOpen=true;
+
+        /*
+         * The existing rooms system already matched us.
+         * Therefore socket open means the opponent is present
+         * from this game's perspective.
+         */
+        opponentConnected=true;
+
+        sendSocket({
+            type:"othelloJoin",
+            game:"othello",
+            room:roomId,
+            player:playerNumber,
+            color:myColor===BLACK?"black":"white",
+            clientId
+        });
+
+        updateOnlineStatus();
+        renderBoard(
+            gameOver?[]:getValidMoves(currentPlayer)
+        );
+        renderScores();
+    });
+
+    socket.addEventListener("message",event=>{
+        let message;
+
+        try{
+            message=JSON.parse(event.data);
+        }catch(e){
+            return;
+        }
+
+        handleOnlineMessage(message);
+    });
+
+    socket.addEventListener("close",()=>{
+        socketOpen=false;
+
+        if(onlineMode&&!gameOver){
+            opponentConnected=false;
+            updateMessage("Connection closed.");
+        }
+    });
+
+    socket.addEventListener("error",()=>{
+        socketOpen=false;
+
+        if(onlineMode&&!gameOver){
+            updateMessage("Connection error.");
+        }
+    });
+}
+
+/* =========================================================
+   ONLINE MESSAGE HANDLER
+   ========================================================= */
+
+function handleOnlineMessage(message){
+
+    if(!message)return;
+
+    /*
+     * Ignore our own echoed packet.
+     */
+    if(message.clientId&&message.clientId===clientId){
+        return;
+    }
+
+    if(message.game&&
+       String(message.game).toLowerCase()!=="othello"){
+        return;
+    }
+
+    if(onlineMode&&
+       message.room&&
+       String(message.room)!==String(roomId)){
+        return;
+    }
+
+    if(onlineMode&&
+       (message.type==="othelloMove"||
+        message.type==="othelloJoin"||
+        message.type==="othelloNewGame")&&
+       !message.room){
+        return;
+    }
+
+    const sender=String(
+        message.player||
+        message.playerNumber||
+        ""
+    );
+
+    /*
+     * Never accept our own player number as an
+     * opponent packet.
+     */
+    if(sender&&sender===String(playerNumber)){
+        return;
+    }
+
+    /*
+     * JOIN DOES NOT SEND STATE.
+     *
+     * This is important. Sending state here was one of
+     * the things capable of overwriting the next move.
+     */
+    if(message.type==="othelloJoin"){
+        opponentConnected=true;
+        updateOnlineStatus();
+        return;
+    }
+
+    /*
+     * NEW GAME
+     */
+    if(message.type==="othelloNewGame"){
+
+        if(message.state&&applyBoardState(message.state)){
+            opponentConnected=true;
+            renderScores();
+            renderBoard(
+                gameOver?[]:getValidMoves(currentPlayer)
+            );
+            updateTurnDisplay();
+            updateOnlineStatus();
+        }
+
+        return;
+    }
+
+    /*
+     * MOVE
+     *
+     * DO NOT replay the move.
+     * DO NOT calculate another move.
+     * DO NOT increment a move counter.
+     * DO NOT request another state.
+     *
+     * Just install the complete state produced by
+     * the other player.
+     */
+    if(message.type==="othelloMove"){
+
+        if(!message.state){
+            return;
+        }
+
+        if(applyBoardState(message.state)){
+
+            opponentConnected=true;
+
+            renderScores();
+
+            renderBoard(
+                gameOver
+                ?[]
+                :getValidMoves(currentPlayer)
+            );
+
+            if(gameOver){
+                showGameResult();
+            }else{
+                updateTurnDisplay();
+                updateOnlineStatus();
+            }
+        }
+
+        return;
+    }
+}
+
+/* =========================================================
+   BOARD CLICK
+   ========================================================= */
+
+boardElement.addEventListener("click",event=>{
+
+    const cell=event.target.closest(".cell");
+
+    if(!cell)return;
+
+    if(gameOver||flipping||computerThinking)return;
+
+    const row=Number(cell.dataset.row);
+    const col=Number(cell.dataset.col);
+
+    if(!Number.isInteger(row)||!Number.isInteger(col)){
+        return;
+    }
+
+    makeMove({
+        row,
+        col
+    });
+});
+
+/* =========================================================
+   COMPUTER
+   ========================================================= */
+
+function computerTurn(){
+
+    if(gameOver||
+       !computerMode||
+       onlineMode||
+       currentPlayer!==WHITE){
+        return;
+    }
+
+    computerThinking=true;
+    updateTurnDisplay();
+    updateMessage("Computer is thinking...");
+
+    setTimeout(()=>{
+
+        if(gameOver||
+           !computerMode||
+           currentPlayer!==WHITE){
+            computerThinking=false;
+            return;
+        }
+
+        const moves=getValidMoves(WHITE);
+
+        if(!moves.length){
+            computerThinking=false;
+            resolveNoMove();
+            return;
+        }
+
+        let selected;
+
+        if(difficultyElement.value==="easy"){
+            selected=moves[
+                Math.floor(Math.random()*moves.length)
+            ];
+        }else{
+            selected=chooseBestMove(
+                WHITE,
+                difficultyElement.value==="hard"?4:2
+            );
+        }
+
+        computerThinking=false;
+        makeMove(selected);
+
+    },300);
+}
+
+const POSITION_WEIGHTS=[
+[120,-25,20,5,5,20,-25,120],
+[-25,-45,-5,-5,-5,-5,-45,-25],
+[20,-5,15,3,3,15,-5,20],
+[5,-5,3,3,3,3,-5,5],
+[5,-5,3,3,3,3,-5,5],
+[20,-5,15,3,3,15,-5,20],
+[-25,-45,-5,-5,-5,-5,-45,-25],
+[120,-25,20,5,5,20,-25,120]
+];
+
+function evaluate(position,color){
+    const opponent=opponentOf(color);
+    let score=0;
+
+    for(let r=0;r<SIZE;r++){
+        for(let c=0;c<SIZE;c++){
+            if(position[r][c]===color){
+                score+=POSITION_WEIGHTS[r][c];
+            }else if(position[r][c]===opponent){
+                score-=POSITION_WEIGHTS[r][c];
+            }
+        }
+    }
+
+    score+=(
+        getValidMoves(color,position).length-
+        getValidMoves(opponent,position).length
+    )*7;
+
+    return score;
+}
+
+function minimax(position,player,depth,alpha,beta,maxColor){
+
+    const opponent=opponentOf(player);
+    const moves=getValidMoves(player,position);
+    const otherMoves=getValidMoves(opponent,position);
+
+    if(depth<=0||(!moves.length&&!otherMoves.length)){
+        return evaluate(position,maxColor);
+    }
+
+    if(!moves.length){
+        return minimax(
+            position,
+            opponent,
+            depth-1,
+            alpha,
+            beta,
+            maxColor
+        );
+    }
+
+    if(player===maxColor){
+
+        let best=-Infinity;
+
+        for(const move of moves){
+
+            const next=applyMove(
+                position,
+                move,
+                player
+            );
+
+            best=Math.max(
+                best,
+                minimax(
+                    next,
+                    opponent,
+                    depth-1,
+                    alpha,
+                    beta,
+                    maxColor
+                )
+            );
+
+            alpha=Math.max(alpha,best);
+
+            if(beta<=alpha)break;
+        }
+
+        return best;
+    }
+
+    let best=Infinity;
+
+    for(const move of moves){
+
+        const next=applyMove(
+            position,
+            move,
+            player
+        );
+
+        best=Math.min(
+            best,
+            minimax(
+                next,
+                opponent,
+                depth-1,
+                alpha,
+                beta,
+                maxColor
+            )
+        );
+
+        beta=Math.min(beta,best);
+
+        if(beta<=alpha)break;
+    }
+
+    return best;
+}
+
+function chooseBestMove(color,depth){
+
+    const moves=getValidMoves(color);
+
+    if(!moves.length)return null;
+
+    let best=moves[0];
+    let bestScore=-Infinity;
+
+    for(const move of moves){
+
+        const next=applyMove(
+            boardState,
+            move,
+            color
+        );
+
+        const score=minimax(
+            next,
+            opponentOf(color),
+            depth-1,
+            -Infinity,
+            Infinity,
+            color
+        );
+
+        if(score>bestScore){
+            bestScore=score;
+            best=move;
+        }
+    }
+
+    return best;
+}
+
+function resolveNoMove(){
+
+    const moves=getValidMoves(currentPlayer);
+
+    if(moves.length){
+        renderBoard(moves);
+        updateTurnDisplay();
+        return;
+    }
+
+    const other=opponentOf(currentPlayer);
+    const otherMoves=getValidMoves(other);
+
+    if(!otherMoves.length){
+        gameOver=true;
+        renderBoard([]);
+        renderScores();
+        showGameResult();
+        return;
+    }
+
+    currentPlayer=other;
+
+    renderBoard(otherMoves);
+    updateTurnDisplay();
+
+    if(!onlineMode&&
+       computerMode&&
+       currentPlayer===WHITE){
+        computerTurn();
+    }
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+twoPlayerButton.addEventListener("click",()=>{
+    if(socket){
+        try{socket.close();}catch(e){}
+    }
+
+    window.location.href="rooms.html?game=othello";
+});
+
+computerButton.addEventListener("click",()=>{
+
+    if(onlineMode){
+        return;
+    }
+
+    computerMode=true;
+    computerButton.disabled=true;
+    difficultyElement.disabled=false;
+
+    resetGame();
+});
+
+newGameButton.addEventListener("click",()=>{
+
+    resetGame();
+
+    if(onlineMode&&socketOpen){
+
+        sendSocket({
+            type:"othelloNewGame",
+            game:"othello",
+            room:roomId,
+            player:playerNumber,
+            clientId,
+            state:getBoardState()
+        });
+    }
+});
+
+menuButton.addEventListener("click",()=>{
+    if(socket){
+        try{socket.close();}catch(e){}
+    }
+
+    window.location.href="index.html";
+});
+
+difficultyElement.addEventListener("change",()=>{
+    if(!computerMode||onlineMode)return;
+
+    updateMessage(
+        "Difficulty: "+
+        difficultyElement.options[
+            difficultyElement.selectedIndex
+        ].text
+    );
+});
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+function resizeBoardToAvailableSpace(){
+
+    if(!boardShadowElement||!gameElement)return;
+
+    const gameRect=gameElement.getBoundingClientRect();
+
+    const tableStyle=getComputedStyle(
+        document.querySelector(".table")
+    );
+
+    const top=boardShadowElement
+        .getBoundingClientRect().top;
+
+    const messageHeight=messageElement
+        ?messageElement.getBoundingClientRect().height
+        :0;
+
+    const controlsHeight=controlsElement
+        ?controlsElement.getBoundingClientRect().height
+        :0;
+
+    const messageMargin=messageElement
+        ?parseFloat(getComputedStyle(messageElement).marginTop)||0
+        :0;
+
+    const controlsMargin=controlsElement
+        ?parseFloat(getComputedStyle(controlsElement).marginTop)||0
+        :0;
+
+    const bottomPadding=Math.max(
+        2,
+        parseFloat(tableStyle.paddingBottom)||0
+    );
+
+    const availableWidth=Math.min(
+        gameRect.width,
+        window.innerWidth*.96
+    );
+
+    const availableHeight=
+        window.innerHeight-
+        top-
+        messageHeight-
+        controlsHeight-
+        messageMargin-
+        controlsMargin-
+        bottomPadding-
+        2;
+
+    let size=Math.min(
+        availableWidth,
+        availableHeight
+    );
+
+    size=Math.min(size,650);
+    size=Math.max(120,Math.floor(size));
+
+    /*
+     * Only the board shadow gets the size.
+     * The old JS width/height assignments to board-wrap
+     * were fighting the CSS sizing.
+     */
+    boardShadowElement.style.setProperty(
+        "--board-size",
+        size+"px"
+    );
+}
+
+window.addEventListener(
+    "resize",
+    resizeBoardToAvailableSpace
+);
+
+window.addEventListener(
+    "orientationchange",
+    ()=>{
+        setTimeout(
+            resizeBoardToAvailableSpace,
+            100
+        );
+    }
+);
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+function initialize(){
+
+    if(onlineMode){
+
+        computerMode=false;
+        difficultyElement.disabled=true;
+        computerButton.disabled=true;
+
+        /*
+         * BOTH PLAYERS start with the identical initial
+         * position. Nobody sends a state on connection.
+         */
+        boardState=createInitialBoard();
+        currentPlayer=BLACK;
+        gameOver=false;
+        lastMove=null;
+
+        renderScores();
+        renderBoard(getValidMoves(currentPlayer));
+        updateTurnDisplay();
+
+        connectToRoom();
+
+    }else{
+
+        computerMode=true;
+        difficultyElement.disabled=false;
+        computerButton.disabled=true;
+
+        renderScores();
+        renderBoard(getValidMoves(currentPlayer));
+        updateTurnDisplay();
+        updateMessage("Onyx begins.");
+    }
+
+    /*
+     * Wait one frame so the browser has the real layout
+     * dimensions before calculating the board size.
+     */
+    requestAnimationFrame(()=>{
+        resizeBoardToAvailableSpace();
+    });
+}
+
+initialize();
+
+</script>
+</body>
+</html>
