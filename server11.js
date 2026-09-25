@@ -1,127 +1,223 @@
 const http = require("http");
 const fs = require("fs");
+const path = require("path");
 const WebSocket = require("ws");
 
 const PORT = process.env.PORT || 3000;
 
-// ============================================================
-// HTTP SERVER
-// ============================================================
+const ROOT = __dirname;
+
+
+/* =========================================================
+   HTTP SERVER
+   ========================================================= */
 
 const server = http.createServer((req, res) => {
 
-    let file;
+    let requestPath;
 
-    if (req.url === "/" || req.url === "/index.html") {
-        file = "index.html";
+    try {
+        requestPath = decodeURIComponent(
+            req.url.split("?")[0]
+        );
+    } catch (err) {
+        res.writeHead(400, {
+            "Content-Type": "text/plain"
+        });
 
-    } else if (req.url === "/ttt.html") {
-        file = "ttt.html";
-
-    } else if (req.url === "/checkers.html") {
-        file = "checkers.html";
-
-    } else if (req.url === "/navalstrike.html") {
-        file = "navalstrike.html";
-
-    } else if (req.url === "/chess.html") {
-        file = "chess.html";
-
-    } else {
-        res.writeHead(404);
-        res.end("Not Found");
+        res.end("Bad Request");
         return;
     }
 
-    fs.readFile(file, (err, data) => {
 
-        if (err) {
-            res.writeHead(500);
-            res.end("Server Error");
-            return;
-        }
+    /* -----------------------------------------------------
+       AUTOMATIC GAME LIST
+       ----------------------------------------------------- */
 
-        let contentType = "text/html";
+    if (requestPath === "/games") {
 
-        res.writeHead(200, {
-            "Content-Type": contentType
+        fs.readdir(ROOT, (err, files) => {
+
+            if (err) {
+
+                res.writeHead(500, {
+                    "Content-Type": "application/json"
+                });
+
+                res.end(JSON.stringify({
+                    error: "Unable to read game directory"
+                }));
+
+                return;
+            }
+
+
+            const games = files
+                .filter(file =>
+                    file.toLowerCase().endsWith(".html")
+                )
+                .filter(file =>
+                    file.toLowerCase() !== "index.html"
+                )
+                .sort((a, b) =>
+                    a.localeCompare(
+                        b,
+                        undefined,
+                        {
+                            sensitivity: "base"
+                        }
+                    )
+                );
+
+
+            res.writeHead(200, {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store",
+                "Access-Control-Allow-Origin": "*"
+            });
+
+            res.end(JSON.stringify(games));
+
         });
 
-        res.end(data);
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       ROOT
+       ----------------------------------------------------- */
+
+    if (requestPath === "/") {
+        requestPath = "/index.html";
+    }
+
+
+    /* -----------------------------------------------------
+       AUTOMATIC HTML FILE SERVING
+       ----------------------------------------------------- */
+
+    if (requestPath.toLowerCase().endsWith(".html")) {
+
+        /*
+         * Only allow simple filenames.
+         *
+         * This prevents requests from escaping the
+         * game directory with ../ paths.
+         */
+
+        const filename =
+            path.basename(requestPath);
+
+        const filePath =
+            path.join(ROOT, filename);
+
+
+        /*
+         * Make sure the requested file actually exists
+         * and is a regular file.
+         */
+
+        fs.stat(filePath, (err, stats) => {
+
+            if (err || !stats.isFile()) {
+
+                res.writeHead(404, {
+                    "Content-Type": "text/plain"
+                });
+
+                res.end("404 - Game Not Found");
+                return;
+            }
+
+
+            /*
+             * All .html files are automatically served.
+             */
+
+            fs.readFile(
+                filePath,
+                "utf8",
+                (readErr, data) => {
+
+                    if (readErr) {
+
+                        res.writeHead(500, {
+                            "Content-Type": "text/plain"
+                        });
+
+                        res.end("500 - Error Reading File");
+                        return;
+                    }
+
+
+                    res.writeHead(200, {
+                        "Content-Type": "text/html; charset=utf-8",
+                        "Cache-Control": "no-store"
+                    });
+
+                    res.end(data);
+                }
+            );
+
+        });
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       FAVICON
+       ----------------------------------------------------- */
+
+    if (requestPath === "/favicon.ico") {
+
+        res.writeHead(204);
+        res.end();
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       EVERYTHING ELSE
+       ----------------------------------------------------- */
+
+    res.writeHead(404, {
+        "Content-Type": "text/plain"
     });
+
+    res.end("404 - Not Found");
+
 });
 
 
-// ============================================================
-// WEBSOCKET SERVER
-// ============================================================
+/* =========================================================
+   WEBSOCKET SERVER
+   ========================================================= */
 
 const wss = new WebSocket.Server({
-    server: server
+    server
 });
 
 
-// ============================================================
-// TIC-TAC-TOE
-// ============================================================
+/* =========================================================
+   TIC-TAC-TOE
+   ========================================================= */
 
 let tttPlayer1 = null;
 let tttPlayer2 = null;
 
-let tttBoard = [
-    "", "", "",
-    "", "", "",
-    "", ""
-];
+let tttBoard = Array(9).fill(null);
 
 let tttTurn = "X";
 
-function tttBroadcast(message) {
-
-    [tttPlayer1, tttPlayer2].forEach(player => {
-
-        if (player && player.readyState === WebSocket.OPEN) {
-            player.send(JSON.stringify(message));
-        }
-
-    });
-}
-
-function checkTTTWinner() {
-
-    const wins = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-    ];
-
-    for (const [a, b, c] of wins) {
-
-        if (
-            tttBoard[a] &&
-            tttBoard[a] === tttBoard[b] &&
-            tttBoard[a] === tttBoard[c]
-        ) {
-            return tttBoard[a];
-        }
-    }
-
-    if (tttBoard.every(cell => cell !== "")) {
-        return "DRAW";
-    }
-
-    return null;
-}
+let tttGameOver = false;
 
 
-// ============================================================
-// CHECKERS
-// ============================================================
+/* =========================================================
+   CHECKERS
+   ========================================================= */
 
 let checkersPlayer1 = null;
 let checkersPlayer2 = null;
@@ -130,8 +226,14 @@ let checkersBoard = createCheckersBoard();
 
 let checkersTurn = "red";
 
+let checkersGameOver = false;
+
 let checkersForcedPiece = null;
 
+
+/* =========================================================
+   CREATE CHECKERS BOARD
+   ========================================================= */
 
 function createCheckersBoard() {
 
@@ -140,198 +242,574 @@ function createCheckersBoard() {
         () => Array(8).fill(null)
     );
 
+
     for (let row = 0; row < 3; row++) {
 
         for (let col = 0; col < 8; col++) {
 
             if ((row + col) % 2 === 1) {
-                board[row][col] = {
-                    color: "black",
-                    king: false
-                };
+                board[row][col] = "black";
             }
+
         }
+
     }
+
 
     for (let row = 5; row < 8; row++) {
 
         for (let col = 0; col < 8; col++) {
 
             if ((row + col) % 2 === 1) {
-                board[row][col] = {
-                    color: "red",
-                    king: false
-                };
+                board[row][col] = "red";
             }
+
         }
+
     }
+
 
     return board;
 }
 
 
-function checkersBroadcast(message) {
+/* =========================================================
+   TTT WIN CHECK
+   ========================================================= */
 
-    [checkersPlayer1, checkersPlayer2].forEach(player => {
+function checkTTTWinner(board) {
 
-        if (player && player.readyState === WebSocket.OPEN) {
-            player.send(JSON.stringify(message));
-        }
+    const wins = [
 
-    });
-}
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+
+        [0, 4, 8],
+        [2, 4, 6]
+
+    ];
 
 
-function getCheckersMoves(row, col) {
+    for (const line of wins) {
 
-    const piece = checkersBoard[row][col];
-
-    if (!piece) {
-        return [];
-    }
-
-    const moves = [];
-
-    const directions = [];
-
-    if (piece.king || piece.color === "red") {
-        directions.push([-1, -1]);
-        directions.push([-1, 1]);
-    }
-
-    if (piece.king || piece.color === "black") {
-        directions.push([1, -1]);
-        directions.push([1, 1]);
-    }
-
-    for (const [dr, dc] of directions) {
-
-        const r = row + dr;
-        const c = col + dc;
+        const [a, b, c] = line;
 
         if (
-            r >= 0 &&
-            r < 8 &&
-            c >= 0 &&
-            c < 8 &&
-            !checkersBoard[r][c]
+            board[a] &&
+            board[a] === board[b] &&
+            board[a] === board[c]
         ) {
-
-            moves.push({
-                row: r,
-                col: c,
-                capture: false
-            });
-
+            return board[a];
         }
 
-        const jumpR = row + dr * 2;
-        const jumpC = col + dc * 2;
-
-        if (
-            jumpR >= 0 &&
-            jumpR < 8 &&
-            jumpC >= 0 &&
-            jumpC < 8 &&
-            checkersBoard[r]?.[c] &&
-            checkersBoard[r][c].color !== piece.color &&
-            !checkersBoard[jumpR][jumpC]
-        ) {
-
-            moves.push({
-                row: jumpR,
-                col: jumpC,
-                capture: true,
-                capturedRow: r,
-                capturedCol: c
-            });
-
-        }
     }
 
-    return moves;
-}
 
-
-function hasCheckersCapture(color) {
-
-    for (let row = 0; row < 8; row++) {
-
-        for (let col = 0; col < 8; col++) {
-
-            const piece = checkersBoard[row][col];
-
-            if (
-                piece &&
-                piece.color === color
-            ) {
-
-                const moves = getCheckersMoves(row, col);
-
-                if (moves.some(move => move.capture)) {
-                    return true;
-                }
-            }
-        }
+    if (board.every(cell => cell !== null)) {
+        return "draw";
     }
 
-    return false;
-}
-
-
-function checkCheckersWinner() {
-
-    let redPieces = 0;
-    let blackPieces = 0;
-
-    let redMoves = 0;
-    let blackMoves = 0;
-
-    for (let row = 0; row < 8; row++) {
-
-        for (let col = 0; col < 8; col++) {
-
-            const piece = checkersBoard[row][col];
-
-            if (!piece) {
-                continue;
-            }
-
-            if (piece.color === "red") {
-                redPieces++;
-                redMoves += getCheckersMoves(row, col).length;
-            }
-
-            if (piece.color === "black") {
-                blackPieces++;
-                blackMoves += getCheckersMoves(row, col).length;
-            }
-        }
-    }
-
-    if (redPieces === 0 || redMoves === 0) {
-        return "black";
-    }
-
-    if (blackPieces === 0 || blackMoves === 0) {
-        return "red";
-    }
 
     return null;
 }
 
 
-// ============================================================
-// WEBSOCKET CONNECTION
-// ============================================================
+/* =========================================================
+   BROADCAST TTT
+   ========================================================= */
+
+function broadcastTTT() {
+
+    const message = JSON.stringify({
+        type: "tttState",
+        board: tttBoard,
+        turn: tttTurn,
+        gameOver: tttGameOver
+    });
+
+
+    [tttPlayer1, tttPlayer2].forEach(player => {
+
+        if (
+            player &&
+            player.readyState === WebSocket.OPEN
+        ) {
+            player.send(message);
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   BROADCAST CHECKERS
+   ========================================================= */
+
+function broadcastCheckers() {
+
+    const message = JSON.stringify({
+        type: "checkersState",
+        board: checkersBoard,
+        turn: checkersTurn,
+        gameOver: checkersGameOver,
+        forcedPiece: checkersForcedPiece
+    });
+
+
+    [checkersPlayer1, checkersPlayer2].forEach(player => {
+
+        if (
+            player &&
+            player.readyState === WebSocket.OPEN
+        ) {
+            player.send(message);
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   CHECKERS PIECE COLOR
+   ========================================================= */
+
+function checkersColor(piece) {
+
+    if (!piece) {
+        return null;
+    }
+
+
+    if (piece === "red" || piece === "redKing") {
+        return "red";
+    }
+
+
+    if (piece === "black" || piece === "blackKing") {
+        return "black";
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   CHECKERS KING
+   ========================================================= */
+
+function isCheckersKing(piece) {
+
+    return (
+        piece === "redKing" ||
+        piece === "blackKing"
+    );
+}
+
+
+/* =========================================================
+   CHECKERS VALID MOVE
+   ========================================================= */
+
+function validCheckersMove(
+    fromRow,
+    fromCol,
+    toRow,
+    toCol,
+    player
+) {
+
+    if (
+        fromRow < 0 ||
+        fromRow > 7 ||
+        fromCol < 0 ||
+        fromCol > 7 ||
+        toRow < 0 ||
+        toRow > 7 ||
+        toCol < 0 ||
+        toCol > 7
+    ) {
+        return false;
+    }
+
+
+    const piece =
+        checkersBoard[fromRow][fromCol];
+
+
+    if (!piece) {
+        return false;
+    }
+
+
+    if (
+        checkersColor(piece) !== player
+    ) {
+        return false;
+    }
+
+
+    if (
+        checkersBoard[toRow][toCol] !== null
+    ) {
+        return false;
+    }
+
+
+    const rowDiff =
+        toRow - fromRow;
+
+    const colDiff =
+        toCol - fromCol;
+
+
+    const absRow =
+        Math.abs(rowDiff);
+
+    const absCol =
+        Math.abs(colDiff);
+
+
+    if (
+        absRow !== absCol
+    ) {
+        return false;
+    }
+
+
+    if (absRow === 1) {
+
+        if (isCheckersKing(piece)) {
+            return true;
+        }
+
+
+        if (player === "red") {
+            return rowDiff === -1;
+        }
+
+
+        return rowDiff === 1;
+    }
+
+
+    if (absRow === 2) {
+
+        const middleRow =
+            fromRow + rowDiff / 2;
+
+        const middleCol =
+            fromCol + colDiff / 2;
+
+
+        const middlePiece =
+            checkersBoard[middleRow][middleCol];
+
+
+        if (!middlePiece) {
+            return false;
+        }
+
+
+        if (
+            checkersColor(middlePiece) === player
+        ) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+/* =========================================================
+   CHECKERS MOVE
+   ========================================================= */
+
+function makeCheckersMove(
+    fromRow,
+    fromCol,
+    toRow,
+    toCol,
+    player
+) {
+
+    if (
+        !validCheckersMove(
+            fromRow,
+            fromCol,
+            toRow,
+            toCol,
+            player
+        )
+    ) {
+        return false;
+    }
+
+
+    const piece =
+        checkersBoard[fromRow][fromCol];
+
+
+    const rowDiff =
+        toRow - fromRow;
+
+    const absRow =
+        Math.abs(rowDiff);
+
+
+    const wasKing =
+        isCheckersKing(piece);
+
+
+    checkersBoard[
+        toRow
+    ][
+        toCol
+    ] = piece;
+
+
+    checkersBoard[
+        fromRow
+    ][
+        fromCol
+    ] = null;
+
+
+    /*
+     * Capture
+     */
+
+    if (absRow === 2) {
+
+        const middleRow =
+            fromRow + rowDiff / 2;
+
+        const middleCol =
+            fromCol +
+            (toCol - fromCol) / 2;
+
+
+        checkersBoard[
+            middleRow
+        ][
+            middleCol
+        ] = null;
+
+    }
+
+
+    /*
+     * Promotion
+     */
+
+    if (
+        piece === "red" &&
+        toRow === 0
+    ) {
+        checkersBoard[
+            toRow
+        ][
+            toCol
+        ] = "redKing";
+    }
+
+
+    if (
+        piece === "black" &&
+        toRow === 7
+    ) {
+        checkersBoard[
+            toRow
+        ][
+            toCol
+        ] = "blackKing";
+    }
+
+
+    /*
+     * Multi-capture detection.
+     */
+
+    checkersForcedPiece = null;
+
+
+    if (absRow === 2) {
+
+        const nextPiece =
+            checkersBoard[toRow][toCol];
+
+
+        const moves =
+            getCheckersCaptures(
+                toRow,
+                toCol,
+                player
+            );
+
+
+        if (moves.length > 0) {
+
+            checkersForcedPiece = {
+                row: toRow,
+                col: toCol
+            };
+
+            broadcastCheckers();
+
+            return true;
+        }
+    }
+
+
+    checkersTurn =
+        player === "red"
+            ? "black"
+            : "red";
+
+
+    return true;
+}
+
+
+/* =========================================================
+   CHECKERS CAPTURES
+   ========================================================= */
+
+function getCheckersCaptures(
+    row,
+    col,
+    player
+) {
+
+    const piece =
+        checkersBoard[row][col];
+
+
+    if (!piece) {
+        return [];
+    }
+
+
+    const directions = [
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+        [1, 1]
+    ];
+
+
+    const result = [];
+
+
+    for (const [dr, dc] of directions) {
+
+        const middleRow =
+            row + dr;
+
+        const middleCol =
+            col + dc;
+
+        const toRow =
+            row + dr * 2;
+
+        const toCol =
+            col + dc * 2;
+
+
+        if (
+            toRow < 0 ||
+            toRow > 7 ||
+            toCol < 0 ||
+            toCol > 7
+        ) {
+            continue;
+        }
+
+
+        const middlePiece =
+            checkersBoard[
+                middleRow
+            ][
+                middleCol
+            ];
+
+
+        if (!middlePiece) {
+            continue;
+        }
+
+
+        if (
+            checkersColor(middlePiece) === player
+        ) {
+            continue;
+        }
+
+
+        if (
+            checkersBoard[
+                toRow
+            ][
+                toCol
+            ] !== null
+        ) {
+            continue;
+        }
+
+
+        result.push({
+            row: toRow,
+            col: toCol
+        });
+
+    }
+
+
+    return result;
+}
+
+
+/* =========================================================
+   WEBSOCKET CONNECTION
+   ========================================================= */
 
 wss.on("connection", (ws, req) => {
 
-    const url = req.url || "/";
+    const url =
+        req.url || "/";
 
-    // --------------------------------------------------------
-    // NAVAL STRIKE
-    // --------------------------------------------------------
+
+    /* =====================================================
+       CHESS
+       ===================================================== */
+
+    if (url.startsWith("/chess")) {
+
+        ws.game = "chess";
+
+        ws.send(JSON.stringify({
+            type: "chessConnected"
+        }));
+
+        return;
+    }
+
+
+    /* =====================================================
+       NAVAL STRIKE
+       ===================================================== */
 
     if (url.startsWith("/navalstrike")) {
 
@@ -345,287 +823,179 @@ wss.on("connection", (ws, req) => {
     }
 
 
-    // --------------------------------------------------------
-    // CHESS
-    // --------------------------------------------------------
-
-    if (url.startsWith("/chess")) {
-
-        ws.game = "chess";
-
-        /*
-         * Chess currently runs locally inside chess.html.
-         * This route is reserved so the server can support
-         * network chess later without disturbing the game.
-         */
-
-        ws.send(JSON.stringify({
-            type: "chessConnected"
-        }));
-
-        return;
-    }
-
-
-    // --------------------------------------------------------
-    // CHECKERS
-    // --------------------------------------------------------
+    /* =====================================================
+       CHECKERS
+       ===================================================== */
 
     if (url.startsWith("/checkers")) {
 
         ws.game = "checkers";
 
+
         if (!checkersPlayer1) {
 
             checkersPlayer1 = ws;
-            ws.player = "red";
+
+            ws.player =
+                "red";
 
         } else if (!checkersPlayer2) {
 
             checkersPlayer2 = ws;
-            ws.player = "black";
+
+            ws.player =
+                "black";
 
         } else {
 
-            ws.send(JSON.stringify({
-                type: "full"
-            }));
-
-            return;
+            ws.player =
+                "spectator";
         }
 
+
         ws.send(JSON.stringify({
-            type: "checkersInit",
-            player: ws.player,
-            board: checkersBoard,
-            turn: checkersTurn
+            type: "checkersAssigned",
+            player: ws.player
         }));
 
-        checkersBroadcast({
-            type: "checkersPlayers",
-            red: !!checkersPlayer1,
-            black: !!checkersPlayer2
-        });
+
+        broadcastCheckers();
+
 
         ws.on("message", data => {
 
             let message;
 
             try {
-                message = JSON.parse(data);
-            } catch {
+                message =
+                    JSON.parse(data.toString());
+            } catch (err) {
                 return;
             }
 
-            if (message.type === "checkersMove") {
 
-                if (ws.player !== checkersTurn) {
-                    return;
-                }
-
-                const fromRow = message.fromRow;
-                const fromCol = message.fromCol;
-
-                const toRow = message.toRow;
-                const toCol = message.toCol;
+            if (
+                message.type === "checkersMove"
+            ) {
 
                 if (
-                    !Number.isInteger(fromRow) ||
-                    !Number.isInteger(fromCol) ||
-                    !Number.isInteger(toRow) ||
-                    !Number.isInteger(toCol)
+                    ws.player !== checkersTurn
                 ) {
                     return;
                 }
 
-                if (
-                    fromRow < 0 || fromRow > 7 ||
-                    fromCol < 0 || fromCol > 7 ||
-                    toRow < 0 || toRow > 7 ||
-                    toCol < 0 || toCol > 7
-                ) {
-                    return;
-                }
-
-                const piece = checkersBoard[fromRow][fromCol];
-
-                if (!piece) {
-                    return;
-                }
-
-                if (piece.color !== checkersTurn) {
-                    return;
-                }
 
                 if (
                     checkersForcedPiece &&
                     (
-                        checkersForcedPiece.row !== fromRow ||
-                        checkersForcedPiece.col !== fromCol
+                        message.fromRow !==
+                            checkersForcedPiece.row ||
+                        message.fromCol !==
+                            checkersForcedPiece.col
                     )
                 ) {
                     return;
                 }
 
-                const moves = getCheckersMoves(fromRow, fromCol);
 
-                const move = moves.find(m =>
-                    m.row === toRow &&
-                    m.col === toCol
-                );
+                const moved =
+                    makeCheckersMove(
+                        message.fromRow,
+                        message.fromCol,
+                        message.toRow,
+                        message.toCol,
+                        ws.player
+                    );
 
-                if (!move) {
+
+                if (!moved) {
                     return;
                 }
 
-                if (
-                    hasCheckersCapture(checkersTurn) &&
-                    !move.capture
-                ) {
-                    return;
-                }
 
-                checkersBoard[toRow][toCol] = piece;
-                checkersBoard[fromRow][fromCol] = null;
-
-                if (move.capture) {
-
-                    checkersBoard[
-                        move.capturedRow
-                    ][
-                        move.capturedCol
-                    ] = null;
-                }
-
-                if (
-                    piece.color === "red" &&
-                    toRow === 0
-                ) {
-                    piece.king = true;
-                }
-
-                if (
-                    piece.color === "black" &&
-                    toRow === 7
-                ) {
-                    piece.king = true;
-                }
-
-                let anotherCapture = false;
-
-                if (move.capture) {
-
-                    const nextMoves =
-                        getCheckersMoves(toRow, toCol);
-
-                    anotherCapture =
-                        nextMoves.some(m => m.capture);
-                }
-
-                if (anotherCapture) {
-
-                    checkersForcedPiece = {
-                        row: toRow,
-                        col: toCol
-                    };
-
-                } else {
-
-                    checkersForcedPiece = null;
-
-                    checkersTurn =
-                        checkersTurn === "red"
-                            ? "black"
-                            : "red";
-                }
-
-                const winner = checkCheckersWinner();
-
-                checkersBroadcast({
-                    type: "checkersUpdate",
-                    board: checkersBoard,
-                    turn: checkersTurn,
-                    forcedPiece: checkersForcedPiece,
-                    winner
-                });
+                broadcastCheckers();
             }
 
 
-            if (message.type === "checkersReset") {
+            if (
+                message.type === "checkersReset"
+            ) {
 
-                checkersBoard = createCheckersBoard();
-                checkersTurn = "red";
-                checkersForcedPiece = null;
+                checkersBoard =
+                    createCheckersBoard();
 
-                checkersBroadcast({
-                    type: "checkersUpdate",
-                    board: checkersBoard,
-                    turn: checkersTurn,
-                    forcedPiece: null,
-                    winner: null
-                });
+                checkersTurn =
+                    "red";
+
+                checkersGameOver =
+                    false;
+
+                checkersForcedPiece =
+                    null;
+
+                broadcastCheckers();
             }
 
         });
+
 
         ws.on("close", () => {
 
-            if (ws === checkersPlayer1) {
+            if (
+                checkersPlayer1 === ws
+            ) {
                 checkersPlayer1 = null;
             }
 
-            if (ws === checkersPlayer2) {
+
+            if (
+                checkersPlayer2 === ws
+            ) {
                 checkersPlayer2 = null;
             }
 
-            checkersBroadcast({
-                type: "checkersPlayers",
-                red: !!checkersPlayer1,
-                black: !!checkersPlayer2
-            });
         });
+
 
         return;
     }
 
 
-    // --------------------------------------------------------
-    // TIC-TAC-TOE
-    // --------------------------------------------------------
+    /* =====================================================
+       TIC-TAC-TOE
+       ===================================================== */
 
     ws.game = "ttt";
+
 
     if (!tttPlayer1) {
 
         tttPlayer1 = ws;
-        ws.player = "X";
+
+        ws.player =
+            "X";
 
     } else if (!tttPlayer2) {
 
         tttPlayer2 = ws;
-        ws.player = "O";
+
+        ws.player =
+            "O";
 
     } else {
 
-        ws.send(JSON.stringify({
-            type: "full"
-        }));
-
-        return;
+        ws.player =
+            "spectator";
     }
 
+
     ws.send(JSON.stringify({
-        type: "init",
-        player: ws.player,
-        board: tttBoard,
-        turn: tttTurn
+        type: "tttAssigned",
+        player: ws.player
     }));
 
-    tttBroadcast({
-        type: "players",
-        x: !!tttPlayer1,
-        o: !!tttPlayer2
-    });
+
+    broadcastTTT();
 
 
     ws.on("message", data => {
@@ -633,23 +1003,38 @@ wss.on("connection", (ws, req) => {
         let message;
 
         try {
-            message = JSON.parse(data);
-        } catch {
+            message =
+                JSON.parse(data.toString());
+        } catch (err) {
             return;
         }
 
 
-        // ----------------------------------------------------
-        // TIC-TAC-TOE MOVE
-        // ----------------------------------------------------
+        /* -----------------------------------------------
+           MOVE
+           ----------------------------------------------- */
 
-        if (message.type === "move") {
+        if (
+            message.type === "tttMove"
+        ) {
 
-            if (ws.player !== tttTurn) {
+            if (
+                tttGameOver
+            ) {
                 return;
             }
 
-            const index = message.index;
+
+            if (
+                ws.player !== tttTurn
+            ) {
+                return;
+            }
+
+
+            const index =
+                Number(message.index);
+
 
             if (
                 !Number.isInteger(index) ||
@@ -659,15 +1044,29 @@ wss.on("connection", (ws, req) => {
                 return;
             }
 
-            if (tttBoard[index] !== "") {
+
+            if (
+                tttBoard[index] !== null
+            ) {
                 return;
             }
 
-            tttBoard[index] = ws.player;
 
-            const winner = checkTTTWinner();
+            tttBoard[index] =
+                ws.player;
 
-            if (!winner) {
+
+            const winner =
+                checkTTTWinner(
+                    tttBoard
+                );
+
+
+            if (winner) {
+
+                tttGameOver =
+                    true;
+            } else {
 
                 tttTurn =
                     tttTurn === "X"
@@ -675,35 +1074,29 @@ wss.on("connection", (ws, req) => {
                         : "X";
             }
 
-            tttBroadcast({
-                type: "update",
-                board: tttBoard,
-                turn: tttTurn,
-                winner
-            });
+
+            broadcastTTT();
         }
 
 
-        // ----------------------------------------------------
-        // TIC-TAC-TOE RESET
-        // ----------------------------------------------------
+        /* -----------------------------------------------
+           RESET
+           ----------------------------------------------- */
 
-        if (message.type === "reset") {
+        if (
+            message.type === "tttReset"
+        ) {
 
-            tttBoard = [
-                "", "", "",
-                "", "", "",
-                "", "", ""
-            ];
+            tttBoard =
+                Array(9).fill(null);
 
-            tttTurn = "X";
+            tttTurn =
+                "X";
 
-            tttBroadcast({
-                type: "update",
-                board: tttBoard,
-                turn: tttTurn,
-                winner: null
-            });
+            tttGameOver =
+                false;
+
+            broadcastTTT();
         }
 
     });
@@ -711,44 +1104,48 @@ wss.on("connection", (ws, req) => {
 
     ws.on("close", () => {
 
-        if (ws === tttPlayer1) {
+        if (
+            tttPlayer1 === ws
+        ) {
             tttPlayer1 = null;
         }
 
-        if (ws === tttPlayer2) {
+
+        if (
+            tttPlayer2 === ws
+        ) {
             tttPlayer2 = null;
         }
 
-        tttBroadcast({
-            type: "players",
-            x: !!tttPlayer1,
-            o: !!tttPlayer2
-        });
     });
 
 });
 
 
-// ============================================================
-// START SERVER
-// ============================================================
+/* =========================================================
+   START SERVER
+   ========================================================= */
 
 server.listen(PORT, () => {
 
     console.log("");
-    console.log("========================================");
-    console.log("       GAME SERVER ONLINE");
-    console.log("========================================");
+    console.log("==========================================");
+    console.log("             GAME SERVER");
+    console.log("==========================================");
     console.log("");
     console.log("Port:", PORT);
     console.log("");
-    console.log("Games:");
-    console.log("  /ttt.html");
-    console.log("  /checkers.html");
-    console.log("  /navalstrike.html");
-    console.log("  /chess.html");
+    console.log("Automatic HTML game discovery: ENABLED");
+    console.log("Automatic /games endpoint: ENABLED");
+    console.log("Tic-Tac-Toe WebSocket: ENABLED");
+    console.log("Checkers WebSocket: ENABLED");
+    console.log("Naval Strike WebSocket: ENABLED");
+    console.log("Chess WebSocket: ENABLED");
     console.log("");
-    console.log("========================================");
+    console.log("Any .html game in this folder is");
+    console.log("automatically available.");
+    console.log("");
+    console.log("==========================================");
     console.log("");
 
 });
