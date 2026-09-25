@@ -2,395 +2,396 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Naval Strike</title>
 
 <style>
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     width: 100%;
-    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #06121d;
     font-family: Arial, Helvetica, sans-serif;
-    background: #06121b;
-    color: white;
-    overflow-x: hidden;
 }
 
-body {
-    min-height: 100vh;
+#viewport {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#stage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1600px;
+    height: 900px;
+    transform-origin: center center;
+    background:
+        linear-gradient(
+            to bottom,
+            #071a29 0%,
+            #0c344d 40%,
+            #0b5974 67%,
+            #063e58 100%
+        );
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 0 40px rgba(0,0,0,.7);
 }
 
 /* =========================================================
    START SCREEN
-   ========================================================= */
+========================================================= */
 
 #startScreen {
-    min-height: 100vh;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at 50% 25%, rgba(47,111,145,.35), transparent 35%),
-        linear-gradient(#071a27, #031019 70%, #02080d);
-}
-
-.oceanGlow {
     position: absolute;
-    width: 140%;
-    height: 55%;
-    left: -20%;
-    bottom: -20%;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     background:
-        repeating-linear-gradient(
-            175deg,
-            rgba(40,120,155,.18) 0px,
-            rgba(40,120,155,.18) 2px,
-            transparent 2px,
-            transparent 22px
+        radial-gradient(
+            ellipse at center,
+            rgba(25,94,124,.65),
+            rgba(2,13,22,.97) 72%
         );
-    transform: rotate(-2deg);
-    opacity: .8;
+    z-index: 50;
 }
 
-.startPanel {
-    position: relative;
-    z-index: 5;
-    width: min(92vw, 600px);
-    padding: 42px 28px 38px;
-    text-align: center;
-    border: 2px solid #426b7d;
-    border-radius: 24px;
-    background: linear-gradient(
-        145deg,
-        rgba(11,34,47,.97),
-        rgba(3,15,23,.97)
-    );
-    box-shadow:
-        0 0 40px rgba(0,180,255,.15),
-        inset 0 0 30px rgba(0,0,0,.55);
-}
-
-.gameLogo {
-    font-size: clamp(42px, 10vw, 76px);
-    font-weight: 900;
-    letter-spacing: 5px;
-    color: #e7f8ff;
+#startScreen h1 {
+    margin: 0;
+    font-size: 92px;
+    letter-spacing: 12px;
+    color: #f3f7fa;
     text-shadow:
-        0 0 8px #4bd5ff,
-        0 0 25px rgba(50,190,255,.6);
-    margin-bottom: 5px;
+        0 5px 0 #1d3745,
+        0 0 25px rgba(90,210,255,.8);
 }
 
 .subtitle {
-    color: #79b6c9;
-    letter-spacing: 4px;
-    font-size: 13px;
-    margin-bottom: 35px;
+    margin-top: 8px;
+    font-size: 23px;
+    letter-spacing: 7px;
+    color: #8fd8ef;
 }
 
-.shipBadge {
-    font-size: 70px;
-    margin-bottom: 25px;
-    filter: drop-shadow(0 5px 10px rgba(0,0,0,.7));
+.startButtons {
+    display: flex;
+    gap: 35px;
+    margin-top: 75px;
 }
 
-.modeButton {
-    width: 100%;
-    max-width: 390px;
-    margin: 10px auto;
-    display: block;
-    padding: 17px 20px;
-    border: 2px solid #3b91ae;
+.startButton {
+    width: 280px;
+    height: 90px;
+    border: 2px solid #63d7ff;
     border-radius: 12px;
-    background: linear-gradient(#174b61, #0b2b3b);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(30,102,133,.95),
+            rgba(7,39,58,.98)
+        );
     color: white;
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 27px;
+    font-weight: bold;
     letter-spacing: 2px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,.4);
+    box-shadow:
+        inset 0 0 20px rgba(0,210,255,.12),
+        0 8px 25px rgba(0,0,0,.45);
+    transition: .15s;
 }
 
-.modeButton:hover {
-    background: linear-gradient(#216b87, #104258);
-    border-color: #72dfff;
+.startButton:hover {
+    transform: translateY(-4px);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(45,137,172,.98),
+            rgba(8,54,76,.98)
+        );
+    box-shadow:
+        0 0 25px rgba(61,205,255,.55),
+        0 10px 30px rgba(0,0,0,.5);
 }
 
-.modeButton:active {
-    transform: scale(.98);
+.startButton:active {
+    transform: translateY(1px);
 }
 
-.gameRoomButton {
-    margin-top: 24px;
-    background: #101d24;
-    border-color: #516771;
+.startFooter {
+    position: absolute;
+    bottom: 35px;
+    color: #7ea5b6;
     font-size: 15px;
-}
-
-.gameRoomButton:hover {
-    background: #182b34;
+    letter-spacing: 3px;
 }
 
 /* =========================================================
-   GAME
-   ========================================================= */
+   GAME SCREEN
+========================================================= */
 
 #gameScreen {
+    position: absolute;
+    inset: 0;
     display: none;
-    min-height: 100vh;
-    background:
-        linear-gradient(
-            to bottom,
-            #071d2a 0%,
-            #0a3142 32%,
-            #0b4254 55%,
-            #061923 100%
-        );
-    overflow: hidden;
 }
 
 .topBar {
-    height: 68px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 82px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 14px;
-    border-bottom: 2px solid #315e6c;
-    background: rgba(3,15,22,.9);
-    position: relative;
+
+    padding: 0 28px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(2,12,20,.96),
+            rgba(5,26,39,.88)
+        );
+
+    border-bottom: 2px solid rgba(95,211,243,.35);
     z-index: 20;
 }
 
-.topTitle {
-    font-size: clamp(22px, 5vw, 34px);
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-shadow: 0 0 10px rgba(75,213,255,.5);
+.gameTitle {
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    letter-spacing: 6px;
+}
+
+.turnDisplay {
+    color: #8ce7ff;
+    font-size: 21px;
+    font-weight: bold;
+    letter-spacing: 2px;
 }
 
 .roomButton {
-    border: 1px solid #526b73;
-    background: #14252d;
-    color: #d9eef4;
-    padding: 9px 13px;
+    border: 1px solid #66d7f7;
     border-radius: 8px;
+    padding: 12px 20px;
+    background: #092638;
+    color: white;
     font-weight: bold;
     cursor: pointer;
 }
 
 .roomButton:hover {
-    background: #203b46;
-}
-
-/* =========================================================
-   MAIN BATTLE AREA
-   ========================================================= */
-
-.battlefield {
-    width: min(1400px, 100%);
-    margin: auto;
-    padding: 15px;
-}
-
-.statusBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding: 9px 14px;
-    background: rgba(2,13,20,.78);
-    border: 1px solid #315d6c;
-    border-radius: 10px;
-    font-size: 14px;
-}
-
-.statusText {
-    color: #8bdcff;
-    font-weight: bold;
-}
-
-.ammoText {
-    color: #c5dce4;
+    background: #10425b;
 }
 
 /* =========================================================
    OCEAN
-   ========================================================= */
+========================================================= */
 
-.ocean {
-    position: relative;
-    height: 250px;
-    border-radius: 18px;
+#ocean {
+    position: absolute;
+    left: 430px;
+    right: 0;
+    top: 82px;
+    bottom: 0;
+
     overflow: hidden;
-    border: 2px solid #386878;
+
     background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,.025) 0px,
+            rgba(255,255,255,.025) 2px,
+            transparent 2px,
+            transparent 18px
+        ),
         linear-gradient(
-            to bottom,
-            #a9d4df 0%,
-            #6fa8b9 23%,
-            #287187 48%,
-            #0c4a60 75%,
-            #062b3a 100%
+            180deg,
+            #3e9ab5 0%,
+            #17647f 48%,
+            #083f5b 100%
         );
-    box-shadow: inset 0 -40px 70px rgba(0,0,0,.45);
 }
+
+.wave {
+    position: absolute;
+    left: -10%;
+    width: 120%;
+    height: 100px;
+    border-radius: 50%;
+    border-top: 2px solid rgba(255,255,255,.16);
+    opacity: .6;
+}
+
+.wave1 {
+    top: 90px;
+}
+
+.wave2 {
+    top: 240px;
+    opacity: .35;
+}
+
+.wave3 {
+    top: 430px;
+    opacity: .25;
+}
+
+.wave4 {
+    top: 650px;
+    opacity: .2;
+}
+
+/* =========================================================
+   CLOUDS
+========================================================= */
 
 .cloud {
     position: absolute;
-    border-radius: 50%;
-    background: rgba(245,253,255,.72);
-    filter: blur(7px);
+    background: rgba(220,235,239,.86);
+    border-radius: 100px;
+    filter: blur(3px);
+    opacity: .82;
 }
 
-.cloud.c1 {
-    width: 190px;
-    height: 55px;
-    top: 25px;
-    left: 5%;
-}
-
-.cloud.c2 {
-    width: 250px;
-    height: 65px;
-    top: 55px;
-    right: 7%;
-}
-
-.cloud.c3 {
-    width: 300px;
-    height: 65px;
-    top: 105px;
-    left: 34%;
-}
-
-.cloud.c4 {
-    width: 170px;
-    height: 50px;
-    top: 145px;
-    right: 35%;
-}
-
-.hiddenFleet {
-    position: absolute;
-    left: 50%;
-    top: 43%;
-    transform: translate(-50%, -50%);
-    color: rgba(3,23,30,.22);
-    font-size: 45px;
-    letter-spacing: 25px;
-    user-select: none;
-}
-
-.oceanLabel {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(2,19,27,.65);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: #b9e8f4;
-}
-
-/* =========================================================
-   MISSILE TRAJECTORY
-   ========================================================= */
-
-.missile {
-    position: absolute;
-    width: 13px;
-    height: 38px;
-    border-radius: 8px 8px 3px 3px;
-    background: linear-gradient(#ffffff, #9bdcff 45%, #21799c);
-    box-shadow:
-        0 0 8px #b9eeff,
-        0 0 20px #32bfff;
-    z-index: 15;
-    display: none;
-}
-
-.missile::after {
+.cloud::before,
+.cloud::after {
     content: "";
     position: absolute;
-    width: 10px;
-    height: 30px;
-    left: 1px;
-    top: 30px;
-    background: linear-gradient(
-        transparent,
-        #ffed8a,
-        #ff7a19,
-        transparent
-    );
-    filter: blur(2px);
+    background: inherit;
+    border-radius: 50%;
+}
+
+.cloud::before {
+    width: 100px;
+    height: 80px;
+    left: 45px;
+    top: -38px;
+}
+
+.cloud::after {
+    width: 130px;
+    height: 90px;
+    left: 115px;
+    top: -45px;
+}
+
+.cloud1 {
+    width: 230px;
+    height: 55px;
+    left: 520px;
+    top: 145px;
+}
+
+.cloud2 {
+    width: 280px;
+    height: 65px;
+    right: 80px;
+    top: 300px;
+    opacity: .5;
+}
+
+.cloud3 {
+    width: 190px;
+    height: 48px;
+    left: 770px;
+    bottom: 150px;
+    opacity: .35;
 }
 
 /* =========================================================
-   LOWER GAME AREA
-   ========================================================= */
+   RADAR PANEL
+========================================================= */
 
-.lowerArea {
-    display: grid;
-    grid-template-columns: minmax(260px, 390px) 1fr;
-    gap: 18px;
-    margin-top: 16px;
+#radarPanel {
+    position: absolute;
+    left: 25px;
+    top: 108px;
+    width: 365px;
+    height: 550px;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(7,31,43,.98),
+            rgba(3,17,27,.98)
+        );
+
+    border: 2px solid rgba(79,206,240,.4);
+
+    box-shadow:
+        inset 0 0 30px rgba(0,220,255,.05),
+        0 15px 35px rgba(0,0,0,.45);
+
+    z-index: 15;
 }
 
-/* =========================================================
-   RADAR
-   ========================================================= */
-
-.radarPanel,
-.shipPanel {
-    border: 2px solid #315d6c;
-    border-radius: 16px;
-    background: rgba(3,16,24,.9);
-    box-shadow: 0 8px 25px rgba(0,0,0,.3);
+.panelTitle {
+    text-align: center;
+    color: #8feaff;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 18px;
 }
 
-.panelHeader {
-    padding: 11px 14px;
-    border-bottom: 1px solid #315d6c;
-    color: #9fe7fa;
-    font-weight: 900;
-    letter-spacing: 2px;
-    font-size: 14px;
-}
+#radar {
+    width: 300px;
+    height: 300px;
+    margin: auto;
 
-.radarWrap {
-    padding: 13px;
-}
-
-.radar {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    aspect-ratio: 1 / 1;
-    border: 2px solid #4287a0;
-    background: #092531;
+    grid-template-rows: repeat(10, 1fr);
+
+    border: 2px solid #50cde9;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(75,235,255,.2),
+            rgba(0,45,60,.7)
+        );
+
+    box-shadow:
+        0 0 25px rgba(0,210,255,.15),
+        inset 0 0 25px rgba(0,210,255,.15);
 }
 
 .radarCell {
     position: relative;
-    border: 1px solid rgba(76,166,190,.35);
-    background:
-        radial-gradient(circle, rgba(45,170,190,.09), transparent 65%);
+
+    border-right: 1px solid rgba(98,218,239,.25);
+    border-bottom: 1px solid rgba(98,218,239,.25);
+
     cursor: pointer;
-    transition: .15s;
+
+    transition: background .1s;
 }
 
 .radarCell:hover {
-    background: rgba(56,190,218,.22);
-    box-shadow: inset 0 0 12px rgba(71,218,255,.35);
+    background: rgba(78,220,255,.22);
 }
 
 .radarCell.disabled {
@@ -399,307 +400,478 @@ body {
 
 .radarCell.hit::after {
     content: "✕";
+
     position: absolute;
     inset: 0;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    color: #ff4d4d;
-    font-size: clamp(14px, 3vw, 26px);
-    font-weight: 900;
-    text-shadow: 0 0 8px #ff0000;
+    justify-content: center;
+
+    color: #ff3d4f;
+    font-size: 25px;
+    font-weight: bold;
+
+    text-shadow: 0 0 10px #ff3045;
 }
 
 .radarCell.miss::after {
     content: "•";
+
     position: absolute;
     inset: 0;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    color: #8eeaff;
-    font-size: clamp(18px, 3vw, 30px);
+    justify-content: center;
+
+    color: #d9f6ff;
+    font-size: 27px;
+
+    text-shadow: 0 0 10px #b8ecff;
 }
 
-.radarCell.targeted {
-    animation: radarFlash .35s;
-}
+.radarLabels {
+    display: flex;
+    justify-content: space-between;
 
-@keyframes radarFlash {
-    0%,100% { background: rgba(50,220,255,.1); }
-    50% { background: rgba(50,220,255,.65); }
-}
+    margin: 7px 4px 0;
 
-.radarLetters {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    margin-left: 2px;
-    color: #669aaa;
-    font-size: 9px;
-    text-align: center;
-    margin-top: 5px;
+    color: #78b5c6;
+    font-size: 12px;
 }
 
 /* =========================================================
-   SHIP
-   ========================================================= */
+   STATUS
+========================================================= */
 
-.shipPanel {
-    position: relative;
-    overflow: hidden;
+#statusBox {
+    margin-top: 20px;
+
+    padding: 14px;
+
+    border: 1px solid rgba(85,210,238,.3);
+    border-radius: 8px;
+
+    background: rgba(0,25,37,.6);
+
+    color: #d4f7ff;
+
+    text-align: center;
+    font-size: 15px;
+}
+
+/* =========================================================
+   DESTROYER
+========================================================= */
+
+#destroyer {
+    position: absolute;
+
+    left: 470px;
+    bottom: 95px;
+
+    width: 760px;
+    height: 270px;
+
+    z-index: 10;
+}
+
+.shipHull {
+    position: absolute;
+
+    left: 0;
+    bottom: 20px;
+
+    width: 760px;
+    height: 145px;
+
+    background:
+        linear-gradient(
+            170deg,
+            #8c9ca4,
+            #46545d 42%,
+            #202d34 100%
+        );
+
+    clip-path: polygon(
+        0 10%,
+        82% 10%,
+        100% 48%,
+        88% 90%,
+        16% 100%,
+        0 65%
+    );
+
+    border: 2px solid #17242b;
+
+    box-shadow:
+        0 20px 30px rgba(0,0,0,.5);
 }
 
 .shipDeck {
-    position: relative;
-    min-height: 430px;
-    padding: 20px;
+    position: absolute;
+
+    left: 80px;
+    bottom: 105px;
+
+    width: 570px;
+    height: 65px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #9da8ad,
+            #515d62
+        );
+
+    transform: skewX(-18deg);
+
+    border: 2px solid #26343a;
+}
+
+.bridge {
+    position: absolute;
+
+    left: 300px;
+    bottom: 145px;
+
+    width: 170px;
+    height: 95px;
+
     background:
         linear-gradient(
             90deg,
-            #10191d,
-            #2b3638 17%,
-            #59605e 50%,
-            #2c3739 83%,
-            #10191d
+            #52636a,
+            #a0adb1,
+            #536168
         );
-    overflow: hidden;
+
+    clip-path: polygon(
+        0 100%,
+        8% 25%,
+        28% 0,
+        85% 0,
+        100% 28%,
+        100% 100%
+    );
+
+    border: 2px solid #29383f;
 }
 
-.shipDeck::before {
-    content: "";
+.bridgeWindow {
     position: absolute;
-    width: 82%;
-    height: 125%;
-    left: 9%;
-    top: -12%;
-    clip-path: polygon(27% 0, 73% 0, 100% 100%, 0 100%);
+
+    left: 320px;
+    bottom: 198px;
+
+    width: 130px;
+    height: 25px;
+
     background:
         repeating-linear-gradient(
             90deg,
-            rgba(255,255,255,.035) 0,
-            rgba(255,255,255,.035) 2px,
-            transparent 2px,
-            transparent 22px
-        ),
-        linear-gradient(90deg, #252d2e, #616766 50%, #252d2e);
-    border-left: 2px solid #111;
-    border-right: 2px solid #111;
+            #061b26 0 18px,
+            #7ed7ed 19px 22px
+        );
+
+    transform: skewX(-8deg);
+
+    box-shadow: 0 0 10px rgba(82,218,244,.25);
 }
 
-.shipBow {
+.mast {
     position: absolute;
-    bottom: -90px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 72%;
-    height: 150px;
-    clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    background: linear-gradient(90deg, #263336, #707a79 50%, #263336);
-    z-index: 3;
+
+    left: 375px;
+    bottom: 238px;
+
+    width: 8px;
+    height: 55px;
+
+    background: #394a52;
 }
 
-.shipTower {
-    position: absolute;
-    left: 50%;
-    top: 18px;
-    transform: translateX(-50%);
-    width: 150px;
-    height: 90px;
-    background: linear-gradient(#536064, #222c2f);
-    border: 2px solid #12191b;
-    z-index: 4;
-    clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
-}
-
-.shipTower::before {
+.mast::before {
     content: "";
-    position: absolute;
-    width: 65px;
-    height: 22px;
-    left: 41px;
-    top: 22px;
-    background: #0d181c;
-    border: 2px solid #7a9197;
-}
 
-.shipTower::after {
-    content: "";
     position: absolute;
+
     width: 90px;
     height: 5px;
-    left: 30px;
-    bottom: 15px;
-    background: #111a1c;
+
+    left: -40px;
+    top: 15px;
+
+    background: #394a52;
 }
 
-.missileBank {
-    position: relative;
-    z-index: 8;
-    width: min(360px, 90%);
-    margin: 125px auto 0;
+.gun {
+    position: absolute;
+
+    left: 520px;
+    bottom: 160px;
+
+    width: 100px;
+    height: 32px;
+
+    background: #3e4b51;
+
+    border-radius: 15px 15px 5px 5px;
+
+    border: 2px solid #222d32;
+}
+
+.gun::after {
+    content: "";
+
+    position: absolute;
+
+    width: 100px;
+    height: 11px;
+
+    right: 75px;
+    top: 8px;
+
+    background: #313d43;
+}
+
+.shipWake {
+    position: absolute;
+
+    left: -35px;
+    bottom: 8px;
+
+    width: 760px;
+    height: 60px;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255,255,255,.5),
+            transparent 65%
+        );
+
+    opacity: .55;
+}
+
+/* =========================================================
+   MISSILE BANK
+========================================================= */
+
+#missileBank {
+    position: absolute;
+
+    left: 130px;
+    bottom: 110px;
+
+    width: 260px;
+    height: 150px;
+
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    gap: 4px;
-    padding: 9px;
-    border: 2px solid #20282a;
-    background: #101719;
+    grid-template-rows: repeat(10, 1fr);
+
+    gap: 3px;
+
+    padding: 8px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #27343a,
+            #111b20
+        );
+
+    border: 2px solid #64747a;
+
     box-shadow:
-        0 8px 15px rgba(0,0,0,.5),
-        inset 0 0 15px rgba(0,0,0,.8);
+        inset 0 0 15px rgba(0,0,0,.7),
+        0 10px 20px rgba(0,0,0,.5);
 }
 
 .missileCell {
-    aspect-ratio: 1 / 1;
-    border-radius: 3px;
     background:
         linear-gradient(
             135deg,
-            #cfd9d8,
-            #657276 50%,
-            #303b3d
+            #6c7b80,
+            #263238
         );
-    border: 1px solid #12191b;
-    box-shadow: inset 0 1px 2px rgba(255,255,255,.25);
+
+    border: 1px solid #8b9ba0;
+
+    border-radius: 2px;
+
     position: relative;
 }
 
 .missileCell::after {
     content: "";
+
     position: absolute;
-    width: 55%;
-    height: 55%;
-    left: 22%;
-    top: 20%;
-    border-radius: 50%;
-    background: #10191c;
+
+    width: 4px;
+    height: 10px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%,-50%);
+
+    background: #d7e0e2;
+
+    border-radius: 3px;
 }
 
-.missileCell.fired {
-    background: #171e20;
-    opacity: .45;
+.missileCell.used {
+    background: #11181c;
+    border-color: #20292d;
 }
 
-.missileCell.fired::after {
-    background: #05090a;
-}
-
-.ammoCaption {
-    position: relative;
-    z-index: 9;
-    text-align: center;
-    margin-top: 12px;
-    color: #d6e2e4;
-    font-size: 12px;
-    letter-spacing: 2px;
+.missileCell.used::after {
+    background: #252d30;
 }
 
 /* =========================================================
-   RESULT OVERLAY
-   ========================================================= */
+   FLYING MISSILE
+========================================================= */
+
+#flyingMissile {
+    position: absolute;
+
+    width: 13px;
+    height: 60px;
+
+    display: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7f8c91,
+            #e5eef1,
+            #657278
+        );
+
+    border-radius: 50% 50% 15% 15%;
+
+    box-shadow:
+        0 0 10px rgba(255,170,60,.8);
+
+    z-index: 30;
+}
+
+#flyingMissile::after {
+    content: "";
+
+    position: absolute;
+
+    width: 22px;
+    height: 55px;
+
+    left: -5px;
+    top: 45px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ffef9a,
+            #ff7328,
+            transparent
+        );
+
+    border-radius: 50%;
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
 
 #resultOverlay {
-    display: none;
-    position: fixed;
+    position: absolute;
+
     inset: 0;
-    z-index: 100;
+
+    display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(0,8,13,.82);
-    backdrop-filter: blur(5px);
+
+    background: rgba(0,8,14,.72);
+
+    z-index: 100;
 }
 
 .resultBox {
-    width: min(90vw, 500px);
-    padding: 38px 25px;
+    width: 540px;
+
+    padding: 45px;
+
     text-align: center;
-    background: linear-gradient(#102e3c, #06141c);
-    border: 2px solid #4d91a8;
-    border-radius: 20px;
-    box-shadow: 0 0 50px rgba(0,190,255,.25);
+
+    border-radius: 18px;
+
+    border: 2px solid #68dcfa;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0d3548,
+            #061923
+        );
+
+    box-shadow: 0 0 50px rgba(0,0,0,.7);
 }
 
-.resultTitle {
-    font-size: 42px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    margin-bottom: 12px;
-}
+.resultBox h2 {
+    margin: 0 0 15px;
 
-.resultMessage {
-    color: #a9d8e4;
-    margin-bottom: 25px;
-}
-
-.restartButton {
-    border: 2px solid #4c9ab4;
-    background: #103b4c;
     color: white;
-    padding: 13px 25px;
-    border-radius: 10px;
-    font-weight: 900;
+
+    font-size: 48px;
+
+    letter-spacing: 4px;
+}
+
+.resultBox p {
+    color: #a8dbe9;
+
+    font-size: 20px;
+}
+
+.resultButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+
+    margin-top: 30px;
+}
+
+.resultButtons button {
+    padding: 14px 24px;
+
+    border-radius: 8px;
+
+    border: 1px solid #64d8f7;
+
+    background: #0a3042;
+
+    color: white;
+
+    font-weight: bold;
+
     cursor: pointer;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 850px) {
-    .lowerArea {
-        grid-template-columns: 1fr;
-    }
-
-    .radarPanel {
-        max-width: 480px;
-        width: 100%;
-        margin: auto;
-    }
-
-    .shipPanel {
-        width: 100%;
-    }
-
-    .ocean {
-        height: 190px;
-    }
-
-    .shipDeck {
-        min-height: 390px;
-    }
+.resultButtons button:hover {
+    background: #13506b;
 }
 
-@media (max-width: 500px) {
-    .battlefield {
-        padding: 8px;
-    }
+/* =========================================================
+   RESPONSIVE SCALE
+========================================================= */
 
-    .topBar {
-        height: 58px;
-    }
-
-    .statusBar {
-        font-size: 11px;
-    }
-
-    .shipDeck {
-        min-height: 350px;
-        padding: 10px;
-    }
-
-    .missileBank {
-        margin-top: 112px;
-        gap: 3px;
-        padding: 6px;
-    }
-
-    .shipTower {
-        width: 120px;
-        height: 75px;
-    }
-
-    .shipTower::before {
-        left: 32px;
-        width: 52px;
+@media (max-width: 700px) {
+    #stage {
+        border-radius: 0;
     }
 }
 </style>
@@ -707,601 +879,697 @@ body {
 
 <body>
 
-<!-- =======================================================
-     START SCREEN
-     ======================================================= -->
+<div id="viewport">
+    <div id="stage">
 
-<section id="startScreen">
+        <!-- =================================================
+             START SCREEN
+        ================================================== -->
 
-    <div class="oceanGlow"></div>
+        <div id="startScreen">
 
-    <div class="startPanel">
+            <h1>NAVAL STRIKE</h1>
 
-        <div class="shipBadge">⚓</div>
-
-        <div class="gameLogo">NAVAL STRIKE</div>
-
-        <div class="subtitle">COMMAND • TARGET • FIRE</div>
-
-        <button class="modeButton" onclick="startGame('2PLAYER')">
-            ⚓ 2 PLAYER
-        </button>
-
-        <button class="modeButton" onclick="startGame('COMPUTER')">
-            🎯 VS COMPUTER
-        </button>
-
-        <button class="modeButton gameRoomButton" onclick="goGameRoom()">
-            GAME ROOM
-        </button>
-
-    </div>
-</section>
-
-
-<!-- =======================================================
-     GAME SCREEN
-     ======================================================= -->
-
-<section id="gameScreen">
-
-    <div class="topBar">
-
-        <div class="topTitle">
-            NAVAL STRIKE
-        </div>
-
-        <button class="roomButton" onclick="goGameRoom()">
-            GAME ROOM
-        </button>
-
-    </div>
-
-
-    <main class="battlefield">
-
-        <div class="statusBar">
-
-            <div class="statusText" id="statusText">
-                SELECT A RADAR TARGET
+            <div class="subtitle">
+                MODERN NAVAL COMBAT
             </div>
 
-            <div class="ammoText">
-                MISSILES:
-                <span id="ammoCount">100</span>
+            <div class="startButtons">
+                <button class="startButton" onclick="startGame('2player')">
+                    2 PLAYER
+                </button>
+
+                <button class="startButton" onclick="startGame('computer')">
+                    VS COMPUTER
+                </button>
+            </div>
+
+            <div class="startFooter">
+                SELECT YOUR TARGET • FIRE • DESTROY THE ENEMY FLEET
             </div>
 
         </div>
 
+        <!-- =================================================
+             GAME SCREEN
+        ================================================== -->
 
-        <!-- OCEAN -->
+        <div id="gameScreen">
 
-        <section class="ocean" id="ocean">
+            <div class="topBar">
 
-            <div class="cloud c1"></div>
-            <div class="cloud c2"></div>
-            <div class="cloud c3"></div>
-            <div class="cloud c4"></div>
+                <div class="gameTitle">
+                    NAVAL STRIKE
+                </div>
 
-            <div class="hiddenFleet">
-                ⚓ 🚢 ⚓
+                <div id="turnDisplay" class="turnDisplay">
+                    READY
+                </div>
+
+                <button class="roomButton" onclick="returnToGameRoom()">
+                    GAME ROOM
+                </button>
+
             </div>
-
-            <div class="oceanLabel">
-                ENEMY WATERS
-            </div>
-
-            <div class="missile" id="missile"></div>
-
-        </section>
-
-
-        <section class="lowerArea">
 
             <!-- RADAR -->
 
-            <div class="radarPanel">
+            <div id="radarPanel">
 
-                <div class="panelHeader">
-                    RADAR TARGETING SYSTEM
+                <div class="panelTitle">
+                    TARGETING RADAR
                 </div>
 
-                <div class="radarWrap">
+                <div id="radar"></div>
 
-                    <div class="radar" id="radar"></div>
+                <div class="radarLabels">
+                    <span>A</span>
+                    <span>B</span>
+                    <span>C</span>
+                    <span>D</span>
+                    <span>E</span>
+                    <span>F</span>
+                    <span>G</span>
+                    <span>H</span>
+                    <span>I</span>
+                    <span>J</span>
+                </div>
 
-                    <div class="radarLetters">
-                        <span>A</span>
-                        <span>B</span>
-                        <span>C</span>
-                        <span>D</span>
-                        <span>E</span>
-                        <span>F</span>
-                        <span>G</span>
-                        <span>H</span>
-                        <span>I</span>
-                        <span>J</span>
-                    </div>
+                <div id="statusBox">
+                    SELECT A TARGET
+                </div>
+
+            </div>
+
+            <!-- OCEAN -->
+
+            <div id="ocean">
+
+                <div class="cloud cloud1"></div>
+                <div class="cloud cloud2"></div>
+                <div class="cloud cloud3"></div>
+
+                <div class="wave wave1"></div>
+                <div class="wave wave2"></div>
+                <div class="wave wave3"></div>
+                <div class="wave wave4"></div>
+
+            </div>
+
+            <!-- DESTROYER -->
+
+            <div id="destroyer">
+
+                <div class="shipWake"></div>
+
+                <div class="shipHull"></div>
+
+                <div class="shipDeck"></div>
+
+                <div class="bridge"></div>
+
+                <div class="bridgeWindow"></div>
+
+                <div class="mast"></div>
+
+                <div class="gun"></div>
+
+                <!-- 100 MISSILES -->
+
+                <div id="missileBank"></div>
+
+            </div>
+
+            <div id="flyingMissile"></div>
+
+        </div>
+
+        <!-- RESULT -->
+
+        <div id="resultOverlay">
+
+            <div class="resultBox">
+
+                <h2 id="resultTitle">
+                    VICTORY
+                </h2>
+
+                <p id="resultMessage">
+                    Enemy fleet destroyed.
+                </p>
+
+                <div class="resultButtons">
+
+                    <button onclick="restartGame()">
+                        PLAY AGAIN
+                    </button>
+
+                    <button onclick="returnToGameRoom()">
+                        GAME ROOM
+                    </button>
 
                 </div>
 
             </div>
 
-
-            <!-- SHIP -->
-
-            <div class="shipPanel">
-
-                <div class="panelHeader">
-                    FORWARD MISSILE DECK
-                </div>
-
-                <div class="shipDeck">
-
-                    <div class="shipTower"></div>
-
-                    <div class="missileBank" id="missileBank"></div>
-
-                    <div class="ammoCaption">
-                        100-CELL VERTICAL LAUNCH SYSTEM
-                    </div>
-
-                    <div class="shipBow"></div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</section>
-
-
-<!-- =======================================================
-     RESULT
-     ======================================================= -->
-
-<div id="resultOverlay">
-
-    <div class="resultBox">
-
-        <div class="resultTitle" id="resultTitle">
-            TARGET DESTROYED
         </div>
-
-        <div class="resultMessage" id="resultMessage">
-            Enemy fleet eliminated.
-        </div>
-
-        <button class="restartButton" onclick="restartGame()">
-            PLAY AGAIN
-        </button>
 
     </div>
-
 </div>
-
 
 <script>
 
 /* =========================================================
+   SCREEN-SIZE SCALING
+========================================================= */
+
+const DESIGN_WIDTH = 1600;
+const DESIGN_HEIGHT = 900;
+
+const stage = document.getElementById("stage");
+
+function resizeStage() {
+
+    const availableWidth = window.innerWidth;
+    const availableHeight = window.innerHeight;
+
+    const scaleX = availableWidth / DESIGN_WIDTH;
+    const scaleY = availableHeight / DESIGN_HEIGHT;
+
+    const scale = Math.min(scaleX, scaleY);
+
+    stage.style.transform =
+        "translate(-50%, -50%) scale(" + scale + ")";
+}
+
+window.addEventListener("resize", resizeStage);
+window.addEventListener("orientationchange", resizeStage);
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener(
+        "resize",
+        resizeStage
+    );
+}
+
+resizeStage();
+
+/* =========================================================
    GAME VARIABLES
-   ========================================================= */
+========================================================= */
 
 let gameMode = null;
+let gameStarted = false;
+
+let playerShots = [];
+let enemyFleet = [];
+
 let missilesRemaining = 100;
-let gameActive = false;
+let gameOver = false;
 
-let enemyBoard = [];
-let shots = [];
+const radar = document.getElementById("radar");
+const missileBank = document.getElementById("missileBank");
+const statusBox = document.getElementById("statusBox");
+const turnDisplay = document.getElementById("turnDisplay");
 
-let shipsRemaining = 17;
+const flyingMissile =
+    document.getElementById("flyingMissile");
 
+const resultOverlay =
+    document.getElementById("resultOverlay");
 
-/* =========================================================
-   GAME ROOM
-   ========================================================= */
+const resultTitle =
+    document.getElementById("resultTitle");
 
-function goGameRoom() {
-    window.location.href = "index.html";
-}
-
-
-/* =========================================================
-   START GAME
-   ========================================================= */
-
-function startGame(mode) {
-
-    gameMode = mode;
-
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("gameScreen").style.display = "block";
-
-    createMissileBank();
-    createRadar();
-    createEnemyFleet();
-
-    missilesRemaining = 100;
-    shots = [];
-    shipsRemaining = 17;
-    gameActive = true;
-
-    updateAmmo();
-
-    if (mode === "COMPUTER") {
-        setStatus("VS COMPUTER — SELECT A TARGET");
-    } else {
-        setStatus("2 PLAYER — SELECT A TARGET");
-    }
-}
-
+const resultMessage =
+    document.getElementById("resultMessage");
 
 /* =========================================================
-   STATUS
-   ========================================================= */
+   BUILD MISSILE BANK
+========================================================= */
 
-function setStatus(text) {
-    document.getElementById("statusText").textContent = text;
-}
+function buildMissileBank() {
 
-
-/* =========================================================
-   MISSILE BANK
-   ========================================================= */
-
-function createMissileBank() {
-
-    const bank = document.getElementById("missileBank");
-
-    bank.innerHTML = "";
+    missileBank.innerHTML = "";
 
     for (let i = 0; i < 100; i++) {
 
         const cell = document.createElement("div");
 
         cell.className = "missileCell";
-        cell.id = "missileCell" + i;
 
-        bank.appendChild(cell);
+        cell.dataset.index = i;
+
+        missileBank.appendChild(cell);
     }
 }
 
-
-function updateAmmo() {
-
-    document.getElementById("ammoCount").textContent =
-        missilesRemaining;
-}
-
-
 /* =========================================================
-   RADAR
-   ========================================================= */
+   BUILD RADAR
+========================================================= */
 
-function createRadar() {
-
-    const radar = document.getElementById("radar");
+function buildRadar() {
 
     radar.innerHTML = "";
 
-    for (let i = 0; i < 100; i++) {
+    for (let row = 0; row < 10; row++) {
 
-        const cell = document.createElement("div");
+        for (let col = 0; col < 10; col++) {
 
-        cell.className = "radarCell";
-        cell.dataset.index = i;
+            const cell = document.createElement("div");
 
-        cell.addEventListener("click", function() {
-            fireAt(i);
-        });
+            cell.className = "radarCell";
 
-        radar.appendChild(cell);
-    }
-}
+            cell.dataset.row = row;
+            cell.dataset.col = col;
 
+            cell.addEventListener(
+                "click",
+                () => fireAt(row, col)
+            );
 
-/* =========================================================
-   ENEMY FLEET
-   ========================================================= */
-
-function createEnemyFleet() {
-
-    enemyBoard = Array.from(
-        { length: 10 },
-        () => Array(10).fill(0)
-    );
-
-    /*
-        Fleet:
-
-        Carrier     5
-        Battleship  4
-        Cruiser     3
-        Submarine   3
-        Destroyer   2
-
-        Total = 17
-    */
-
-    const ships = [5, 4, 3, 3, 2];
-
-    ships.forEach(length => {
-        placeShip(length);
-    });
-}
-
-
-function placeShip(length) {
-
-    let placed = false;
-
-    while (!placed) {
-
-        const horizontal =
-            Math.random() < 0.5;
-
-        const row =
-            Math.floor(Math.random() * 10);
-
-        const col =
-            Math.floor(Math.random() * 10);
-
-        if (horizontal) {
-
-            if (col + length > 10)
-                continue;
-
-            let clear = true;
-
-            for (let x = 0; x < length; x++) {
-
-                if (enemyBoard[row][col + x] !== 0) {
-                    clear = false;
-                    break;
-                }
-            }
-
-            if (!clear)
-                continue;
-
-            for (let x = 0; x < length; x++) {
-                enemyBoard[row][col + x] = 1;
-            }
-
-            placed = true;
-
-        } else {
-
-            if (row + length > 10)
-                continue;
-
-            let clear = true;
-
-            for (let y = 0; y < length; y++) {
-
-                if (enemyBoard[row + y][col] !== 0) {
-                    clear = false;
-                    break;
-                }
-            }
-
-            if (!clear)
-                continue;
-
-            for (let y = 0; y < length; y++) {
-                enemyBoard[row + y][col] = 1;
-            }
-
-            placed = true;
+            radar.appendChild(cell);
         }
     }
 }
 
+/* =========================================================
+   RANDOM FLEET
+========================================================= */
+
+function createFleet() {
+
+    const fleet = [];
+
+    /*
+       Simple fleet:
+
+       Carrier 5
+       Battleship 4
+       Cruiser 3
+       Submarine 3
+       Destroyer 2
+    */
+
+    const ships = [
+        5,
+        4,
+        3,
+        3,
+        2
+    ];
+
+    for (const length of ships) {
+
+        let placed = false;
+
+        while (!placed) {
+
+            const horizontal =
+                Math.random() < 0.5;
+
+            const row =
+                Math.floor(Math.random() * 10);
+
+            const col =
+                Math.floor(Math.random() * 10);
+
+            const cells = [];
+
+            for (let i = 0; i < length; i++) {
+
+                const r =
+                    horizontal ? row : row + i;
+
+                const c =
+                    horizontal ? col + i : col;
+
+                if (
+                    r < 0 ||
+                    r >= 10 ||
+                    c < 0 ||
+                    c >= 10
+                ) {
+                    break;
+                }
+
+                cells.push(r + "," + c);
+            }
+
+            if (cells.length !== length) {
+                continue;
+            }
+
+            let conflict = false;
+
+            for (const existing of fleet) {
+
+                for (const occupied of existing) {
+
+                    if (cells.includes(occupied)) {
+                        conflict = true;
+                    }
+                }
+            }
+
+            if (!conflict) {
+
+                fleet.push(cells);
+
+                placed = true;
+            }
+        }
+    }
+
+    return fleet;
+}
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+function startGame(mode) {
+
+    gameMode = mode;
+
+    gameStarted = true;
+    gameOver = false;
+
+    playerShots = [];
+
+    missilesRemaining = 100;
+
+    enemyFleet = createFleet();
+
+    document.getElementById("startScreen").style.display =
+        "none";
+
+    document.getElementById("gameScreen").style.display =
+        "block";
+
+    resultOverlay.style.display =
+        "none";
+
+    buildRadar();
+    buildMissileBank();
+
+    statusBox.textContent =
+        "SELECT A TARGET";
+
+    turnDisplay.textContent =
+        mode === "computer"
+            ? "YOUR TURN"
+            : "PLAYER 1 — YOUR TURN";
+}
 
 /* =========================================================
    FIRE
-   ========================================================= */
+========================================================= */
 
-function fireAt(index) {
+function fireAt(row, col) {
 
-    if (!gameActive)
+    if (!gameStarted || gameOver) {
         return;
+    }
+
+    const key = row + "," + col;
+
+    if (playerShots.includes(key)) {
+        return;
+    }
 
     if (missilesRemaining <= 0) {
-        setStatus("NO MISSILES REMAIN");
         return;
     }
 
-    if (shots.includes(index)) {
-        setStatus("TARGET ALREADY FIRED UPON");
-        return;
-    }
-
-    shots.push(index);
+    playerShots.push(key);
 
     missilesRemaining--;
-    updateAmmo();
 
-    const missileCell =
-        document.getElementById(
-            "missileCell" + missilesRemaining
-        );
+    markMissileUsed();
 
-    if (missileCell) {
-        missileCell.classList.add("fired");
-    }
+    disableRadarCell(row, col);
 
-    const radarCell =
-        document.querySelector(
-            `.radarCell[data-index="${index}"]`
-        );
-
-    radarCell.classList.add("disabled");
-    radarCell.classList.add("targeted");
-
-    launchMissile(index, radarCell);
+    animateMissile(row, col);
 }
 
+/* =========================================================
+   MARK MISSILE
+========================================================= */
+
+function markMissileUsed() {
+
+    const used =
+        100 - missilesRemaining;
+
+    const cell =
+        missileBank.children[used - 1];
+
+    if (cell) {
+        cell.classList.add("used");
+    }
+}
+
+/* =========================================================
+   DISABLE CELL
+========================================================= */
+
+function disableRadarCell(row, col) {
+
+    const index =
+        row * 10 + col;
+
+    const cell =
+        radar.children[index];
+
+    if (cell) {
+        cell.classList.add("disabled");
+    }
+}
 
 /* =========================================================
    MISSILE ANIMATION
-   ========================================================= */
+========================================================= */
 
-function launchMissile(index, radarCell) {
+function animateMissile(row, col) {
 
-    const missile =
-        document.getElementById("missile");
+    flyingMissile.style.display =
+        "block";
 
-    const ocean =
-        document.getElementById("ocean");
-
-    const oceanRect =
-        ocean.getBoundingClientRect();
+    const radarCell =
+        radar.children[row * 10 + col];
 
     const targetRect =
         radarCell.getBoundingClientRect();
 
-    const startX =
-        oceanRect.width / 2 - 7;
+    const stageRect =
+        stage.getBoundingClientRect();
 
-    const startY =
-        oceanRect.height - 15;
+    const scale =
+        stageRect.width / DESIGN_WIDTH;
 
     const targetX =
-        targetRect.left +
-        targetRect.width / 2 -
-        oceanRect.left -
-        7;
+        (targetRect.left - stageRect.left) / scale +
+        radarCell.offsetWidth / 2;
 
     const targetY =
-        targetRect.top +
-        targetRect.height / 2 -
-        oceanRect.top;
+        (targetRect.top - stageRect.top) / scale +
+        radarCell.offsetHeight / 2;
 
-    missile.style.display = "block";
-    missile.style.left = startX + "px";
-    missile.style.top = startY + "px";
-    missile.style.transform =
+    const startX = 850;
+    const startY = 560;
+
+    flyingMissile.style.left =
+        startX + "px";
+
+    flyingMissile.style.top =
+        startY + "px";
+
+    flyingMissile.style.transform =
         "rotate(0deg)";
 
-    const dx = targetX - startX;
-    const dy = targetY - startY;
+    const distanceX =
+        targetX - startX;
+
+    const distanceY =
+        targetY - startY;
 
     const angle =
-        Math.atan2(dy, dx) * 180 / Math.PI + 90;
+        Math.atan2(
+            distanceY,
+            distanceX
+        ) * 180 / Math.PI + 90;
 
-    missile.style.transition =
-        "left .75s cubic-bezier(.2,.7,.3,1), " +
-        "top .75s cubic-bezier(.2,.7,.3,1), " +
-        "transform .2s";
-
-    missile.style.transform =
-        `rotate(${angle}deg)`;
+    flyingMissile.style.transition =
+        "left .65s ease-in, top .65s ease-in, transform .65s ease-in";
 
     requestAnimationFrame(() => {
 
-        missile.style.left = targetX + "px";
-        missile.style.top = targetY + "px";
+        flyingMissile.style.left =
+            (targetX - 6) + "px";
 
+        flyingMissile.style.top =
+            (targetY - 30) + "px";
+
+        flyingMissile.style.transform =
+            "rotate(" + angle + "deg)";
     });
 
     setTimeout(() => {
 
-        missile.style.display = "none";
+        flyingMissile.style.display =
+            "none";
 
-        resolveShot(index, radarCell);
+        resolveShot(row, col);
 
-    }, 800);
+    }, 700);
 }
-
 
 /* =========================================================
    RESOLVE SHOT
-   ========================================================= */
+========================================================= */
 
-function resolveShot(index, radarCell) {
+function resolveShot(row, col) {
 
-    const row = Math.floor(index / 10);
-    const col = index % 10;
+    const key =
+        row + "," + col;
 
-    if (enemyBoard[row][col] === 1) {
+    let hit = false;
 
-        radarCell.classList.remove("targeted");
-        radarCell.classList.add("hit");
+    for (const ship of enemyFleet) {
 
-        shipsRemaining--;
-
-        setStatus("DIRECT HIT!");
-
-        if (shipsRemaining <= 0) {
-
-            endGame(
-                "TARGET DESTROYED",
-                "The enemy fleet has been eliminated."
-            );
-
-            return;
+        if (ship.includes(key)) {
+            hit = true;
+            break;
         }
+    }
+
+    const cell =
+        radar.children[row * 10 + col];
+
+    if (hit) {
+
+        cell.classList.add("hit");
+
+        statusBox.textContent =
+            "DIRECT HIT!";
 
     } else {
 
-        radarCell.classList.remove("targeted");
-        radarCell.classList.add("miss");
+        cell.classList.add("miss");
 
-        setStatus("MISS — SCANNING FOR TARGET");
-
+        statusBox.textContent =
+            "MISS";
     }
 
-    if (missilesRemaining <= 0) {
+    if (checkVictory()) {
 
-        setTimeout(() => {
+        endGame(
+            true,
+            "Enemy fleet destroyed."
+        );
 
-            if (gameActive) {
+        return;
+    }
 
-                endGame(
-                    "OUT OF MISSILES",
-                    "The enemy fleet survived the attack."
-                );
+    if (gameMode === "computer") {
 
-            }
+        turnDisplay.textContent =
+            "COMPUTER TURN";
 
-        }, 700);
+        setTimeout(
+            computerTurn,
+            900
+        );
+
+    } else {
+
+        turnDisplay.textContent =
+            "PLAYER 2 — YOUR TURN";
     }
 }
 
+/* =========================================================
+   VICTORY CHECK
+========================================================= */
+
+function checkVictory() {
+
+    for (const ship of enemyFleet) {
+
+        for (const cell of ship) {
+
+            if (!playerShots.includes(cell)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+/* =========================================================
+   COMPUTER TURN
+========================================================= */
+
+function computerTurn() {
+
+    if (gameOver) {
+        return;
+    }
+
+    /*
+       Placeholder computer action.
+
+       The full two-fleet server-authoritative version
+       will replace this with an actual opponent fleet.
+    */
+
+    turnDisplay.textContent =
+        "YOUR TURN";
+
+    statusBox.textContent =
+        "COMPUTER FIRED — YOUR TURN";
+}
 
 /* =========================================================
    END GAME
-   ========================================================= */
+========================================================= */
 
-function endGame(title, message) {
+function endGame(won, message) {
 
-    gameActive = false;
+    gameOver = true;
 
-    document.getElementById("resultTitle")
-        .textContent = title;
+    resultTitle.textContent =
+        won ? "VICTORY" : "DEFEAT";
 
-    document.getElementById("resultMessage")
-        .textContent = message;
+    resultMessage.textContent =
+        message;
 
-    document.getElementById("resultOverlay")
-        .style.display = "flex";
+    resultOverlay.style.display =
+        "flex";
 }
-
 
 /* =========================================================
    RESTART
-   ========================================================= */
+========================================================= */
 
 function restartGame() {
 
-    document.getElementById("resultOverlay")
-        .style.display = "none";
+    resultOverlay.style.display =
+        "none";
 
     startGame(gameMode);
+}
+
+/* =========================================================
+   GAME ROOM
+========================================================= */
+
+function returnToGameRoom() {
+
+    window.location.href =
+        "index.html";
 }
 
 </script>
