@@ -964,6 +964,53 @@ body {
     }
 }
 
+/* LADYBUG STOPS WITH THE CHARACTERS */
+
+.ladybug-wrapper.meeting {
+    animation-play-state: paused !important;
+}
+
+/* LADYBUG FLIES UP AND ACROSS THE SCREEN */
+
+.ladybug-wrapper.flyaway {
+    animation:
+        ladybugFlyAway 4.8s cubic-bezier(.2,.7,.25,1) forwards !important;
+    animation-play-state: running !important;
+}
+
+@keyframes ladybugFlyAway {
+
+    0% {
+        left: var(--ladybug-current-left);
+        bottom: 8px;
+        transform: scale(1) rotate(0deg);
+    }
+
+    28% {
+        left: 3%;
+        bottom: 78%;
+        transform: scale(1.15) rotate(-18deg);
+    }
+
+    55% {
+        left: 42%;
+        bottom: 88%;
+        transform: scale(1.1) rotate(8deg);
+    }
+
+    78% {
+        left: 72%;
+        bottom: 88%;
+        transform: scale(1.05) rotate(-5deg);
+    }
+
+    100% {
+        left: calc(100% + 35px);
+        bottom: 88%;
+        transform: scale(1) rotate(8deg);
+    }
+}
+
 .ladybug {
     position: relative;
     width: 24px;
@@ -979,6 +1026,20 @@ body {
 
     to {
         transform: rotate(8deg) translateY(-2px);
+    }
+}
+
+.ladybug-wrapper.flyaway .ladybug {
+    animation: ladybugFlying .18s ease-in-out infinite alternate;
+}
+
+@keyframes ladybugFlying {
+    from {
+        transform: rotate(-8deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(8deg) translateY(-3px);
     }
 }
 
@@ -1449,7 +1510,7 @@ body {
 
     <!-- LADYBUG -->
 
-    <div class="ladybug-wrapper">
+    <div class="ladybug-wrapper" id="ladybug">
 
         <div class="ladybug">
 
@@ -1495,6 +1556,7 @@ body {
 
 const giraffe = document.getElementById("giraffe");
 const bulldog = document.getElementById("bulldog");
+const ladybug = document.getElementById("ladybug");
 
 const bark = document.getElementById("bark");
 const sniff = document.getElementById("sniff");
@@ -1630,6 +1692,79 @@ function checkForMeeting() {
 
 
 /* =========================================================
+   LADYBUG STOPS NEAR THEM
+========================================================= */
+
+function stopLadybugNearCharacters() {
+
+    const g = giraffe.getBoundingClientRect();
+    const d = bulldog.getBoundingClientRect();
+
+    const room =
+        document.querySelector(".game-room")
+            .getBoundingClientRect();
+
+    /*
+       Put the ladybug near the middle of the two
+       characters, down on the ground.
+    */
+
+    const center =
+        ((g.left + g.right) / 2 +
+         (d.left + d.right) / 2) / 2;
+
+    const currentLeft =
+        center - room.left - 12;
+
+    ladybug.style.setProperty(
+        "--ladybug-current-left",
+        currentLeft + "px"
+    );
+
+    ladybug.style.left =
+        currentLeft + "px";
+
+    ladybug.style.bottom = "8px";
+
+    ladybug.classList.add("meeting");
+}
+
+
+/* =========================================================
+   LADYBUG FLIES AWAY
+========================================================= */
+
+function ladybugFliesAway() {
+
+    ladybug.classList.remove("meeting");
+
+    void ladybug.offsetWidth;
+
+    ladybug.classList.add("flyaway");
+
+    setTimeout(() => {
+
+        ladybug.classList.remove("flyaway");
+
+        ladybug.style.left = "-30px";
+        ladybug.style.bottom = "8px";
+
+        void ladybug.offsetWidth;
+
+        ladybug.style.removeProperty("left");
+        ladybug.style.removeProperty("bottom");
+        ladybug.style.removeProperty(
+            "--ladybug-current-left"
+        );
+
+        ladybug.style.animation =
+            "ladybugWalk 22s linear infinite";
+
+    }, 5000);
+}
+
+
+/* =========================================================
    EXACT STORY
 ========================================================= */
 
@@ -1641,6 +1776,12 @@ function startInteraction() {
 
     giraffe.classList.add("meeting");
     bulldog.classList.add("meeting");
+
+    /*
+       LADYBUG NOTICES THEM AND STOPS NEAR THEM
+    */
+
+    stopLadybugNearCharacters();
 
 
     /*
@@ -1721,8 +1862,8 @@ function startInteraction() {
 
 
     /*
-       5. NO CHASE.
-          DOG STAYS THERE.
+       5. DOG STAYS.
+          LADYBUG WAITS.
     */
 
     setTimeout(() => {
@@ -1758,6 +1899,17 @@ function startInteraction() {
             "labradorWalk 18s linear infinite";
 
         bulldog.style.removeProperty("right");
+
+        /*
+           NOW THE LADYBUG FLIES AWAY:
+           UP TO THE TOP LEFT,
+           ACROSS THE GAME ROOM TITLE,
+           AND OFF THE RIGHT SIDE.
+        */
+
+        setTimeout(() => {
+            ladybugFliesAway();
+        }, 400);
 
         interactionRunning = false;
 
