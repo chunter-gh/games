@@ -5,7 +5,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>Ancient Tic-Tac-Toe</title>
+<title>Tic-Tac-Toe</title>
 
 <style>
 
@@ -44,21 +44,12 @@ body {
     touch-action: manipulation;
 }
 
-
-/* =========================================================
-   GAME
-   ========================================================= */
-
 #game {
-
     width: 100vw;
     height: 100dvh;
-
     min-height: 0;
-
     display: flex;
     flex-direction: column;
-
     align-items: center;
     justify-content: space-between;
 
@@ -71,15 +62,8 @@ body {
     position: relative;
 }
 
-
-/* =========================================================
-   TITLE
-   ========================================================= */
-
 #title {
-
     flex: 0 0 auto;
-
     text-align: center;
 
     font-size:
@@ -105,19 +89,11 @@ body {
         0 4px 12px #000;
 
     line-height: 1;
-
     margin-top: 2px;
 }
 
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
 #status {
-
     flex: 0 0 auto;
-
     text-align: center;
 
     font-size:
@@ -137,13 +113,7 @@ body {
     font-weight: bold;
 }
 
-
-/* =========================================================
-   CONNECTION STATUS
-   ========================================================= */
-
 #connection {
-
     position: absolute;
 
     top:
@@ -187,36 +157,20 @@ body {
     color: #e18c7c;
 }
 
-
-/* =========================================================
-   ARENA
-   ========================================================= */
-
 #arena {
-
     flex: 1 1 auto;
-
     min-height: 0;
-
     width: 100%;
 
     display: flex;
-
     justify-content: center;
     align-items: center;
 
     perspective: 1200px;
-
     overflow: hidden;
 }
 
-
-/* =========================================================
-   MONUMENT
-   ========================================================= */
-
 #monument {
-
     width:
         calc(
             var(--boardSize) +
@@ -230,7 +184,6 @@ body {
         );
 
     position: relative;
-
     flex: 0 0 auto;
 
     transform:
@@ -239,7 +192,6 @@ body {
 }
 
 #monument::after {
-
     content: "";
 
     position: absolute;
@@ -260,13 +212,7 @@ body {
     z-index: -5;
 }
 
-
-/* =========================================================
-   METAL FRAME
-   ========================================================= */
-
 .frame {
-
     position: absolute;
 
     background:
@@ -290,7 +236,6 @@ body {
         #171512;
 
     box-shadow:
-
         inset
         0 0
         0
@@ -311,10 +256,8 @@ body {
 
 .frame.left,
 .frame.right {
-
     top: 0;
     bottom: 0;
-
     width: var(--frameWidth);
 }
 
@@ -328,10 +271,8 @@ body {
 
 .frame.top,
 .frame.bottom {
-
     left: 0;
     right: 0;
-
     height: var(--frameWidth);
 }
 
@@ -343,13 +284,7 @@ body {
     bottom: 0;
 }
 
-
-/* =========================================================
-   RIVETS
-   ========================================================= */
-
 .rivet {
-
     position: absolute;
 
     width:
@@ -402,13 +337,7 @@ body {
     bottom: 5%;
 }
 
-
-/* =========================================================
-   BOARD
-   ========================================================= */
-
 #board {
-
     position: absolute;
 
     width: var(--boardSize);
@@ -441,7 +370,6 @@ body {
         #15130f;
 
     box-shadow:
-
         inset
         0 0
         calc(
@@ -463,13 +391,7 @@ body {
         rgba(0,0,0,.8);
 }
 
-
-/* =========================================================
-   CELLS
-   ========================================================= */
-
 .cell {
-
     position: relative;
 
     display: flex;
@@ -488,18 +410,14 @@ body {
 
 .cell::before,
 .cell::after {
-
     content: "";
-
     position: absolute;
-
     pointer-events: none;
 }
 
 .cell:nth-child(2)::before,
 .cell:nth-child(5)::before,
 .cell:nth-child(8)::before {
-
     right: 0;
 
     top: 4%;
@@ -523,7 +441,6 @@ body {
 }
 
 .cell:nth-child(n+4)::after {
-
     left: 4%;
     right: 4%;
 
@@ -546,13 +463,7 @@ body {
         0 -2px 4px #000;
 }
 
-
-/* =========================================================
-   PIECES
-   ========================================================= */
-
 .piece {
-
     width: 70%;
     height: 70%;
 
@@ -578,7 +489,6 @@ body {
 
 .x-piece,
 .o-piece {
-
     color: #b88945;
 
     text-shadow:
@@ -587,14 +497,8 @@ body {
         2px 4px 5px #000;
 }
 
-
-/* =========================================================
-   X
-   ========================================================= */
-
 .x-piece::before,
 .x-piece::after {
-
     content: "";
 
     position: absolute;
@@ -633,13 +537,7 @@ body {
     transform: rotate(-45deg);
 }
 
-
-/* =========================================================
-   O
-   ========================================================= */
-
 .o-piece {
-
     width: 62%;
     height: 62%;
 
@@ -683,7 +581,6 @@ body {
 }
 
 .o-piece::after {
-
     content: "";
 
     position: absolute;
@@ -705,13 +602,7 @@ body {
         inset 2px 2px 3px rgba(0,0,0,.9);
 }
 
-
-/* =========================================================
-   FIVE ANIMATIONS
-   ========================================================= */
-
 .anim-hammer {
-
     animation:
         hammer
         .58s
@@ -720,7 +611,6 @@ body {
 }
 
 @keyframes hammer {
-
     0% {
         transform:
             translateY(
@@ -765,9 +655,7 @@ body {
     }
 }
 
-
 .anim-spin {
-
     animation:
         spinIn
         .65s
@@ -776,7 +664,6 @@ body {
 }
 
 @keyframes spinIn {
-
     0% {
         transform:
             scale(.15)
@@ -800,9 +687,7 @@ body {
     }
 }
 
-
 .anim-rise {
-
     animation:
         rise
         .65s
@@ -811,7 +696,6 @@ body {
 }
 
 @keyframes rise {
-
     0% {
         transform:
             translateY(100%)
@@ -835,9 +719,7 @@ body {
     }
 }
 
-
 .anim-forge {
-
     animation:
         forge
         .55s
@@ -846,7 +728,6 @@ body {
 }
 
 @keyframes forge {
-
     0% {
         transform: scale(2.5);
 
@@ -895,9 +776,7 @@ body {
     }
 }
 
-
 .anim-swing {
-
     animation:
         swing
         .65s
@@ -908,7 +787,6 @@ body {
 }
 
 @keyframes swing {
-
     0% {
         transform:
             translateX(-60%)
@@ -935,13 +813,7 @@ body {
     }
 }
 
-
-/* =========================================================
-   WIN
-   ========================================================= */
-
 .winner {
-
     animation:
         winnerPulse
         .7s
@@ -951,7 +823,6 @@ body {
 }
 
 @keyframes winnerPulse {
-
     from {
         filter:
             drop-shadow(
@@ -969,9 +840,7 @@ body {
     }
 }
 
-
 .draw-cell {
-
     animation:
         drawPulse
         .7s
@@ -981,7 +850,6 @@ body {
 }
 
 @keyframes drawPulse {
-
     from {
         background:
             rgba(170,130,55,.04);
@@ -993,13 +861,7 @@ body {
     }
 }
 
-
-/* =========================================================
-   CONTROLS
-   ========================================================= */
-
 #controls {
-
     flex: 0 0 auto;
 
     display: flex;
@@ -1017,10 +879,11 @@ body {
     width: 100%;
 
     padding-bottom: 2px;
+
+    flex-wrap: wrap;
 }
 
 button {
-
     font-family:
         Georgia,
         "Times New Roman",
@@ -1079,7 +942,6 @@ button:active {
 }
 
 button.active {
-
     border-color: #d2ae68;
 
     box-shadow:
@@ -1093,15 +955,8 @@ button.active {
     color: #fff1c7;
 }
 
-
-/* =========================================================
-   LANDSCAPE
-   ========================================================= */
-
 @media (orientation: landscape) {
-
     #game {
-
         padding-top:
             max(
                 4px,
@@ -1116,7 +971,6 @@ button.active {
     }
 
     #title {
-
         font-size:
             clamp(
                 16px,
@@ -1126,7 +980,6 @@ button.active {
     }
 
     #status {
-
         font-size:
             clamp(
                 11px,
@@ -1136,13 +989,7 @@ button.active {
     }
 }
 
-
-/* =========================================================
-   VERY SHORT SCREEN
-   ========================================================= */
-
 @media (max-height: 430px) {
-
     #title {
         display: none;
     }
@@ -1159,7 +1006,6 @@ button.active {
 </style>
 </head>
 
-
 <body>
 
 <div id="game">
@@ -1169,13 +1015,12 @@ button.active {
     </div>
 
     <div id="title">
-        ANCIENT TIC-TAC-TOE
+        TIC-TAC-TOE
     </div>
 
     <div id="status">
         CONNECTING TO GAME SERVER...
     </div>
-
 
     <div id="arena">
 
@@ -1191,55 +1036,19 @@ button.active {
             <div class="rivet r3"></div>
             <div class="rivet r4"></div>
 
-
             <div id="board">
 
-                <div
-                    class="cell"
-                    data-index="0">
-                </div>
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
 
-                <div
-                    class="cell"
-                    data-index="1">
-                </div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
 
-                <div
-                    class="cell"
-                    data-index="2">
-                </div>
-
-
-                <div
-                    class="cell"
-                    data-index="3">
-                </div>
-
-                <div
-                    class="cell"
-                    data-index="4">
-                </div>
-
-                <div
-                    class="cell"
-                    data-index="5">
-                </div>
-
-
-                <div
-                    class="cell"
-                    data-index="6">
-                </div>
-
-                <div
-                    class="cell"
-                    data-index="7">
-                </div>
-
-                <div
-                    class="cell"
-                    data-index="8">
-                </div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
 
             </div>
 
@@ -1247,43 +1056,34 @@ button.active {
 
     </div>
 
-
     <div id="controls">
 
         <button
             id="twoPlayer"
             class="active">
-
             2 PLAYERS
-
         </button>
-
 
         <button
             id="computer">
-
             VS COMPUTER
-
         </button>
-
 
         <button
             id="newGame">
-
             NEW GAME
+        </button>
 
+        <button
+            id="gameRoom">
+            GAME ROOM
         </button>
 
     </div>
 
 </div>
 
-
 <script>
-
-/* =========================================================
-   ELEMENTS
-   ========================================================= */
 
 const cells =
     [...document.querySelectorAll(".cell")];
@@ -1312,10 +1112,8 @@ const computerButton =
 const newGameButton =
     document.getElementById("newGame");
 
-
-/* =========================================================
-   GAME STATE
-   ========================================================= */
+const gameRoomButton =
+    document.getElementById("gameRoom");
 
 let game =
     Array(9).fill(null);
@@ -1347,29 +1145,13 @@ let reconnectTimer =
 let animationNumber =
     0;
 
-
-/* =========================================================
-   FIVE PLACEMENT ANIMATIONS
-   ========================================================= */
-
 const animations = [
-
     "anim-hammer",
-
     "anim-spin",
-
     "anim-rise",
-
     "anim-forge",
-
     "anim-swing"
-
 ];
-
-
-/* =========================================================
-   RESPONSIVE FIT
-   ========================================================= */
 
 function fitGame() {
 
@@ -1379,7 +1161,6 @@ function fitGame() {
     const arenaHeight =
         arena.clientHeight;
 
-
     if (
         !arenaWidth ||
         !arenaHeight
@@ -1387,10 +1168,8 @@ function fitGame() {
         return;
     }
 
-
     const frameRatio =
         0.105;
-
 
     const usableWidth =
         arenaWidth * .96;
@@ -1398,16 +1177,13 @@ function fitGame() {
     const usableHeight =
         arenaHeight * .96;
 
-
     const maxBoardFromWidth =
         usableWidth /
         (1 + frameRatio * 2);
 
-
     const maxBoardFromHeight =
         usableHeight /
         (1 + frameRatio * 2);
-
 
     let boardSize =
         Math.min(
@@ -1415,23 +1191,19 @@ function fitGame() {
             maxBoardFromHeight
         );
 
-
     boardSize =
         Math.max(
             100,
             boardSize
         );
 
-
     const frameWidth =
         boardSize * frameRatio;
-
 
     monument.style.setProperty(
         "--boardSize",
         boardSize + "px"
     );
-
 
     monument.style.setProperty(
         "--frameWidth",
@@ -1439,17 +1211,14 @@ function fitGame() {
     );
 }
 
-
 window.addEventListener(
     "resize",
     fitGame
 );
 
-
 window.addEventListener(
     "orientationchange",
     () => {
-
         setTimeout(
             fitGame,
             100
@@ -1457,48 +1226,23 @@ window.addEventListener(
     }
 );
 
-
 if (window.visualViewport) {
-
     window.visualViewport.addEventListener(
         "resize",
         fitGame
     );
 }
 
-
-/* =========================================================
-   CONNECTION STATUS
-   ========================================================= */
-
 function setConnection(
     text,
     state
 ) {
-
     connectionText.textContent =
         text;
 
     connectionText.className =
         state || "";
 }
-
-
-/* =========================================================
-   CONNECT TO YOUR RENDER SERVER
-   =========================================================
-
-   THIS MATCHES server11.js.
-
-   server11.js creates the WebSocket server on the
-   same HTTP server, and anything other than /checkers
-   is treated as Tic-Tac-Toe.
-
-   Therefore the correct endpoint is:
-
-   wss://games-z5k2.onrender.com/
-
-   ========================================================= */
 
 function connectToServer() {
 
@@ -1515,16 +1259,13 @@ function connectToServer() {
         return;
     }
 
-
     setConnection(
         "CONNECTING...",
         ""
     );
 
-
     statusText.textContent =
         "CONNECTING TO GAME SERVER...";
-
 
     try {
 
@@ -1532,7 +1273,6 @@ function connectToServer() {
             new WebSocket(
                 "wss://games-z5k2.onrender.com/"
             );
-
 
     } catch (error) {
 
@@ -1545,7 +1285,6 @@ function connectToServer() {
 
         return;
     }
-
 
     socket.addEventListener(
         "open",
@@ -1561,17 +1300,14 @@ function connectToServer() {
         }
     );
 
-
     socket.addEventListener(
         "message",
         event => {
-
             handleServerMessage(
                 event.data
             );
         }
     );
-
 
     socket.addEventListener(
         "close",
@@ -1591,7 +1327,6 @@ function connectToServer() {
         }
     );
 
-
     socket.addEventListener(
         "error",
         () => {
@@ -1604,17 +1339,11 @@ function connectToServer() {
     );
 }
 
-
-/* =========================================================
-   RECONNECT
-   ========================================================= */
-
 function scheduleReconnect() {
 
     if (reconnectTimer) {
         return;
     }
-
 
     reconnectTimer =
         setTimeout(
@@ -1630,17 +1359,11 @@ function scheduleReconnect() {
         );
 }
 
-
-/* =========================================================
-   SERVER MESSAGE
-   ========================================================= */
-
 function handleServerMessage(
     raw
 ) {
 
     let data;
-
 
     try {
 
@@ -1652,11 +1375,6 @@ function handleServerMessage(
         return;
     }
 
-
-    /* -----------------------------------------------------
-       SERVER ASSIGNS X OR O
-       ----------------------------------------------------- */
-
     if (
         data.type ===
         "assign"
@@ -1665,55 +1383,38 @@ function handleServerMessage(
         mySymbol =
             data.symbol;
 
-
         setConnection(
             "CONNECTED — PLAYER " +
             mySymbol,
             "connected"
         );
 
-
         updateStatus();
 
         return;
     }
-
-
-    /* -----------------------------------------------------
-       SERVER STATE
-       ----------------------------------------------------- */
 
     if (
         data.type ===
         "state"
     ) {
 
-        /*
-         * Make a fresh array so the UI always follows
-         * the server's authoritative board.
-         */
-
         game =
             Array.isArray(data.board)
                 ? [...data.board]
                 : Array(9).fill(null);
 
-
         currentPlayer =
             data.currentPlayer || "X";
-
 
         gameOver =
             Boolean(data.gameOver);
 
-
         winner =
             data.winner || null;
 
-
         draw =
             Boolean(data.draw);
-
 
         renderBoard();
 
@@ -1721,11 +1422,6 @@ function handleServerMessage(
 
         return;
     }
-
-
-    /* -----------------------------------------------------
-       SERVER ERROR
-       ----------------------------------------------------- */
 
     if (
         data.type ===
@@ -1740,11 +1436,6 @@ function handleServerMessage(
     }
 }
 
-
-/* =========================================================
-   SEND MOVE TO SERVER
-   ========================================================= */
-
 function sendMove(index) {
 
     if (
@@ -1755,21 +1446,13 @@ function sendMove(index) {
         return;
     }
 
-
     socket.send(
         JSON.stringify({
-
             type: "move",
-
             index: index
         })
     );
 }
-
-
-/* =========================================================
-   SEND NEW GAME
-   ========================================================= */
 
 function sendNewGame() {
 
@@ -1781,26 +1464,14 @@ function sendNewGame() {
         return;
     }
 
-
     socket.send(
         JSON.stringify({
-
             type: "new_game"
         })
     );
 }
 
-
-/* =========================================================
-   CELL TAP
-   ========================================================= */
-
 function cellPressed(index) {
-
-    /* -----------------------------------------------------
-       COMPUTER MODE IS LOCAL.
-       It does not send moves to the server.
-       ----------------------------------------------------- */
 
     if (mode === "CPU") {
 
@@ -1808,11 +1479,6 @@ function cellPressed(index) {
 
         return;
     }
-
-
-    /* -----------------------------------------------------
-       ONLINE 2 PLAYER MODE
-       ----------------------------------------------------- */
 
     if (
         !socket ||
@@ -1826,7 +1492,6 @@ function cellPressed(index) {
         return;
     }
 
-
     if (!mySymbol) {
 
         statusText.textContent =
@@ -1835,45 +1500,25 @@ function cellPressed(index) {
         return;
     }
 
-
     if (gameOver) {
         return;
     }
-
 
     if (
         currentPlayer !==
         mySymbol
     ) {
-
         return;
     }
-
 
     if (
         game[index] !== null
     ) {
-
         return;
     }
 
-
-    /*
-     * Do NOT modify the board locally.
-     *
-     * Send the move to server11.js.
-     *
-     * server11.js validates it and broadcasts
-     * the new authoritative state to both devices.
-     */
-
     sendMove(index);
 }
-
-
-/* =========================================================
-   RENDER SERVER BOARD
-   ========================================================= */
 
 function renderBoard() {
 
@@ -1885,34 +1530,27 @@ function renderBoard() {
                     cell.dataset.index
                 );
 
-
             const value =
                 game[index];
 
-
             cell.innerHTML = "";
-
 
             cell.classList.remove(
                 "draw-cell"
             );
 
-
             if (!value) {
                 return;
             }
-
 
             const piece =
                 document.createElement(
                     "div"
                 );
 
-
             piece.classList.add(
                 "piece"
             );
-
 
             if (
                 value === "X"
@@ -1929,14 +1567,6 @@ function renderBoard() {
                 );
             }
 
-
-            /*
-             * Only animate newly appearing pieces.
-             *
-             * We compare against the previous rendered
-             * board stored on the cell.
-             */
-
             if (
                 cell.dataset.value !==
                 value
@@ -1952,21 +1582,14 @@ function renderBoard() {
                 animationNumber++;
             }
 
-
             cell.dataset.value =
                 value;
-
 
             cell.appendChild(
                 piece
             );
         }
     );
-
-
-    /*
-     * Clear stale dataset values.
-     */
 
     cells.forEach(
         cell => {
@@ -1975,7 +1598,6 @@ function renderBoard() {
                 Number(
                     cell.dataset.index
                 );
-
 
             if (
                 !game[index]
@@ -1987,18 +1609,12 @@ function renderBoard() {
         }
     );
 
-
-    /*
-     * Highlight winning line.
-     */
-
     if (winner) {
 
         const line =
             getWinningLine(
                 winner
             );
-
 
         if (line) {
 
@@ -2011,7 +1627,6 @@ function renderBoard() {
                                 ".piece"
                             );
 
-
                     if (piece) {
 
                         piece.classList.add(
@@ -2022,7 +1637,6 @@ function renderBoard() {
             );
         }
     }
-
 
     if (draw) {
 
@@ -2036,11 +1650,6 @@ function renderBoard() {
         );
     }
 }
-
-
-/* =========================================================
-   WINNING LINE
-   ========================================================= */
 
 function getWinningLine(
     player
@@ -2060,7 +1669,6 @@ function getWinningLine(
         [2,4,6]
     ];
 
-
     for (
         const line
         of lines
@@ -2078,21 +1686,14 @@ function getWinningLine(
         }
     }
 
-
     return null;
 }
-
-
-/* =========================================================
-   ONLINE STATUS
-   ========================================================= */
 
 function updateStatus() {
 
     if (mode !== "2P") {
         return;
     }
-
 
     if (!mySymbol) {
 
@@ -2101,33 +1702,6 @@ function updateStatus() {
 
         return;
     }
-
-
-    if (
-        !gameOver &&
-        (
-            !game[0] &&
-            !game[1] &&
-            !game[2] &&
-            !game[3] &&
-            !game[4] &&
-            !game[5] &&
-            !game[6] &&
-            !game[7] &&
-            !game[8]
-        )
-    ) {
-
-        /*
-         * If X is assigned and O hasn't connected,
-         * the server's players state isn't currently
-         * sent to us explicitly. The server does,
-         * however, broadcast a state when a second
-         * player joins.
-         */
-
-    }
-
 
     if (gameOver) {
 
@@ -2139,7 +1713,6 @@ function updateStatus() {
             return;
         }
 
-
         if (winner) {
 
             statusText.textContent =
@@ -2150,7 +1723,6 @@ function updateStatus() {
             return;
         }
     }
-
 
     if (
         currentPlayer ===
@@ -2171,11 +1743,6 @@ function updateStatus() {
     }
 }
 
-
-/* =========================================================
-   LOCAL COMPUTER MODE
-   ========================================================= */
-
 let localGame =
     Array(9).fill(null);
 
@@ -2188,7 +1755,6 @@ let localOver =
 let localAnimation =
     0;
 
-
 function humanComputerMove(
     index
 ) {
@@ -2197,7 +1763,6 @@ function humanComputerMove(
         return;
     }
 
-
     if (
         localCurrent !==
         "X"
@@ -2205,20 +1770,16 @@ function humanComputerMove(
         return;
     }
 
-
     if (
         localGame[index]
     ) {
         return;
     }
 
-
     localGame[index] =
         "X";
 
-
     renderLocalBoard();
-
 
     if (
         finishLocalGame()
@@ -2226,14 +1787,11 @@ function humanComputerMove(
         return;
     }
 
-
     localCurrent =
         "O";
 
-
     statusText.textContent =
         "COMPUTER — THINKING...";
-
 
     setTimeout(
         computerMove,
@@ -2241,17 +1799,14 @@ function humanComputerMove(
     );
 }
 
-
 function computerMove() {
 
     if (localOver) {
         return;
     }
 
-
     const move =
         findComputerMove();
-
 
     if (
         move === -1
@@ -2259,13 +1814,10 @@ function computerMove() {
         return;
     }
 
-
     localGame[move] =
         "O";
 
-
     renderLocalBoard();
-
 
     if (
         finishLocalGame()
@@ -2273,34 +1825,14 @@ function computerMove() {
         return;
     }
 
-
     localCurrent =
         "X";
-
 
     statusText.textContent =
         "PLAYER X — YOUR TURN";
 }
 
-
 function findComputerMove() {
-
-    const wins = [
-
-        [0,1,2],
-        [3,4,5],
-        [6,7,8],
-
-        [0,3,6],
-        [1,4,7],
-        [2,5,8],
-
-        [0,4,8],
-        [2,4,6]
-    ];
-
-
-    /* WIN */
 
     for (
         let i = 0;
@@ -2313,7 +1845,6 @@ function findComputerMove() {
             localGame[i] =
                 "O";
 
-
             if (
                 localWinner() ===
                 "O"
@@ -2325,14 +1856,10 @@ function findComputerMove() {
                 return i;
             }
 
-
             localGame[i] =
                 null;
         }
     }
-
-
-    /* BLOCK */
 
     for (
         let i = 0;
@@ -2345,7 +1872,6 @@ function findComputerMove() {
             localGame[i] =
                 "X";
 
-
             if (
                 localWinner() ===
                 "X"
@@ -2357,21 +1883,14 @@ function findComputerMove() {
                 return i;
             }
 
-
             localGame[i] =
                 null;
         }
     }
 
-
-    /* CENTER */
-
     if (!localGame[4]) {
         return 4;
     }
-
-
-    /* CORNERS */
 
     const corners =
         [0,2,6,8]
@@ -2379,7 +1898,6 @@ function findComputerMove() {
                 i =>
                     !localGame[i]
             );
-
 
     if (
         corners.length
@@ -2392,9 +1910,6 @@ function findComputerMove() {
             )
         ];
     }
-
-
-    /* ANY */
 
     const available =
         localGame
@@ -2409,14 +1924,12 @@ function findComputerMove() {
                     i !== -1
             );
 
-
     if (
         !available.length
     ) {
 
         return -1;
     }
-
 
     return available[
         Math.floor(
@@ -2425,7 +1938,6 @@ function findComputerMove() {
         )
     ];
 }
-
 
 function localWinner() {
 
@@ -2437,12 +1949,11 @@ function localWinner() {
 
         [0,3,6],
         [1,4,7],
-        [2,4,8],
+        [2,5,8],
 
         [0,4,8],
         [2,4,6]
     ];
-
 
     for (
         const line
@@ -2454,7 +1965,6 @@ function localWinner() {
             b,
             c
         ] = line;
-
 
         if (
             localGame[a] &&
@@ -2468,34 +1978,28 @@ function localWinner() {
         }
     }
 
-
     return null;
 }
 
-
 function finishLocalGame() {
 
-    const winner =
+    const localWinnerValue =
         localWinner();
 
-
-    if (winner) {
+    if (localWinnerValue) {
 
         localOver =
             true;
 
-
         statusText.textContent =
             "PLAYER " +
-            winner +
+            localWinnerValue +
             " WINS!";
-
 
         const line =
             getLocalWinningLine(
-                winner
+                localWinnerValue
             );
-
 
         if (line) {
 
@@ -2508,7 +2012,6 @@ function finishLocalGame() {
                                 ".piece"
                             );
 
-
                     if (piece) {
 
                         piece.classList.add(
@@ -2519,10 +2022,8 @@ function finishLocalGame() {
             );
         }
 
-
         return true;
     }
-
 
     if (
         localGame.every(
@@ -2533,10 +2034,8 @@ function finishLocalGame() {
         localOver =
             true;
 
-
         statusText.textContent =
             "DRAW — THE BOARD IS COMPLETE";
-
 
         cells.forEach(
             cell => {
@@ -2547,14 +2046,11 @@ function finishLocalGame() {
             }
         );
 
-
         return true;
     }
 
-
     return false;
 }
-
 
 function getLocalWinningLine(
     player
@@ -2574,7 +2070,6 @@ function getLocalWinningLine(
         [2,4,6]
     ];
 
-
     return lines.find(
         line =>
             line.every(
@@ -2584,7 +2079,6 @@ function getLocalWinningLine(
             )
     );
 }
-
 
 function renderLocalBoard() {
 
@@ -2597,39 +2091,32 @@ function renderLocalBoard() {
                 "draw-cell"
             );
 
-
             const index =
                 Number(
                     cell.dataset.index
                 );
 
-
             const value =
                 localGame[index];
-
 
             if (!value) {
                 return;
             }
-
 
             const piece =
                 document.createElement(
                     "div"
                 );
 
-
             piece.classList.add(
                 "piece"
             );
-
 
             piece.classList.add(
                 value === "X"
                     ? "x-piece"
                     : "o-piece"
             );
-
 
             piece.classList.add(
                 animations[
@@ -2638,9 +2125,7 @@ function renderLocalBoard() {
                 ]
             );
 
-
             localAnimation++;
-
 
             cell.appendChild(
                 piece
@@ -2648,11 +2133,6 @@ function renderLocalBoard() {
         }
     );
 }
-
-
-/* =========================================================
-   NEW GAME BUTTON
-   ========================================================= */
 
 function newGame() {
 
@@ -2670,7 +2150,6 @@ function newGame() {
         localAnimation =
             0;
 
-
         cells.forEach(
             cell => {
 
@@ -2686,29 +2165,14 @@ function newGame() {
             }
         );
 
-
         statusText.textContent =
             "PLAYER X — YOUR TURN";
-
 
         return;
     }
 
-
-    /*
-     * IMPORTANT:
-     *
-     * This sends the exact message
-     * expected by server11.js.
-     */
-
     sendNewGame();
 }
-
-
-/* =========================================================
-   MODE BUTTONS
-   ========================================================= */
 
 twoPlayerButton.addEventListener(
     "pointerup",
@@ -2719,20 +2183,13 @@ twoPlayerButton.addEventListener(
         mode =
             "2P";
 
-
         twoPlayerButton
             .classList
             .add("active");
 
-
         computerButton
             .classList
             .remove("active");
-
-
-        /*
-         * Reconnect if necessary.
-         */
 
         if (
             !socket ||
@@ -2755,7 +2212,6 @@ twoPlayerButton.addEventListener(
     }
 );
 
-
 computerButton.addEventListener(
     "pointerup",
     event => {
@@ -2765,16 +2221,13 @@ computerButton.addEventListener(
         mode =
             "CPU";
 
-
         computerButton
             .classList
             .add("active");
 
-
         twoPlayerButton
             .classList
             .remove("active");
-
 
         localGame =
             Array(9).fill(null);
@@ -2787,7 +2240,6 @@ computerButton.addEventListener(
 
         localAnimation =
             0;
-
 
         cells.forEach(
             cell => {
@@ -2804,7 +2256,6 @@ computerButton.addEventListener(
             }
         );
 
-
         statusText.textContent =
             "PLAYER X — YOUR TURN";
 
@@ -2813,7 +2264,6 @@ computerButton.addEventListener(
         passive: false
     }
 );
-
 
 newGameButton.addEventListener(
     "pointerup",
@@ -2829,10 +2279,20 @@ newGameButton.addEventListener(
     }
 );
 
+gameRoomButton.addEventListener(
+    "pointerup",
+    event => {
 
-/* =========================================================
-   PHONE / MOUSE / TABLET INPUT
-   ========================================================= */
+        event.preventDefault();
+
+        window.location.href =
+            "index.html";
+
+    },
+    {
+        passive: false
+    }
+);
 
 cells.forEach(
     cell => {
@@ -2848,7 +2308,6 @@ cells.forEach(
                         cell.dataset.index
                     );
 
-
                 cellPressed(index);
 
             },
@@ -2858,11 +2317,6 @@ cells.forEach(
         );
     }
 );
-
-
-/* =========================================================
-   START
-   ========================================================= */
 
 fitGame();
 
