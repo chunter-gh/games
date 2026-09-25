@@ -55,6 +55,7 @@ body {
 
 #app {
     width: 100%;
+    height: 100%;
     height: 100dvh;
 
     min-height: 0;
@@ -198,7 +199,7 @@ button.active {
     overflow: hidden;
 
     padding:
-        clamp(6px, 1vw, 14px);
+        clamp(4px, 1vw, 14px);
 }
 
 
@@ -217,7 +218,7 @@ button.active {
         clamp(8px, 2vw, 25px);
 
     margin-bottom:
-        clamp(5px, 1vh, 10px);
+        clamp(3px, 1vh, 10px);
 
     color: #f3f0e6;
 
@@ -261,6 +262,17 @@ button.active {
     flex-direction: column;
 
     overflow: hidden;
+
+    /*
+       IMPORTANT:
+       Keep the game centered and prevent the seven-column
+       layout from becoming excessively wide in landscape.
+    */
+    width: 100%;
+    max-width: 1100px;
+
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
@@ -408,9 +420,11 @@ button.active {
         clamp(3px, .8vw, 12px);
 
     margin-top:
-        clamp(7px, 1.2vh, 14px);
+        clamp(5px, 1.2vh, 14px);
 
     overflow: hidden;
+
+    width: 100%;
 }
 
 
@@ -814,7 +828,7 @@ button.active {
         clamp(5px, 1vw, 12px);
 
     margin-top:
-        clamp(6px, 1vh, 12px);
+        clamp(4px, 1vh, 12px);
 }
 
 .controls button {
@@ -987,6 +1001,64 @@ button.active {
     .controls button {
         min-height: 27px;
     }
+
+    /*
+       In short landscape screens, give the table as much
+       horizontal room as possible while keeping it centered.
+    */
+    .table {
+        max-width: 100%;
+    }
+}
+
+
+/* =========================================================
+   VERY SHORT LANDSCAPE / EMBEDDED GAME AREA
+   ========================================================= */
+
+@media (max-height: 430px) and (orientation: landscape) {
+
+    .header {
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+
+    .title {
+        font-size: 17px;
+    }
+
+    .header-buttons {
+        gap: 3px;
+    }
+
+    .header-buttons button {
+        min-height: 24px;
+        padding: 3px 6px;
+        font-size: 9px;
+    }
+
+    .game {
+        padding: 3px;
+    }
+
+    .info {
+        margin-bottom: 2px;
+        font-size: 9px;
+    }
+
+    .tableau {
+        margin-top: 3px;
+    }
+
+    .controls {
+        margin-top: 3px;
+    }
+
+    .controls button {
+        min-height: 24px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
 }
 
 </style>
@@ -1054,14 +1126,7 @@ button.active {
 
         <div class="table">
 
-            <!-- =================================================
-                 TOP ROW
-                 ================================================= -->
-
             <div class="top-row">
-
-
-                <!-- STOCK -->
 
                 <div
                     class="top-cell stock-area">
@@ -1074,8 +1139,6 @@ button.active {
                 </div>
 
 
-                <!-- WASTE -->
-
                 <div
                     class="top-cell waste-area">
 
@@ -1085,8 +1148,6 @@ button.active {
 
                 </div>
 
-
-                <!-- FOUNDATIONS -->
 
                 <div class="foundation-area">
 
@@ -1119,20 +1180,11 @@ button.active {
             </div>
 
 
-            <!-- =================================================
-                 TABLEAU
-                 ================================================= -->
-
             <div
                 id="tableau"
                 class="tableau">
-
             </div>
 
-
-            <!-- =================================================
-                 CONTROLS
-                 ================================================= -->
 
             <div class="controls">
 
@@ -1152,10 +1204,6 @@ button.active {
 
 </div>
 
-
-<!-- =========================================================
-     WIN
-     ========================================================= -->
 
 <div
     id="winOverlay"
@@ -1182,10 +1230,6 @@ button.active {
 
 
 <script>
-
-/* =========================================================
-   CARD DEFINITIONS
-   ========================================================= */
 
 const SUITS = [
     "♠",
@@ -1218,10 +1262,6 @@ const RANKS = [
 ];
 
 
-/* =========================================================
-   DOM
-   ========================================================= */
-
 const stockElement =
     document.getElementById("stock");
 
@@ -1249,10 +1289,6 @@ const winOverlay =
 const winText =
     document.getElementById("winText");
 
-
-/* =========================================================
-   GAME STATE
-   ========================================================= */
 
 let stock = [];
 
@@ -1290,10 +1326,6 @@ let history = [];
 let dragged = null;
 
 
-/* =========================================================
-   CARD OBJECT
-   ========================================================= */
-
 function makeCard(
     suit,
     rank,
@@ -1318,10 +1350,6 @@ function makeCard(
 }
 
 
-/* =========================================================
-   COLOR
-   ========================================================= */
-
 function isRed(card) {
 
     return (
@@ -1330,10 +1358,6 @@ function isRed(card) {
     );
 }
 
-
-/* =========================================================
-   DECK
-   ========================================================= */
 
 function createDeck() {
 
@@ -1356,10 +1380,6 @@ function createDeck() {
     return deck;
 }
 
-
-/* =========================================================
-   SHUFFLE
-   ========================================================= */
 
 function shuffle(array) {
 
@@ -1389,10 +1409,6 @@ function shuffle(array) {
 }
 
 
-/* =========================================================
-   SAVE STATE
-   ========================================================= */
-
 function saveState() {
 
     history.push(
@@ -1414,10 +1430,6 @@ function saveState() {
         history.length === 0;
 }
 
-
-/* =========================================================
-   RESTORE STATE
-   ========================================================= */
 
 function restoreState() {
 
@@ -1456,10 +1468,6 @@ function restoreState() {
     render();
 }
 
-
-/* =========================================================
-   NEW GAME
-   ========================================================= */
 
 function newGame() {
 
@@ -1506,10 +1514,6 @@ function newGame() {
     ];
 
 
-    /* =====================================================
-       DEAL TABLEAU
-       ===================================================== */
-
     for (
         let column = 0;
         column < 7;
@@ -1534,10 +1538,6 @@ function newGame() {
     }
 
 
-    /* =====================================================
-       REMAINING CARDS -> STOCK
-       ===================================================== */
-
     stock =
         deck.reverse();
 
@@ -1547,10 +1547,6 @@ function newGame() {
     startTimer();
 }
 
-
-/* =========================================================
-   TIMER
-   ========================================================= */
 
 function startTimer() {
 
@@ -1592,10 +1588,6 @@ function updateTimer() {
 }
 
 
-/* =========================================================
-   MOVE COUNTER
-   ========================================================= */
-
 function addMove() {
 
     moves++;
@@ -1604,10 +1596,6 @@ function addMove() {
         moves;
 }
 
-
-/* =========================================================
-   CARD HTML
-   ========================================================= */
 
 function createCardElement(
     card,
@@ -1681,10 +1669,6 @@ function createCardElement(
     return element;
 }
 
-
-/* =========================================================
-   BUILD CARD FACE
-   ========================================================= */
 
 function buildFace(
     element,
@@ -1769,7 +1753,7 @@ function buildFace(
 
 
 /* =========================================================
-   CARD POSITIONING
+   SIZING
    ========================================================= */
 
 function getTableauOffset() {
@@ -1777,9 +1761,11 @@ function getTableauOffset() {
     const available =
         tableauElement.clientHeight;
 
+    const cardWidth =
+        tableauElement.clientWidth / 7;
+
     const cardHeight =
-        tableauElement
-            .clientWidth / 7 / .70;
+        cardWidth / .70;
 
     const maxStack =
         Math.max(
@@ -1817,10 +1803,6 @@ function getTableauOffset() {
 }
 
 
-/* =========================================================
-   RENDER
-   ========================================================= */
-
 function render() {
 
     renderStock();
@@ -1840,10 +1822,6 @@ function render() {
         history.length === 0;
 }
 
-
-/* =========================================================
-   STOCK
-   ========================================================= */
 
 function renderStock() {
 
@@ -1909,10 +1887,6 @@ function renderStock() {
 }
 
 
-/* =========================================================
-   DRAW STOCK
-   ========================================================= */
-
 function drawStock() {
 
     if (!stock.length) {
@@ -1938,10 +1912,6 @@ function drawStock() {
     render();
 }
 
-
-/* =========================================================
-   RECYCLE WASTE
-   ========================================================= */
 
 function recycleWaste() {
 
@@ -1971,10 +1941,6 @@ function recycleWaste() {
     render();
 }
 
-
-/* =========================================================
-   WASTE
-   ========================================================= */
 
 function renderWaste() {
 
@@ -2024,10 +1990,6 @@ function renderWaste() {
 }
 
 
-/* =========================================================
-   FOUNDATIONS
-   ========================================================= */
-
 function renderFoundations() {
 
     foundationElements.forEach(
@@ -2075,10 +2037,6 @@ function renderFoundations() {
     );
 }
 
-
-/* =========================================================
-   TABLEAU
-   ========================================================= */
 
 function renderTableau() {
 
@@ -2179,10 +2137,6 @@ function renderTableau() {
 }
 
 
-/* =========================================================
-   FIND CARD LOCATION
-   ========================================================= */
-
 function findCardLocation(id) {
 
     for (
@@ -2232,10 +2186,6 @@ function findCardLocation(id) {
     return null;
 }
 
-
-/* =========================================================
-   GET MOVABLE SEQUENCE
-   ========================================================= */
 
 function getMovableSequence(
     column,
@@ -2294,10 +2244,6 @@ function getMovableSequence(
 }
 
 
-/* =========================================================
-   CARD CLICK
-   ========================================================= */
-
 function handleCardClick(
     card,
     source,
@@ -2308,8 +2254,6 @@ function handleCardClick(
         return;
     }
 
-
-    /* SECOND CLICK */
 
     if (selectedCards) {
 
@@ -2338,8 +2282,6 @@ function handleCardClick(
         }
     }
 
-
-    /* SELECT */
 
     if (
         source.startsWith(
@@ -2375,8 +2317,6 @@ function handleCardClick(
     }
 
 
-    /* WASTE */
-
     if (source === "waste") {
 
         selectedCards = {
@@ -2393,10 +2333,6 @@ function handleCardClick(
 }
 
 
-/* =========================================================
-   ATTEMPT SELECTED MOVE
-   ========================================================= */
-
 function attemptMoveSelected(
     targetCard,
     targetSource,
@@ -2410,8 +2346,6 @@ function attemptMoveSelected(
         return false;
     }
 
-
-    /* TABLEAU TARGET */
 
     if (
         targetSource.startsWith(
@@ -2446,8 +2380,6 @@ function attemptMoveSelected(
         }
     }
 
-
-    /* FOUNDATION TARGET */
 
     if (
         selection.sequence.length === 1
@@ -2485,10 +2417,6 @@ function attemptMoveSelected(
 }
 
 
-/* =========================================================
-   EMPTY COLUMN
-   ========================================================= */
-
 function handleEmptyColumnClick(
     columnIndex
 ) {
@@ -2512,10 +2440,6 @@ function handleEmptyColumnClick(
 }
 
 
-/* =========================================================
-   TABLEAU RULE
-   ========================================================= */
-
 function canPlaceOnTableau(
     card,
     target
@@ -2533,10 +2457,6 @@ function canPlaceOnTableau(
     );
 }
 
-
-/* =========================================================
-   FOUNDATION RULE
-   ========================================================= */
 
 function canPlaceOnFoundation(
     card,
@@ -2564,10 +2484,6 @@ function canPlaceOnFoundation(
     );
 }
 
-
-/* =========================================================
-   REMOVE SELECTED
-   ========================================================= */
 
 function removeSelectedCards() {
 
@@ -2604,10 +2520,6 @@ function removeSelectedCards() {
 }
 
 
-/* =========================================================
-   MOVE TO TABLEAU
-   ========================================================= */
-
 function moveSelectedToTableau(
     targetColumn
 ) {
@@ -2640,10 +2552,6 @@ function moveSelectedToTableau(
 }
 
 
-/* =========================================================
-   MOVE TO FOUNDATION
-   ========================================================= */
-
 function moveSelectedToFoundation(
     foundationIndex
 ) {
@@ -2675,10 +2583,6 @@ function moveSelectedToFoundation(
 }
 
 
-/* =========================================================
-   FLIP TOP CARD
-   ========================================================= */
-
 function flipTopCardAfterMove() {
 
     for (
@@ -2704,15 +2608,10 @@ function flipTopCardAfterMove() {
 }
 
 
-/* =========================================================
-   AUTO MOVE
-   ========================================================= */
-
 function autoMove() {
 
     selectedCards = null;
 
-    /* WASTE -> FOUNDATION */
 
     if (waste.length) {
 
@@ -2747,8 +2646,6 @@ function autoMove() {
         }
     }
 
-
-    /* TABLEAU -> FOUNDATION */
 
     for (
         let c = 0;
@@ -2805,10 +2702,6 @@ function autoMove() {
 }
 
 
-/* =========================================================
-   AUTO BUTTON
-   ========================================================= */
-
 document
     .getElementById("autoButton")
     .addEventListener(
@@ -2826,10 +2719,6 @@ document
     );
 
 
-/* =========================================================
-   UNDO
-   ========================================================= */
-
 undoButton.addEventListener(
     "click",
     () => {
@@ -2838,10 +2727,6 @@ undoButton.addEventListener(
     }
 );
 
-
-/* =========================================================
-   HINT
-   ========================================================= */
 
 document
     .getElementById("hintButton")
@@ -2855,8 +2740,6 @@ function showHint() {
 
     const candidates = [];
 
-
-    /* WASTE TO FOUNDATION */
 
     if (waste.length) {
 
@@ -2883,8 +2766,6 @@ function showHint() {
         }
     }
 
-
-    /* TABLEAU TO FOUNDATION */
 
     for (
         let c = 0;
@@ -2928,8 +2809,6 @@ function showHint() {
 
 
     if (!candidates.length) {
-
-        /* Find tableau-to-tableau move */
 
         outer:
         for (
@@ -3022,10 +2901,6 @@ function showHint() {
 }
 
 
-/* =========================================================
-   DRAG AND DROP
-   ========================================================= */
-
 function startDrag(
     event,
     card,
@@ -3098,12 +2973,6 @@ function startDrag(
         "dragging"
     );
 
-
-    dragged.moveHandler =
-        dragMove;
-
-    dragged.upHandler =
-        dragEnd;
 
     document.addEventListener(
         "pointermove",
@@ -3272,10 +3141,6 @@ function dragEnd(event) {
 }
 
 
-/* =========================================================
-   DOUBLE CLICK AUTO FOUNDATION
-   ========================================================= */
-
 document.addEventListener(
     "dblclick",
     event => {
@@ -3382,10 +3247,6 @@ document.addEventListener(
 );
 
 
-/* =========================================================
-   WIN CHECK
-   ========================================================= */
-
 function checkWin() {
 
     let total = 0;
@@ -3418,10 +3279,6 @@ function checkWin() {
 }
 
 
-/* =========================================================
-   NEW GAME BUTTONS
-   ========================================================= */
-
 document
     .getElementById("newGameButton")
     .addEventListener(
@@ -3444,10 +3301,6 @@ document
     );
 
 
-/* =========================================================
-   RESIZE
-   ========================================================= */
-
 let resizeTimer = null;
 
 window.addEventListener(
@@ -3468,8 +3321,28 @@ window.addEventListener(
 
 
 /* =========================================================
-   START
+   ALSO HANDLE VISUAL VIEWPORT CHANGES
    ========================================================= */
+
+if (window.visualViewport) {
+
+    window.visualViewport.addEventListener(
+        "resize",
+        () => {
+
+            clearTimeout(
+                resizeTimer
+            );
+
+            resizeTimer =
+                setTimeout(
+                    render,
+                    50
+                );
+        }
+    );
+}
+
 
 newGame();
 
