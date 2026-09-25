@@ -799,25 +799,25 @@ body {
 
     border: 3px solid #4e2c17;
 
-    z-index: -1;
+    z-index: -2;
 }
 
 .dog-ear.left {
-    left: -14px;
-    top: 4px;
+    left: -24px;
+    top: 2px;
 
-    border-radius: 60% 40% 55% 45%;
+    border-radius: 65% 35% 55% 45%;
 
-    transform: rotate(17deg);
+    transform: rotate(12deg);
 }
 
 .dog-ear.right {
-    right: -13px;
-    top: 5px;
+    right: -18px;
+    top: 4px;
 
-    border-radius: 40% 60% 45% 55%;
+    border-radius: 35% 65% 45% 55%;
 
-    transform: rotate(-17deg);
+    transform: rotate(-14deg);
 }
 
 /* Labrador muzzle */
@@ -867,7 +867,7 @@ body {
     z-index: 4;
 }
 
-/* Labrador eye */
+/* Labrador eyes */
 
 .dog-eye {
     position: absolute;
@@ -884,14 +884,16 @@ body {
     box-shadow:
         0 0 0 2px rgba(255,255,255,.25),
         inset 2px 2px 2px rgba(255,255,255,.25);
+
+    z-index: 6;
 }
 
 .dog-eye.left {
-    left: 40px;
+    left: 39px;
 }
 
 .dog-eye.right {
-    display: none;
+    left: 60px;
 }
 
 /* Friendly mouth */
@@ -950,66 +952,6 @@ body {
     to {
         transform: translateY(4px) scaleY(1);
     }
-}
-
-/* Collar */
-
-.collar {
-    position: absolute;
-
-    left: 66px;
-    top: 72px;
-
-    width: 12px;
-    height: 45px;
-
-    border-radius: 50%;
-
-    background:
-        linear-gradient(
-            90deg,
-            #284e78,
-            #163354
-        );
-
-    border: 2px solid #10263e;
-
-    transform: rotate(-3deg);
-
-    z-index: 6;
-}
-
-/* Tag */
-
-.tag {
-    position: absolute;
-
-    left: 63px;
-    top: 107px;
-
-    width: 13px;
-    height: 15px;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle at 35% 30%,
-            #fff5a8,
-            #d3a72f 65%,
-            #805d14
-        );
-
-    border: 1px solid #70500f;
-
-    z-index: 7;
-
-    animation: tagSwing .5s ease-in-out infinite alternate;
-}
-
-@keyframes tagSwing {
-    from { transform: rotate(-10deg); }
-    to   { transform: rotate(12deg); }
 }
 
 /* Long Greyhound-like legs */
@@ -1521,6 +1463,7 @@ body {
                 <div class="dog-ear right"></div>
 
                 <div class="dog-eye left"></div>
+                <div class="dog-eye right"></div>
 
                 <div class="dog-muzzle"></div>
 
@@ -1531,9 +1474,6 @@ body {
                 <div class="dog-tongue"></div>
 
             </div>
-
-            <div class="collar"></div>
-            <div class="tag"></div>
 
         </div>
 
