@@ -81,28 +81,20 @@ body {
 .menu {
     position: absolute;
     z-index: 40;
-
     width: min(88vw, 420px);
-
     left: 50%;
     top: 50%;
-
     transform: translate(-50%, -50%);
-
     display: flex;
     flex-direction: column;
-
     gap: clamp(7px, 1.5vh, 16px);
 }
 
 .game-button {
     position: relative;
-
     width: 100%;
     height: clamp(62px, 10vh, 82px);
-
     margin: 0;
-
     border: 1px solid rgba(255,255,255,.35);
     border-radius: 22px;
 
@@ -122,10 +114,8 @@ body {
 
     color: white;
     cursor: pointer;
-
     display: flex;
     align-items: center;
-
     padding: 0 25px;
 
     transition:
@@ -144,10 +134,8 @@ body {
 .icon {
     width: 55px;
     flex-shrink: 0;
-
     font-size: 38px;
     text-align: center;
-
     filter:
         drop-shadow(0 4px 4px rgba(0,0,0,.65));
 }
@@ -174,10 +162,8 @@ body {
 
 .ground {
     position: absolute;
-
     left: -10%;
     bottom: 0;
-
     width: 120%;
     height: clamp(75px, 14vh, 115px);
 
@@ -197,20 +183,15 @@ body {
 
 /* =========================================================
    GIRAFFE
-   ORIGINAL ARTWORK
 ========================================================= */
 
 .giraffe-wrapper {
     position: absolute;
-
     z-index: 10;
-
     bottom: clamp(35px, 6vh, 45px);
     left: -230px;
-
     width: 210px;
     height: 250px;
-
     animation:
         giraffeWalk 15s linear infinite;
 }
@@ -227,10 +208,8 @@ body {
 
 .giraffe {
     position: relative;
-
     width: 210px;
     height: 250px;
-
     animation:
         bodyBounce .42s ease-in-out infinite alternate;
 }
@@ -249,13 +228,10 @@ body {
 
 .body {
     position: absolute;
-
     left: 35px;
     top: 105px;
-
     width: 125px;
     height: 75px;
-
     border-radius: 52% 48% 45% 48%;
 
     background:
@@ -316,13 +292,10 @@ body {
 
 .neck {
     position: absolute;
-
     left: 125px;
     top: 32px;
-
     width: 42px;
     height: 115px;
-
     border-radius: 22px;
 
     background:
@@ -334,9 +307,7 @@ body {
         );
 
     border: 3px solid #815c20;
-
     transform: rotate(-7deg);
-
     transform-origin: bottom center;
 
     box-shadow:
@@ -369,13 +340,10 @@ body {
 
 .head {
     position: absolute;
-
     left: 135px;
     top: 5px;
-
     width: 67px;
     height: 55px;
-
     border-radius: 48% 55% 42% 48%;
 
     background:
@@ -386,7 +354,6 @@ body {
         );
 
     border: 3px solid #80591e;
-
     transform: rotate(-8deg);
 
     box-shadow:
@@ -396,47 +363,34 @@ body {
 
 .muzzle {
     position: absolute;
-
     right: -14px;
     top: 27px;
-
     width: 28px;
     height: 20px;
-
     border-radius: 50%;
-
     background: #dcae4d;
     border: 2px solid #875e20;
 }
 
 .muzzle::after {
     content: "";
-
     position: absolute;
     right: 5px;
     top: 6px;
-
     width: 5px;
     height: 3px;
-
     border-radius: 50%;
-
     background: #392613;
-
     box-shadow: 10px 0 #392613;
 }
 
 .eye {
     position: absolute;
-
     right: 18px;
     top: 18px;
-
     width: 9px;
     height: 9px;
-
     border-radius: 50%;
-
     background: #111;
 
     box-shadow:
@@ -449,14 +403,10 @@ body {
 
 .ear {
     position: absolute;
-
     width: 27px;
     height: 18px;
-
     background: #c08b2e;
-
     border: 3px solid #80591e;
-
     border-radius: 80% 20% 70% 25%;
 }
 
@@ -476,10 +426,8 @@ body {
 
 .horn {
     position: absolute;
-
     width: 8px;
     height: 19px;
-
     background: #795524;
     border-radius: 5px;
     top: -14px;
@@ -497,10 +445,8 @@ body {
 
 .mane {
     position: absolute;
-
     left: 119px;
     top: 42px;
-
     width: 11px;
     height: 85px;
 
@@ -516,21 +462,14 @@ body {
 
 .tail {
     position: absolute;
-
     left: 28px;
     top: 112px;
-
     width: 55px;
     height: 65px;
-
     border-left: 7px solid #b17c29;
-
     border-radius: 50%;
-
     transform: rotate(20deg);
-
     transform-origin: top;
-
     animation: giraffeTail .8s ease-in-out infinite alternate;
 }
 
@@ -541,15 +480,11 @@ body {
 
 .tail-tip {
     position: absolute;
-
     left: -11px;
     bottom: -4px;
-
     width: 20px;
     height: 24px;
-
     border-radius: 50% 50% 45% 45%;
-
     background: #54341a;
 }
 
@@ -557,12 +492,9 @@ body {
 
 .leg {
     position: absolute;
-
     top: 164px;
-
     width: 22px;
     height: 82px;
-
     border-radius: 12px 12px 8px 8px;
 
     background:
@@ -574,7 +506,6 @@ body {
         );
 
     border: 3px solid #7d581e;
-
     transform-origin: top center;
 }
 
@@ -620,17 +551,12 @@ body {
 
 .leg::after {
     content: "";
-
     position: absolute;
-
     bottom: -3px;
     left: -3px;
-
     width: 22px;
     height: 12px;
-
     border-radius: 4px;
-
     background: #54351a;
 }
 
@@ -640,20 +566,13 @@ body {
 
 .bulldog-wrapper {
     position: absolute;
-
     z-index: 11;
-
     bottom: clamp(35px, 6vh, 45px);
-
     right: -225px;
-
     left: auto;
-
     width: 220px;
     height: 145px;
-
     animation: labradorWalk 18s linear infinite;
-
     pointer-events: none;
 }
 
@@ -669,10 +588,8 @@ body {
 
 .bulldog {
     position: relative;
-
     width: 220px;
     height: 145px;
-
     animation: dogBounce .28s ease-in-out infinite alternate;
 }
 
@@ -685,31 +602,23 @@ body {
 
 .dog-shadow {
     position: absolute;
-
     left: 35px;
     top: 123px;
-
     width: 160px;
     height: 13px;
-
     border-radius: 50%;
-
     background: rgba(0,0,0,.35);
-
     filter: blur(4px);
 }
 
-/* Lean Greyhound-influenced body */
+/* Body */
 
 .dog-body {
     position: absolute;
-
     left: 62px;
     top: 57px;
-
     width: 125px;
     height: 48px;
-
     border-radius: 55% 48% 45% 50%;
 
     background:
@@ -721,7 +630,6 @@ body {
         );
 
     border: 3px solid #69401f;
-
     transform: rotate(-3deg);
 
     box-shadow:
@@ -729,17 +637,14 @@ body {
         7px 9px 12px rgba(0,0,0,.35);
 }
 
-/* Lean athletic chest */
+/* Chest */
 
 .dog-chest {
     position: absolute;
-
     left: 51px;
     top: 58px;
-
     width: 42px;
     height: 58px;
-
     border-radius: 48% 42% 40% 45%;
 
     background:
@@ -752,17 +657,14 @@ body {
     border: 3px solid #69401f;
 }
 
-/* Labrador head */
+/* Head */
 
 .dog-head {
     position: absolute;
-
     left: 9px;
     top: 29px;
-
     width: 78px;
     height: 68px;
-
     border-radius: 46% 48% 48% 45%;
 
     background:
@@ -782,11 +684,10 @@ body {
     z-index: 5;
 }
 
-/* Labrador floppy ears */
+/* Ears */
 
 .dog-ear {
     position: absolute;
-
     width: 31px;
     height: 55px;
 
@@ -798,39 +699,31 @@ body {
         );
 
     border: 3px solid #4e2c17;
-
     z-index: -2;
 }
 
 .dog-ear.left {
     left: -24px;
     top: 2px;
-
     border-radius: 65% 35% 55% 45%;
-
     transform: rotate(12deg);
 }
 
 .dog-ear.right {
     right: -18px;
     top: 4px;
-
     border-radius: 35% 65% 45% 55%;
-
     transform: rotate(-14deg);
 }
 
-/* Labrador muzzle */
+/* Muzzle */
 
 .dog-muzzle {
     position: absolute;
-
     left: -9px;
     top: 47px;
-
     width: 53px;
     height: 32px;
-
     border-radius: 48%;
 
     background:
@@ -847,13 +740,10 @@ body {
 
 .dog-nose {
     position: absolute;
-
     left: -8px;
     top: 51px;
-
     width: 22px;
     height: 16px;
-
     border-radius: 48%;
 
     background:
@@ -867,18 +757,14 @@ body {
     z-index: 4;
 }
 
-/* Labrador eyes */
+/* Eyes */
 
 .dog-eye {
     position: absolute;
-
     top: 40px;
-
     width: 10px;
     height: 10px;
-
     border-radius: 50%;
-
     background: #18120e;
 
     box-shadow:
@@ -889,28 +775,23 @@ body {
 }
 
 .dog-eye.left {
-    left: 39px;
+    left: 28px;
 }
 
 .dog-eye.right {
-    left: 60px;
+    left: 50px;
 }
 
-/* Friendly mouth */
+/* Mouth */
 
 .dog-mouth {
     position: absolute;
-
     left: 2px;
     top: 66px;
-
     width: 26px;
     height: 11px;
-
     border-bottom: 3px solid #4c291a;
-
     border-radius: 0 0 50% 50%;
-
     z-index: 5;
 }
 
@@ -918,13 +799,10 @@ body {
 
 .dog-tongue {
     position: absolute;
-
     left: 8px;
     top: 75px;
-
     width: 15px;
     height: 21px;
-
     border-radius: 7px 7px 50% 50%;
 
     background:
@@ -936,11 +814,8 @@ body {
         );
 
     border: 2px solid #72313a;
-
     transform-origin: top;
-
     animation: tonguePant .55s ease-in-out infinite alternate;
-
     z-index: 3;
 }
 
@@ -954,16 +829,13 @@ body {
     }
 }
 
-/* Long Greyhound-like legs */
+/* Legs */
 
 .dog-leg {
     position: absolute;
-
     top: 91px;
-
     width: 13px;
     height: 48px;
-
     border-radius: 9px 9px 6px 6px;
 
     background:
@@ -975,23 +847,17 @@ body {
         );
 
     border: 3px solid #69401f;
-
     transform-origin: top center;
 }
 
 .dog-leg::after {
     content: "";
-
     position: absolute;
-
     left: -4px;
     bottom: -4px;
-
     width: 18px;
     height: 9px;
-
     border-radius: 50%;
-
     background: #50301b;
 }
 
@@ -1025,26 +891,19 @@ body {
     to   { transform: rotate(12deg); }
 }
 
-/* Long athletic tail */
+/* Tail */
 
 .dog-tail {
     position: absolute;
-
     left: 177px;
     top: 47px;
-
     width: 45px;
     height: 46px;
-
     border-top: 7px solid #75451f;
     border-right: 5px solid #75451f;
-
     border-radius: 0 70% 20% 0;
-
     transform: rotate(-17deg);
-
     transform-origin: left center;
-
     animation: dogTailWag .35s ease-in-out infinite alternate;
 }
 
@@ -1057,14 +916,10 @@ body {
    INTERACTION
 ========================================================= */
 
-/* Freeze animals at the actual meeting point */
-
 .giraffe-wrapper.meeting,
 .bulldog-wrapper.meeting {
     animation-play-state: paused !important;
 }
-
-/* Dog sniff */
 
 .bulldog-wrapper.sniffing .dog-head {
     transform:
@@ -1076,8 +931,6 @@ body {
 .bulldog-wrapper.sniffing .dog-nose {
     transform: translateX(-5px);
 }
-
-/* Bark */
 
 .bulldog-wrapper.barking .dog-head {
     animation:
@@ -1094,8 +947,6 @@ body {
     }
 }
 
-/* Giraffe startled */
-
 .giraffe-wrapper.startled .head {
     animation:
         giraffeStartled .16s ease-in-out 3;
@@ -1110,11 +961,6 @@ body {
         transform: rotate(-14deg) translateX(-7px);
     }
 }
-
-/*
-   THE GIRAFFE FLIPS HORIZONTALLY
-   AND THEN RUNS LEFT.
-*/
 
 .giraffe-wrapper.escape {
     animation:
@@ -1143,23 +989,17 @@ body {
     }
 }
 
-/* Sniff/bark bubbles */
+/* Sniff/Bark bubbles */
 
 .bark {
     position: fixed;
-
     z-index: 100;
-
     left: 0;
     top: 0;
-
     padding: 8px 12px;
-
     border-radius: 15px;
-
     background: rgba(255,255,255,.95);
     color: #1a1a1a;
-
     font-size: 14px;
     font-weight: 900;
 
@@ -1168,7 +1008,6 @@ body {
 
     opacity: 0;
     pointer-events: none;
-
     transform: scale(.5);
 
     transition:
@@ -1183,12 +1022,9 @@ body {
 
 .bark::after {
     content: "";
-
     position: absolute;
-
     bottom: -7px;
     left: 16px;
-
     border-width: 7px 7px 0 0;
     border-style: solid;
     border-color: white transparent transparent transparent;
@@ -1196,23 +1032,15 @@ body {
 
 .sniff {
     position: fixed;
-
     z-index: 100;
-
     padding: 6px 10px;
-
     border-radius: 12px;
-
     background: rgba(255,255,255,.9);
     color: #273d4d;
-
     font-size: 13px;
     font-weight: bold;
-
     opacity: 0;
-
     pointer-events: none;
-
     transform: scale(.7);
 
     transition:
@@ -1229,20 +1057,13 @@ body {
 
 .footer {
     position: absolute;
-
     z-index: 30;
-
     bottom: 10px;
     left: 0;
-
     width: 100%;
-
     text-align: center;
-
     color: rgba(255,255,255,.35);
-
     font-size: 10px;
-
     letter-spacing: 2px;
 }
 
@@ -1325,7 +1146,6 @@ body {
         <div class="subtitle">CHOOSE YOUR GAME</div>
     </div>
 
-
     <!-- GAME MENU -->
 
     <div class="menu">
@@ -1348,7 +1168,6 @@ body {
 
         </button>
 
-
         <button
             class="game-button"
             onclick="location.href='checkers.html'">
@@ -1366,7 +1185,6 @@ body {
             </div>
 
         </button>
-
 
         <button
             class="game-button"
@@ -1388,10 +1206,7 @@ body {
 
     </div>
 
-
-    <!-- =====================================================
-         GIRAFFE
-    ====================================================== -->
+    <!-- GIRAFFE -->
 
     <div class="giraffe-wrapper" id="giraffe">
 
@@ -1435,10 +1250,7 @@ body {
 
     </div>
 
-
-    <!-- =====================================================
-         LABRADOR / GREYHOUND HYBRID
-    ====================================================== -->
+    <!-- LABRADOR / GREYHOUND HYBRID -->
 
     <div class="bulldog-wrapper" id="bulldog">
 
@@ -1479,7 +1291,6 @@ body {
 
     </div>
 
-
     <div class="ground"></div>
 
     <div class="footer">
@@ -1495,7 +1306,6 @@ body {
     </div>
 
 </div>
-
 
 <script>
 
@@ -1649,10 +1459,6 @@ function startInteraction() {
 
     interactionRunning = true;
 
-    /*
-       Freeze both exactly where they meet.
-    */
-
     giraffe.classList.add("meeting");
     bulldog.classList.add("meeting");
 
@@ -1712,11 +1518,6 @@ function startInteraction() {
 
         giraffe.classList.remove("startled");
 
-        /*
-           Get the exact current position.
-           This prevents the giraffe from jumping.
-        */
-
         const giraffeRect =
             giraffe.getBoundingClientRect();
 
@@ -1732,15 +1533,7 @@ function startInteraction() {
             currentLeft + "px"
         );
 
-        /*
-           Remove the frozen state.
-        */
-
         giraffe.classList.remove("meeting");
-
-        /*
-           Flip and run LEFT.
-        */
 
         giraffe.classList.add("escape");
 
@@ -1754,22 +1547,12 @@ function startInteraction() {
 
     setTimeout(() => {
 
-        /*
-           Stop the escape state after the
-           giraffe has completely left the screen.
-        */
-
         giraffe.classList.remove("escape");
 
         giraffe.style.setProperty(
             "left",
             "-230px"
         );
-
-        /*
-           Restore the original giraffe
-           walking animation.
-        */
 
         giraffe.style.animation = "none";
 
@@ -1782,11 +1565,6 @@ function startInteraction() {
         giraffe.style.removeProperty(
             "--giraffe-current-left"
         );
-
-        /*
-           Put the dog back on the RIGHT side
-           so the entire encounter can happen again.
-        */
 
         bulldog.classList.remove("meeting");
 
