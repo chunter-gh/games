@@ -1,1 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Othello</title>
 
+<style>
+/* EXACT ORIGINAL APPEARANCE */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at 50% 20%, #153d2a 0%, #07150e 55%, #020603 100%);
+    color: #f4ead4;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: hidden;
+}
+
+#game {
+    width: 100%;
+    max-width: 900px;
+    min-height: 100vh;
+    padding: 18px 14px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    margin: 4px 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(38px, 8vw, 68px);
+    letter-spacing: 4px;
+    text-shadow:
+        0 3px 0 #000,
+        0 5px 14px rgba(0,0,0,.7);
+}
+
+.subtitle {
+    margin-top: 2px;
+    color: #bda77b;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 15px;
+    letter-spacing: 2px;
+}
+
+#scoreRow {
+    width: min(760px, 100%);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 16px 0 8px;
+}
+
+.scoreBox {
+    flex: 1;
+    max-width: 240px;
+    min-width: 0;
+    border: 2px solid #6b5432;
+    border-radius: 12px;
+    background:
+        linear-gradient(145deg, #151515, #050505);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 5px 12px rgba(0,0,0,.45);
+    padding: 9px 10px;
+    text-align: center;
+}
+
+.scoreLabel {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #bcae92;
+}
+
+.scoreValue {
+    font-size: 29px;
+    font-weight: bold;
+    line-height: 1.05;
+    margin-top: 3px;
+}
+
+#turnDisplay {
+    min-height: 25px;
+    margin: 3px 0 10px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    text-align: center;
+    color: #ead9b4;
+}
+
+#boardFrame {
+    padding: 8px;
+    border-radius: 10px;
+    background:
+        linear-gradient(135deg, #7a542d, #3e2817 50%, #80572d);
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.65),
+        inset 0 0 0 2px #241509;
+}
+
+#board {
+    width: min(82vw, 700px);
+    height: min(82vw, 700px);
+    max-width: 700px;
+    max-height: 700px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    background: #14502f;
+    border: 2px solid #082817;
+}
+
+.cell {
+    position: relative;
+    border: 1px solid rgba(0,0,0,.35);
+    background:
+        radial-gradient(circle at 50% 45%, #176238 0%, #12502e 65%, #0d3d23 100%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cell:hover {
+    background:
+        radial-gradient(circle at 50% 45%, #1b7040 0%, #155d35 65%, #104827 100%);
+}
+
+.cell.legal::after {
+    content: "";
+    width: 18%;
+    height: 18%;
+    border-radius: 50%;
+    background: rgba(231, 211, 163, .58);
+    box-shadow: 0 0 8px rgba(255,240,190,.35);
+}
+
+.cell.lastMove {
+    box-shadow: inset 0 0 0 3px rgba(235,213,156,.5);
+}
+
+.stone {
+    width: 82%;
+    height: 82%;
+    border-radius: 50%;
+    position: relative;
+    transform: scale(1);
+    box-shadow:
+        inset -5px -7px 9px rgba(0,0,0,.45),
+        inset 4px 4px 8px rgba(255,255,255,.16),
+        0 4px 7px rgba(0,0,0,.55);
+}
+
+.stone.black {
+    background:
+        radial-gradient(circle at 35% 28%, #555 0%, #222 18%, #090909 58%, #000 100%);
+    border: 1px solid #000;
+}
+
+.stone.white {
+    background:
+        radial-gradient(circle at 35% 28%, #fffdf5 0%, #e7e0d1 35%, #b8b0a1 75%, #898174 100%);
+    border: 1px solid #5e584f;
+}
+
+.stone.flip {
+    animation: flipStone .38s ease-in-out;
+}
+
+@keyframes flipStone {
+    0% { transform: rotateY(0deg) scale(1); }
+    48% { transform: rotateY(90deg) scale(.86); }
+    100% { transform: rotateY(180deg) scale(1); }
+}
+
+#message {
+    width: min(700px, 100%);
+    min-height: 46px;
+    margin: 12px 0 10px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid #59462c;
+    background: rgba(4,8,5,.82);
+    color: #d8c9a8;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: inset 0 1px 5px rgba(0,0,0,.5);
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: min(700px, 100%);
+}
+
+button, select {
+    appearance: none;
+    border: 1px solid #725631;
+    border-radius: 8px;
+    padding: 10px 15px;
+    background:
+        linear-gradient(180deg, #29251f, #11100d);
+    color: #eee1c6;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 3px 7px rgba(0,0,0,.35);
+}
+
+button:hover, select:hover {
+    background:
+        linear-gradient(180deg, #363026, #16130f);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+select {
+    min-width: 120px;
+}
+
+@media (max-width: 600px) {
+    #game {
+        padding-top: 10px;
+    }
+
+    h1 {
+        font-size: 42px;
+    }
+
+    .subtitle {
+        font-size: 12px;
+    }
+
+    #scoreRow {
+        margin-top: 11px;
+    }
+
+    .scoreValue {
+        font-size: 25px;
+    }
+
+    #boardFrame {
+        padding: 5px;
+    }
+
+    #message {
+        font-size: 13px;
+    }
+
+    button, select {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <h1>Othello</h1>
+    <div class="subtitle">Stone &amp; Felt Edition</div>
+
+    <div id="scoreRow">
+        <div class="scoreBox">
+            <div class="scoreLabel">BLACK</div>
+            <div class="scoreValue" id="blackScore">2</div>
+        </div>
+
+        <div class="scoreBox">
+            <div class="scoreLabel">WHITE</div>
+            <div class="scoreValue" id="whiteScore">2</div>
+        </div>
+    </div>
+
+    <div id="turnDisplay">Black's turn</div>
+
+    <div id="boardFrame">
+        <div id="board"></div>
+    </div>
+
+    <div id="message">Black starts.</div>
+
+    <div class="controls">
+        <button id="twoPlayersBtn">2 PLAYERS</button>
+        <button id="computerBtn">VS COMPUTER</button>
+
+        <select id="difficulty">
+            <option value="easy">AI: EASY</option>
+            <option value="medium">AI: MEDIUM</option>
+            <option value="hard">AI: HARD</option>
+        </select>
+
+        <button id="newGameBtn">NEW GAME</button>
+        <button id="menuBtn">MENU</button>
+    </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   OTHELLO
+   Complete-state multiplayer synchronization.
+   Appearance is intentionally unchanged.
+   ========================================================= */
+
+const SIZE = 8;
+
+const EMPTY = "";
+const BLACK = "B";
+const WHITE = "W";
+
+const DIRECTIONS = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [ 0, -1],           [ 0, 1],
+    [ 1, -1], [ 1, 0],  [ 1, 1]
+];
+
+const boardElement = document.getElementById("board");
+const blackScoreElement = document.getElementById("blackScore");
+const whiteScoreElement = document.getElementById("whiteScore");
+const turnDisplayElement = document.getElementById("turnDisplay");
+const messageElement = document.getElementById("message");
+
+const twoPlayersButton = document.getElementById("twoPlayersBtn");
+const computerButton = document.getElementById("computerBtn");
+const difficultySelect = document.getElementById("difficulty");
+const newGameButton = document.getElementById("newGameBtn");
+const menuButton = document.getElementById("menuBtn");
+
+const params = new URLSearchParams(window.location.search);
+
+const roomId = params.get("room");
+
+const rawPlayer = String(params.get("player") || "")
+    .trim()
+    .toLowerCase();
+
+const playerNumber =
+    (rawPlayer === "2" ||
+     rawPlayer === "player2" ||
+     rawPlayer === "player 2" ||
+     rawPlayer === "p2")
+        ? "2"
+        : "1";
+
+const onlineMode = !!roomId;
+
+const clientId =
+    (window.crypto &&
+     typeof window.crypto.randomUUID === "function")
+        ? window.crypto.randomUUID()
+        : (
+            Date.now().toString(36) +
+            "-" +
+            Math.random().toString(36).slice(2)
+        );
+
+const myColor = playerNumber === "2" ? WHITE : BLACK;
+const opponentColor = opposite(myColor);
+
+let boardState = createInitialBoard();
+let currentPlayer = BLACK;
+
+let gameOver = false;
+let computerThinking = false;
+let flipping = false;
+
+let socket = null;
+let socketOpen = false;
+let opponentConnected = false;
+let gameStarted = false;
+
+let lastMove = null;
+let animationTimer = null;
+
+/* =========================================================
+   BASIC BOARD FUNCTIONS
+   ========================================================= */
+
+function createInitialBoard() {
+    const board = Array.from(
+        { length: SIZE },
+        () => Array(SIZE).fill(EMPTY)
+    );
+
+    board[3][3] = WHITE;
+    board[3][4] = BLACK;
+    board[4][3] = BLACK;
+    board[4][4] = WHITE;
+
+    return board;
+}
+
+function cloneBoard(position) {
+    return position.map(row => row.slice());
+}
+
+function opposite(player) {
+    return player === BLACK ? WHITE : BLACK;
+}
+
+function inside(row, col) {
+    return (
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    );
+}
+
+function getFlips(position, row, col, player) {
+    if (!inside(row, col) || position[row][col] !== EMPTY) {
+        return [];
+    }
+
+    const enemy = opposite(player);
+    const flips = [];
+
+    for (const [dr, dc] of DIRECTIONS) {
+        const direction = [];
+
+        let r = row + dr;
+        let c = col + dc;
+
+        while (
+            inside(r, c) &&
+            position[r][c] === enemy
+        ) {
+            direction.push([r, c]);
+            r += dr;
+            c += dc;
+        }
+
+        if (
+            direction.length > 0 &&
+            inside(r, c) &&
+            position[r][c] === player
+        ) {
+            flips.push(...direction);
+        }
+    }
+
+    return flips;
+}
+
+function getLegalMoves(position, player) {
+    const moves = [];
+
+    for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+            if (
+                position[row][col] === EMPTY &&
+                getFlips(position, row, col, player).length > 0
+            ) {
+                moves.push({
+                    row,
+                    col
+                });
+            }
+        }
+    }
+
+    return moves;
+}
+
+function countPieces(position) {
+    let black = 0;
+    let white = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+            if (position[row][col] === BLACK) {
+                black++;
+            } else if (position[row][col] === WHITE) {
+                white++;
+            }
+        }
+    }
+
+    return {
+        black,
+        white
+    };
+}
+
+/* =========================================================
+   COMPLETE GAME STATE
+   ========================================================= */
+
+function getGameState() {
+    return {
+        board: cloneBoard(boardState),
+        currentPlayer,
+        gameStarted,
+        gameOver
+    };
+}
+
+function applyGameState(state) {
+    if (
+        !state ||
+        !Array.isArray(state.board) ||
+        state.board.length !== SIZE
+    ) {
+        return false;
+    }
+
+    const nextBoard = [];
+
+    for (let row = 0; row < SIZE; row++) {
+        if (!Array.isArray(state.board[row])) {
+            return false;
+        }
+
+        const nextRow = [];
+
+        for (let col = 0; col < SIZE; col++) {
+            const value = state.board[row][col];
+
+            if (
+                value !== EMPTY &&
+                value !== BLACK &&
+                value !== WHITE
+            ) {
+                return false;
+            }
+
+            nextRow.push(value);
+        }
+
+        nextBoard.push(nextRow);
+    }
+
+    boardState = nextBoard;
+
+    if (
+        state.currentPlayer === BLACK ||
+        state.currentPlayer === WHITE
+    ) {
+        currentPlayer = state.currentPlayer;
+    }
+
+    if (typeof state.gameStarted === "boolean") {
+        gameStarted = state.gameStarted;
+    }
+
+    if (typeof state.gameOver === "boolean") {
+        gameOver = state.gameOver;
+    }
+
+    lastMove = null;
+
+    if (animationTimer) {
+        clearTimeout(animationTimer);
+        animationTimer = null;
+    }
+
+    flipping = false;
+    computerThinking = false;
+
+    return true;
+}
+
+/* =========================================================
+   ONLINE CONNECTION
+   ========================================================= */
+
+function getSocketUrl() {
+    const protocol =
+        location.protocol === "https:" ? "wss:" : "ws:";
+
+    return protocol + "//" + location.host + "/othello";
+}
+
+function sendSocket(message) {
+    if (
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+    ) {
+        return false;
+    }
+
+    try {
+        socket.send(JSON.stringify(message));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function connectToRoom() {
+    if (!onlineMode) {
+        return;
+    }
+
+    messageElement.textContent = "Connecting to room...";
+
+    socket = new WebSocket(getSocketUrl());
+
+    socket.addEventListener("open", () => {
+        socketOpen = true;
+        opponentConnected = true;
+
+        sendSocket({
+            type: "othelloJoin",
+            game: "othello",
+            room: roomId,
+            player: playerNumber,
+            color: myColor === BLACK ? "black" : "white",
+            clientId
+        });
+
+        /*
+         * Player 1 is the source of the initial complete state.
+         * If a game is already underway, this sends the current
+         * state instead of resetting it.
+         */
+        if (playerNumber === "1") {
+            gameStarted = true;
+
+            sendSocket({
+                type: "othelloState",
+                game: "othello",
+                room: roomId,
+                player: playerNumber,
+                clientId,
+                state: getGameState()
+            });
+        }
+
+        updateDisplay();
+        renderBoard();
+    });
+
+    socket.addEventListener("message", event => {
+        let message;
+
+        try {
+            message = JSON.parse(event.data);
+        } catch {
+            return;
+        }
+
+        handleOnlineMessage(message);
+    });
+
+    socket.addEventListener("close", () => {
+        socketOpen = false;
+
+        if (!gameOver) {
+            opponentConnected = false;
+            updateDisplay();
+        }
+    });
+
+    socket.addEventListener("error", () => {
+        socketOpen = false;
+        opponentConnected = false;
+
+        if (!gameOver) {
+            messageElement.textContent =
+                "Connection error.";
+        }
+
+        updateDisplay();
+    });
+}
+
+/* =========================================================
+   ONLINE MESSAGE HANDLING
+   ========================================================= */
+
+function handleOnlineMessage(message) {
+    /*
+     * The server echoes messages to the sender.
+     * Ignore our own messages.
+     */
+    if (
+        message.clientId &&
+        message.clientId === clientId
+    ) {
+        return;
+    }
+
+    if (
+        message.game &&
+        String(message.game).toLowerCase() !== "othello"
+    ) {
+        return;
+    }
+
+    if (
+        onlineMode &&
+        message.room &&
+        String(message.room) !== String(roomId)
+    ) {
+        return;
+    }
+
+    /*
+     * Online game messages must identify their room.
+     */
+    if (
+        onlineMode &&
+        (
+            message.type === "othelloMove" ||
+            message.type === "othelloJoin" ||
+            message.type === "othelloState" ||
+            message.type === "othelloPass" ||
+            message.type === "othelloGameOver" ||
+            message.type === "othelloNewGame"
+        ) &&
+        !message.room
+    ) {
+        return;
+    }
+
+    if (message.type === "othelloJoin") {
+        opponentConnected = true;
+
+        /*
+         * Player 1 supplies the current complete state when
+         * another player joins.
+         */
+        if (playerNumber === "1") {
+            sendSocket({
+                type: "othelloState",
+                game: "othello",
+                room: roomId,
+                player: playerNumber,
+                clientId,
+                state: getGameState()
+            });
+        }
+
+        updateDisplay();
+        return;
+    }
+
+    if (message.type === "othelloConnected") {
+        opponentConnected = true;
+
+        if (playerNumber === "1") {
+            sendSocket({
+                type: "othelloState",
+                game: "othello",
+                room: roomId,
+                player: playerNumber,
+                clientId,
+                state: getGameState()
+            });
+        }
+
+        updateDisplay();
+        return;
+    }
+
+    /*
+     * The important multiplayer rule:
+     *
+     * A move message contains the COMPLETE FINAL state.
+     * We replace our local state with that state.
+     *
+     * We do NOT reconstruct the opponent's move.
+     * We do NOT apply flips a second time.
+     * We do NOT generate another pass/game-over message.
+     */
+    if (message.type === "othelloMove") {
+        opponentConnected = true;
+
+        if (
+            message.state &&
+            applyGameState(message.state)
+        ) {
+            renderBoard();
+            updateDisplay();
+        }
+
+        return;
+    }
+
+    if (message.type === "othelloState") {
+        opponentConnected = true;
+
+        if (
+            message.state &&
+            applyGameState(message.state)
+        ) {
+            renderBoard();
+            updateDisplay();
+        }
+
+        return;
+    }
+
+    /*
+     * Compatibility with older clients/server messages.
+     * New code does not send these as a second message after
+     * a move, but it can still safely accept them.
+     */
+    if (message.type === "othelloPass") {
+        opponentConnected = true;
+
+        if (
+            message.state &&
+            applyGameState(message.state)
+        ) {
+            renderBoard();
+            updateDisplay();
+        }
+
+        return;
+    }
+
+    if (message.type === "othelloGameOver") {
+        opponentConnected = true;
+
+        if (
+            message.state &&
+            applyGameState(message.state)
+        ) {
+            gameOver = true;
+        } else {
+            gameOver = true;
+        }
+
+        renderBoard();
+        updateDisplay();
+
+        return;
+    }
+
+    if (message.type === "othelloNewGame") {
+        opponentConnected = true;
+
+        if (
+            message.state &&
+            applyGameState(message.state)
+        ) {
+            gameOver = false;
+        } else {
+            boardState = createInitialBoard();
+            currentPlayer = BLACK;
+            gameStarted = true;
+            gameOver = false;
+            lastMove = null;
+        }
+
+        renderBoard();
+        updateDisplay();
+
+        return;
+    }
+
+    if (message.type === "othelloDisconnect") {
+        opponentConnected = false;
+        updateDisplay();
+    }
+}
+
+/* =========================================================
+   GAME RESOLUTION
+   ========================================================= */
+
+/*
+ * Resolve everything caused by the just-completed move:
+ *
+ * 1. Switch player.
+ * 2. If that player has no move, pass automatically.
+ * 3. If neither player can move, end the game.
+ *
+ * This is deliberately completed BEFORE the network state is sent.
+ * Therefore one physical move produces ONE final state.
+ */
+function resolveAfterMove() {
+    let nextPlayer = opposite(currentPlayer);
+
+    const nextMoves = getLegalMoves(
+        boardState,
+        nextPlayer
+    );
+
+    if (nextMoves.length > 0) {
+        currentPlayer = nextPlayer;
+        return;
+    }
+
+    const previousPlayer = opposite(nextPlayer);
+
+    const previousMoves = getLegalMoves(
+        boardState,
+        previousPlayer
+    );
+
+    if (previousMoves.length > 0) {
+        /*
+         * Automatic pass.
+         * The final state simply has the original player
+         * as currentPlayer again.
+         */
+        currentPlayer = previousPlayer;
+        return;
+    }
+
+    /*
+     * Neither side can move.
+     */
+    currentPlayer = nextPlayer;
+    gameOver = true;
+}
+
+/* =========================================================
+   MAKE MOVE
+   ========================================================= */
+
+function makeMove(row, col) {
+    if (gameOver || flipping) {
+        return;
+    }
+
+    if (onlineMode) {
+        if (!socketOpen) {
+            messageElement.textContent =
+                "Waiting for the room connection...";
+            return;
+        }
+
+        if (!opponentConnected) {
+            messageElement.textContent =
+                "Waiting for the other player...";
+            return;
+        }
+
+        if (!gameStarted) {
+            messageElement.textContent =
+                "Waiting for the game to start...";
+            return;
+        }
+
+        if (currentPlayer !== myColor) {
+            return;
+        }
+    } else {
+        if (computerThinking) {
+            return;
+        }
+    }
+
+    if (boardState[row][col] !== EMPTY) {
+        return;
+    }
+
+    const player = currentPlayer;
+
+    const flips = getFlips(
+        boardState,
+        row,
+        col,
+        player
+    );
+
+    if (flips.length === 0) {
+        return;
+    }
+
+    /*
+     * Apply the move locally first.
+     */
+    boardState[row][col] = player;
+
+    for (const [r, c] of flips) {
+        boardState[r][c] = player;
+    }
+
+    lastMove = {
+        row,
+        col
+    };
+
+    /*
+     * Fully resolve the resulting position BEFORE sending it.
+     */
+    resolveAfterMove();
+
+    gameStarted = true;
+
+    /*
+     * ONLINE:
+     * Exactly ONE complete final state is sent.
+     *
+     * No separate pass message.
+     * No separate game-over message.
+     * No move reconstruction on the receiving side.
+     */
+    if (onlineMode) {
+        sendSocket({
+            type: "othelloMove",
+            game: "othello",
+            room: roomId,
+            player: playerNumber,
+            color: player,
+            clientId,
+            state: getGameState()
+        });
+    }
+
+    /*
+     * Render the move locally.
+     */
+    flipping = true;
+
+    renderBoard();
+
+    animationTimer = setTimeout(() => {
+        animationTimer = null;
+        flipping = false;
+
+        updateDisplay();
+
+        if (!onlineMode && !gameOver) {
+            if (currentPlayer === WHITE) {
+                startComputerTurn();
+            }
+        }
+    }, 380);
+
+    updateDisplay();
+}
+
+/* =========================================================
+   BOARD RENDERING
+   ========================================================= */
+
+function renderBoard() {
+    boardElement.innerHTML = "";
+
+    for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+            const cell = document.createElement("div");
+
+            cell.className = "cell";
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+
+            const value = boardState[row][col];
+
+            if (
+                !gameOver &&
+                !flipping &&
+                !computerThinking &&
+                canHumanPlayCurrentTurn()
+            ) {
+                if (
+                    value === EMPTY &&
+                    getFlips(
+                        boardState,
+                        row,
+                        col,
+                        currentPlayer
+                    ).length > 0
+                ) {
+                    cell.classList.add("legal");
+                }
+            }
+
+            if (
+                lastMove &&
+                lastMove.row === row &&
+                lastMove.col === col
+            ) {
+                cell.classList.add("lastMove");
+            }
+
+            if (value === BLACK || value === WHITE) {
+                const stone = document.createElement("div");
+
+                stone.className =
+                    "stone " +
+                    (value === BLACK ? "black" : "white");
+
+                if (
+                    lastMove &&
+                    lastMove.row === row &&
+                    lastMove.col === col
+                ) {
+                    stone.classList.add("flip");
+                }
+
+                cell.appendChild(stone);
+            }
+
+            cell.addEventListener("click", () => {
+                makeMove(row, col);
+            });
+
+            boardElement.appendChild(cell);
+        }
+    }
+}
+
+/* =========================================================
+   TURN / DISPLAY
+   ========================================================= */
+
+function canHumanPlayCurrentTurn() {
+    if (onlineMode) {
+        return (
+            socketOpen &&
+            opponentConnected &&
+            gameStarted &&
+            currentPlayer === myColor
+        );
+    }
+
+    return currentPlayer === BLACK;
+}
+
+function updateDisplay() {
+    const counts = countPieces(boardState);
+
+    blackScoreElement.textContent = counts.black;
+    whiteScoreElement.textContent = counts.white;
+
+    if (gameOver) {
+        turnDisplayElement.textContent = "Game Over";
+
+        if (counts.black > counts.white) {
+            messageElement.textContent =
+                "Black wins " +
+                counts.black +
+                " to " +
+                counts.white +
+                ".";
+        } else if (counts.white > counts.black) {
+            messageElement.textContent =
+                "White wins " +
+                counts.white +
+                " to " +
+                counts.black +
+                ".";
+        } else {
+            messageElement.textContent =
+                "The game is a draw.";
+        }
+
+        return;
+    }
+
+    const playerName =
+        currentPlayer === BLACK ? "Black" : "White";
+
+    if (onlineMode) {
+        if (!socketOpen) {
+            turnDisplayElement.textContent =
+                "Connecting...";
+            messageElement.textContent =
+                "Connecting to room...";
+            return;
+        }
+
+        if (!opponentConnected) {
+            turnDisplayElement.textContent =
+                "Waiting...";
+            messageElement.textContent =
+                "Waiting for the other player...";
+            return;
+        }
+
+        if (!gameStarted) {
+            turnDisplayElement.textContent =
+                "Waiting...";
+            messageElement.textContent =
+                "Waiting for the game to start...";
+            return;
+        }
+
+        if (currentPlayer === myColor) {
+            turnDisplayElement.textContent =
+                "Your turn — " + playerName;
+            messageElement.textContent =
+                "Your move.";
+        } else {
+            turnDisplayElement.textContent =
+                "Opponent's turn — " + playerName;
+            messageElement.textContent =
+                "Waiting for the other player.";
+        }
+
+        return;
+    }
+
+    turnDisplayElement.textContent =
+        playerName + "'s turn";
+
+    if (currentPlayer === BLACK) {
+        messageElement.textContent =
+            "Black's turn.";
+    } else if (computerThinking) {
+        messageElement.textContent =
+            "White is thinking...";
+    } else {
+        messageElement.textContent =
+            "White's turn.";
+    }
+}
+
+/* =========================================================
+   COMPUTER PLAYER
+   ========================================================= */
+
+function startComputerTurn() {
+    if (
+        onlineMode ||
+        gameOver ||
+        currentPlayer !== WHITE ||
+        computerThinking
+    ) {
+        return;
+    }
+
+    computerThinking = true;
+    renderBoard();
+    updateDisplay();
+
+    setTimeout(() => {
+        if (
+            gameOver ||
+            currentPlayer !== WHITE
+        ) {
+            computerThinking = false;
+            renderBoard();
+            updateDisplay();
+            return;
+        }
+
+        const moves = getLegalMoves(
+            boardState,
+            WHITE
+        );
+
+        if (moves.length === 0) {
+            computerThinking = false;
+
+            const blackMoves = getLegalMoves(
+                boardState,
+                BLACK
+            );
+
+            if (blackMoves.length > 0) {
+                currentPlayer = BLACK;
+                renderBoard();
+                updateDisplay();
+            } else {
+                gameOver = true;
+                renderBoard();
+                updateDisplay();
+            }
+
+            return;
+        }
+
+        const move = chooseComputerMove();
+
+        computerThinking = false;
+
+        if (move) {
+            makeMove(move.row, move.col);
+        } else {
+            renderBoard();
+            updateDisplay();
+        }
+    }, 350);
+}
+
+function chooseComputerMove() {
+    const difficulty = difficultySelect.value;
+
+    const moves = getLegalMoves(
+        boardState,
+        WHITE
+    );
+
+    if (!moves.length) {
+        return null;
+    }
+
+    if (difficulty === "easy") {
+        return moves[
+            Math.floor(Math.random() * moves.length)
+        ];
+    }
+
+    const depth =
+        difficulty === "hard" ? 5 : 3;
+
+    let bestScore = -Infinity;
+    let bestMoves = [];
+
+    for (const move of moves) {
+        const next = applyMoveToCopy(
+            boardState,
+            move.row,
+            move.col,
+            WHITE
+        );
+
+        const score =
+            minimax(
+                next,
+                BLACK,
+                depth - 1,
+                -Infinity,
+                Infinity
+            );
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestMoves = [move];
+        } else if (score === bestScore) {
+            bestMoves.push(move);
+        }
+    }
+
+    return bestMoves[
+        Math.floor(Math.random() * bestMoves.length)
+    ];
+}
+
+function applyMoveToCopy(position, row, col, player) {
+    const next = cloneBoard(position);
+
+    const flips = getFlips(
+        next,
+        row,
+        col,
+        player
+    );
+
+    next[row][col] = player;
+
+    for (const [r, c] of flips) {
+        next[r][c] = player;
+    }
+
+    return next;
+}
+
+function minimax(
+    position,
+    player,
+    depth,
+    alpha,
+    beta
+) {
+    const moves = getLegalMoves(
+        position,
+        player
+    );
+
+    const opponent = opposite(player);
+
+    if (depth <= 0) {
+        return evaluateBoard(position);
+    }
+
+    if (moves.length === 0) {
+        const opponentMoves =
+            getLegalMoves(
+                position,
+                opponent
+            );
+
+        if (opponentMoves.length === 0) {
+            return evaluateBoard(position);
+        }
+
+        return minimax(
+            position,
+            opponent,
+            depth - 1,
+            alpha,
+            beta
+        );
+    }
+
+    if (player === WHITE) {
+        let value = -Infinity;
+
+        for (const move of moves) {
+            const next =
+                applyMoveToCopy(
+                    position,
+                    move.row,
+                    move.col,
+                    player
+                );
+
+            value = Math.max(
+                value,
+                minimax(
+                    next,
+                    opponent,
+                    depth - 1,
+                    alpha,
+                    beta
+                )
+            );
+
+            alpha = Math.max(alpha, value);
+
+            if (beta <= alpha) {
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    let value = Infinity;
+
+    for (const move of moves) {
+        const next =
+            applyMoveToCopy(
+                position,
+                move.row,
+                move.col,
+                player
+            );
+
+        value = Math.min(
+            value,
+            minimax(
+                next,
+                opponent,
+                depth - 1,
+                alpha,
+                beta
+            )
+        );
+
+        beta = Math.min(beta, value);
+
+        if (beta <= alpha) {
+            break;
+        }
+    }
+
+    return value;
+}
+
+const POSITION_WEIGHTS = [
+    [120, -25, 20, 5, 5, 20, -25, 120],
+    [-25, -45, -5, -5, -5, -5, -45, -25],
+    [20, -5, 15, 3, 3, 15, -5, 20],
+    [5, -5, 3, 3, 3, 3, -5, 5],
+    [5, -5, 3, 3, 3, 3, -5, 5],
+    [20, -5, 15, 3, 3, 15, -5, 20],
+    [-25, -45, -5, -5, -5, -5, -45, -25],
+    [120, -25, 20, 5, 5, 20, -25, 120]
+];
+
+function evaluateBoard(position) {
+    let score = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+            if (position[row][col] === WHITE) {
+                score += POSITION_WEIGHTS[row][col];
+            } else if (position[row][col] === BLACK) {
+                score -= POSITION_WEIGHTS[row][col];
+            }
+        }
+    }
+
+    const counts = countPieces(position);
+
+    score +=
+        (counts.white - counts.black) * 2;
+
+    const whiteMoves =
+        getLegalMoves(position, WHITE).length;
+
+    const blackMoves =
+        getLegalMoves(position, BLACK).length;
+
+    score +=
+        (whiteMoves - blackMoves) * 5;
+
+    return score;
+}
+
+/* =========================================================
+   NEW GAME
+   ========================================================= */
+
+function startNewGame() {
+    if (onlineMode) {
+        /*
+         * Keep the existing room model:
+         * Player 1 starts a new online game.
+         */
+        if (playerNumber !== "1") {
+            messageElement.textContent =
+                "Player 1 starts the new game.";
+            return;
+        }
+
+        boardState = createInitialBoard();
+        currentPlayer = BLACK;
+        gameOver = false;
+        gameStarted = true;
+        computerThinking = false;
+        flipping = false;
+        lastMove = null;
+
+        if (animationTimer) {
+            clearTimeout(animationTimer);
+            animationTimer = null;
+        }
+
+        renderBoard();
+        updateDisplay();
+
+        sendSocket({
+            type: "othelloNewGame",
+            game: "othello",
+            room: roomId,
+            player: playerNumber,
+            clientId,
+            state: getGameState()
+        });
+
+        return;
+    }
+
+    boardState = createInitialBoard();
+    currentPlayer = BLACK;
+    gameOver = false;
+    gameStarted = true;
+    computerThinking = false;
+    flipping = false;
+    lastMove = null;
+
+    if (animationTimer) {
+        clearTimeout(animationTimer);
+        animationTimer = null;
+    }
+
+    renderBoard();
+    updateDisplay();
+}
+
+/* =========================================================
+   GAME MODE BUTTONS
+   ========================================================= */
+
+twoPlayersButton.addEventListener("click", () => {
+    if (onlineMode) {
+        messageElement.textContent =
+            "This room is a 2-player game.";
+        return;
+    }
+
+    startNewGame();
+});
+
+computerButton.addEventListener("click", () => {
+    if (onlineMode) {
+        messageElement.textContent =
+            "This room is a 2-player game.";
+        return;
+    }
+
+    startNewGame();
+});
+
+difficultySelect.addEventListener("change", () => {
+    if (!onlineMode) {
+        updateDisplay();
+    }
+});
+
+newGameButton.addEventListener("click", () => {
+    startNewGame();
+});
+
+menuButton.addEventListener("click", () => {
+    window.location.href = "index.html";
+});
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+gameStarted = !onlineMode;
+
+renderBoard();
+updateDisplay();
+
+if (onlineMode) {
+    connectToRoom();
+}
+</script>
+
+</body>
+</html>
