@@ -263,11 +263,6 @@ button.active {
 
     overflow: hidden;
 
-    /*
-       IMPORTANT:
-       Keep the game centered and prevent the seven-column
-       layout from becoming excessively wide in landscape.
-    */
     width: 100%;
     max-width: 1100px;
 
@@ -1002,10 +997,6 @@ button.active {
         min-height: 27px;
     }
 
-    /*
-       In short landscape screens, give the table as much
-       horizontal room as possible while keeping it centered.
-    */
     .table {
         max-width: 100%;
     }
@@ -2608,97 +2599,235 @@ function flipTopCardAfterMove() {
 }
 
 
+/* =========================================================
+   AUTOMATIC ACE MOVEMENT
+   ========================================================= */
+
+function autoMoveAces() {
+
+    let moved = true;
+
+    while (moved) {
+
+        moved = false;
+
+
+        /*
+           Check the waste pile.
+        */
+
+        if (waste.length) {
+
+            const card =
+                waste[waste.length - 1];
+
+            if (card.rank === "A") {
+
+                const foundationIndex =
+                    SUITS.indexOf(card.suit);
+
+                if (
+                    foundationIndex >= 0 &&
+                    canPlaceOnFoundation(
+                        card,
+                        foundationIndex
+                    )
+                ) {
+
+                    selectedCards = {
+                        card: card,
+                        source: "waste",
+                        index: waste.length - 1,
+                        sequence: [card]
+                    };
+
+                    moveSelectedToFoundation(
+                        foundationIndex
+                    );
+
+                    moved = true;
+
+                    continue;
+                }
+            }
+        }
+
+
+        /*
+           Check all seven tableau columns.
+        */
+
+        for (
+            let c = 0;
+            c < tableau.length;
+            c++
+        ) {
+
+            const column =
+                tableau[c];
+
+            if (!column.length) {
+                continue;
+            }
+
+            const index =
+                column.length - 1;
+
+            const card =
+                column[index];
+
+            if (
+                !card.faceUp ||
+                card.rank !== "A"
+            ) {
+                continue;
+            }
+
+            const foundationIndex =
+                SUITS.indexOf(card.suit);
+
+            if (
+                foundationIndex >= 0 &&
+                canPlaceOnFoundation(
+                    card,
+                    foundationIndex
+                )
+            ) {
+
+                selectedCards = {
+                    card: card,
+                    source: "tableau-" + c,
+                    index: index,
+                    sequence: [card]
+                };
+
+                moveSelectedToFoundation(
+                    foundationIndex
+                );
+
+                moved = true;
+
+                break;
+            }
+        }
+    }
+}
+
+
+/* =========================================================
+   AUTO MOVE
+   ========================================================= */
+
 function autoMove() {
 
-    selectedCards = null;
+    let movedAnything = false;
+
+    let moved = true;
+
+    while (moved) {
+
+        moved = false;
 
 
-    if (waste.length) {
+        /*
+           CHECK WASTE
+        */
 
-        const card =
-            waste[waste.length - 1];
+        if (waste.length) {
 
-        for (
-            let f = 0;
-            f < 4;
-            f++
-        ) {
+            const card =
+                waste[waste.length - 1];
+
+            const foundationIndex =
+                SUITS.indexOf(card.suit);
 
             if (
+                foundationIndex >= 0 &&
                 canPlaceOnFoundation(
                     card,
-                    f
+                    foundationIndex
                 )
             ) {
 
                 selectedCards = {
-                    card,
+                    card: card,
                     source: "waste",
-                    index:
-                        waste.length - 1,
+                    index: waste.length - 1,
                     sequence: [card]
                 };
 
-                moveSelectedToFoundation(f);
+                moveSelectedToFoundation(
+                    foundationIndex
+                );
 
-                return true;
+                moved = true;
+
+                movedAnything = true;
+
+                continue;
             }
         }
-    }
 
 
-    for (
-        let c = 0;
-        c < 7;
-        c++
-    ) {
-
-        const column =
-            tableau[c];
-
-        if (!column.length) {
-            continue;
-        }
-
-        const index =
-            column.length - 1;
-
-        const card =
-            column[index];
-
-        if (!card.faceUp) {
-            continue;
-        }
+        /*
+           CHECK TABLEAU
+        */
 
         for (
-            let f = 0;
-            f < 4;
-            f++
+            let c = 0;
+            c < tableau.length;
+            c++
         ) {
 
+            const column =
+                tableau[c];
+
+            if (!column.length) {
+                continue;
+            }
+
+            const index =
+                column.length - 1;
+
+            const card =
+                column[index];
+
+            if (!card.faceUp) {
+                continue;
+            }
+
+            const foundationIndex =
+                SUITS.indexOf(card.suit);
+
             if (
+                foundationIndex >= 0 &&
                 canPlaceOnFoundation(
                     card,
-                    f
+                    foundationIndex
                 )
             ) {
 
                 selectedCards = {
-                    card,
-                    source:
-                        "tableau-" + c,
-                    index,
+                    card: card,
+                    source: "tableau-" + c,
+                    index: index,
                     sequence: [card]
                 };
 
-                moveSelectedToFoundation(f);
+                moveSelectedToFoundation(
+                    foundationIndex
+                );
 
-                return true;
+                moved = true;
+
+                movedAnything = true;
+
+                break;
             }
         }
     }
 
-    return false;
+    return movedAnything;
 }
 
 
@@ -2707,6 +2836,17 @@ document
     .addEventListener(
         "click",
         () => {
+
+            /*
+               First move every available Ace.
+            */
+
+            autoMoveAces();
+
+            /*
+               Then continue normal automatic
+               foundation moves.
+            */
 
             let moved = true;
 
