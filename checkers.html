@@ -1,0 +1,2566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Game Room - Checkers</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at 50% 0%, #263b72 0%, #101a39 42%, #060b19 100%);
+    color: white;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 10px;
+    overflow: hidden;
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(22px, 4vw, 40px);
+    letter-spacing: 4px;
+    text-shadow:
+        0 2px 4px #000,
+        0 0 15px rgba(255,255,255,.15);
+    flex-shrink: 0;
+}
+
+.subtitle {
+    margin: 1px 0 5px;
+    font-size: clamp(10px, 1.7vw, 15px);
+    letter-spacing: 2px;
+    opacity: .75;
+    flex-shrink: 0;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+button,
+select {
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 8px;
+    background:
+        linear-gradient(145deg, #394e82, #18264d);
+    color: white;
+    font-weight: bold;
+    padding: 6px 10px;
+    font-size: clamp(10px, 1.6vw, 14px);
+    box-shadow:
+        0 3px 7px rgba(0,0,0,.45),
+        inset 0 1px 1px rgba(255,255,255,.15);
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    background:
+        linear-gradient(145deg, #4c649f, #223665);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+select {
+    cursor: pointer;
+}
+
+.status {
+    min-height: 24px;
+    padding: 3px 12px;
+    margin-bottom: 4px;
+    border-radius: 20px;
+    background: rgba(0,0,0,.30);
+    border: 1px solid rgba(255,255,255,.14);
+    font-size: clamp(11px, 1.8vw, 16px);
+    font-weight: bold;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.board-area {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.board {
+    width: var(--board-size);
+    height: var(--board-size);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+
+    border-radius: 12px;
+    padding: 5px;
+
+    background:
+        linear-gradient(145deg, #080b12, #222838 45%, #05070c);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.65),
+        0 0 0 2px rgba(255,255,255,.10),
+        inset 0 2px 3px rgba(255,255,255,.18),
+        inset 0 -4px 8px rgba(0,0,0,.75);
+
+    flex-shrink: 0;
+}
+
+.square {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+.light {
+    background:
+        linear-gradient(135deg,
+            #b52a2a 0%,
+            #7d1117 42%,
+            #48080d 100%);
+    box-shadow:
+        inset 1px 1px 2px rgba(255,255,255,.16),
+        inset -2px -2px 4px rgba(0,0,0,.30);
+}
+
+.dark {
+    background:
+        linear-gradient(135deg,
+            #121722 0%,
+            #070a10 45%,
+            #020307 100%);
+    box-shadow:
+        inset 1px 1px 2px rgba(255,255,255,.09),
+        inset -2px -2px 4px rgba(0,0,0,.55);
+}
+
+.square.selected {
+    box-shadow:
+        inset 0 0 0 3px #ffd84a,
+        inset 0 0 15px rgba(255,216,74,.45);
+}
+
+.square.move-target::after {
+    content: "";
+    position: absolute;
+    width: 24%;
+    height: 24%;
+    border-radius: 50%;
+    background: rgba(255,216,74,.85);
+    box-shadow:
+        0 0 10px rgba(255,216,74,.9);
+    pointer-events: none;
+}
+
+.square.capture-target::after {
+    content: "";
+    position: absolute;
+    width: 31%;
+    height: 31%;
+    border-radius: 50%;
+    border: 3px solid #ffd84a;
+    box-shadow:
+        0 0 12px rgba(255,216,74,.9);
+    pointer-events: none;
+}
+
+.piece {
+    position: relative;
+    width: 82%;
+    height: 82%;
+    border-radius: 50%;
+    z-index: 5;
+    cursor: pointer;
+    transform: translateY(-1%);
+    box-shadow:
+        0 5px 5px rgba(0,0,0,.65),
+        0 2px 2px rgba(0,0,0,.75);
+    transition:
+        transform .12s ease,
+        filter .12s ease;
+}
+
+.piece:hover {
+    transform: translateY(-4%) scale(1.04);
+}
+
+.piece.red {
+    background:
+        radial-gradient(
+            circle at 32% 24%,
+            #ffb0b0 0%,
+            #ff5959 8%,
+            #e71925 23%,
+            #a90712 52%,
+            #69050b 77%,
+            #340207 100%
+        );
+    border: 2px solid #51040a;
+    box-shadow:
+        0 5px 6px rgba(0,0,0,.72),
+        inset 0 3px 3px rgba(255,255,255,.45),
+        inset 0 -5px 6px rgba(0,0,0,.45),
+        0 0 7px rgba(255,30,30,.20);
+}
+
+.piece.black {
+    background:
+        radial-gradient(
+            circle at 32% 24%,
+            #9fa8b8 0%,
+            #515a69 7%,
+            #242b37 22%,
+            #10151d 48%,
+            #070a0f 74%,
+            #020306 100%
+        );
+    border: 2px solid #010205;
+    box-shadow:
+        0 5px 6px rgba(0,0,0,.80),
+        inset 0 3px 3px rgba(255,255,255,.30),
+        inset 0 -5px 7px rgba(0,0,0,.72),
+        0 0 7px rgba(255,255,255,.10);
+}
+
+.piece::before {
+    content: "";
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    pointer-events: none;
+    border: 2px solid rgba(255,255,255,.20);
+    box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,.24),
+        inset 0 0 0 5px rgba(255,255,255,.10),
+        inset 0 0 0 7px rgba(0,0,0,.20);
+}
+
+.piece::after {
+    content: "";
+    position: absolute;
+    left: 23%;
+    top: 23%;
+    width: 54%;
+    height: 54%;
+    border-radius: 50%;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,.22);
+    box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,.20),
+        0 1px 1px rgba(255,255,255,.16);
+}
+
+.piece .rim {
+    position: absolute;
+    left: 5%;
+    top: 42%;
+    width: 90%;
+    height: 48%;
+    border-radius: 0 0 50% 50%;
+    border-bottom: 3px solid rgba(0,0,0,.35);
+    pointer-events: none;
+}
+
+.piece .shine {
+    position: absolute;
+    left: 19%;
+    top: 10%;
+    width: 35%;
+    height: 18%;
+    border-radius: 50%;
+    transform: rotate(-22deg);
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,.48),
+        rgba(255,255,255,0)
+    );
+    filter: blur(.4px);
+    pointer-events: none;
+}
+
+.piece.king {
+    transform: translateY(-5%);
+}
+
+.piece.king .king-stack {
+    position: absolute;
+    left: 0;
+    top: 11%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.piece.red.king .king-stack {
+    background:
+        radial-gradient(
+            circle at 32% 24%,
+            #ff8585 0%,
+            #d71922 24%,
+            #8d0710 58%,
+            #470308 100%
+        );
+    border: 2px solid #4b0308;
+    box-shadow:
+        0 4px 5px rgba(0,0,0,.75),
+        inset 0 2px 3px rgba(255,255,255,.25);
+}
+
+.piece.black.king .king-stack {
+    background:
+        radial-gradient(
+            circle at 32% 24%,
+            #737d8e 0%,
+            #343b48 23%,
+            #11161e 58%,
+            #030407 100%
+        );
+    border: 2px solid #010204;
+    box-shadow:
+        0 4px 5px rgba(0,0,0,.78),
+        inset 0 2px 3px rgba(255,255,255,.20);
+}
+
+.piece.king .king-stack::before {
+    content: "";
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.14);
+    box-shadow:
+        inset 0 0 0 3px rgba(0,0,0,.25);
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 20px;
+    margin-top: 3px;
+    font-size: clamp(9px, 1.4vw, 12px);
+    opacity: .72;
+    flex-shrink: 0;
+}
+
+.legend span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 1px 2px #000;
+}
+
+.dot.red {
+    background: #d71922;
+}
+
+.dot.black {
+    background: #111;
+    border: 1px solid #555;
+}
+
+.footer {
+    min-height: 15px;
+    margin-top: 2px;
+    font-size: clamp(7px, 1.1vw, 10px);
+    letter-spacing: 1px;
+    opacity: .35;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .game {
+        padding: 5px 5px;
+    }
+
+    h1 {
+        letter-spacing: 2px;
+    }
+
+    .subtitle {
+        letter-spacing: 1px;
+    }
+
+    .controls {
+        gap: 4px;
+        margin-bottom: 3px;
+    }
+
+    button,
+    select {
+        padding: 5px 7px;
+        border-radius: 6px;
+    }
+
+    .status {
+        margin-bottom: 2px;
+    }
+
+    .board {
+        padding: 3px;
+        border-radius: 8px;
+    }
+
+    .piece {
+        width: 84%;
+        height: 84%;
+    }
+
+    .legend {
+        margin-top: 1px;
+        gap: 8px;
+    }
+
+    .footer {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <h1>CHECKERS</h1>
+
+    <div class="subtitle">
+        CLASSIC • GLOSSY • TWO PLAYER
+    </div>
+
+    <div class="controls">
+
+        <button id="twoPlayerBtn">2 PLAYERS</button>
+
+        <button id="computerBtn">VS COMPUTER</button>
+
+        <select id="difficulty">
+            <option value="easy">EASY</option>
+            <option value="medium" selected>MEDIUM</option>
+            <option value="hard">HARD</option>
+        </select>
+
+        <button id="newGameBtn">NEW GAME</button>
+
+        <button id="menuBtn">GAME ROOM</button>
+
+    </div>
+
+    <div class="status" id="status">Red's turn</div>
+
+    <div class="board-area" id="boardArea">
+        <div class="board" id="board"></div>
+    </div>
+
+    <div class="legend">
+        <span><i class="dot red"></i>RED</span>
+        <span><i class="dot black"></i>BLACK</span>
+        <span>STACKED = KING</span>
+    </div>
+
+    <div class="footer">
+        GAME ROOM • CHECKERS
+    </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   ROOM INFORMATION
+   ========================================================= */
+
+const params = new URLSearchParams(window.location.search);
+
+const roomId = params.get("room");
+const playerNumber = params.get("player");
+const playerRole = params.get("role");
+
+const onlineMode = !!roomId;
+
+let socket = null;
+let socketReady = false;
+let opponentConnected = false;
+
+const myColor =
+    playerNumber === "2" ? "b" : "r";
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const boardElement =
+    document.getElementById("board");
+
+const boardArea =
+    document.getElementById("boardArea");
+
+const statusElement =
+    document.getElementById("status");
+
+const twoPlayerBtn =
+    document.getElementById("twoPlayerBtn");
+
+const computerBtn =
+    document.getElementById("computerBtn");
+
+const difficultySelect =
+    document.getElementById("difficulty");
+
+const newGameBtn =
+    document.getElementById("newGameBtn");
+
+const menuBtn =
+    document.getElementById("menuBtn");
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+
+let board = [];
+let currentPlayer = "r";
+let selected = null;
+let legalTargets = [];
+let forcedPiece = null;
+let gameOver = false;
+
+let gameMode = onlineMode ? "online" : "2p";
+let computerThinking = false;
+
+const SIZE = 8;
+
+/* =========================================================
+   INITIAL BOARD
+   ========================================================= */
+
+function createInitialBoard() {
+
+    board =
+        Array.from(
+            { length: SIZE },
+            () => Array(SIZE).fill(null)
+        );
+
+    for (let row = 0; row < 3; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if ((row + col) % 2 === 1) {
+                board[row][col] = "b";
+            }
+        }
+    }
+
+    for (let row = 5; row < 8; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if ((row + col) % 2 === 1) {
+                board[row][col] = "r";
+            }
+        }
+    }
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function render() {
+
+    boardElement.innerHTML = "";
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const square =
+                document.createElement("div");
+
+            square.className =
+                "square " +
+                ((row + col) % 2 === 0
+                    ? "light"
+                    : "dark");
+
+            if (
+                selected &&
+                selected.row === row &&
+                selected.col === col
+            ) {
+                square.classList.add("selected");
+            }
+
+            const target =
+                legalTargets.find(
+                    move =>
+                        move.row === row &&
+                        move.col === col
+                );
+
+            if (target) {
+
+                square.classList.add(
+                    target.capture
+                        ? "capture-target"
+                        : "move-target"
+                );
+            }
+
+            const piece = board[row][col];
+
+            if (piece) {
+
+                const pieceElement =
+                    document.createElement("div");
+
+                const color =
+                    piece.toLowerCase();
+
+                const king =
+                    piece === piece.toUpperCase();
+
+                pieceElement.className =
+                    "piece " +
+                    (color === "r"
+                        ? "red"
+                        : "black") +
+                    (king ? " king" : "");
+
+                const rim =
+                    document.createElement("div");
+
+                rim.className = "rim";
+
+                const shine =
+                    document.createElement("div");
+
+                shine.className = "shine";
+
+                pieceElement.appendChild(rim);
+                pieceElement.appendChild(shine);
+
+                if (king) {
+
+                    const stack =
+                        document.createElement("div");
+
+                    stack.className =
+                        "king-stack";
+
+                    pieceElement.appendChild(stack);
+                }
+
+                square.appendChild(pieceElement);
+            }
+
+            square.addEventListener(
+                "click",
+                () => handleSquareClick(row, col)
+            );
+
+            boardElement.appendChild(square);
+        }
+    }
+}
+
+/* =========================================================
+   BOARD SIZE
+   ========================================================= */
+
+function fitBoard() {
+
+    const rect =
+        boardArea.getBoundingClientRect();
+
+    let size =
+        Math.min(
+            rect.width - 4,
+            rect.height - 4
+        );
+
+    size = Math.min(size, 760);
+    size = Math.max(size, 0);
+
+    boardElement.style.setProperty(
+        "--board-size",
+        size + "px"
+    );
+}
+
+window.addEventListener("resize", fitBoard);
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener(
+        "resize",
+        fitBoard
+    );
+}
+
+new ResizeObserver(fitBoard)
+    .observe(boardArea);
+
+/* =========================================================
+   START GAME
+   ========================================================= */
+
+function startGame() {
+
+    createInitialBoard();
+
+    currentPlayer = "r";
+    selected = null;
+    legalTargets = [];
+    forcedPiece = null;
+    gameOver = false;
+    computerThinking = false;
+
+    updateStatus();
+    render();
+
+    requestAnimationFrame(fitBoard);
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function isKing(piece) {
+    return piece && piece === piece.toUpperCase();
+}
+
+function belongsTo(piece, player) {
+
+    return !!piece &&
+        piece.toLowerCase() === player;
+}
+
+function inside(row, col) {
+
+    return (
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    );
+}
+
+function getDirections(piece) {
+
+    if (isKing(piece)) {
+
+        return [
+            [-1,-1],
+            [-1,1],
+            [1,-1],
+            [1,1]
+        ];
+    }
+
+    if (piece.toLowerCase() === "r") {
+
+        return [
+            [-1,-1],
+            [-1,1]
+        ];
+    }
+
+    return [
+        [1,-1],
+        [1,1]
+    ];
+}
+
+/* =========================================================
+   MOVES
+   ========================================================= */
+
+function getSimpleMoves(row, col) {
+
+    const piece = board[row][col];
+
+    if (!piece) return [];
+
+    const moves = [];
+
+    for (const [dr, dc] of getDirections(piece)) {
+
+        const nr = row + dr;
+        const nc = col + dc;
+
+        if (
+            inside(nr, nc) &&
+            !board[nr][nc]
+        ) {
+            moves.push({
+                row: nr,
+                col: nc,
+                capture: null
+            });
+        }
+    }
+
+    return moves;
+}
+
+function getCaptureMoves(row, col) {
+
+    const piece = board[row][col];
+
+    if (!piece) return [];
+
+    const moves = [];
+
+    for (const [dr, dc] of getDirections(piece)) {
+
+        const middleRow = row + dr;
+        const middleCol = col + dc;
+
+        const landingRow = row + dr * 2;
+        const landingCol = col + dc * 2;
+
+        if (
+            inside(landingRow, landingCol) &&
+            board[middleRow]?.[middleCol] &&
+            !board[landingRow][landingCol]
+        ) {
+
+            const enemy =
+                board[middleRow][middleCol];
+
+            if (
+                enemy.toLowerCase() !==
+                piece.toLowerCase()
+            ) {
+
+                moves.push({
+                    row: landingRow,
+                    col: landingCol,
+                    capture: {
+                        row: middleRow,
+                        col: middleCol
+                    }
+                });
+            }
+        }
+    }
+
+    return moves;
+}
+
+function getAllMoves(player) {
+
+    const captures = [];
+    const simple = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece = board[row][col];
+
+            if (!belongsTo(piece, player))
+                continue;
+
+            for (
+                const move
+                of getCaptureMoves(row, col)
+            ) {
+
+                captures.push({
+                    from: { row, col },
+                    to: {
+                        row: move.row,
+                        col: move.col
+                    },
+                    capture: move.capture
+                });
+            }
+        }
+    }
+
+    if (captures.length)
+        return captures;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece = board[row][col];
+
+            if (!belongsTo(piece, player))
+                continue;
+
+            for (
+                const move
+                of getSimpleMoves(row, col)
+            ) {
+
+                simple.push({
+                    from: { row, col },
+                    to: {
+                        row: move.row,
+                        col: move.col
+                    },
+                    capture: null
+                });
+            }
+        }
+    }
+
+    return simple;
+}
+
+/* =========================================================
+   CLICK HANDLING
+   ========================================================= */
+
+function handleSquareClick(row, col) {
+
+    if (gameOver || computerThinking)
+        return;
+
+    if (onlineMode) {
+
+        if (!socketReady)
+            return;
+
+        if (!opponentConnected)
+            return;
+
+        if (currentPlayer !== myColor)
+            return;
+    }
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === "b"
+    ) {
+        return;
+    }
+
+    const piece = board[row][col];
+
+    if (selected) {
+
+        const target =
+            legalTargets.find(
+                move =>
+                    move.row === row &&
+                    move.col === col
+            );
+
+        if (target) {
+
+            makeHumanMove(
+                selected.row,
+                selected.col,
+                target
+            );
+
+            return;
+        }
+    }
+
+    if (
+        piece &&
+        belongsTo(piece, currentPlayer)
+    ) {
+
+        if (
+            forcedPiece &&
+            (
+                forcedPiece.row !== row ||
+                forcedPiece.col !== col
+            )
+        ) {
+            return;
+        }
+
+        const captures =
+            getCaptureMoves(row, col);
+
+        const allCaptures =
+            getAllMoves(currentPlayer)
+                .filter(move => move.capture);
+
+        if (
+            allCaptures.length &&
+            !captures.length
+        ) {
+            return;
+        }
+
+        selected = {
+            row,
+            col
+        };
+
+        legalTargets =
+            captures.length
+                ? captures
+                : getSimpleMoves(row, col);
+
+        render();
+    }
+}
+
+/* =========================================================
+   HUMAN MOVE
+   ========================================================= */
+
+function makeHumanMove(row, col, target) {
+
+    if (onlineMode) {
+
+        sendOnlineMove({
+            from: {
+                row,
+                col
+            },
+            to: {
+                row: target.row,
+                col: target.col
+            },
+            capture: target.capture
+        });
+
+        return;
+    }
+
+    applyLocalMove(
+        row,
+        col,
+        target
+    );
+}
+
+/* =========================================================
+   LOCAL MOVE
+   ========================================================= */
+
+function applyLocalMove(row, col, target) {
+
+    movePiece(
+        row,
+        col,
+        target.row,
+        target.col,
+        target.capture
+    );
+
+    if (target.capture) {
+
+        const more =
+            getCaptureMoves(
+                target.row,
+                target.col
+            );
+
+        if (more.length) {
+
+            selected = {
+                row: target.row,
+                col: target.col
+            };
+
+            forcedPiece = {
+                row: target.row,
+                col: target.col
+            };
+
+            legalTargets = more;
+
+            updateStatus(
+                "Multiple jump — continue!"
+            );
+
+            render();
+
+            return;
+        }
+    }
+
+    finishTurn();
+}
+
+/* =========================================================
+   MOVE
+   ========================================================= */
+
+function movePiece(
+    fromRow,
+    fromCol,
+    toRow,
+    toCol,
+    capture
+) {
+
+    const piece =
+        board[fromRow][fromCol];
+
+    board[fromRow][fromCol] = null;
+    board[toRow][toCol] = piece;
+
+    if (capture) {
+
+        board[capture.row][capture.col] =
+            null;
+    }
+
+    if (
+        piece === "r" &&
+        toRow === 0
+    ) {
+        board[toRow][toCol] = "R";
+    }
+
+    if (
+        piece === "b" &&
+        toRow === 7
+    ) {
+        board[toRow][toCol] = "B";
+    }
+}
+
+/* =========================================================
+   FINISH TURN
+   ========================================================= */
+
+function finishTurn() {
+
+    selected = null;
+    legalTargets = [];
+    forcedPiece = null;
+
+    currentPlayer =
+        currentPlayer === "r"
+            ? "b"
+            : "r";
+
+    if (checkGameOver())
+        return;
+
+    updateStatus();
+    render();
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === "b"
+    ) {
+        computerMove();
+    }
+}
+
+/* =========================================================
+   GAME OVER
+   ========================================================= */
+
+function checkGameOver() {
+
+    const red =
+        countPieces("r");
+
+    const black =
+        countPieces("b");
+
+    if (!red) {
+
+        gameOver = true;
+        updateStatus("BLACK WINS!");
+        render();
+        return true;
+    }
+
+    if (!black) {
+
+        gameOver = true;
+        updateStatus("RED WINS!");
+        render();
+        return true;
+    }
+
+    const moves =
+        getAllMoves(currentPlayer);
+
+    if (!moves.length) {
+
+        gameOver = true;
+
+        updateStatus(
+            currentPlayer === "r"
+                ? "BLACK WINS!"
+                : "RED WINS!"
+        );
+
+        render();
+
+        return true;
+    }
+
+    return false;
+}
+
+function countPieces(player) {
+
+    let count = 0;
+
+    for (let r = 0; r < SIZE; r++) {
+
+        for (let c = 0; c < SIZE; c++) {
+
+            if (
+                belongsTo(
+                    board[r][c],
+                    player
+                )
+            ) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function updateStatus(custom) {
+
+    if (custom) {
+
+        statusElement.textContent =
+            custom;
+
+        return;
+    }
+
+    if (gameOver)
+        return;
+
+    if (onlineMode) {
+
+        if (!socketReady) {
+
+            statusElement.textContent =
+                "Connecting to room...";
+
+            return;
+        }
+
+        if (!opponentConnected) {
+
+            statusElement.textContent =
+                "Waiting for opponent...";
+
+            return;
+        }
+
+        statusElement.textContent =
+            currentPlayer === myColor
+                ? (
+                    myColor === "r"
+                        ? "Your turn — RED"
+                        : "Your turn — BLACK"
+                )
+                : (
+                    currentPlayer === "r"
+                        ? "Red's turn"
+                        : "Black's turn"
+                );
+
+        return;
+    }
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === "b"
+    ) {
+
+        statusElement.textContent =
+            "Computer's turn";
+
+        return;
+    }
+
+    statusElement.textContent =
+        currentPlayer === "r"
+            ? "Red's turn"
+            : "Black's turn";
+}
+
+/* =========================================================
+   ONLINE ROOM
+   ========================================================= */
+
+function getSocketUrl() {
+
+    const protocol =
+        location.protocol === "https:"
+            ? "wss:"
+            : "ws:";
+
+    return (
+        protocol +
+        "//" +
+        location.host +
+        "/checkers?room=" +
+        encodeURIComponent(roomId) +
+        "&player=" +
+        encodeURIComponent(playerNumber || "")
+    );
+}
+
+function connectToRoom() {
+
+    if (!onlineMode)
+        return;
+
+    statusElement.textContent =
+        "Connecting to room...";
+
+    try {
+
+        socket =
+            new WebSocket(
+                getSocketUrl()
+            );
+
+    } catch (error) {
+
+        statusElement.textContent =
+            "Could not connect to game room.";
+
+        return;
+    }
+
+    socket.addEventListener(
+        "open",
+        () => {
+
+            socketReady = true;
+
+            /*
+             * IMPORTANT:
+             * The central lobby has already matched the
+             * two players before sending them here.
+             *
+             * Therefore a successful game WebSocket
+             * connection means this player is in the
+             * matched room. Do not wait for another
+             * opponent handshake before enabling the game.
+             */
+            opponentConnected = true;
+
+            sendSocket({
+                type: "joinRoom",
+                game: "checkers",
+                room: roomId,
+                player: playerNumber,
+                role: playerRole
+            });
+
+            updateStatus();
+            render();
+        }
+    );
+
+    socket.addEventListener(
+        "message",
+        event => {
+
+            let message;
+
+            try {
+                message =
+                    JSON.parse(event.data);
+            } catch {
+                return;
+            }
+
+            handleOnlineMessage(message);
+        }
+    );
+
+    socket.addEventListener(
+        "close",
+        () => {
+
+            socketReady = false;
+
+            if (!gameOver) {
+
+                updateStatus(
+                    "Connection lost."
+                );
+            }
+        }
+    );
+
+    socket.addEventListener(
+        "error",
+        () => {
+
+            socketReady = false;
+
+            if (!gameOver) {
+
+                updateStatus(
+                    "Game room connection error."
+                );
+            }
+        }
+    );
+}
+
+function sendSocket(message) {
+
+    if (
+        socket &&
+        socket.readyState === WebSocket.OPEN
+    ) {
+
+        socket.send(
+            JSON.stringify(message)
+        );
+    }
+}
+
+/* =========================================================
+   SEND MOVE
+   ========================================================= */
+
+function sendOnlineMove(move) {
+
+    sendSocket({
+        type: "move",
+        game: "checkers",
+        room: roomId,
+        player: playerNumber,
+        move
+    });
+
+    selected = null;
+    legalTargets = [];
+
+    updateStatus(
+        "Move sent..."
+    );
+
+    render();
+}
+
+/* =========================================================
+   ONLINE MESSAGE HANDLER
+   ========================================================= */
+
+function handleOnlineMessage(message) {
+
+    if (
+        message.type === "roomJoined" ||
+        message.type === "joined" ||
+        message.type === "ready"
+    ) {
+
+        /*
+         * Never turn the opponent flag back off merely
+         * because the server's acknowledgement doesn't
+         * contain an opponentConnected field.
+         */
+        if (
+            message.opponentConnected !== undefined
+        ) {
+            opponentConnected =
+                !!message.opponentConnected;
+        } else {
+            opponentConnected = true;
+        }
+
+        updateStatus();
+
+        return;
+    }
+
+    if (
+        message.type === "playerJoined" ||
+        message.type === "opponentJoined"
+    ) {
+
+        opponentConnected = true;
+
+        updateStatus();
+
+        return;
+    }
+
+    if (
+        message.type === "playerLeft" ||
+        message.type === "opponentLeft"
+    ) {
+
+        opponentConnected = false;
+
+        updateStatus(
+            "Opponent disconnected."
+        );
+
+        return;
+    }
+
+    if (
+        message.type === "state" ||
+        message.type === "gameState"
+    ) {
+
+        if (Array.isArray(message.board)) {
+
+            board =
+                message.board.map(
+                    row => row.slice()
+                );
+        }
+
+        if (message.currentPlayer) {
+
+            currentPlayer =
+                message.currentPlayer;
+        }
+
+        if (
+            typeof message.gameOver ===
+            "boolean"
+        ) {
+
+            gameOver =
+                message.gameOver;
+        }
+
+        if (
+            message.opponentConnected !==
+            undefined
+        ) {
+
+            opponentConnected =
+                !!message.opponentConnected;
+        } else {
+            opponentConnected = true;
+        }
+
+        selected = null;
+        legalTargets = [];
+        forcedPiece = null;
+
+        if (message.status) {
+            updateStatus(message.status);
+        } else {
+            updateStatus();
+        }
+
+        render();
+
+        return;
+    }
+
+    if (
+        message.type === "move" ||
+        message.type === "gameMove"
+    ) {
+
+        const move =
+            message.move || message;
+
+        if (
+            move.from &&
+            move.to
+        ) {
+
+            applyRemoteMove(move);
+        }
+
+        return;
+    }
+
+    if (message.type === "checkersMove") {
+
+        if (message.move) {
+
+            applyRemoteMove(
+                message.move
+            );
+        }
+
+        return;
+    }
+
+    if (
+        message.type === "newGame" ||
+        message.type === "reset"
+    ) {
+
+        startGame();
+
+        return;
+    }
+
+    if (
+        message.type === "gameOver"
+    ) {
+
+        gameOver = true;
+
+        if (message.message) {
+
+            updateStatus(
+                message.message
+            );
+
+        } else if (message.winner) {
+
+            updateStatus(
+                String(message.winner)
+                    .toUpperCase() +
+                " WINS!"
+            );
+        }
+
+        render();
+    }
+}
+
+/* =========================================================
+   APPLY REMOTE MOVE
+   ========================================================= */
+
+function applyRemoteMove(move) {
+
+    if (
+        !move.from ||
+        !move.to
+    ) {
+        return;
+    }
+
+    const fromRow =
+        Number(move.from.row);
+
+    const fromCol =
+        Number(move.from.col);
+
+    const toRow =
+        Number(move.to.row);
+
+    const toCol =
+        Number(move.to.col);
+
+    const capture =
+        move.capture
+            ? {
+                row: Number(move.capture.row),
+                col: Number(move.capture.col)
+            }
+            : null;
+
+    if (
+        !inside(fromRow, fromCol) ||
+        !inside(toRow, toCol)
+    ) {
+        return;
+    }
+
+    movePiece(
+        fromRow,
+        fromCol,
+        toRow,
+        toCol,
+        capture
+    );
+
+    selected = null;
+    legalTargets = [];
+    forcedPiece = null;
+
+    if (move.continueJump) {
+
+        currentPlayer =
+            move.playerColor ||
+            currentPlayer;
+
+        if (currentPlayer === myColor) {
+
+            selected = {
+                row: toRow,
+                col: toCol
+            };
+
+            forcedPiece = {
+                row: toRow,
+                col: toCol
+            };
+
+            legalTargets =
+                getCaptureMoves(
+                    toRow,
+                    toCol
+                );
+
+            updateStatus(
+                "Multiple jump — continue!"
+            );
+        }
+
+        render();
+
+        return;
+    }
+
+    currentPlayer =
+        currentPlayer === "r"
+            ? "b"
+            : "r";
+
+    if (checkGameOver())
+        return;
+
+    updateStatus();
+    render();
+}
+
+/* =========================================================
+   COMPUTER
+   ========================================================= */
+
+function computerMove() {
+
+    if (gameOver)
+        return;
+
+    computerThinking = true;
+
+    updateStatus(
+        "Computer is thinking..."
+    );
+
+    render();
+
+    setTimeout(() => {
+
+        const moves =
+            getAllMoves("b");
+
+        if (!moves.length) {
+
+            computerThinking = false;
+            checkGameOver();
+
+            return;
+        }
+
+        let chosen;
+
+        if (
+            difficultySelect.value ===
+            "easy"
+        ) {
+
+            chosen =
+                chooseEasyMove(moves);
+
+        } else if (
+            difficultySelect.value ===
+            "medium"
+        ) {
+
+            chosen =
+                chooseMediumMove(moves);
+
+        } else {
+
+            chosen =
+                chooseHardMove(moves);
+        }
+
+        performComputerMove(chosen);
+
+    }, 450);
+}
+
+function chooseEasyMove(moves) {
+
+    return moves[
+        Math.floor(
+            Math.random() *
+            moves.length
+        )
+    ];
+}
+
+function chooseMediumMove(moves) {
+
+    const captures =
+        moves.filter(
+            move => move.capture
+        );
+
+    if (captures.length) {
+
+        const promotions =
+            captures.filter(
+                move =>
+                    move.to.row === 7 &&
+                    board[
+                        move.from.row
+                    ][move.from.col] === "b"
+            );
+
+        if (promotions.length) {
+
+            return promotions[
+                Math.floor(
+                    Math.random() *
+                    promotions.length
+                )
+            ];
+        }
+
+        return captures[
+            Math.floor(
+                Math.random() *
+                captures.length
+            )
+        ];
+    }
+
+    const scored =
+        moves.map(move => {
+
+            let score =
+                move.to.row * 2;
+
+            if (
+                isSafeSquare(
+                    move.to.row,
+                    move.to.col,
+                    "b"
+                )
+            ) {
+                score += 3;
+            }
+
+            return {
+                move,
+                score
+            };
+        });
+
+    scored.sort(
+        (a,b) =>
+            b.score - a.score
+    );
+
+    const top =
+        scored.slice(
+            0,
+            Math.min(3, scored.length)
+        );
+
+    return top[
+        Math.floor(
+            Math.random() *
+            top.length
+        )
+    ].move;
+}
+
+/* =========================================================
+   HARD AI
+   ========================================================= */
+
+function chooseHardMove(moves) {
+
+    let bestScore = -Infinity;
+    let bestMoves = [];
+
+    for (const move of moves) {
+
+        const snapshot =
+            cloneBoard(board);
+
+        applyMoveToBoard(
+            board,
+            move
+        );
+
+        const score =
+            minimax(
+                board,
+                4,
+                false,
+                -Infinity,
+                Infinity
+            );
+
+        board = snapshot;
+
+        if (score > bestScore) {
+
+            bestScore = score;
+            bestMoves = [move];
+
+        } else if (
+            score === bestScore
+        ) {
+
+            bestMoves.push(move);
+        }
+    }
+
+    return bestMoves[
+        Math.floor(
+            Math.random() *
+            bestMoves.length
+        )
+    ];
+}
+
+function minimax(
+    position,
+    depth,
+    maximizing,
+    alpha,
+    beta
+) {
+
+    const blackMoves =
+        getMovesFromPosition(
+            position,
+            "b"
+        );
+
+    const redMoves =
+        getMovesFromPosition(
+            position,
+            "r"
+        );
+
+    if (
+        depth === 0 ||
+        !blackMoves.length ||
+        !redMoves.length
+    ) {
+
+        return evaluatePosition(
+            position
+        );
+    }
+
+    if (maximizing) {
+
+        let best = -Infinity;
+
+        for (const move of blackMoves) {
+
+            const next =
+                cloneBoard(position);
+
+            applyMoveToBoard(
+                next,
+                move
+            );
+
+            const value =
+                minimax(
+                    next,
+                    depth - 1,
+                    false,
+                    alpha,
+                    beta
+                );
+
+            best =
+                Math.max(best, value);
+
+            alpha =
+                Math.max(alpha, best);
+
+            if (beta <= alpha)
+                break;
+        }
+
+        return best;
+    }
+
+    let best = Infinity;
+
+    for (const move of redMoves) {
+
+        const next =
+            cloneBoard(position);
+
+        applyMoveToBoard(
+            next,
+            move
+        );
+
+        const value =
+            minimax(
+                next,
+                depth - 1,
+                true,
+                alpha,
+                beta
+            );
+
+        best =
+            Math.min(best, value);
+
+        beta =
+            Math.min(beta, best);
+
+        if (beta <= alpha)
+            break;
+    }
+
+    return best;
+}
+
+function getMovesFromPosition(
+    position,
+    player
+) {
+
+    const captures = [];
+    const simple = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece =
+                position[row][col];
+
+            if (!belongsTo(piece, player))
+                continue;
+
+            for (
+                const [dr, dc]
+                of getDirections(piece)
+            ) {
+
+                const mr = row + dr;
+                const mc = col + dc;
+
+                const lr = row + dr * 2;
+                const lc = col + dc * 2;
+
+                if (
+                    inside(lr, lc) &&
+                    position[mr]?.[mc] &&
+                    !position[lr][lc] &&
+                    position[mr][mc]
+                        .toLowerCase() !==
+                    piece.toLowerCase()
+                ) {
+
+                    captures.push({
+                        from: {
+                            row,
+                            col
+                        },
+                        to: {
+                            row: lr,
+                            col: lc
+                        },
+                        capture: {
+                            row: mr,
+                            col: mc
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    if (captures.length)
+        return captures;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece =
+                position[row][col];
+
+            if (!belongsTo(piece, player))
+                continue;
+
+            for (
+                const [dr, dc]
+                of getDirections(piece)
+            ) {
+
+                const nr = row + dr;
+                const nc = col + dc;
+
+                if (
+                    inside(nr, nc) &&
+                    !position[nr][nc]
+                ) {
+
+                    simple.push({
+                        from: {
+                            row,
+                            col
+                        },
+                        to: {
+                            row: nr,
+                            col: nc
+                        },
+                        capture: null
+                    });
+                }
+            }
+        }
+    }
+
+    return simple;
+}
+
+function applyMoveToBoard(
+    position,
+    move
+) {
+
+    const piece =
+        position[
+            move.from.row
+        ][
+            move.from.col
+        ];
+
+    position[
+        move.from.row
+    ][
+        move.from.col
+    ] = null;
+
+    position[
+        move.to.row
+    ][
+        move.to.col
+    ] = piece;
+
+    if (move.capture) {
+
+        position[
+            move.capture.row
+        ][
+            move.capture.col
+        ] = null;
+    }
+
+    if (
+        piece === "b" &&
+        move.to.row === 7
+    ) {
+
+        position[
+            move.to.row
+        ][
+            move.to.col
+        ] = "B";
+    }
+
+    if (
+        piece === "r" &&
+        move.to.row === 0
+    ) {
+
+        position[
+            move.to.row
+        ][
+            move.to.col
+        ] = "R";
+    }
+}
+
+function evaluatePosition(position) {
+
+    let score = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const piece =
+                position[row][col];
+
+            if (!piece)
+                continue;
+
+            const king =
+                isKing(piece);
+
+            let value =
+                king ? 5 : 3;
+
+            if (!king) {
+
+                if (piece === "b") {
+                    value += row * .15;
+                }
+
+                if (piece === "r") {
+                    value +=
+                        (7 - row) * .15;
+                }
+            }
+
+            if (
+                col >= 2 &&
+                col <= 5 &&
+                row >= 2 &&
+                row <= 5
+            ) {
+                value += .3;
+            }
+
+            if (
+                piece.toLowerCase() === "b"
+            ) {
+                score += value;
+            } else {
+                score -= value;
+            }
+        }
+    }
+
+    return score;
+}
+
+function isSafeSquare(
+    row,
+    col,
+    player
+) {
+
+    const enemy =
+        player === "r"
+            ? "b"
+            : "r";
+
+    for (let r = 0; r < SIZE; r++) {
+
+        for (let c = 0; c < SIZE; c++) {
+
+            const piece =
+                board[r][c];
+
+            if (!belongsTo(piece, enemy))
+                continue;
+
+            for (
+                const move
+                of getCaptureMoves(r, c)
+            ) {
+
+                if (
+                    move.row === row &&
+                    move.col === col
+                ) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+function cloneBoard(position) {
+
+    return position.map(
+        row => row.slice()
+    );
+}
+
+/* =========================================================
+   COMPUTER EXECUTION
+   ========================================================= */
+
+function performComputerMove(move) {
+
+    movePiece(
+        move.from.row,
+        move.from.col,
+        move.to.row,
+        move.to.col,
+        move.capture
+    );
+
+    if (move.capture) {
+
+        const more =
+            getCaptureMoves(
+                move.to.row,
+                move.to.col
+            );
+
+        if (more.length) {
+
+            const continuation =
+                more[
+                    Math.floor(
+                        Math.random() *
+                        more.length
+                    )
+                ];
+
+            setTimeout(
+                () => performComputerContinuation(
+                    move.to.row,
+                    move.to.col,
+                    continuation
+                ),
+                250
+            );
+
+            return;
+        }
+    }
+
+    computerThinking = false;
+
+    finishTurn();
+}
+
+function performComputerContinuation(
+    row,
+    col,
+    move
+) {
+
+    movePiece(
+        row,
+        col,
+        move.row,
+        move.col,
+        move.capture
+    );
+
+    if (move.capture) {
+
+        const more =
+            getCaptureMoves(
+                move.row,
+                move.col
+            );
+
+        if (more.length) {
+
+            const next =
+                more[
+                    Math.floor(
+                        Math.random() *
+                        more.length
+                    )
+                ];
+
+            setTimeout(
+                () =>
+                    performComputerContinuation(
+                        move.row,
+                        move.col,
+                        next
+                    ),
+                250
+            );
+
+            return;
+        }
+    }
+
+    computerThinking = false;
+
+    finishTurn();
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+twoPlayerBtn.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "rooms.html?game=checkers";
+    }
+);
+
+computerBtn.addEventListener(
+    "click",
+    () => {
+
+        if (onlineMode) {
+
+            if (socket) {
+
+                try {
+                    socket.close();
+                } catch {}
+            }
+
+            window.location.href =
+                "rooms.html?game=checkers";
+
+            return;
+        }
+
+        gameMode = "computer";
+
+        computerBtn.style.outline =
+            "2px solid #ffd84a";
+
+        twoPlayerBtn.style.outline =
+            "none";
+
+        startGame();
+    }
+);
+
+difficultySelect.addEventListener(
+    "change",
+    () => {}
+);
+
+newGameBtn.addEventListener(
+    "click",
+    () => {
+
+        if (onlineMode) {
+
+            sendSocket({
+                type: "newGame",
+                game: "checkers",
+                room: roomId,
+                player: playerNumber
+            });
+
+            return;
+        }
+
+        startGame();
+    }
+);
+
+menuBtn.addEventListener(
+    "click",
+    () => {
+
+        if (socket) {
+
+            try {
+                socket.close();
+            } catch {}
+        }
+
+        window.location.href =
+            "index.html";
+    }
+);
+
+/* =========================================================
+   INITIAL UI
+   ========================================================= */
+
+if (onlineMode) {
+
+    twoPlayerBtn.textContent =
+        "LOBBY";
+
+    computerBtn.textContent =
+        "LEAVE ROOM";
+
+    difficultySelect.style.display =
+        "none";
+
+    twoPlayerBtn.style.outline =
+        "none";
+
+    computerBtn.style.outline =
+        "none";
+
+    startGame();
+
+    connectToRoom();
+
+} else {
+
+    twoPlayerBtn.style.outline =
+        "2px solid #ffd84a";
+
+    startGame();
+}
+
+requestAnimationFrame(fitBoard);
+
+</script>
+
+</body>
+</html>
