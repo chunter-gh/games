@@ -2,16 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Game Room</title>
 
 <style>
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
@@ -19,1450 +15,868 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
     background:
-        radial-gradient(circle at 50% 15%, #244b72 0%, #10243c 45%, #06101d 100%);
+        radial-gradient(circle at 50% 35%, #183d6b 0%, #0c2343 45%, #061326 100%);
     color: white;
 }
 
-.game-room {
-    width: 100%;
-    height: 100%;
+/* =========================
+   MENU
+   ========================= */
+
+.menu {
     position: relative;
-    overflow: hidden;
-}
-
-/* =========================================================
-   ATMOSPHERE
-========================================================= */
-
-.glow {
-    position: absolute;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,.12), transparent 70%);
-    left: 50%;
-    top: -130px;
-    transform: translateX(-50%);
-}
-
-/* =========================================================
-   TITLE
-========================================================= */
-
-.title-area {
-    position: relative;
-    z-index: 50;
+    z-index: 20;
     text-align: center;
-    padding-top: clamp(12px, 3vh, 28px);
+    padding-top: 35px;
 }
 
-.title {
+h1 {
     margin: 0;
-    font-size: clamp(34px, 8vw, 62px);
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: #fff;
-    text-shadow:
-        0 3px 0 #14283e,
-        0 6px 12px rgba(0,0,0,.8),
-        0 0 20px rgba(120,200,255,.45);
+    font-size: clamp(38px, 7vw, 72px);
+    letter-spacing: 8px;
+    text-shadow: 0 4px 12px #000;
 }
 
 .subtitle {
-    margin-top: 5px;
-    font-size: clamp(10px, 1.7vw, 13px);
+    margin-top: 8px;
+    font-size: 18px;
     letter-spacing: 5px;
-    color: #b9d7ee;
+    color: #d7e8ff;
 }
 
-/* =========================================================
-   MENU
-========================================================= */
-
-.menu {
-    position: absolute;
-    z-index: 40;
-    width: min(88vw, 420px);
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+.buttons {
+    margin-top: 30px;
     display: flex;
-    flex-direction: column;
-    gap: clamp(7px, 1.5vh, 16px);
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-.game-button {
-    position: relative;
-    width: 100%;
-    height: clamp(62px, 10vh, 82px);
-    margin: 0;
-
-    border: 1px solid rgba(255,255,255,.35);
-    border-radius: 22px;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.28),
-            rgba(255,255,255,.05) 45%,
-            rgba(0,0,0,.18)
-        ),
-        linear-gradient(135deg, #28699e, #123557);
-
-    box-shadow:
-        inset 0 2px 2px rgba(255,255,255,.35),
-        inset 0 -7px 12px rgba(0,0,0,.25),
-        0 10px 20px rgba(0,0,0,.45);
-
+.buttons a {
+    text-decoration: none;
     color: white;
-    cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    padding: 0 25px;
-
-    transition:
-        transform .15s ease,
-        box-shadow .15s ease;
-}
-
-.game-button:active {
-    transform: scale(.96);
-
+    background: linear-gradient(#28598d, #173a63);
+    border: 2px solid #5e91c5;
+    border-radius: 12px;
+    padding: 15px 25px;
+    min-width: 155px;
+    font-size: 18px;
+    font-weight: bold;
     box-shadow:
-        inset 0 5px 12px rgba(0,0,0,.35),
-        0 4px 8px rgba(0,0,0,.4);
+        0 5px 12px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.25);
+    transition: .2s;
 }
 
-.icon {
-    width: 55px;
-    flex-shrink: 0;
-    font-size: 38px;
-    text-align: center;
-    filter: drop-shadow(0 4px 4px rgba(0,0,0,.65));
+.buttons a:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(#3471ad, #1c4776);
 }
 
-.button-text {
-    text-align: left;
-    margin-left: 15px;
-}
-
-.button-title {
-    font-size: clamp(19px, 5vw, 25px);
-    font-weight: 900;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 4px #000;
-}
-
-.button-subtitle {
-    margin-top: 3px;
-    font-size: 12px;
-    color: #c9e5fa;
-}
-
-/* =========================================================
+/* =========================
    GROUND
-========================================================= */
+   ========================= */
 
 .ground {
     position: absolute;
-    left: -10%;
+    left: 0;
+    right: 0;
     bottom: 0;
-    width: 120%;
-    height: clamp(75px, 14vh, 115px);
-
+    height: 105px;
     background:
-        linear-gradient(
-            180deg,
-            #182e26,
-            #091610
-        );
-
-    border-top: 2px solid rgba(130,190,130,.25);
-
-    box-shadow:
-        0 -12px 30px rgba(0,0,0,.25);
+        linear-gradient(#172b27 0 3px, #10201d 4px 100%);
+    border-top: 3px solid #284b42;
+    z-index: 1;
 }
 
-/* =========================================================
+.ground::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 20px;
+    height: 2px;
+    background: rgba(94,139,119,.22);
+}
+
+/* =========================
+   ANIMAL STAGE
+   ========================= */
+
+.animal-stage {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 72px;
+    height: 300px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* =========================
    GIRAFFE
-========================================================= */
+   ========================= */
 
 .giraffe-wrapper {
     position: absolute;
-    z-index: 10;
-
-    bottom: clamp(35px, 6vh, 45px);
-    left: -230px;
-
+    left: -235px;
+    bottom: 0;
     width: 210px;
-    height: 250px;
-
-    animation:
-        giraffeWalk 15s linear infinite;
-}
-
-@keyframes giraffeWalk {
-    0% {
-        left: -230px;
-    }
-
-    100% {
-        left: calc(100% + 30px);
-    }
+    height: 270px;
+    animation: giraffeWalk 15s linear infinite;
+    transform-origin: center bottom;
 }
 
 .giraffe {
     position: relative;
     width: 210px;
-    height: 250px;
-
-    animation:
-        bodyBounce .42s ease-in-out infinite alternate;
-
+    height: 270px;
     transform-origin: center bottom;
 }
 
-@keyframes bodyBounce {
-    from {
-        transform: translateY(1px);
-    }
+/* body */
 
-    to {
-        transform: translateY(-4px);
-    }
-}
-
-/* =========================================================
-   GIRAFFE BODY
-========================================================= */
-
-.body {
+.giraffe-body {
     position: absolute;
-
-    left: 35px;
-    top: 105px;
-
-    width: 125px;
-    height: 75px;
-
-    border-radius: 52% 48% 45% 48%;
-
-    background:
-        radial-gradient(
-            circle at 35% 28%,
-            #f5d66f 0 10%,
-            #d9a93e 11% 100%
-        );
-
-    border: 3px solid #8b6424;
-
-    box-shadow:
-        inset -12px -12px 15px rgba(90,55,10,.28),
-        8px 12px 15px rgba(0,0,0,.35);
+    width: 112px;
+    height: 72px;
+    left: 58px;
+    top: 125px;
+    background: #d89a36;
+    border-radius: 50% 48% 45% 50%;
+    border: 3px solid #9a6620;
+    box-shadow: inset -8px -7px 0 rgba(126,77,20,.12);
 }
-
-/* Giraffe patches */
 
 .patch {
     position: absolute;
-    background: #9b6928;
-    border: 1px solid rgba(80,45,10,.3);
+    background: #8c561c;
+    border-radius: 45%;
 }
 
-.p1 {
+.patch.p1 {
     width: 27px;
     height: 24px;
-    border-radius: 45%;
-    left: 65px;
-    top: 116px;
+    left: 15px;
+    top: 12px;
 }
 
-.p2 {
+.patch.p2 {
+    width: 21px;
+    height: 25px;
+    left: 58px;
+    top: 30px;
+}
+
+.patch.p3 {
     width: 19px;
-    height: 27px;
-    border-radius: 50%;
-    left: 111px;
-    top: 142px;
-}
-
-.p3 {
-    width: 24px;
     height: 18px;
-    border-radius: 50%;
-    left: 42px;
-    top: 153px;
+    left: 85px;
+    top: 8px;
 }
 
-.p4 {
-    width: 16px;
-    height: 18px;
-    border-radius: 45%;
-    left: 87px;
-    top: 112px;
+.patch.p4 {
+    width: 23px;
+    height: 19px;
+    left: 37px;
+    top: 4px;
 }
 
-/* Neck */
+/* neck */
 
-.neck {
+.giraffe-neck {
     position: absolute;
-
-    left: 125px;
-    top: 32px;
-
-    width: 42px;
-    height: 115px;
-
+    left: 116px;
+    top: 24px;
+    width: 46px;
+    height: 130px;
+    background: #d89a36;
+    border: 3px solid #9a6620;
     border-radius: 22px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #c89432,
-            #efd16b 48%,
-            #b77d26
-        );
-
-    border: 3px solid #815c20;
-
-    transform: rotate(-7deg);
+    transform: rotate(-5deg);
     transform-origin: bottom center;
-
-    box-shadow:
-        inset -7px 0 8px rgba(80,45,5,.22);
 }
 
-.neck::before,
-.neck::after {
+.giraffe-neck::before {
     content: "";
     position: absolute;
-    background: #996528;
+    inset: 7px;
+    background:
+        radial-gradient(ellipse at 30% 18%, #8c561c 0 18%, transparent 20%),
+        radial-gradient(ellipse at 70% 42%, #8c561c 0 17%, transparent 19%),
+        radial-gradient(ellipse at 32% 66%, #8c561c 0 19%, transparent 21%),
+        radial-gradient(ellipse at 72% 82%, #8c561c 0 17%, transparent 19%);
+    border-radius: 18px;
+}
+
+/* head */
+
+.giraffe-head {
+    position: absolute;
+    left: 103px;
+    top: 0;
+    width: 91px;
+    height: 67px;
+    background: #d89a36;
+    border: 3px solid #9a6620;
+    border-radius: 48% 55% 45% 42%;
+    transform: rotate(3deg);
+}
+
+.giraffe-head::before {
+    content: "";
+    position: absolute;
+    width: 28px;
+    height: 31px;
+    left: -14px;
+    top: 27px;
+    background: #e4ad54;
+    border: 3px solid #9a6620;
     border-radius: 45%;
 }
 
-.neck::before {
-    width: 18px;
-    height: 20px;
-    top: 18px;
-    left: 5px;
-}
-
-.neck::after {
-    width: 14px;
-    height: 17px;
-    top: 55px;
-    right: 4px;
-}
-
-/* Head */
-
-.head {
+.giraffe-muzzle {
     position: absolute;
-
-    left: 135px;
-    top: 5px;
-
-    width: 67px;
-    height: 55px;
-
-    border-radius: 48% 55% 42% 48%;
-
-    background:
-        linear-gradient(
-            135deg,
-            #f0ce67,
-            #c58b2e
-        );
-
-    border: 3px solid #80591e;
-
-    transform: rotate(-8deg);
-
-    box-shadow:
-        inset -8px -8px 12px rgba(80,45,5,.2),
-        5px 7px 10px rgba(0,0,0,.35);
-
-    transform-origin: center;
-}
-
-.muzzle {
-    position: absolute;
-
-    right: -14px;
-    top: 27px;
-
-    width: 28px;
-    height: 20px;
-
+    width: 40px;
+    height: 25px;
+    left: -21px;
+    top: 34px;
+    background: #e7b866;
     border-radius: 50%;
-
-    background: #dcae4d;
-    border: 2px solid #875e20;
+    border: 2px solid #9a6620;
 }
 
-.muzzle::after {
-    content: "";
-
+.giraffe-eye {
     position: absolute;
-    right: 5px;
-    top: 6px;
-
-    width: 5px;
-    height: 3px;
-
-    border-radius: 50%;
-
-    background: #392613;
-
-    box-shadow: 10px 0 #392613;
-}
-
-.eye {
-    position: absolute;
-
-    right: 18px;
-    top: 18px;
-
-    width: 9px;
-    height: 9px;
-
-    border-radius: 50%;
-
+    width: 10px;
+    height: 10px;
     background: #111;
-
-    box-shadow:
-        0 0 0 3px rgba(255,255,255,.35);
+    border-radius: 50%;
+    left: 39px;
+    top: 21px;
+    box-shadow: 2px 2px 0 white;
 }
 
-/* Ears */
-
-.ear {
+.giraffe-ear {
     position: absolute;
-
-    width: 27px;
-    height: 18px;
-
-    background: #c08b2e;
-
-    border: 3px solid #80591e;
-
-    border-radius: 80% 20% 70% 25%;
+    width: 23px;
+    height: 32px;
+    background: #b97827;
+    border: 3px solid #895519;
+    border-radius: 50% 50% 40% 40%;
+    top: -15px;
 }
 
-.ear.left {
-    left: -12px;
-    top: 7px;
-    transform: rotate(25deg);
-}
-
-.ear.right {
-    right: 8px;
-    top: -8px;
+.giraffe-ear.left {
+    left: 12px;
     transform: rotate(-25deg);
 }
 
-/* Horns */
+.giraffe-ear.right {
+    right: 9px;
+    transform: rotate(25deg);
+}
 
 .horn {
     position: absolute;
-
-    width: 8px;
-    height: 19px;
-
-    background: #795524;
-    border-radius: 5px;
-    top: -14px;
+    width: 10px;
+    height: 27px;
+    background: #76501e;
+    border-radius: 7px;
+    top: -27px;
 }
 
-.horn.one {
-    left: 18px;
-}
-
-.horn.two {
-    left: 42px;
-}
-
-/* Mane */
-
-.mane {
-    position: absolute;
-
-    left: 119px;
-    top: 42px;
-
-    width: 11px;
-    height: 85px;
-
-    background:
-        repeating-linear-gradient(
-            180deg,
-            #633d18 0 7px,
-            transparent 7px 12px
-        );
-}
-
-/* Tail */
-
-.tail {
-    position: absolute;
-
-    left: 28px;
-    top: 112px;
-
-    width: 55px;
-    height: 65px;
-
-    border-left: 7px solid #b17c29;
-    border-radius: 50%;
-
-    transform: rotate(20deg);
-    transform-origin: top;
-
-    animation:
-        giraffeTail .8s ease-in-out infinite alternate;
-}
-
-@keyframes giraffeTail {
-    from {
-        transform: rotate(16deg);
-    }
-
-    to {
-        transform: rotate(29deg);
-    }
-}
-
-.tail-tip {
-    position: absolute;
-
-    left: -11px;
-    bottom: -4px;
-
-    width: 20px;
-    height: 24px;
-
-    border-radius: 50%;
-
-    background: #54341a;
-}
-
-/* Legs */
-
-.leg {
-    position: absolute;
-
-    top: 164px;
-
-    width: 22px;
-    height: 82px;
-
-    border-radius: 12px 12px 8px 8px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #b77f28,
-            #e4bd57,
-            #a86f20
-        );
-
-    border: 3px solid #7d581e;
-
-    transform-origin: top center;
-}
-
-.leg.back1 {
-    left: 52px;
-    animation: legBack1 .42s ease-in-out infinite alternate;
-}
-
-.leg.back2 {
-    left: 83px;
-    animation: legBack2 .42s ease-in-out infinite alternate;
-}
-
-.leg.front1 {
-    left: 119px;
-    animation: legFront1 .42s ease-in-out infinite alternate;
-}
-
-.leg.front2 {
-    left: 145px;
-    animation: legFront2 .42s ease-in-out infinite alternate;
-}
-
-@keyframes legBack1 {
-    from { transform: rotate(14deg); }
-    to   { transform: rotate(-14deg); }
-}
-
-@keyframes legBack2 {
-    from { transform: rotate(-14deg); }
-    to   { transform: rotate(14deg); }
-}
-
-@keyframes legFront1 {
-    from { transform: rotate(-14deg); }
-    to   { transform: rotate(14deg); }
-}
-
-@keyframes legFront2 {
-    from { transform: rotate(14deg); }
-    to   { transform: rotate(-14deg); }
-}
-
-.leg::after {
+.horn::after {
     content: "";
-
     position: absolute;
-
-    bottom: -3px;
-    left: -3px;
-
-    width: 22px;
+    width: 15px;
     height: 12px;
-
-    border-radius: 4px;
-
-    background: #54351a;
-}
-
-/* =========================================================
-   LABRADOR / GREYHOUND HYBRID
-========================================================= */
-
-.bulldog-wrapper {
-    position: absolute;
-
-    z-index: 11;
-
-    bottom: clamp(35px, 6vh, 45px);
-
-    left: calc(100% + 220px);
-
-    width: 225px;
-    height: 145px;
-
-    animation:
-        bulldogWalk 18s linear infinite;
-
-    pointer-events: none;
-}
-
-@keyframes bulldogWalk {
-    0% {
-        left: calc(100% + 220px);
-    }
-
-    100% {
-        left: -240px;
-    }
-}
-
-.bulldog {
-    position: relative;
-
-    width: 225px;
-    height: 145px;
-
-    animation:
-        dogBounce .34s ease-in-out infinite alternate;
-}
-
-@keyframes dogBounce {
-    from {
-        transform: translateY(1px);
-    }
-
-    to {
-        transform: translateY(-3px);
-    }
-}
-
-/* Dog shadow */
-
-.dog-shadow {
-    position: absolute;
-
-    left: 25px;
-    top: 122px;
-
-    width: 178px;
-    height: 13px;
-
+    background: #8e6025;
     border-radius: 50%;
-
-    background: rgba(0,0,0,.38);
-
-    filter: blur(4px);
+    left: -2px;
+    top: -5px;
 }
 
-/* Lean Labrador/Greyhound body */
-
-.dog-body {
-    position: absolute;
-
-    left: 48px;
-    top: 53px;
-
-    width: 137px;
-    height: 55px;
-
-    border-radius: 52% 45% 42% 48%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #d8d1c8,
-            #aaa19a 55%,
-            #756d67
-        );
-
-    border: 3px solid #4b4541;
-
-    box-shadow:
-        inset -14px -10px 15px rgba(45,35,30,.25),
-        8px 10px 15px rgba(0,0,0,.35);
-}
-
-/* Athletic shoulders */
-
-.dog-shoulders {
-    position: absolute;
-
-    left: 48px;
-    top: 50px;
-
-    width: 55px;
-    height: 63px;
-
-    border-radius: 52% 48% 45% 50%;
-
-    background:
-        radial-gradient(
-            ellipse at 35% 20%,
-            #f8f2e9 0 8%,
-            #ded7ce 25%,
-            #b8afa7 65%,
-            #817871 100%
-        );
-
-    border: 3px solid #514a45;
-
-    box-shadow:
-        inset -8px -9px 12px rgba(50,40,35,.22);
-
-    z-index: 2;
-}
-
-/* Chest */
-
-.dog-chest {
-    position: absolute;
-
-    left: 62px;
-    top: 59px;
-
-    width: 43px;
-    height: 55px;
-
-    border-radius: 50%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #f7f0e6,
-            #d0c7bd 60%,
-            #aaa099
-        );
-
-    z-index: 3;
-}
-
-/* Labrador-style head */
-
-.dog-head {
-    position: absolute;
-
-    left: 4px;
-    top: 22px;
-
-    width: 82px;
-    height: 69px;
-
-    border-radius: 46% 50% 45% 48%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #d7d0c7,
-            #a79d95 62%,
-            #6f6660
-        );
-
-    border: 3px solid #49423e;
-
-    box-shadow:
-        inset -8px -9px 14px rgba(45,35,30,.24),
-        5px 9px 12px rgba(0,0,0,.4);
-
-    z-index: 5;
-}
-
-/* Labrador ears */
-
-.dog-ear {
-    position: absolute;
-
-    width: 30px;
-    height: 39px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #8c827a,
-            #544c47
-        );
-
-    border: 3px solid #403a36;
-
-    z-index: -1;
-}
-
-.dog-ear.left {
-    left: -13px;
-    top: 6px;
-
-    border-radius: 70% 30% 65% 35%;
-
-    transform: rotate(-17deg);
-}
-
-.dog-ear.right {
-    right: -10px;
-    top: 7px;
-
-    border-radius: 30% 70% 35% 65%;
-
-    transform: rotate(15deg);
-}
-
-/* White blaze */
-
-.dog-blaze {
-    position: absolute;
-
-    left: 32px;
-    top: -2px;
-
-    width: 20px;
-    height: 43px;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.8),
-            #eee7dc,
-            rgba(255,255,255,.75)
-        );
-
-    border-radius: 50%;
-
-    transform: rotate(3deg);
-
-    opacity: .9;
-}
-
-/* Eyes */
-
-.dog-eye {
-    position: absolute;
-
-    top: 28px;
-
-    width: 11px;
-    height: 11px;
-
-    border-radius: 50%;
-
-    background: #171412;
-
-    border: 2px solid #302a26;
-
-    box-shadow:
-        0 0 0 2px rgba(255,255,255,.22);
-}
-
-.dog-eye.left {
-    left: 17px;
-}
-
-.dog-eye.right {
-    left: 51px;
-}
-
-/* Brows */
-
-.brow {
-    position: absolute;
-
-    width: 23px;
-    height: 7px;
-
-    border-top: 3px solid #605750;
-
-    border-radius: 50%;
-}
-
-.brow.left {
-    left: 11px;
-    top: 19px;
-    transform: rotate(7deg);
-}
-
-.brow.right {
-    left: 47px;
-    top: 19px;
+.horn.left {
+    left: 28px;
     transform: rotate(-7deg);
 }
 
-/* Muzzle */
+.horn.right {
+    left: 58px;
+    transform: rotate(7deg);
+}
 
-.dog-muzzle {
+.mane {
     position: absolute;
-
-    left: 13px;
+    left: 103px;
     top: 42px;
-
-    width: 61px;
-    height: 31px;
-
-    border-radius: 48%;
-
-    background:
-        radial-gradient(
-            circle at 50% 25%,
-            #eee8df,
-            #bcb2a8
-        );
-
-    border: 2px solid #625952;
+    width: 12px;
+    height: 108px;
+    background: #754716;
+    clip-path: polygon(
+        0 0,100% 5%,35% 12%,100% 20%,
+        35% 29%,100% 38%,35% 47%,
+        100% 57%,35% 67%,100% 76%,
+        35% 87%,100% 96%,0 100%
+    );
 }
 
-/* Nose */
+/* legs */
 
-.dog-nose {
+.giraffe-leg {
     position: absolute;
-
-    left: 30px;
-    top: 42px;
-
-    width: 27px;
-    height: 18px;
-
-    border-radius: 48%;
-
-    background:
-        radial-gradient(
-            circle at 35% 25%,
-            #665e59,
-            #171514 55%,
-            #050505 100%
-        );
-
-    z-index: 3;
-
-    box-shadow:
-        2px 3px 4px rgba(0,0,0,.4);
-}
-
-/* Mouth */
-
-.dog-mouth {
-    position: absolute;
-
-    left: 32px;
-    top: 57px;
-
-    width: 25px;
-    height: 14px;
-
-    border-bottom: 3px solid #332a27;
-
-    border-radius: 0 0 50% 50%;
-
-    z-index: 4;
-}
-
-/* Tongue */
-
-.dog-tongue {
-    position: absolute;
-
-    left: 39px;
-    top: 67px;
-
     width: 16px;
-    height: 24px;
-
-    border-radius: 7px 7px 50% 50%;
-
-    background:
-        linear-gradient(
-            90deg,
-            #a74752,
-            #e07880,
-            #a53e49
-        );
-
-    border: 2px solid #72313a;
-
-    transform-origin: top;
-
-    animation:
-        tonguePant .55s ease-in-out infinite alternate;
-
-    z-index: 2;
-}
-
-@keyframes tonguePant {
-    from {
-        transform: translateY(0) scaleY(.85);
-    }
-
-    to {
-        transform: translateY(4px) scaleY(1);
-    }
-}
-
-/* Collar */
-
-.collar {
-    position: absolute;
-
-    left: 64px;
-    top: 76px;
-
-    width: 65px;
-    height: 12px;
-
-    border-radius: 50%;
-
-    background:
-        linear-gradient(
-            180deg,
-            #b92d35,
-            #70171d
-        );
-
-    border: 2px solid #4b1115;
-
-    transform: rotate(5deg);
-
-    z-index: 6;
-}
-
-/* =========================================================
-   LONG ATHLETIC DOG LEGS
-========================================================= */
-
-.dog-leg {
-    position: absolute;
-
-    top: 91px;
-
-    width: 19px;
-    height: 42px;
-
-    border-radius: 10px 10px 7px 7px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #81766d,
-            #d5cdc3,
-            #71665f
-        );
-
-    border: 3px solid #514a45;
-
+    height: 92px;
+    background: #d89a36;
+    border: 3px solid #9a6620;
+    border-radius: 10px;
     transform-origin: top center;
-
-    z-index: 1;
 }
 
-.dog-leg::after {
+.giraffe-leg::after {
     content: "";
-
     position: absolute;
+    bottom: -6px;
+    left: -3px;
+    width: 20px;
+    height: 11px;
+    background: #69451c;
+    border-radius: 5px;
+}
 
-    left: -4px;
-    bottom: -4px;
+.giraffe-leg.one {
+    left: 68px;
+    top: 181px;
+}
 
-    width: 21px;
-    height: 9px;
+.giraffe-leg.two {
+    left: 94px;
+    top: 183px;
+}
 
+.giraffe-leg.three {
+    left: 132px;
+    top: 181px;
+}
+
+.giraffe-leg.four {
+    left: 157px;
+    top: 183px;
+}
+
+/* tail */
+
+.giraffe-tail {
+    position: absolute;
+    width: 55px;
+    height: 13px;
+    left: 42px;
+    top: 137px;
+    border-top: 5px solid #9a6620;
     border-radius: 50%;
-
-    background: #403934;
+    transform: rotate(15deg);
+    transform-origin: right center;
 }
 
-.dog-leg.one {
-    left: 57px;
-    animation: dogLegA .34s ease-in-out infinite alternate;
-}
-
-.dog-leg.two {
-    left: 79px;
-    animation: dogLegB .34s ease-in-out infinite alternate;
-}
-
-.dog-leg.three {
-    left: 128px;
-    animation: dogLegB .34s ease-in-out infinite alternate;
-}
-
-.dog-leg.four {
-    left: 151px;
-    animation: dogLegA .34s ease-in-out infinite alternate;
-}
-
-@keyframes dogLegA {
-    from {
-        transform: rotate(15deg);
-    }
-
-    to {
-        transform: rotate(-15deg);
-    }
-}
-
-@keyframes dogLegB {
-    from {
-        transform: rotate(-15deg);
-    }
-
-    to {
-        transform: rotate(15deg);
-    }
-}
-
-/* Tail */
-
-.dog-tail {
+.giraffe-tail::after {
+    content: "";
     position: absolute;
+    width: 19px;
+    height: 19px;
+    background: #69451c;
+    border-radius: 50%;
+    left: -8px;
+    top: -10px;
+}
 
-    left: 170px;
-    top: 48px;
+/* giraffe walking */
 
-    width: 48px;
-    height: 39px;
+@keyframes giraffeWalk {
+    0% {
+        left: -235px;
+        transform: translateY(0);
+    }
+    10% {
+        transform: translateY(-3px);
+    }
+    20% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-3px);
+    }
+    40% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+    60% {
+        transform: translateY(0);
+    }
+    70% {
+        transform: translateY(-3px);
+    }
+    80% {
+        transform: translateY(0);
+    }
+    100% {
+        left: calc(100% + 25px);
+        transform: translateY(0);
+    }
+}
 
-    border-top: 8px solid #777069;
-    border-right: 5px solid #777069;
+@keyframes giraffeLeg1 {
+    0%,100% { transform: rotate(10deg); }
+    50% { transform: rotate(-12deg); }
+}
 
-    border-radius: 0 70% 20% 0;
+@keyframes giraffeLeg2 {
+    0%,100% { transform: rotate(-12deg); }
+    50% { transform: rotate(10deg); }
+}
 
-    transform: rotate(-15deg);
+.giraffe-leg.one,
+.giraffe-leg.three {
+    animation: giraffeLeg1 .65s ease-in-out infinite;
+}
 
+.giraffe-leg.two,
+.giraffe-leg.four {
+    animation: giraffeLeg2 .65s ease-in-out infinite;
+}
+
+.giraffe-tail {
+    animation: tailWag .9s ease-in-out infinite;
+}
+
+@keyframes tailWag {
+    0%,100% { transform: rotate(10deg); }
+    50% { transform: rotate(27deg); }
+}
+
+/* =========================
+   LABRADOR / GREYHOUND
+   ========================= */
+
+.labrador-wrapper {
+    position: absolute;
+    right: -250px;
+    bottom: 2px;
+    width: 235px;
+    height: 155px;
+    animation: labradorWalk 18s linear infinite;
+    transform-origin: center bottom;
+}
+
+.labrador {
+    position: relative;
+    width: 235px;
+    height: 155px;
+}
+
+/*
+   Lean Greyhound-influenced body,
+   Labrador head/ears/muzzle/coat.
+*/
+
+.lab-body {
+    position: absolute;
+    left: 65px;
+    top: 54px;
+    width: 125px;
+    height: 55px;
+    background: #b87538;
+    border: 3px solid #74451f;
+    border-radius: 55% 48% 48% 52%;
+    transform: rotate(-3deg);
+    box-shadow: inset -8px -5px 0 rgba(80,40,15,.12);
+}
+
+.lab-chest {
+    position: absolute;
+    left: 51px;
+    top: 57px;
+    width: 49px;
+    height: 69px;
+    background: #c48142;
+    border: 3px solid #74451f;
+    border-radius: 48% 42% 35% 45%;
+}
+
+.lab-head {
+    position: absolute;
+    left: 18px;
+    top: 31px;
+    width: 73px;
+    height: 68px;
+    background: #b87538;
+    border: 3px solid #74451f;
+    border-radius: 50% 48% 46% 50%;
+    transform: rotate(-3deg);
+}
+
+/* Labrador floppy ears */
+
+.lab-ear {
+    position: absolute;
+    width: 29px;
+    height: 54px;
+    background: #75451f;
+    border: 3px solid #593316;
+    border-radius: 55% 45% 55% 45%;
+    top: 39px;
+    z-index: -1;
+}
+
+.lab-ear.left {
+    left: 11px;
+    transform: rotate(19deg);
+}
+
+.lab-ear.right {
+    left: 69px;
+    transform: rotate(-25deg);
+}
+
+/* Labrador muzzle */
+
+.lab-muzzle {
+    position: absolute;
+    left: -8px;
+    top: 61px;
+    width: 49px;
+    height: 31px;
+    background: #d59a5c;
+    border: 3px solid #74451f;
+    border-radius: 52%;
+}
+
+.lab-nose {
+    position: absolute;
+    left: -7px;
+    top: 68px;
+    width: 20px;
+    height: 14px;
+    background: #17130f;
+    border-radius: 50%;
+}
+
+.lab-eye {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: #111;
+    border-radius: 50%;
+    left: 43px;
+    top: 55px;
+    box-shadow: 2px 2px 0 white;
+}
+
+.lab-collar {
+    position: absolute;
+    left: 70px;
+    top: 50px;
+    width: 13px;
+    height: 58px;
+    background: #263f70;
+    border: 2px solid #152846;
+    border-radius: 5px;
+    transform: rotate(-3deg);
+}
+
+.lab-tag {
+    position: absolute;
+    left: 67px;
+    top: 101px;
+    width: 14px;
+    height: 16px;
+    background: #d6b75b;
+    border-radius: 50%;
+    border: 2px solid #806a27;
+}
+
+/* Long Greyhound-like legs */
+
+.lab-leg {
+    position: absolute;
+    width: 12px;
+    height: 76px;
+    background: #a96632;
+    border: 3px solid #70411d;
+    border-radius: 9px;
+    transform-origin: top center;
+}
+
+.lab-leg::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    bottom: -5px;
+    width: 17px;
+    height: 9px;
+    background: #57341c;
+    border-radius: 5px;
+}
+
+.lab-leg.front1 {
+    left: 71px;
+    top: 93px;
+}
+
+.lab-leg.front2 {
+    left: 91px;
+    top: 91px;
+}
+
+.lab-leg.back1 {
+    left: 157px;
+    top: 92px;
+}
+
+.lab-leg.back2 {
+    left: 178px;
+    top: 91px;
+}
+
+/* long lean tail */
+
+.lab-tail {
+    position: absolute;
+    left: 180px;
+    top: 53px;
+    width: 58px;
+    height: 17px;
+    border-top: 6px solid #74451f;
+    border-radius: 50%;
+    transform: rotate(13deg);
     transform-origin: left center;
-
-    animation:
-        dogTailWag .25s ease-in-out infinite alternate;
-
-    z-index: 4;
 }
 
-@keyframes dogTailWag {
-    from {
-        transform: rotate(-25deg);
-    }
+.lab-tail::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: -7px;
+    width: 16px;
+    height: 16px;
+    background: #74451f;
+    border-radius: 50%;
+}
 
-    to {
-        transform: rotate(15deg);
+/* Labrador/Greyhound walking gait */
+
+@keyframes labradorWalk {
+    0% {
+        right: -250px;
+        transform: translateY(0);
+    }
+    10% {
+        transform: translateY(-2px);
+    }
+    20% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-2px);
+    }
+    40% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+    60% {
+        transform: translateY(0);
+    }
+    70% {
+        transform: translateY(-2px);
+    }
+    80% {
+        transform: translateY(0);
+    }
+    100% {
+        right: calc(100% + 30px);
+        transform: translateY(0);
     }
 }
 
-/* =========================================================
-   MEETING
-========================================================= */
+@keyframes labLegA {
+    0%,100% { transform: rotate(12deg); }
+    50% { transform: rotate(-14deg); }
+}
 
-.giraffe-wrapper.meet,
-.bulldog-wrapper.meet {
+@keyframes labLegB {
+    0%,100% { transform: rotate(-14deg); }
+    50% { transform: rotate(12deg); }
+}
+
+.lab-leg.front1,
+.lab-leg.back1 {
+    animation: labLegA .58s ease-in-out infinite;
+}
+
+.lab-leg.front2,
+.lab-leg.back2 {
+    animation: labLegB .58s ease-in-out infinite;
+}
+
+.lab-tail {
+    animation: dogTail .8s ease-in-out infinite;
+}
+
+@keyframes dogTail {
+    0%,100% { transform: rotate(8deg); }
+    50% { transform: rotate(23deg); }
+}
+
+/* =========================
+   INTERACTION
+   ========================= */
+
+.animal-stage.meeting .giraffe-wrapper,
+.animal-stage.meeting .labrador-wrapper {
     animation-play-state: paused;
 }
 
-/* Giraffe notices dog */
-
-.giraffe-wrapper.look .head {
-    animation:
-        giraffeLook .65s ease forwards;
+.sniff-bubble,
+.bark-bubble {
+    position: absolute;
+    z-index: 30;
+    opacity: 0;
+    pointer-events: none;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
-@keyframes giraffeLook {
-
-    0% {
-        transform: rotate(-8deg);
-    }
-
-    100% {
-        transform: rotate(18deg) translateX(-8px);
-    }
+.sniff-bubble {
+    left: 50%;
+    bottom: 125px;
+    transform: translateX(-50%);
+    font-size: 18px;
+    color: #d9e9ff;
 }
 
-/* =========================================================
-   DOG SNIFFS
-========================================================= */
-
-.bulldog-wrapper.sniff .dog-head {
-    animation:
-        dogSniff .22s ease-in-out 5 alternate;
+.bark-bubble {
+    left: 50%;
+    bottom: 165px;
+    transform: translateX(-50%);
+    background: white;
+    color: #17253a;
+    padding: 8px 13px;
+    border-radius: 15px;
+    font-size: 17px;
+    box-shadow: 0 3px 8px rgba(0,0,0,.4);
 }
 
-@keyframes dogSniff {
-
-    from {
-        transform: translateX(0) rotate(0deg);
-    }
-
-    to {
-        transform: translateX(9px) rotate(2deg);
-    }
+.sniff-bubble.show {
+    opacity: 1;
 }
 
-/* Dog gets ready to bark */
-
-.bulldog-wrapper.barking .dog-head {
-    animation:
-        dogBarkHead .12s ease-in-out 3 alternate;
+.bark-bubble.show {
+    opacity: 1;
 }
 
-@keyframes dogBarkHead {
+/* dog sniffing */
 
-    from {
-        transform: translateX(0) scale(1);
-    }
-
-    to {
-        transform: translateX(5px) scale(1.04);
-    }
+.labrador-wrapper.sniffing .lab-head {
+    transform: rotate(7deg) translateX(-5px);
 }
 
-/* =========================================================
-   GIRAFFE STARTLES
-========================================================= */
+.labrador-wrapper.sniffing .lab-muzzle {
+    transform: translateX(-5px);
+}
 
-/*
-   THIS IS THE IMPORTANT PART:
+/* bark */
 
-   The entire giraffe is flipped left/right after
-   the dog barks.
+.labrador-wrapper.barking .lab-head {
+    animation: barkHead .16s ease-in-out 3;
+}
 
-   Then the giraffe runs quickly to the LEFT.
-*/
+@keyframes barkHead {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(4deg) translateX(-3px); }
+}
+
+/* giraffe startled */
 
 .giraffe-wrapper.startled .giraffe {
-    transform: scaleX(-1);
-    animation:
-        giraffeStartle .18s ease forwards;
+    animation: startled .18s ease-in-out 3;
 }
 
-@keyframes giraffeStartle {
-
-    0% {
-        transform: scaleX(1);
+@keyframes startled {
+    0%,100% {
+        transform: translateX(0);
     }
-
-    100% {
-        transform: scaleX(-1);
+    50% {
+        transform: translateX(-8px);
     }
 }
 
-/* Fast escape */
-
-.giraffe-wrapper.escape {
-    animation:
-        giraffeEscape 2.2s cubic-bezier(.18,.75,.08,1) forwards;
-}
+/*
+   Horizontal flip exactly when startled.
+   Then the whole giraffe runs left.
+*/
 
 .giraffe-wrapper.escape .giraffe {
     transform: scaleX(-1);
+}
+
+.giraffe-wrapper.escape {
     animation:
-        fastGiraffeBounce .20s ease-in-out infinite alternate;
-}
-
-.giraffe-wrapper.escape .leg {
-    animation-duration: .20s;
-}
-
-@keyframes fastGiraffeBounce {
-
-    from {
-        transform: scaleX(-1) translateY(1px);
-    }
-
-    to {
-        transform: scaleX(-1) translateY(-5px);
-    }
+        giraffeEscape 2.3s linear forwards !important;
 }
 
 @keyframes giraffeEscape {
-
-    from {
-        transform: translateX(0);
+    0% {
+        left: var(--escape-start);
     }
-
-    to {
-        transform: translateX(-125vw);
+    100% {
+        left: -270px;
     }
 }
 
-/* Bark bubble */
+/* =========================
+   MOBILE
+   ========================= */
 
-.bark {
-    position: fixed;
+@media (max-width: 700px) {
 
-    z-index: 100;
+    .menu {
+        padding-top: 22px;
+    }
 
-    left: 0;
-    top: 0;
-
-    padding: 8px 12px;
-
-    border-radius: 15px;
-
-    background: rgba(255,255,255,.95);
-    color: #1a1a1a;
-
-    font-size: 14px;
-    font-weight: 900;
-
-    box-shadow:
-        0 5px 15px rgba(0,0,0,.4);
-
-    opacity: 0;
-    pointer-events: none;
-
-    transform: scale(.5);
-
-    transition:
-        opacity .15s,
-        transform .15s;
-}
-
-.bark.show {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.bark::after {
-    content: "";
-
-    position: absolute;
-
-    bottom: -7px;
-    left: 16px;
-
-    border-width: 7px 7px 0 0;
-    border-style: solid;
-    border-color: white transparent transparent transparent;
-}
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.footer {
-    position: absolute;
-
-    z-index: 30;
-
-    bottom: 10px;
-    left: 0;
-
-    width: 100%;
-
-    text-align: center;
-
-    color: rgba(255,255,255,.35);
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-}
-
-/* =========================================================
-   SMALL HEIGHT
-========================================================= */
-
-@media (max-height: 650px) {
-
-    .title-area {
-        padding-top: 8px;
+    h1 {
+        letter-spacing: 4px;
     }
 
     .subtitle {
-        display: none;
+        font-size: 13px;
+        letter-spacing: 3px;
     }
 
-    .menu {
-        top: 48%;
+    .buttons {
+        margin-top: 20px;
+        gap: 9px;
     }
 
-    .game-button {
-        height: 58px;
-        border-radius: 17px;
+    .buttons a {
+        min-width: 125px;
+        padding: 11px 13px;
+        font-size: 15px;
     }
 
-    .icon {
-        font-size: 30px;
-    }
-
-    .button-title {
-        font-size: 18px;
-    }
-
-    .button-subtitle {
-        font-size: 10px;
-    }
-
-    .giraffe-wrapper,
-    .bulldog-wrapper {
-        transform: scale(.72);
+    .animal-stage {
+        transform: scale(.78);
         transform-origin: bottom center;
-    }
-}
-
-/* =========================================================
-   VERY SHORT SCREEN
-========================================================= */
-
-@media (max-height: 500px) {
-
-    .title {
-        font-size: 30px;
-    }
-
-    .menu {
-        width: min(70vw, 380px);
-        top: 52%;
-    }
-
-    .game-button {
-        height: 48px;
-    }
-
-    .button-subtitle {
-        display: none;
-    }
-
-    .footer {
-        display: none;
+        width: 128%;
+        left: -14%;
     }
 }
 </style>
@@ -1470,508 +884,258 @@ body {
 
 <body>
 
-<div class="game-room">
+<div class="menu">
+    <h1>GAME ROOM</h1>
+    <div class="subtitle">CHOOSE YOUR GAME</div>
 
-    <div class="glow"></div>
-
-    <div class="title-area">
-        <h1 class="title">GAME ROOM</h1>
-        <div class="subtitle">CHOOSE YOUR GAME</div>
+    <div class="buttons">
+        <a href="ttt.html">TIC-TAC-TOE</a>
+        <a href="checkers.html">CHECKERS</a>
+        <a href="carrierstrike.html">CARRIER STRIKE</a>
     </div>
+</div>
 
-    <!-- =====================================================
-         GAME MENU
-    ====================================================== -->
+<div class="animal-stage" id="animalStage">
 
-    <div class="menu">
-
-        <button
-            class="game-button"
-            onclick="location.href='ttt.html'">
-
-            <div class="icon">⭕</div>
-
-            <div class="button-text">
-                <div class="button-title">
-                    TIC-TAC-TOE
-                </div>
-
-                <div class="button-subtitle">
-                    Classic X vs O
-                </div>
-            </div>
-
-        </button>
-
-        <button
-            class="game-button"
-            onclick="location.href='checkers.html'">
-
-            <div class="icon">⛀</div>
-
-            <div class="button-text">
-                <div class="button-title">
-                    CHECKERS
-                </div>
-
-                <div class="button-subtitle">
-                    Jump • Capture • King
-                </div>
-            </div>
-
-        </button>
-
-        <button
-            class="game-button"
-            onclick="location.href='carrierstrike.html'">
-
-            <div class="icon">⚓</div>
-
-            <div class="button-text">
-                <div class="button-title">
-                    CARRIER STRIKE
-                </div>
-
-                <div class="button-subtitle">
-                    Hunt • Fire • Sink
-                </div>
-            </div>
-
-        </button>
-
-    </div>
-
-    <!-- =====================================================
-         GIRAFFE
-    ====================================================== -->
+    <!-- ================= GIRAFFE ================= -->
 
     <div class="giraffe-wrapper" id="giraffe">
-
         <div class="giraffe">
 
-            <div class="tail">
-                <div class="tail-tip"></div>
+            <div class="giraffe-tail"></div>
+
+            <div class="giraffe-body">
+                <div class="patch p1"></div>
+                <div class="patch p2"></div>
+                <div class="patch p3"></div>
+                <div class="patch p4"></div>
             </div>
 
-            <div class="body"></div>
-
-            <div class="patch p1"></div>
-            <div class="patch p2"></div>
-            <div class="patch p3"></div>
-            <div class="patch p4"></div>
-
-            <div class="leg back1"></div>
-            <div class="leg back2"></div>
-            <div class="leg front1"></div>
-            <div class="leg front2"></div>
-
-            <div class="neck"></div>
+            <div class="giraffe-neck"></div>
 
             <div class="mane"></div>
 
-            <div class="head">
+            <div class="giraffe-head">
+                <div class="giraffe-ear left"></div>
+                <div class="giraffe-ear right"></div>
 
-                <div class="ear left"></div>
-                <div class="ear right"></div>
+                <div class="horn left"></div>
+                <div class="horn right"></div>
 
-                <div class="horn one"></div>
-                <div class="horn two"></div>
-
-                <div class="eye"></div>
-
-                <div class="muzzle"></div>
-
+                <div class="giraffe-eye"></div>
+                <div class="giraffe-muzzle"></div>
             </div>
 
-        </div>
+            <div class="giraffe-leg one"></div>
+            <div class="giraffe-leg two"></div>
+            <div class="giraffe-leg three"></div>
+            <div class="giraffe-leg four"></div>
 
+        </div>
     </div>
 
-    <!-- =====================================================
-         LABRADOR / GREYHOUND
-    ====================================================== -->
+    <!-- ================= LABRADOR / GREYHOUND ================= -->
 
-    <div class="bulldog-wrapper" id="bulldog">
+    <div class="labrador-wrapper" id="labrador">
+        <div class="labrador">
 
-        <div class="bulldog">
+            <div class="lab-tail"></div>
 
-            <div class="dog-shadow"></div>
+            <div class="lab-body"></div>
+            <div class="lab-chest"></div>
 
-            <div class="dog-tail"></div>
+            <div class="lab-ear left"></div>
+            <div class="lab-ear right"></div>
 
-            <div class="dog-body"></div>
-
-            <div class="dog-shoulders"></div>
-
-            <div class="dog-chest"></div>
-
-            <div class="dog-leg one"></div>
-            <div class="dog-leg two"></div>
-            <div class="dog-leg three"></div>
-            <div class="dog-leg four"></div>
-
-            <div class="dog-head">
-
-                <div class="dog-ear left"></div>
-                <div class="dog-ear right"></div>
-
-                <div class="dog-blaze"></div>
-
-                <div class="brow left"></div>
-                <div class="brow right"></div>
-
-                <div class="dog-eye left"></div>
-                <div class="dog-eye right"></div>
-
-                <div class="dog-muzzle"></div>
-
-                <div class="dog-nose"></div>
-
-                <div class="dog-mouth"></div>
-
-                <div class="dog-tongue"></div>
-
+            <div class="lab-head">
+                <div class="lab-muzzle"></div>
+                <div class="lab-nose"></div>
+                <div class="lab-eye"></div>
             </div>
 
-            <div class="collar"></div>
+            <div class="lab-collar"></div>
+            <div class="lab-tag"></div>
+
+            <div class="lab-leg front1"></div>
+            <div class="lab-leg front2"></div>
+            <div class="lab-leg back1"></div>
+            <div class="lab-leg back2"></div>
 
         </div>
-
     </div>
 
-    <div class="ground"></div>
-
-    <div class="footer">
-        TWO PLAYERS • ONE SCREEN • LET'S PLAY
+    <div class="sniff-bubble" id="sniffBubble">
+        sniff...
     </div>
 
-    <div class="bark" id="bark">
+    <div class="bark-bubble" id="barkBubble">
         WOOF!
     </div>
 
 </div>
 
+<div class="ground"></div>
+
 <script>
-
-/* =========================================================
-   CHARACTER INTERACTION
-========================================================= */
-
-const giraffe =
-    document.getElementById("giraffe");
-
-const bulldog =
-    document.getElementById("bulldog");
-
-const bark =
-    document.getElementById("bark");
+const stage = document.getElementById("animalStage");
+const giraffe = document.getElementById("giraffe");
+const labrador = document.getElementById("labrador");
+const sniffBubble = document.getElementById("sniffBubble");
+const barkBubble = document.getElementById("barkBubble");
 
 let interactionRunning = false;
 
-
-/* =========================================================
-   BARK BUBBLE
-========================================================= */
-
-function showBark(text = "WOOF!") {
-
-    bark.textContent = text;
-
-    const dogRect =
-        bulldog.getBoundingClientRect();
-
-    bark.style.left =
-        Math.max(10, dogRect.left + 25) + "px";
-
-    bark.style.top =
-        Math.max(20, dogRect.top - 38) + "px";
-
-    bark.classList.add("show");
-
-    setTimeout(() => {
-        bark.classList.remove("show");
-    }, 650);
-}
-
-
-/* =========================================================
-   BARK SOUND
-========================================================= */
-
-function barkSound() {
-
-    try {
-
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        if (!AudioContext) return;
-
-        const ctx =
-            new AudioContext();
-
-        const now =
-            ctx.currentTime;
-
-        const osc =
-            ctx.createOscillator();
-
-        const gain =
-            ctx.createGain();
-
-        osc.type = "sawtooth";
-
-        osc.frequency.setValueAtTime(
-            190,
-            now
-        );
-
-        osc.frequency.exponentialRampToValueAtTime(
-            72,
-            now + .16
-        );
-
-        gain.gain.setValueAtTime(
-            .0001,
-            now
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            .22,
-            now + .015
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            .0001,
-            now + .18
-        );
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + .2);
-
-    } catch (e) {
-        /* Sound is optional */
-    }
-}
-
-
-function dogBark(text = "WOOF!") {
-
-    showBark(text);
-    barkSound();
-}
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-function resetCharacters() {
-
-    giraffe.className =
-        "giraffe-wrapper";
-
-    bulldog.className =
-        "bulldog-wrapper";
-
-    giraffe.style.animation =
-        "none";
-
-    bulldog.style.animation =
-        "none";
-
-    giraffe.style.transform =
-        "";
-
-    bulldog.style.transform =
-        "";
-
-    giraffe.style.animationPlayState =
-        "";
-
-    bulldog.style.animationPlayState =
-        "";
-
-    void giraffe.offsetWidth;
-    void bulldog.offsetWidth;
-
-    giraffe.style.animation =
-        "giraffeWalk 15s linear infinite";
-
-    bulldog.style.animation =
-        "bulldogWalk 18s linear infinite";
-
-    interactionRunning = false;
-}
-
-
-/* =========================================================
-   MAIN ENCOUNTER
-========================================================= */
-
-/*
-   EXACT SEQUENCE:
-
-   1. Giraffe walks RIGHT.
-   2. Labrador walks LEFT.
-   3. They meet.
-   4. Both stop.
-   5. Labrador sniffs giraffe.
-   6. Labrador barks.
-   7. Giraffe gets startled.
-   8. Giraffe flips horizontally.
-   9. Giraffe runs FAST to the LEFT.
-   10. Labrador stays where he is.
-*/
-
-function interaction() {
-
-    if (interactionRunning) return;
-
-    interactionRunning = true;
-
-    /* STOP BOTH */
-
-    giraffe.classList.add("meet");
-    bulldog.classList.add("meet");
-
-    giraffe.style.animationPlayState =
-        "paused";
-
-    bulldog.style.animationPlayState =
-        "paused";
-
-
-    /* =====================================================
-       DOG SNIFFS
-    ===================================================== */
-
-    setTimeout(() => {
-
-        bulldog.classList.add("sniff");
-
-    }, 300);
-
-
-    /* =====================================================
-       GIRAFFE LOOKS DOWN WHILE DOG SNIFFS
-    ===================================================== */
-
-    setTimeout(() => {
-
-        giraffe.classList.add("look");
-
-    }, 650);
-
-
-    /* =====================================================
-       DOG FINISHES SNIFFING
-    ===================================================== */
-
-    setTimeout(() => {
-
-        bulldog.classList.remove("sniff");
-
-    }, 1450);
-
-
-    /* =====================================================
-       DOG BARKS
-    ===================================================== */
-
-    setTimeout(() => {
-
-        bulldog.classList.add("barking");
-
-        dogBark("WOOF!");
-
-    }, 1600);
-
-
-    /* =====================================================
-       GIRAFFE GETS STARTLED
-    ===================================================== */
-
-    setTimeout(() => {
-
-        giraffe.classList.add("startled");
-
-    }, 1780);
-
-
-    /* =====================================================
-       GIRAFFE FLIPS AND RUNS LEFT
-    ===================================================== */
-
-    setTimeout(() => {
-
-        giraffe.classList.remove("meet");
-        giraffe.classList.remove("look");
-        giraffe.classList.remove("startled");
-
-        giraffe.classList.add("escape");
-
-        bulldog.classList.remove("meet");
-        bulldog.classList.remove("barking");
-
-    }, 1980);
-
-
-    /* =====================================================
-       RESET AFTER GIRAFFE LEAVES
-    ===================================================== */
-
-    setTimeout(() => {
-
-        resetCharacters();
-
-    }, 4400);
-
-}
-
-
-/* =========================================================
-   NATURAL MEETING DETECTION
-========================================================= */
+/* ---------------------------------
+   Check when the animals meet
+---------------------------------- */
 
 function checkForMeeting() {
 
     if (interactionRunning) return;
 
-    const g =
-        giraffe.getBoundingClientRect();
-
-    const d =
-        bulldog.getBoundingClientRect();
+    const g = giraffe.getBoundingClientRect();
+    const d = labrador.getBoundingClientRect();
 
     /*
-       Their bodies overlap enough to count
-       as meeting.
+       They are considered to have met when
+       their horizontal bodies overlap and
+       they are on the same ground level.
     */
 
-    const closeEnough =
-        d.left < g.right - 20 &&
-        d.right > g.left + 20;
+    const horizontalOverlap =
+        g.right > d.left + 8 &&
+        g.left < d.right - 8;
 
-    if (closeEnough) {
+    const verticalOverlap =
+        g.bottom > d.top + 25 &&
+        g.top < d.bottom - 15;
 
-        interaction();
-
+    if (horizontalOverlap && verticalOverlap) {
+        startEncounter();
     }
 }
 
+/* ---------------------------------
+   Exact encounter sequence
+---------------------------------- */
 
-/* Check their positions frequently */
+function startEncounter() {
 
-setInterval(
-    checkForMeeting,
-    100
-);
+    if (interactionRunning) return;
 
+    interactionRunning = true;
+
+    stage.classList.add("meeting");
+
+    /* DOG SNIFFS */
+
+    setTimeout(() => {
+        labrador.classList.add("sniffing");
+        sniffBubble.classList.add("show");
+    }, 250);
+
+    /* DOG BARKS */
+
+    setTimeout(() => {
+        labrador.classList.remove("sniffing");
+        sniffBubble.classList.remove("show");
+
+        labrador.classList.add("barking");
+        barkBubble.classList.add("show");
+    }, 1900);
+
+    /* GIRAFFE STARTLES */
+
+    setTimeout(() => {
+        labrador.classList.remove("barking");
+        barkBubble.classList.remove("show");
+
+        giraffe.classList.add("startled");
+    }, 2400);
+
+    /* GIRAFFE FLIPS AND RUNS LEFT */
+
+    setTimeout(() => {
+
+        giraffe.classList.remove("startled");
+
+        /*
+           Save its current left position so the
+           escape animation starts exactly where
+           the giraffe was standing.
+        */
+
+        const rect = giraffe.getBoundingClientRect();
+        const stageRect = stage.getBoundingClientRect();
+
+        const currentLeft = rect.left - stageRect.left;
+
+        giraffe.style.setProperty(
+            "--escape-start",
+            currentLeft + "px"
+        );
+
+        giraffe.classList.add("escape");
+
+    }, 2900);
+
+    /*
+       After the giraffe has run completely off
+       the left side, restart the normal scene.
+       The dog NEVER disappears.
+    */
+
+    setTimeout(() => {
+
+        giraffe.classList.remove("escape");
+
+        /*
+           Force the giraffe's original CSS walking
+           animation to restart from the left side.
+        */
+
+        giraffe.style.animation = "none";
+        void giraffe.offsetWidth;
+        giraffe.style.animation = "";
+
+        /*
+           The dog is already traveling normally
+           toward the left. Restart its animation
+           only if necessary.
+        */
+
+        labrador.style.animation = "none";
+        void labrador.offsetWidth;
+        labrador.style.animation = "";
+
+        stage.classList.remove("meeting");
+
+        interactionRunning = false;
+
+    }, 5500);
+}
+
+/* Check continuously while both animals are moving */
+
+setInterval(checkForMeeting, 80);
+
+/*
+   If a browser has resized, keep everything
+   alive and restart cleanly.
+*/
+
+window.addEventListener("resize", () => {
+    if (!interactionRunning) {
+        giraffe.style.animation = "none";
+        labrador.style.animation = "none";
+
+        void giraffe.offsetWidth;
+        void labrador.offsetWidth;
+
+        giraffe.style.animation = "";
+        labrador.style.animation = "";
+    }
+});
 </script>
 
 </body>
