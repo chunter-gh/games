@@ -1,0 +1,1106 @@
+<script>
+
+/* =========================================================
+   AUTOMATIC GAME DISCOVERY
+========================================================= */
+
+const gameMenu = document.getElementById("gameMenu");
+
+const gameInfo = {
+
+    "ttt.html": {
+        icon: "⭕",
+        title: "TIC-TAC-TOE",
+        subtitle: "Classic X vs O"
+    },
+
+    "checkers.html": {
+        icon: "⛀",
+        title: "CHECKERS",
+        subtitle: "Jump • Capture • King"
+    },
+
+    "navalstrike.html": {
+        icon: "⚓",
+        title: "NAVAL STRIKE",
+        subtitle: "Hunt • Fire • Sink"
+    },
+
+    "carrierstrike.html": {
+        icon: "⚓",
+        title: "CARRIER STRIKE",
+        subtitle: "Hunt • Fire • Sink"
+    },
+
+    "chess.html": {
+        icon: "♛",
+        title: "CHESS",
+        subtitle: "Classic Strategy"
+    },
+
+    "solitaire.html": {
+        icon: "🂡",
+        title: "SOLITAIRE",
+        subtitle: "Classic Card Game"
+    }
+
+};
+
+function makeGameTitle(filename) {
+
+    let name = filename
+        .replace(/\.html$/i, "")
+        .replace(/[-_]+/g, " ");
+
+    name = name.replace(/\b\w/g, c => c.toUpperCase());
+
+    return name;
+}
+
+function createGameButton(filename) {
+
+    const info =
+        gameInfo[filename.toLowerCase()] || {
+
+            icon: "🎮",
+
+            title: makeGameTitle(filename)
+                .toUpperCase(),
+
+            subtitle: "Play Game"
+
+        };
+
+    const button =
+        document.createElement("button");
+
+    button.className = "game-button";
+
+    button.onclick = () => {
+        unlockAudio();
+        location.href = filename;
+    };
+
+    const icon =
+        document.createElement("div");
+
+    icon.className = "icon";
+    icon.textContent = info.icon;
+
+    const text =
+        document.createElement("div");
+
+    text.className = "button-text";
+
+    const title =
+        document.createElement("div");
+
+    title.className = "button-title";
+    title.textContent = info.title;
+
+    const subtitle =
+        document.createElement("div");
+
+    subtitle.className = "button-subtitle";
+    subtitle.textContent = info.subtitle;
+
+    text.appendChild(title);
+    text.appendChild(subtitle);
+
+    button.appendChild(icon);
+    button.appendChild(text);
+
+    return button;
+}
+
+async function loadGames() {
+
+    try {
+
+        const response =
+            await fetch("/games", {
+                cache: "no-store"
+            });
+
+        if (!response.ok) {
+            throw new Error("Game list unavailable");
+        }
+
+        const games =
+            await response.json();
+
+        gameMenu.innerHTML = "";
+
+        const htmlGames =
+            games
+                .filter(game =>
+                    typeof game === "string" &&
+                    /\.html$/i.test(game) &&
+                    game.toLowerCase() !== "index.html"
+                )
+                .sort((a, b) => {
+
+                    const order = [
+                        "ttt.html",
+                        "checkers.html",
+                        "navalstrike.html",
+                        "carrierstrike.html",
+                        "chess.html",
+                        "solitaire.html"
+                    ];
+
+                    const ai =
+                        order.indexOf(a.toLowerCase());
+
+                    const bi =
+                        order.indexOf(b.toLowerCase());
+
+                    if (ai !== -1 && bi !== -1) {
+                        return ai - bi;
+                    }
+
+                    if (ai !== -1) return -1;
+                    if (bi !== -1) return 1;
+
+                    return a.localeCompare(b);
+                });
+
+        gameMenu.classList.remove(
+            "many-games",
+            "lots-of-games",
+            "huge-game-list"
+        );
+
+        if (htmlGames.length >= 5 &&
+            htmlGames.length < 8) {
+
+            gameMenu.classList.add(
+                "many-games"
+            );
+        }
+
+        if (htmlGames.length >= 8 &&
+            htmlGames.length < 12) {
+
+            gameMenu.classList.add(
+                "lots-of-games"
+            );
+        }
+
+        if (htmlGames.length >= 12) {
+
+            gameMenu.classList.add(
+                "huge-game-list"
+            );
+        }
+
+        htmlGames.forEach(filename => {
+
+            gameMenu.appendChild(
+                createGameButton(filename)
+            );
+
+        });
+
+        if (htmlGames.length === 0) {
+
+            const message =
+                document.createElement("div");
+
+            message.style.textAlign = "center";
+            message.style.color = "#c9e5fa";
+            message.style.fontWeight = "bold";
+            message.textContent =
+                "NO GAMES FOUND";
+
+            gameMenu.appendChild(message);
+        }
+
+    } catch (error) {
+
+        gameMenu.innerHTML = "";
+
+        [
+            "ttt.html",
+            "checkers.html",
+            "navalstrike.html"
+        ].forEach(filename => {
+
+            gameMenu.appendChild(
+                createGameButton(filename)
+            );
+
+        });
+
+        gameMenu.classList.remove(
+            "many-games",
+            "lots-of-games",
+            "huge-game-list"
+        );
+
+        console.error(
+            "Automatic game discovery failed:",
+            error
+        );
+    }
+}
+
+loadGames();
+
+
+/* =========================================================
+   CHARACTER INTERACTION
+========================================================= */
+
+const giraffe = document.getElementById("giraffe");
+const bulldog = document.getElementById("bulldog");
+const ladybug = document.getElementById("ladybug");
+
+const bark = document.getElementById("bark");
+const sniff = document.getElementById("sniff");
+
+let interactionRunning = false;
+
+
+/* =========================================================
+   AUDIO ENGINE
+========================================================= */
+
+let audioContext = null;
+let audioUnlocked = false;
+let ladybugBuzz = null;
+let giraffeStepTimer = null;
+
+function getAudioContext() {
+
+    if (audioContext) {
+        return audioContext;
+    }
+
+    const AudioContext =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioContext) {
+        return null;
+    }
+
+    try {
+
+        audioContext = new AudioContext();
+
+        return audioContext;
+
+    } catch (e) {
+
+        return null;
+    }
+}
+
+function unlockAudio() {
+
+    const ctx = getAudioContext();
+
+    if (!ctx) return;
+
+    try {
+
+        if (ctx.state === "suspended") {
+            ctx.resume();
+        }
+
+        audioUnlocked = true;
+
+        startLadybugBuzz();
+        startGiraffeSteps();
+
+    } catch (e) {
+        /* Audio remains optional. */
+    }
+}
+
+
+/*
+   Chrome requires a user gesture before audio can play.
+   This unlocks the audio engine on the first interaction.
+*/
+
+document.addEventListener(
+    "pointerdown",
+    unlockAudio,
+    { once: true, passive: true }
+);
+
+document.addEventListener(
+    "keydown",
+    unlockAudio,
+    { once: true }
+);
+
+
+/* =========================================================
+   DOG BARK
+========================================================= */
+
+function barkSound() {
+
+    const ctx = getAudioContext();
+
+    if (!ctx || !audioUnlocked) return;
+
+    try {
+
+        if (ctx.state === "suspended") {
+            ctx.resume();
+        }
+
+        const now = ctx.currentTime;
+
+        /*
+           Main bark body.
+           Starts higher and drops quickly,
+           like a short dog bark.
+        */
+
+        const barkOsc =
+            ctx.createOscillator();
+
+        const barkGain =
+            ctx.createGain();
+
+        const barkFilter =
+            ctx.createBiquadFilter();
+
+        barkOsc.type = "sawtooth";
+
+        barkOsc.frequency.setValueAtTime(
+            260,
+            now
+        );
+
+        barkOsc.frequency.exponentialRampToValueAtTime(
+            105,
+            now + 0.13
+        );
+
+        barkOsc.frequency.exponentialRampToValueAtTime(
+            72,
+            now + 0.23
+        );
+
+        barkFilter.type = "lowpass";
+        barkFilter.frequency.setValueAtTime(
+            1250,
+            now
+        );
+
+        barkFilter.Q.value = 1.2;
+
+        barkGain.gain.setValueAtTime(
+            0.0001,
+            now
+        );
+
+        barkGain.gain.exponentialRampToValueAtTime(
+            0.42,
+            now + 0.012
+        );
+
+        barkGain.gain.exponentialRampToValueAtTime(
+            0.20,
+            now + 0.08
+        );
+
+        barkGain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + 0.25
+        );
+
+        barkOsc.connect(barkFilter);
+        barkFilter.connect(barkGain);
+        barkGain.connect(ctx.destination);
+
+        barkOsc.start(now);
+        barkOsc.stop(now + 0.27);
+
+
+        /*
+           Short noisy component gives the bark
+           some breath/grit instead of sounding
+           like a plain electronic tone.
+        */
+
+        const buffer =
+            ctx.createBuffer(
+                1,
+                Math.floor(ctx.sampleRate * 0.28),
+                ctx.sampleRate
+            );
+
+        const data =
+            buffer.getChannelData(0);
+
+        for (let i = 0; i < data.length; i++) {
+
+            const t =
+                i / data.length;
+
+            const envelope =
+                Math.pow(1 - t, 2.2);
+
+            data[i] =
+                (Math.random() * 2 - 1) *
+                envelope;
+        }
+
+        const noise =
+            ctx.createBufferSource();
+
+        const noiseFilter =
+            ctx.createBiquadFilter();
+
+        const noiseGain =
+            ctx.createGain();
+
+        noise.buffer = buffer;
+
+        noiseFilter.type = "bandpass";
+        noiseFilter.frequency.value = 950;
+        noiseFilter.Q.value = 0.7;
+
+        noiseGain.gain.setValueAtTime(
+            0.0001,
+            now
+        );
+
+        noiseGain.gain.exponentialRampToValueAtTime(
+            0.16,
+            now + 0.008
+        );
+
+        noiseGain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + 0.24
+        );
+
+        noise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + 0.28);
+
+    } catch (e) {
+        /* Sound is optional. */
+    }
+}
+
+function dogBarks() {
+
+    showBark();
+    barkSound();
+
+    setTimeout(() => {
+
+        showBark();
+        barkSound();
+
+    }, 430);
+}
+
+
+/* =========================================================
+   HEAVY GIRAFFE HOOFSTEP
+========================================================= */
+
+function giraffeStepSound() {
+
+    if (!audioUnlocked || interactionRunning) {
+        return;
+    }
+
+    const ctx = getAudioContext();
+
+    if (!ctx) return;
+
+    try {
+
+        if (ctx.state === "suspended") {
+            ctx.resume();
+        }
+
+        const now = ctx.currentTime;
+
+        /*
+           Low-frequency impact.
+           This is deliberately heavy.
+        */
+
+        const thud =
+            ctx.createOscillator();
+
+        const thudGain =
+            ctx.createGain();
+
+        thud.type = "sine";
+
+        thud.frequency.setValueAtTime(
+            92,
+            now
+        );
+
+        thud.frequency.exponentialRampToValueAtTime(
+            42,
+            now + 0.16
+        );
+
+        thudGain.gain.setValueAtTime(
+            0.0001,
+            now
+        );
+
+        thudGain.gain.exponentialRampToValueAtTime(
+            0.34,
+            now + 0.008
+        );
+
+        thudGain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + 0.19
+        );
+
+        thud.connect(thudGain);
+        thudGain.connect(ctx.destination);
+
+        thud.start(now);
+        thud.stop(now + 0.20);
+
+
+        /*
+           Hard hoof impact / ground click.
+        */
+
+        const buffer =
+            ctx.createBuffer(
+                1,
+                Math.floor(ctx.sampleRate * 0.12),
+                ctx.sampleRate
+            );
+
+        const data =
+            buffer.getChannelData(0);
+
+        for (let i = 0; i < data.length; i++) {
+
+            const t =
+                i / data.length;
+
+            data[i] =
+                (Math.random() * 2 - 1) *
+                Math.pow(1 - t, 5);
+        }
+
+        const impact =
+            ctx.createBufferSource();
+
+        const impactFilter =
+            ctx.createBiquadFilter();
+
+        const impactGain =
+            ctx.createGain();
+
+        impact.buffer = buffer;
+
+        impactFilter.type = "lowpass";
+        impactFilter.frequency.value = 850;
+
+        impactGain.gain.setValueAtTime(
+            0.24,
+            now
+        );
+
+        impactGain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + 0.11
+        );
+
+        impact.connect(impactFilter);
+        impactFilter.connect(impactGain);
+        impactGain.connect(ctx.destination);
+
+        impact.start(now);
+        impact.stop(now + 0.12);
+
+    } catch (e) {
+        /* Sound is optional. */
+    }
+}
+
+
+/*
+   The giraffe's existing leg animation is .42 seconds,
+   so the sound follows that same walking rhythm.
+*/
+
+function startGiraffeSteps() {
+
+    if (giraffeStepTimer) return;
+
+    giraffeStepTimer =
+        setInterval(
+            giraffeStepSound,
+            420
+        );
+}
+
+
+/* =========================================================
+   LADYBUG BUZZ
+========================================================= */
+
+function startLadybugBuzz() {
+
+    if (ladybugBuzz || !audioUnlocked) {
+        return;
+    }
+
+    const ctx = getAudioContext();
+
+    if (!ctx) return;
+
+    try {
+
+        const master =
+            ctx.createGain();
+
+        master.gain.value = 0.035;
+
+        master.connect(ctx.destination);
+
+
+        /*
+           Two slightly different frequencies
+           make the buzz less like a pure tone.
+        */
+
+        const osc1 =
+            ctx.createOscillator();
+
+        const osc2 =
+            ctx.createOscillator();
+
+        const mod =
+            ctx.createOscillator();
+
+        const modGain =
+            ctx.createGain();
+
+        osc1.type = "sawtooth";
+        osc2.type = "triangle";
+
+        osc1.frequency.value = 178;
+        osc2.frequency.value = 192;
+
+        mod.frequency.value = 27;
+        modGain.gain.value = 0.018;
+
+        mod.connect(modGain);
+        modGain.connect(master.gain);
+
+        osc1.connect(master);
+        osc2.connect(master);
+
+        osc1.start();
+        osc2.start();
+        mod.start();
+
+        ladybugBuzz = {
+            osc1,
+            osc2,
+            mod,
+            master
+        };
+
+    } catch (e) {
+
+        ladybugBuzz = null;
+    }
+}
+
+function stopLadybugBuzz() {
+
+    if (!ladybugBuzz) return;
+
+    try {
+
+        const ctx = getAudioContext();
+
+        if (ctx) {
+
+            const now = ctx.currentTime;
+
+            ladybugBuzz.master.gain.cancelScheduledValues(
+                now
+            );
+
+            ladybugBuzz.master.gain.setValueAtTime(
+                ladybugBuzz.master.gain.value,
+                now
+            );
+
+            ladybugBuzz.master.gain.exponentialRampToValueAtTime(
+                0.0001,
+                now + 0.08
+            );
+
+            ladybugBuzz.osc1.stop(now + 0.1);
+            ladybugBuzz.osc2.stop(now + 0.1);
+            ladybugBuzz.mod.stop(now + 0.1);
+        }
+
+    } catch (e) {
+        /* Ignore audio shutdown errors. */
+    }
+
+    ladybugBuzz = null;
+}
+
+
+/* =========================================================
+   SNIFF / BARK DISPLAY
+========================================================= */
+
+function showBark() {
+
+    const dogRect =
+        bulldog.getBoundingClientRect();
+
+    bark.style.left =
+        Math.max(
+            10,
+            dogRect.left + 25
+        ) + "px";
+
+    bark.style.top =
+        Math.max(
+            20,
+            dogRect.top - 35
+        ) + "px";
+
+    bark.classList.add("show");
+
+    setTimeout(() => {
+        bark.classList.remove("show");
+    }, 650);
+}
+
+function showSniff() {
+
+    const dogRect =
+        bulldog.getBoundingClientRect();
+
+    sniff.style.left =
+        Math.max(
+            10,
+            dogRect.left - 5
+        ) + "px";
+
+    sniff.style.top =
+        Math.max(
+            20,
+            dogRect.top - 28
+        ) + "px";
+
+    sniff.classList.add("show");
+}
+
+
+/* =========================================================
+   DETECT THE ACTUAL MEETING
+========================================================= */
+
+function checkForMeeting() {
+
+    if (interactionRunning) return;
+
+    const g =
+        giraffe.getBoundingClientRect();
+
+    const d =
+        bulldog.getBoundingClientRect();
+
+    const horizontalOverlap =
+        g.left < d.right &&
+        g.right > d.left;
+
+    const verticalOverlap =
+        g.bottom > d.top + 20 &&
+        g.top < d.bottom - 10;
+
+    if (horizontalOverlap && verticalOverlap) {
+        startInteraction();
+    }
+}
+
+
+/* =========================================================
+   LADYBUG STOPS NEAR THEM
+========================================================= */
+
+function stopLadybugNearCharacters() {
+
+    const g =
+        giraffe.getBoundingClientRect();
+
+    const d =
+        bulldog.getBoundingClientRect();
+
+    const room =
+        document
+            .querySelector(".game-room")
+            .getBoundingClientRect();
+
+    const center =
+        (
+            (g.left + g.right) / 2 +
+            (d.left + d.right) / 2
+        ) / 2;
+
+    const currentLeft =
+        center - room.left - 12;
+
+    ladybug.style.setProperty(
+        "--ladybug-current-left",
+        currentLeft + "px"
+    );
+
+    ladybug.style.left =
+        currentLeft + "px";
+
+    ladybug.style.bottom =
+        "8px";
+
+    ladybug.classList.add("meeting");
+
+    /*
+       Let the buzz fade when the ladybug stops.
+    */
+    stopLadybugBuzz();
+}
+
+
+/* =========================================================
+   LADYBUG FLIES AWAY
+========================================================= */
+
+function ladybugFliesAway() {
+
+    ladybug.classList.remove("meeting");
+
+    /*
+       Buzz returns as the ladybug takes off.
+    */
+    if (audioUnlocked) {
+        startLadybugBuzz();
+    }
+
+    void ladybug.offsetWidth;
+
+    ladybug.classList.add("flyaway");
+
+    setTimeout(() => {
+
+        ladybug.classList.remove("flyaway");
+
+        ladybug.style.left =
+            "-30px";
+
+        ladybug.style.bottom =
+            "8px";
+
+        void ladybug.offsetWidth;
+
+        ladybug.style.removeProperty("left");
+
+        ladybug.style.removeProperty("bottom");
+
+        ladybug.style.removeProperty(
+            "--ladybug-current-left"
+        );
+
+        ladybug.style.animation =
+            "ladybugWalk 22s linear infinite";
+
+    }, 5000);
+}
+
+
+/* =========================================================
+   EXACT STORY
+========================================================= */
+
+function startInteraction() {
+
+    if (interactionRunning) return;
+
+    interactionRunning = true;
+
+    giraffe.classList.add("meeting");
+
+    bulldog.classList.add("meeting");
+
+    stopLadybugNearCharacters();
+
+
+    setTimeout(() => {
+
+        bulldog.classList.add(
+            "sniffing"
+        );
+
+        showSniff();
+
+    }, 150);
+
+
+    setTimeout(() => {
+
+        bulldog.classList.remove(
+            "sniffing"
+        );
+
+        sniff.classList.remove(
+            "show"
+        );
+
+        bulldog.classList.add(
+            "barking"
+        );
+
+        showBark();
+        barkSound();
+
+    }, 1650);
+
+
+    setTimeout(() => {
+
+        bulldog.classList.remove(
+            "barking"
+        );
+
+        showBark();
+        barkSound();
+
+        giraffe.classList.add(
+            "startled"
+        );
+
+    }, 2250);
+
+
+    setTimeout(() => {
+
+        giraffe.classList.remove(
+            "startled"
+        );
+
+        const giraffeRect =
+            giraffe.getBoundingClientRect();
+
+        const roomRect =
+            document
+                .querySelector(".game-room")
+                .getBoundingClientRect();
+
+        const currentLeft =
+            giraffeRect.left -
+            roomRect.left;
+
+        giraffe.style.setProperty(
+            "--giraffe-current-left",
+            currentLeft + "px"
+        );
+
+        giraffe.classList.remove(
+            "meeting"
+        );
+
+        giraffe.classList.add(
+            "escape"
+        );
+
+    }, 2750);
+
+
+    setTimeout(() => {
+
+        giraffe.classList.remove(
+            "escape"
+        );
+
+        giraffe.style.setProperty(
+            "left",
+            "-230px"
+        );
+
+        giraffe.style.animation =
+            "none";
+
+        void giraffe.offsetWidth;
+
+        giraffe.style.animation =
+            "giraffeWalk 15s linear infinite";
+
+        giraffe.style.removeProperty(
+            "left"
+        );
+
+        giraffe.style.removeProperty(
+            "--giraffe-current-left"
+        );
+
+
+        bulldog.classList.remove(
+            "meeting"
+        );
+
+        bulldog.style.animation =
+            "none";
+
+        bulldog.style.right =
+            "-225px";
+
+        void bulldog.offsetWidth;
+
+        bulldog.style.animation =
+            "labradorWalk 18s linear infinite";
+
+        bulldog.style.removeProperty(
+            "right"
+        );
+
+
+        setTimeout(() => {
+
+            ladybugFliesAway();
+
+        }, 400);
+
+
+        interactionRunning = false;
+
+    }, 5400);
+}
+
+
+/* =========================================================
+   WATCH FOR THEM TO MEET
+========================================================= */
+
+setInterval(
+    checkForMeeting,
+    60
+);
+
+</script>
