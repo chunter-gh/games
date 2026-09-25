@@ -1269,9 +1269,14 @@ function connectToServer() {
 
     try {
 
+        /*
+         * IMPORTANT:
+         * Tic-Tac-Toe is handled by the
+         * /ttt WebSocket room on server 11.js.
+         */
         socket =
             new WebSocket(
-                "wss://games-z5k2.onrender.com/"
+                "wss://games-z5k2.onrender.com/ttt"
             );
 
     } catch (error) {
@@ -1390,6 +1395,27 @@ function handleServerMessage(
         );
 
         updateStatus();
+
+        return;
+    }
+
+    if (
+        data.type ===
+        "tttConnected"
+    ) {
+
+        if (
+            data.player === "spectator"
+        ) {
+
+            setConnection(
+                "SPECTATOR",
+                "waiting"
+            );
+
+            statusText.textContent =
+                "GAME IS FULL — SPECTATING";
+        }
 
         return;
     }
