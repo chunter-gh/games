@@ -28,15 +28,14 @@ body {
 }
 
 body {
-    margin: 0;
     overflow: hidden;
 
     background:
         radial-gradient(
-            circle at 50% 25%,
-            #315d3d 0%,
-            #173b25 48%,
-            #07190e 100%
+            circle at 50% 22%,
+            #3d704b 0%,
+            #1c4329 42%,
+            #09190f 100%
         );
 
     color: #fff;
@@ -88,16 +87,16 @@ body {
     background:
         linear-gradient(
             180deg,
-            rgba(30,30,30,.97),
-            rgba(8,8,8,.98)
+            rgba(32,32,32,.98),
+            rgba(7,7,7,.99)
         );
 
     border-bottom:
-        2px solid #050505;
+        2px solid #030303;
 
     box-shadow:
-        0 4px 15px rgba(0,0,0,.65),
-        inset 0 1px 0 rgba(255,255,255,.12);
+        0 5px 18px rgba(0,0,0,.75),
+        inset 0 1px 0 rgba(255,255,255,.13);
 
     z-index: 50;
 }
@@ -120,18 +119,15 @@ body {
 
     text-shadow:
         2px 2px 2px #000,
-        0 0 10px rgba(255,255,255,.12);
+        0 0 12px rgba(255,255,255,.13);
 
     white-space: nowrap;
 }
 
 .header-buttons {
     display: flex;
-
     gap: 6px;
-
     flex-wrap: wrap;
-
     justify-content: flex-end;
 }
 
@@ -149,8 +145,8 @@ button {
     background:
         linear-gradient(
             180deg,
-            #686868,
-            #292929
+            #707070,
+            #252525
         );
 
     color: #fff;
@@ -160,16 +156,26 @@ button {
     cursor: pointer;
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.2),
-        0 2px 5px rgba(0,0,0,.55);
+        inset 0 1px 0 rgba(255,255,255,.23),
+        0 3px 7px rgba(0,0,0,.6);
+
+    transition:
+        filter .12s,
+        transform .08s;
 }
 
 button:hover {
-    filter: brightness(1.15);
+    filter: brightness(1.16);
 }
 
 button:active {
     transform: translateY(1px);
+}
+
+button:disabled {
+    opacity: .35;
+    cursor: default;
+    filter: none;
 }
 
 
@@ -203,7 +209,7 @@ button:active {
     flex: 0 0 auto;
 
     width: 100%;
-    max-width: 700px;
+    max-width: 760px;
 
     display: flex;
 
@@ -211,7 +217,7 @@ button:active {
     justify-content: center;
 
     gap:
-        clamp(10px, 3vw, 35px);
+        clamp(8px, 3vw, 35px);
 
     margin-bottom:
         clamp(5px, 1vh, 12px);
@@ -235,37 +241,68 @@ button:active {
 
 .score-piece {
     width:
-        clamp(17px, 2.5vw, 28px);
+        clamp(18px, 2.5vw, 29px);
 
     height:
-        clamp(17px, 2.5vw, 28px);
+        clamp(18px, 2.5vw, 29px);
 
     border-radius: 50%;
 
+    flex: 0 0 auto;
+
+    position: relative;
+
     border:
-        2px solid rgba(255,255,255,.5);
+        2px solid rgba(255,255,255,.35);
 
     box-shadow:
-        0 2px 4px rgba(0,0,0,.7);
+        0 3px 5px rgba(0,0,0,.8),
+        inset 2px 2px 4px rgba(255,255,255,.35),
+        inset -3px -4px 5px rgba(0,0,0,.7);
+}
+
+.score-piece::after {
+    content: "";
+
+    position: absolute;
+
+    left: 19%;
+    top: 12%;
+
+    width: 35%;
+    height: 19%;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.55);
+
+    transform: rotate(-20deg);
+
+    filter: blur(.6px);
 }
 
 .score-piece.black {
     background:
         radial-gradient(
-            circle at 35% 30%,
-            #555,
-            #111 60%,
-            #000
+            circle at 32% 25%,
+            #a0a0a0 0%,
+            #565656 12%,
+            #222 42%,
+            #070707 78%,
+            #000 100%
         );
 }
 
 .score-piece.white {
     background:
         radial-gradient(
-            circle at 35% 30%,
-            #fff,
-            #ddd 60%,
-            #aaa
+            circle at 32% 25%,
+            #fff 0%,
+            #f4f4f4 25%,
+            #d1d1d1 54%,
+            #858585 83%,
+            #505050 100%
         );
 }
 
@@ -276,15 +313,25 @@ button:active {
     border-radius: 20px;
 
     background:
-        rgba(0,0,0,.32);
+        linear-gradient(
+            180deg,
+            rgba(55,55,55,.72),
+            rgba(0,0,0,.58)
+        );
 
     border:
-        1px solid rgba(255,255,255,.15);
+        1px solid rgba(255,255,255,.16);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.1),
+        0 2px 5px rgba(0,0,0,.45);
+
+    white-space: nowrap;
 }
 
 
 /* =========================================================
-   BOARD
+   BOARD AREA
    ========================================================= */
 
 .board-wrap {
@@ -303,23 +350,70 @@ button:active {
     overflow: hidden;
 }
 
-.board {
+
+/* =========================================================
+   BOARD FRAME
+   ========================================================= */
+
+.board-frame {
     width:
         min(
             92vw,
             82vh,
-            700px
+            720px
         );
 
     height:
         min(
             92vw,
             82vh,
-            700px
+            720px
         );
 
-    max-width: 100%;
-    max-height: 100%;
+    padding:
+        clamp(6px, 1vw, 11px);
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #76552d 0%,
+            #35210f 40%,
+            #100a04 100%
+        );
+
+    border:
+        3px solid #050302;
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.88),
+        inset 0 2px 2px rgba(255,255,255,.2),
+        inset 0 -7px 12px rgba(0,0,0,.8);
+
+    position: relative;
+}
+
+.board-frame::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 4px;
+
+    border-radius: 12px;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    pointer-events: none;
+
+    z-index: 20;
+}
+
+.board {
+    width: 100%;
+    height: 100%;
 
     display: grid;
 
@@ -333,21 +427,17 @@ button:active {
 
     padding: 5px;
 
+    border-radius: 10px;
+
     background:
         linear-gradient(
             145deg,
-            #164f2c,
-            #092416
+            #0b3920,
+            #04180d
         );
 
-    border:
-        3px solid #050505;
-
-    border-radius: 10px;
-
     box-shadow:
-        0 12px 30px rgba(0,0,0,.7),
-        inset 0 1px 0 rgba(255,255,255,.12);
+        inset 0 0 18px rgba(0,0,0,.9);
 
     touch-action: manipulation;
 }
@@ -371,25 +461,45 @@ button:active {
     background:
         linear-gradient(
             145deg,
-            #258346,
-            #176234
+            #2a8a4b 0%,
+            #1c6a39 48%,
+            #15552e 100%
         );
 
     border:
-        1px solid rgba(0,0,0,.3);
+        1px solid rgba(0,0,0,.38);
 
     cursor: pointer;
 
     overflow: hidden;
 }
 
+.square::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.08),
+            transparent 34%,
+            rgba(0,0,0,.13)
+        );
+
+    pointer-events: none;
+}
+
 .square:hover {
-    filter: brightness(1.12);
+    filter: brightness(1.1);
 }
 
 .square.legal {
     box-shadow:
-        inset 0 0 0 3px rgba(255,220,70,.8);
+        inset 0 0 0 3px rgba(255,218,55,.78),
+        inset 0 0 13px rgba(255,218,55,.22);
 }
 
 .square.legal::after {
@@ -397,103 +507,239 @@ button:active {
 
     position: absolute;
 
-    width: 22%;
-    height: 22%;
+    width: 20%;
+    height: 20%;
 
     border-radius: 50%;
 
     background:
-        rgba(255,220,70,.75);
+        radial-gradient(
+            circle at 35% 30%,
+            #fffbd0,
+            #ffdf3c 48%,
+            #9b7100 100%
+        );
 
     box-shadow:
-        0 0 8px rgba(255,220,70,.8);
+        0 0 8px rgba(255,218,55,.9),
+        0 0 15px rgba(255,205,20,.35);
 
     pointer-events: none;
 }
 
 
 /* =========================================================
-   PIECES
+   HEAVY STONE
    ========================================================= */
 
 .piece {
-    width: 78%;
-    height: 78%;
+    width: 80%;
+    height: 80%;
 
     border-radius: 50%;
 
     position: relative;
 
-    z-index: 2;
+    z-index: 4;
 
-    box-shadow:
-        0 4px 7px rgba(0,0,0,.6);
+    transform-style: preserve-3d;
 
     animation:
-        pieceIn .18s ease-out;
+        stoneDrop .28s cubic-bezier(.18,1.35,.3,1);
+
+    box-shadow:
+        0 7px 7px rgba(0,0,0,.78),
+        0 2px 2px rgba(0,0,0,.95);
 }
+
+
+/* broad polished rim */
+
+.piece::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 3%;
+
+    border-radius: 50%;
+
+    border:
+        2px solid rgba(255,255,255,.18);
+
+    box-shadow:
+        inset 0 2px 3px rgba(255,255,255,.25),
+        inset 0 -4px 6px rgba(0,0,0,.45);
+
+    pointer-events: none;
+}
+
+
+/* large reflected highlight */
 
 .piece::after {
     content: "";
 
     position: absolute;
 
-    left: 17%;
-    top: 10%;
+    left: 15%;
+    top: 8%;
 
-    width: 30%;
-    height: 18%;
+    width: 45%;
+    height: 28%;
 
     border-radius: 50%;
 
     background:
-        rgba(255,255,255,.25);
+        radial-gradient(
+            ellipse,
+            rgba(255,255,255,.8) 0%,
+            rgba(255,255,255,.32) 35%,
+            rgba(255,255,255,.05) 60%,
+            transparent 76%
+        );
 
     transform:
-        rotate(-20deg);
+        rotate(-21deg);
 
     filter:
-        blur(1px);
+        blur(.7px);
+
+    pointer-events: none;
 }
+
+
+/* =========================================================
+   BLACK STONE
+   ========================================================= */
 
 .piece.black {
     background:
         radial-gradient(
-            circle at 35% 30%,
-            #555,
-            #181818 48%,
+            circle at 29% 22%,
+            #c5c5c5 0%,
+            #858585 7%,
+            #4c4c4c 15%,
+            #292929 29%,
+            #111 53%,
+            #050505 77%,
             #000 100%
         );
 
     border:
         2px solid #000;
+
+    box-shadow:
+        inset 7px 7px 10px rgba(255,255,255,.13),
+        inset -9px -11px 14px rgba(0,0,0,.96),
+        0 8px 7px rgba(0,0,0,.82),
+        0 2px 2px #000;
 }
+
+
+/* =========================================================
+   WHITE STONE
+   ========================================================= */
 
 .piece.white {
     background:
         radial-gradient(
-            circle at 35% 30%,
-            #fff,
-            #e2e2e2 48%,
-            #aaa 100%
+            circle at 29% 22%,
+            #fff 0%,
+            #fff 9%,
+            #f0f0f0 20%,
+            #d2d2d2 40%,
+            #a6a6a6 63%,
+            #777 82%,
+            #535353 100%
         );
 
     border:
-        2px solid #777;
+        2px solid #5b5b5b;
+
+    box-shadow:
+        inset 7px 7px 11px rgba(255,255,255,.92),
+        inset -9px -11px 14px rgba(0,0,0,.55),
+        0 8px 7px rgba(0,0,0,.82),
+        0 2px 2px #000;
 }
 
-@keyframes pieceIn {
 
-    from {
+/* =========================================================
+   STONE DROP
+   ========================================================= */
+
+@keyframes stoneDrop {
+
+    0% {
         transform:
-            scale(.65);
-        opacity: .3;
+            translateY(-20px)
+            scale(.58);
+
+        opacity: .05;
     }
 
-    to {
+    60% {
         transform:
-            scale(1);
+            translateY(3px)
+            scale(1.05);
+
         opacity: 1;
+    }
+
+    82% {
+        transform:
+            translateY(-1px)
+            scale(.985);
+    }
+
+    100% {
+        transform:
+            translateY(0)
+            scale(1);
+
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   FLIP
+   ========================================================= */
+
+.piece.flip {
+    animation:
+        stoneFlip .56s ease-in-out;
+}
+
+@keyframes stoneFlip {
+
+    0% {
+        transform:
+            perspective(500px)
+            rotateY(0deg)
+            scale(1);
+    }
+
+    42% {
+        transform:
+            perspective(500px)
+            rotateY(88deg)
+            scale(1.08);
+    }
+
+    50% {
+        transform:
+            perspective(500px)
+            rotateY(92deg)
+            scale(1.08);
+    }
+
+    100% {
+        transform:
+            perspective(500px)
+            rotateY(180deg)
+            scale(1);
     }
 }
 
@@ -552,13 +798,13 @@ button:active {
     border-radius: 20px;
 
     background:
-        rgba(0,0,0,.82);
+        rgba(0,0,0,.88);
 
     border:
         1px solid rgba(255,255,255,.2);
 
     box-shadow:
-        0 5px 20px rgba(0,0,0,.6);
+        0 5px 20px rgba(0,0,0,.7);
 
     font-weight: 900;
 
@@ -581,6 +827,139 @@ button:active {
 
 
 /* =========================================================
+   MODE SCREEN
+   ========================================================= */
+
+.mode-screen {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 4000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(48,96,62,.94),
+            rgba(0,0,0,.97)
+        );
+}
+
+.mode-box {
+    width:
+        min(92vw, 540px);
+
+    padding:
+        clamp(23px, 5vw, 42px);
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #454545,
+            #101010
+        );
+
+    border:
+        2px solid #000;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.95),
+        inset 0 1px 0 rgba(255,255,255,.17);
+
+    text-align: center;
+}
+
+.mode-title {
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:
+        clamp(34px, 9vw, 58px);
+
+    font-weight: 900;
+
+    letter-spacing: 4px;
+
+    color: #f4ead0;
+
+    text-shadow:
+        3px 4px 4px #000,
+        0 0 15px rgba(255,255,255,.1);
+
+    margin-bottom: 6px;
+}
+
+.mode-subtitle {
+    color: #aaa;
+
+    font-size:
+        clamp(11px, 2.4vw, 16px);
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 25px;
+}
+
+.mode-buttons {
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+}
+
+.mode-button {
+    flex:
+        1 1 190px;
+
+    min-height: 76px;
+
+    font-size:
+        clamp(15px, 3vw, 20px);
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #626262,
+            #161616
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.25),
+        0 6px 13px rgba(0,0,0,.65);
+}
+
+.mode-button small {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #aaa;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
    GAME OVER
    ========================================================= */
 
@@ -597,7 +976,7 @@ button:active {
     justify-content: center;
 
     background:
-        rgba(0,0,0,.74);
+        rgba(0,0,0,.78);
 
     padding: 20px;
 }
@@ -608,25 +987,25 @@ button:active {
 
 .win-box {
     width:
-        min(90vw, 430px);
+        min(90vw, 440px);
 
     padding:
-        clamp(20px, 4vw, 35px);
+        clamp(20px, 4vw, 36px);
 
-    border-radius: 18px;
+    border-radius: 19px;
 
     background:
         linear-gradient(
             145deg,
-            #3e3e3e,
-            #101010
+            #424242,
+            #0f0f0f
         );
 
     border:
         2px solid #000;
 
     box-shadow:
-        0 25px 70px rgba(0,0,0,.9),
+        0 28px 75px rgba(0,0,0,.95),
         inset 0 1px 0 rgba(255,255,255,.14);
 
     text-align: center;
@@ -643,12 +1022,12 @@ button:active {
         clamp(30px, 8vw, 55px);
 
     color:
-        #f3e5a0;
+        #f3e4a0;
 
     text-shadow:
-        2px 3px 2px #000;
+        2px 3px 3px #000;
 
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .win-text {
@@ -657,9 +1036,9 @@ button:active {
     font-size:
         clamp(13px, 3vw, 18px);
 
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 
@@ -696,7 +1075,7 @@ button:active {
         margin-bottom: 4px;
     }
 
-    .board {
+    .board-frame {
         width:
             min(
                 96vw,
@@ -708,20 +1087,33 @@ button:active {
                 96vw,
                 76vh
             );
+    }
 
+    .board {
         gap: 1px;
-
         padding: 3px;
     }
 
     .controls {
         margin-top: 5px;
     }
+
+    .mode-box {
+        padding: 24px 17px;
+    }
+
+    .mode-buttons {
+        gap: 9px;
+    }
+
+    .mode-button {
+        min-height: 68px;
+    }
 }
 
 
 /* =========================================================
-   SHORT LANDSCAPE
+   LANDSCAPE
    ========================================================= */
 
 @media (max-height: 550px) and (orientation: landscape) {
@@ -742,7 +1134,7 @@ button:active {
         font-size: 10px;
     }
 
-    .board {
+    .board-frame {
         width:
             min(
                 80vh,
@@ -796,7 +1188,7 @@ button:active {
         font-size: 9px;
     }
 
-    .board {
+    .board-frame {
         width:
             min(
                 72vh,
@@ -826,6 +1218,7 @@ button:active {
 
 
 <body>
+
 
 <div id="app">
 
@@ -890,9 +1283,13 @@ button:active {
 
         <div class="board-wrap">
 
-            <div
-                id="board"
-                class="board">
+            <div class="board-frame">
+
+                <div
+                    id="board"
+                    class="board">
+                </div>
+
             </div>
 
         </div>
@@ -911,11 +1308,72 @@ button:active {
 </div>
 
 
+<!-- =======================================================
+     MODE SELECTION
+     ======================================================= -->
+
+<div
+    id="modeScreen"
+    class="mode-screen">
+
+    <div class="mode-box">
+
+        <div class="mode-title">
+            OTHELLO
+        </div>
+
+        <div class="mode-subtitle">
+            CHOOSE HOW TO PLAY
+        </div>
+
+
+        <div class="mode-buttons">
+
+            <button
+                id="twoPlayerButton"
+                class="mode-button">
+
+                👥 2 PLAYER
+
+                <small>
+                    TWO PEOPLE • SAME DEVICE
+                </small>
+
+            </button>
+
+
+            <button
+                id="computerButton"
+                class="mode-button">
+
+                🤖 VS COMPUTER
+
+                <small>
+                    YOU ARE BLACK
+                </small>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     MESSAGE
+     ======================================================= -->
+
 <div
     id="message"
     class="message">
 </div>
 
+
+<!-- =======================================================
+     GAME OVER
+     ======================================================= -->
 
 <div
     id="gameOverlay"
@@ -945,21 +1403,62 @@ button:active {
 
 <script>
 
+/* =========================================================
+   CONSTANTS
+   ========================================================= */
+
 const EMPTY = 0;
 const BLACK = 1;
 const WHITE = 2;
 
+
 const DIRECTIONS = [
-    [-1, -1],
-    [-1,  0],
-    [-1,  1],
-    [ 0, -1],
-    [ 0,  1],
-    [ 1, -1],
-    [ 1,  0],
-    [ 1,  1]
+
+    [-1,-1],
+    [-1, 0],
+    [-1, 1],
+
+    [ 0,-1],
+    [ 0, 1],
+
+    [ 1,-1],
+    [ 1, 0],
+    [ 1, 1]
+
 ];
 
+
+/*
+   Position values used by the computer.
+
+   Corners are extremely valuable.
+   Squares next to corners are dangerous.
+*/
+
+const POSITION_VALUES = [
+
+    [120, -35,  20,   5,   5,  20, -35, 120],
+
+    [-35, -60,   5,   1,   1,   5, -60, -35],
+
+    [ 20,   5,  15,   3,   3,  15,   5,  20],
+
+    [  5,   1,   3,   8,   8,   3,   1,   5],
+
+    [  5,   1,   3,   8,   8,   3,   1,   5],
+
+    [ 20,   5,  15,   3,   3,  15,   5,  20],
+
+    [-35, -60,   5,   1,   1,   5, -60, -35],
+
+    [120, -35,  20,   5,   5,  20, -35, 120]
+
+];
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
 
 const boardElement =
     document.getElementById("board");
@@ -976,6 +1475,9 @@ const turnElement =
 const messageElement =
     document.getElementById("message");
 
+const modeScreen =
+    document.getElementById("modeScreen");
+
 const gameOverlay =
     document.getElementById("gameOverlay");
 
@@ -989,6 +1491,10 @@ const passButton =
     document.getElementById("passButton");
 
 
+/* =========================================================
+   STATE
+   ========================================================= */
+
 let board = [];
 
 let currentPlayer =
@@ -997,26 +1503,37 @@ let currentPlayer =
 let gameOver =
     false;
 
+let gameMode =
+    null;
+
+let computerThinking =
+    false;
+
+let moveLock =
+    false;
+
 let messageTimer =
     null;
 
 
 /* =========================================================
-   NEW GAME
+   START GAME
    ========================================================= */
 
-function newGame() {
+function startGame(mode) {
+
+    gameMode =
+        mode;
 
     board =
         Array.from(
             { length: 8 },
-            () =>
-                Array(8).fill(EMPTY)
+            () => Array(8).fill(EMPTY)
         );
 
 
     /*
-       Standard Othello starting position.
+       Official Othello opening.
     */
 
     board[3][3] = WHITE;
@@ -1031,16 +1548,42 @@ function newGame() {
     gameOver =
         false;
 
+    computerThinking =
+        false;
+
+    moveLock =
+        false;
+
+
+    modeScreen.style.display =
+        "none";
+
     gameOverlay.classList.remove(
         "show"
     );
+
 
     render();
 }
 
 
 /* =========================================================
-   BOARD HELPERS
+   NEW GAME BUTTON
+   ========================================================= */
+
+function newGame() {
+
+    gameOverlay.classList.remove(
+        "show"
+    );
+
+    modeScreen.style.display =
+        "flex";
+}
+
+
+/* =========================================================
+   BOUNDS
    ========================================================= */
 
 function inBounds(
@@ -1056,6 +1599,10 @@ function inBounds(
     );
 }
 
+
+/* =========================================================
+   OPPONENT
+   ========================================================= */
 
 function opponent(
     player
@@ -1078,7 +1625,7 @@ function getFlips(
 ) {
 
     if (
-        !inBounds(row, col) ||
+        !inBounds(row,col) ||
         board[row][col] !== EMPTY
     ) {
 
@@ -1093,7 +1640,7 @@ function getFlips(
 
 
     for (
-        const [dr, dc]
+        const [dr,dc]
         of DIRECTIONS
     ) {
 
@@ -1107,11 +1654,14 @@ function getFlips(
 
 
         while (
-            inBounds(r, c) &&
+            inBounds(r,c) &&
             board[r][c] === other
         ) {
 
-            line.push([r, c]);
+            line.push([
+                r,
+                c
+            ]);
 
             r += dr;
             c += dc;
@@ -1119,8 +1669,8 @@ function getFlips(
 
 
         if (
-            line.length &&
-            inBounds(r, c) &&
+            line.length > 0 &&
+            inBounds(r,c) &&
             board[r][c] === player
         ) {
 
@@ -1165,7 +1715,10 @@ function getLegalMoves(
                     player
                 );
 
-            if (flips.length) {
+
+            if (
+                flips.length
+            ) {
 
                 moves.push({
                     row,
@@ -1182,7 +1735,7 @@ function getLegalMoves(
 
 
 /* =========================================================
-   MAKE MOVE
+   PLACE HUMAN MOVE
    ========================================================= */
 
 function makeMove(
@@ -1190,7 +1743,25 @@ function makeMove(
     col
 ) {
 
-    if (gameOver) {
+    if (
+        gameOver ||
+        moveLock ||
+        computerThinking
+    ) {
+        return;
+    }
+
+
+    /*
+       During computer mode,
+       the human controls BLACK.
+    */
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === WHITE
+    ) {
+
         return;
     }
 
@@ -1203,27 +1774,179 @@ function makeMove(
         );
 
 
-    if (!flips.length) {
+    if (
+        !flips.length
+    ) {
 
         showMessage(
-            "THAT IS NOT A LEGAL MOVE"
+            "NOT A LEGAL MOVE"
         );
 
         return;
     }
 
 
+    executeMove(
+        row,
+        col,
+        flips,
+        currentPlayer
+    );
+}
+
+
+/* =========================================================
+   EXECUTE MOVE
+   ========================================================= */
+
+function executeMove(
+    row,
+    col,
+    flips,
+    player
+) {
+
+    moveLock =
+        true;
+
+
     board[row][col] =
-        currentPlayer;
+        player;
 
 
     for (
-        const [r, c]
+        const [r,c]
         of flips
     ) {
 
         board[r][c] =
-            currentPlayer;
+            player;
+    }
+
+
+    render();
+
+
+    /*
+       Add the flip animation after
+       the board has changed.
+    */
+
+    animateFlips(
+        flips
+    );
+
+
+    setTimeout(
+        () => {
+
+            moveLock =
+                false;
+
+            advanceTurn();
+
+        },
+        590
+    );
+}
+
+
+/* =========================================================
+   FLIP ANIMATION
+   ========================================================= */
+
+function animateFlips(
+    flips
+) {
+
+    const flipSet =
+        new Set(
+            flips.map(
+                ([r,c]) =>
+                    r + "," + c
+            )
+        );
+
+
+    const squares =
+        boardElement.children;
+
+
+    for (
+        let i = 0;
+        i < squares.length;
+        i++
+    ) {
+
+        const row =
+            Math.floor(i / 8);
+
+        const col =
+            i % 8;
+
+
+        if (
+            flipSet.has(
+                row + "," + col
+            )
+        ) {
+
+            const piece =
+                squares[i].querySelector(
+                    ".piece"
+                );
+
+
+            if (piece) {
+
+                /*
+                   Slightly stagger the flips
+                   to make the captured line
+                   feel physical.
+                */
+
+                const delay =
+                    (
+                        Math.abs(row - flips[0][0]) +
+                        Math.abs(col - flips[0][1])
+                    ) * 18;
+
+
+                piece.style.animationDelay =
+                    delay + "ms";
+
+                piece.classList.add(
+                    "flip"
+                );
+
+
+                setTimeout(
+                    () => {
+
+                        piece.style.animationDelay =
+                            "";
+
+                        piece.classList.remove(
+                            "flip"
+                        );
+
+                    },
+                    650 + delay
+                );
+            }
+        }
+    }
+}
+
+
+/* =========================================================
+   ADVANCE TURN
+   ========================================================= */
+
+function advanceTurn() {
+
+    if (gameOver) {
+        return;
     }
 
 
@@ -1233,60 +1956,665 @@ function makeMove(
         );
 
 
-    render();
-
-
-    /*
-       If the new player has no move,
-       automatically pass to the other player.
-    */
-
-    const legal =
+    let legal =
         getLegalMoves(
             currentPlayer
         );
 
 
-    if (!legal.length) {
+    /*
+       Automatic pass.
+    */
+
+    if (
+        legal.length === 0
+    ) {
 
         const other =
             opponent(
                 currentPlayer
             );
 
-        const otherMoves =
+        const otherLegal =
             getLegalMoves(
                 other
             );
 
 
-        if (otherMoves.length) {
+        /*
+           Neither player can move.
+        */
 
-            showMessage(
-                (
-                    currentPlayer === BLACK
-                        ? "BLACK"
-                        : "WHITE"
-                ) +
-                " HAS NO LEGAL MOVE — PASS"
-            );
+        if (
+            otherLegal.length === 0
+        ) {
 
-            currentPlayer =
-                other;
-
-            render();
+            finishGame();
 
             return;
         }
 
 
-        finishGame();
+        showMessage(
+            (
+                currentPlayer === BLACK
+                    ? "BLACK"
+                    : "WHITE"
+            ) +
+            " HAS NO MOVE — PASS"
+        );
+
+
+        currentPlayer =
+            other;
+
+        legal =
+            otherLegal;
+    }
+
+
+    render();
+
+
+    /*
+       Computer's turn.
+    */
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === WHITE &&
+        !gameOver
+    ) {
+
+        computerThinking =
+            true;
+
+        turnElement.textContent =
+            "COMPUTER THINKING...";
+
+
+        setTimeout(
+            computerMove,
+            520
+        );
+    }
+}
+
+
+/* =========================================================
+   COMPUTER MOVE
+   ========================================================= */
+
+function computerMove() {
+
+    if (
+        gameOver ||
+        currentPlayer !== WHITE
+    ) {
+
+        computerThinking =
+            false;
 
         return;
     }
 
 
-    render();
+    const moves =
+        getLegalMoves(
+            WHITE
+        );
+
+
+    if (!moves.length) {
+
+        computerThinking =
+            false;
+
+        advanceTurn();
+
+        return;
+    }
+
+
+    /*
+       Search several plies with minimax.
+       The board is small enough for this
+       depth to run comfortably in-browser.
+    */
+
+    let bestMove =
+        moves[0];
+
+    let bestScore =
+        -Infinity;
+
+
+    for (
+        const move of moves
+    ) {
+
+        const testBoard =
+            applyMoveToBoard(
+                board,
+                move.row,
+                move.col,
+                WHITE
+            );
+
+
+        const score =
+            minimax(
+                testBoard,
+                BLACK,
+                3,
+                -Infinity,
+                Infinity
+            );
+
+
+        /*
+           Small random amount prevents
+           identical-looking choices when
+           moves are strategically equivalent.
+        */
+
+        const finalScore =
+            score +
+            Math.random() * 0.05;
+
+
+        if (
+            finalScore > bestScore
+        ) {
+
+            bestScore =
+                finalScore;
+
+            bestMove =
+                move;
+        }
+    }
+
+
+    computerThinking =
+        false;
+
+
+    executeMove(
+        bestMove.row,
+        bestMove.col,
+        bestMove.flips,
+        WHITE
+    );
+}
+
+
+/* =========================================================
+   APPLY MOVE TO COPY
+   ========================================================= */
+
+function applyMoveToBoard(
+    source,
+    row,
+    col,
+    player
+) {
+
+    const next =
+        source.map(
+            r => [...r]
+        );
+
+
+    if (
+        next[row][col] !== EMPTY
+    ) {
+
+        return next;
+    }
+
+
+    const other =
+        opponent(player);
+
+
+    next[row][col] =
+        player;
+
+
+    for (
+        const [dr,dc]
+        of DIRECTIONS
+    ) {
+
+        let r =
+            row + dr;
+
+        let c =
+            col + dc;
+
+        const line = [];
+
+
+        while (
+            inBounds(r,c) &&
+            next[r][c] === other
+        ) {
+
+            line.push([
+                r,
+                c
+            ]);
+
+            r += dr;
+            c += dc;
+        }
+
+
+        if (
+            line.length &&
+            inBounds(r,c) &&
+            next[r][c] === player
+        ) {
+
+            for (
+                const [fr,fc]
+                of line
+            ) {
+
+                next[fr][fc] =
+                    player;
+            }
+        }
+    }
+
+
+    return next;
+}
+
+
+/* =========================================================
+   LEGAL MOVES FOR ARBITRARY BOARD
+   ========================================================= */
+
+function getLegalMovesForBoard(
+    state,
+    player
+) {
+
+    const moves = [];
+
+
+    for (
+        let row=0;
+        row<8;
+        row++
+    ) {
+
+        for (
+            let col=0;
+            col<8;
+            col++
+        ) {
+
+            if (
+                state[row][col] !== EMPTY
+            ) {
+                continue;
+            }
+
+
+            const flips =
+                getFlipsForBoard(
+                    state,
+                    row,
+                    col,
+                    player
+                );
+
+
+            if (
+                flips.length
+            ) {
+
+                moves.push({
+                    row,
+                    col
+                });
+            }
+        }
+    }
+
+
+    return moves;
+}
+
+
+/* =========================================================
+   FLIPS FOR ARBITRARY BOARD
+   ========================================================= */
+
+function getFlipsForBoard(
+    state,
+    row,
+    col,
+    player
+) {
+
+    if (
+        !inBounds(row,col) ||
+        state[row][col] !== EMPTY
+    ) {
+
+        return [];
+    }
+
+
+    const other =
+        opponent(player);
+
+    const flips = [];
+
+
+    for (
+        const [dr,dc]
+        of DIRECTIONS
+    ) {
+
+        let r =
+            row + dr;
+
+        let c =
+            col + dc;
+
+        const line = [];
+
+
+        while (
+            inBounds(r,c) &&
+            state[r][c] === other
+        ) {
+
+            line.push([
+                r,
+                c
+            ]);
+
+            r += dr;
+            c += dc;
+        }
+
+
+        if (
+            line.length &&
+            inBounds(r,c) &&
+            state[r][c] === player
+        ) {
+
+            flips.push(
+                ...line
+            );
+        }
+    }
+
+
+    return flips;
+}
+
+
+/* =========================================================
+   MINIMAX
+   ========================================================= */
+
+function minimax(
+    state,
+    player,
+    depth,
+    alpha,
+    beta
+) {
+
+    const myMoves =
+        getLegalMovesForBoard(
+            state,
+            player
+        );
+
+
+    const other =
+        opponent(player);
+
+
+    const opponentMoves =
+        getLegalMovesForBoard(
+            state,
+            other
+        );
+
+
+    if (
+        depth <= 0 ||
+        (
+            myMoves.length === 0 &&
+            opponentMoves.length === 0
+        )
+    ) {
+
+        return evaluateBoard(
+            state,
+            WHITE
+        );
+    }
+
+
+    /*
+       Forced pass.
+    */
+
+    if (
+        myMoves.length === 0
+    ) {
+
+        return minimax(
+            state,
+            other,
+            depth - 1,
+            alpha,
+            beta
+        );
+    }
+
+
+    /*
+       White maximizes.
+       Black minimizes.
+    */
+
+    if (
+        player === WHITE
+    ) {
+
+        let value =
+            -Infinity;
+
+
+        for (
+            const move of myMoves
+        ) {
+
+            const next =
+                applyMoveToBoard(
+                    state,
+                    move.row,
+                    move.col,
+                    player
+                );
+
+
+            value =
+                Math.max(
+                    value,
+                    minimax(
+                        next,
+                        other,
+                        depth - 1,
+                        alpha,
+                        beta
+                    )
+                );
+
+
+            alpha =
+                Math.max(
+                    alpha,
+                    value
+                );
+
+
+            if (
+                beta <= alpha
+            ) {
+                break;
+            }
+        }
+
+
+        return value;
+    }
+
+
+    else {
+
+        let value =
+            Infinity;
+
+
+        for (
+            const move of myMoves
+        ) {
+
+            const next =
+                applyMoveToBoard(
+                    state,
+                    move.row,
+                    move.col,
+                    player
+                );
+
+
+            value =
+                Math.min(
+                    value,
+                    minimax(
+                        next,
+                        other,
+                        depth - 1,
+                        alpha,
+                        beta
+                    )
+                );
+
+
+            beta =
+                Math.min(
+                    beta,
+                    value
+                );
+
+
+            if (
+                beta <= alpha
+            ) {
+                break;
+            }
+        }
+
+
+        return value;
+    }
+}
+
+
+/* =========================================================
+   EVALUATE BOARD
+   ========================================================= */
+
+function evaluateBoard(
+    state,
+    player
+) {
+
+    const other =
+        opponent(player);
+
+
+    let playerPieces = 0;
+    let otherPieces = 0;
+
+    let positional = 0;
+
+
+    for (
+        let row=0;
+        row<8;
+        row++
+    ) {
+
+        for (
+            let col=0;
+            col<8;
+            col++
+        ) {
+
+            if (
+                state[row][col] === player
+            ) {
+
+                playerPieces++;
+
+                positional +=
+                    POSITION_VALUES[row][col];
+
+            } else if (
+                state[row][col] === other
+            ) {
+
+                otherPieces++;
+
+                positional -=
+                    POSITION_VALUES[row][col];
+            }
+        }
+    }
+
+
+    const playerMoves =
+        getLegalMovesForBoard(
+            state,
+            player
+        ).length;
+
+
+    const otherMoves =
+        getLegalMovesForBoard(
+            state,
+            other
+        ).length;
+
+
+    const mobility =
+        (playerMoves - otherMoves) * 7;
+
+
+    const pieceDifference =
+        (playerPieces - otherPieces) * 1.5;
+
+
+    return (
+        positional * 2 +
+        mobility +
+        pieceDifference
+    );
 }
 
 
@@ -1319,14 +2647,14 @@ function render() {
 
 
     for (
-        let row = 0;
-        row < 8;
+        let row=0;
+        row<8;
         row++
     ) {
 
         for (
-            let col = 0;
-            col < 8;
+            let col=0;
+            col<8;
             col++
         ) {
 
@@ -1363,6 +2691,7 @@ function render() {
                         row,
                         col
                     );
+
                 }
             );
 
@@ -1380,6 +2709,7 @@ function render() {
                         "div"
                     );
 
+
                 piece.className =
                     "piece " +
                     (
@@ -1387,6 +2717,7 @@ function render() {
                             ? "black"
                             : "white"
                     );
+
 
                 square.appendChild(
                     piece
@@ -1415,6 +2746,7 @@ function render() {
 
     passButton.disabled =
         gameOver ||
+        computerThinking ||
         getLegalMoves(
             currentPlayer
         ).length > 0;
@@ -1432,14 +2764,14 @@ function updateScore() {
 
 
     for (
-        let row = 0;
-        row < 8;
+        let row=0;
+        row<8;
         row++
     ) {
 
         for (
-            let col = 0;
-            col < 8;
+            let col=0;
+            col<8;
             col++
         ) {
 
@@ -1473,7 +2805,11 @@ function updateScore() {
 
 function passTurn() {
 
-    if (gameOver) {
+    if (
+        gameOver ||
+        computerThinking ||
+        moveLock
+    ) {
         return;
     }
 
@@ -1484,12 +2820,9 @@ function passTurn() {
         );
 
 
-    /*
-       A player should only pass when
-       they genuinely have no legal move.
-    */
-
-    if (legal.length) {
+    if (
+        legal.length
+    ) {
 
         showMessage(
             "YOU HAVE A LEGAL MOVE"
@@ -1505,13 +2838,15 @@ function passTurn() {
         );
 
 
-    const otherMoves =
+    const nextMoves =
         getLegalMoves(
             currentPlayer
         );
 
 
-    if (!otherMoves.length) {
+    if (
+        !nextMoves.length
+    ) {
 
         finishGame();
 
@@ -1519,17 +2854,26 @@ function passTurn() {
     }
 
 
-    showMessage(
-        (
-            currentPlayer === BLACK
-                ? "BLACK"
-                : "WHITE"
-        ) +
-        "'S TURN"
-    );
-
-
     render();
+
+
+    if (
+        gameMode === "computer" &&
+        currentPlayer === WHITE
+    ) {
+
+        computerThinking =
+            true;
+
+        turnElement.textContent =
+            "COMPUTER THINKING...";
+
+
+        setTimeout(
+            computerMove,
+            520
+        );
+    }
 }
 
 
@@ -1542,20 +2886,26 @@ function finishGame() {
     gameOver =
         true;
 
+    computerThinking =
+        false;
+
+    moveLock =
+        false;
+
 
     let black = 0;
     let white = 0;
 
 
     for (
-        let row = 0;
-        row < 8;
+        let row=0;
+        row<8;
         row++
     ) {
 
         for (
-            let col = 0;
-            col < 8;
+            let col=0;
+            col<8;
             col++
         ) {
 
@@ -1575,15 +2925,23 @@ function finishGame() {
     }
 
 
-    if (black > white) {
+    if (
+        black > white
+    ) {
 
         gameTitle.textContent =
-            "BLACK WINS!";
+            gameMode === "computer"
+                ? "YOU WIN!"
+                : "BLACK WINS!";
 
-    } else if (white > black) {
+    } else if (
+        white > black
+    ) {
 
         gameTitle.textContent =
-            "WHITE WINS!";
+            gameMode === "computer"
+                ? "COMPUTER WINS!"
+                : "WHITE WINS!";
 
     } else {
 
@@ -1626,8 +2984,10 @@ function showMessage(
         messageTimer
     );
 
+
     messageElement.textContent =
         text;
+
 
     messageElement.classList.add(
         "show"
@@ -1653,6 +3013,34 @@ function showMessage(
    ========================================================= */
 
 document
+    .getElementById("twoPlayerButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            startGame(
+                "2player"
+            );
+
+        }
+    );
+
+
+document
+    .getElementById("computerButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            startGame(
+                "computer"
+            );
+
+        }
+    );
+
+
+document
     .getElementById("newGameButton")
     .addEventListener(
         "click",
@@ -1675,10 +3063,11 @@ passButton.addEventListener(
 
 
 /* =========================================================
-   START
+   INITIAL SCREEN
    ========================================================= */
 
-newGame();
+modeScreen.style.display =
+    "flex";
 
 </script>
 
