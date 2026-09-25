@@ -2,437 +2,377 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Game Room • Lobby</title>
 
 <style>
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body {
     margin: 0;
+    padding: 0;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
+    min-height: 100%;
+    background: #080b12;
+    color: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
-    background:
-        radial-gradient(
-            circle at 50% 0%,
-            #263b72 0%,
-            #101a39 42%,
-            #060b19 100%
-        );
-    color: white;
 }
 
 body {
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.app {
-    width: min(900px, 100%);
-    height: 100dvh;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.panel {
-    width: min(700px, 100%);
-    max-height: 94dvh;
-    overflow: auto;
-
-    padding: 28px;
-
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(43,61,108,.96),
-            rgba(10,17,38,.98)
-        );
-
-    border: 1px solid rgba(255,255,255,.16);
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.65),
-        inset 0 1px 1px rgba(255,255,255,.12);
-}
-
-h1 {
-    margin: 0;
-    text-align: center;
-
-    font-size: clamp(26px, 6vw, 48px);
-    letter-spacing: 5px;
-
-    text-shadow:
-        0 2px 4px #000,
-        0 0 20px rgba(255,255,255,.15);
-}
-
-.subtitle {
-    margin-top: 7px;
-    text-align: center;
-
-    font-size: clamp(11px, 2vw, 15px);
-    letter-spacing: 2px;
-    opacity: .7;
-}
-
-.section {
-    margin-top: 24px;
-}
-
-label {
-    display: block;
-    margin-bottom: 7px;
-
-    font-size: 12px;
-    letter-spacing: 1px;
-    opacity: .75;
-}
-
-input {
-    width: 100%;
-
-    padding: 13px 14px;
-
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,.20);
-
-    background: rgba(0,0,0,.30);
-    color: white;
-
-    outline: none;
-
-    font-size: 16px;
-}
-
-input:focus {
-    border-color: #ffd84a;
-    box-shadow:
-        0 0 0 2px rgba(255,216,74,.16);
-}
-
-.identity-buttons,
-.action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-button {
-    border: 1px solid rgba(255,255,255,.25);
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #394e82,
-            #18264d
-        );
-
-    color: white;
-
-    font-weight: bold;
-
-    padding: 12px 18px;
-
-    font-size: 14px;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 4px 10px rgba(0,0,0,.45),
-        inset 0 1px 1px rgba(255,255,255,.14);
-}
-
-button:hover {
-    background:
-        linear-gradient(
-            145deg,
-            #4c649f,
-            #223665
-        );
-}
-
-button:active {
-    transform: translateY(1px);
-}
-
-button.primary {
-    border-color: rgba(255,216,74,.55);
-
-    background:
-        linear-gradient(
-            145deg,
-            #806b20,
-            #4b3d0c
-        );
-}
-
-button.danger {
-    background:
-        linear-gradient(
-            145deg,
-            #702c35,
-            #39151b
-        );
-}
-
-button.selected {
-    outline: 2px solid #ffd84a;
 }
 
 .hidden {
     display: none !important;
 }
 
-.identity-note {
-    margin-top: 9px;
-
-    text-align: center;
-
-    font-size: 12px;
-    opacity: .55;
+.room-shell {
+    width: min(900px, 100%);
+    min-height: 600px;
+    background:
+        linear-gradient(
+            145deg,
+            #111827,
+            #090d16 60%,
+            #06080d
+        );
+    border: 1px solid #263247;
+    border-radius: 22px;
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.04);
+    overflow: hidden;
 }
 
-.lobby-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+.header {
+    padding: 25px 28px 20px;
+    border-bottom: 1px solid #222c3d;
+    background: rgba(255,255,255,.02);
+}
 
+.header-title {
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: #8fa4c7;
+    font-weight: bold;
+}
+
+.header-game {
+    margin-top: 7px;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.content {
+    padding: 30px;
+}
+
+.panel {
+    background: rgba(255,255,255,.025);
+    border: 1px solid #222c3d;
+    border-radius: 18px;
+    padding: 25px;
+}
+
+.identity-title,
+.lobby-title {
+    font-size: 25px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #8d9bb2;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+input {
+    width: 100%;
+    height: 54px;
+    border-radius: 12px;
+    border: 1px solid #34425a;
+    background: #080c14;
+    color: white;
+    padding: 0 16px;
+    font-size: 18px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #5d86c7;
+    box-shadow: 0 0 0 3px rgba(93,134,199,.12);
+}
+
+.button-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+button {
+    border: 0;
+    border-radius: 12px;
+    min-height: 50px;
+    padding: 0 20px;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    cursor: pointer;
+    color: white;
+    background: #26344b;
+    transition:
+        transform .12s ease,
+        filter .12s ease,
+        background .12s ease;
+}
+
+button:hover {
+    filter: brightness(1.15);
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+button.primary {
+    background: #2463d4;
+}
+
+button.green {
+    background: #1c8750;
+}
+
+button.red {
+    background: #9d2936;
+}
+
+button.dark {
+    background: #151d2b;
+    border: 1px solid #2d3b52;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: default;
+}
+
+.anonymous-button {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.status {
+    margin-top: 18px;
+    min-height: 24px;
+    color: #8fa4c7;
+    font-size: 14px;
+}
+
+.status.error {
+    color: #ff7373;
+}
+
+.status.good {
+    color: #65d99b;
+}
+
+.lobby-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 20px 0 25px;
+}
+
+.waiting-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 12px;
 }
 
-.lobby-title {
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 2px;
+.waiting-heading span:first-child {
+    font-size: 17px;
+    font-weight: 900;
 }
 
 .player-count {
-    padding: 5px 9px;
-
-    border-radius: 20px;
-
-    background: rgba(0,0,0,.3);
-    border: 1px solid rgba(255,255,255,.12);
-
-    font-size: 11px;
-    opacity: .8;
+    color: #71829e;
+    font-size: 13px;
 }
 
 .players {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-
-    min-height: 70px;
+    gap: 10px;
 }
 
 .player {
+    min-height: 62px;
+    border: 1px solid #263247;
+    border-radius: 13px;
+    background: #0c121d;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 15px;
+}
 
+.player-left {
+    display: flex;
+    align-items: center;
     gap: 12px;
+    min-width: 0;
+}
 
-    padding: 12px 14px;
-
-    border-radius: 10px;
-
-    background: rgba(0,0,0,.23);
-    border: 1px solid rgba(255,255,255,.10);
+.player-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #4e9cff;
+    box-shadow: 0 0 12px rgba(78,156,255,.45);
+    flex: 0 0 auto;
 }
 
 .player-name {
     font-weight: bold;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-.player-status {
-    font-size: 10px;
-    opacity: .5;
-    margin-top: 3px;
-}
-
-.player button {
-    flex-shrink: 0;
-    padding: 8px 12px;
+.player-you {
+    color: #70809a;
     font-size: 12px;
+    margin-left: 5px;
 }
 
 .empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    min-height: 70px;
-
-    border-radius: 10px;
-
-    background: rgba(0,0,0,.16);
-
-    border: 1px dashed rgba(255,255,255,.12);
-
-    font-size: 13px;
-    opacity: .5;
-}
-
-.status {
-    margin-top: 16px;
-
-    min-height: 28px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    padding: 6px 12px;
-
-    border-radius: 20px;
-
-    background: rgba(0,0,0,.25);
-    border: 1px solid rgba(255,255,255,.12);
-
+    color: #6d7d96;
     text-align: center;
+    padding: 30px 15px;
+    border: 1px dashed #29364b;
+    border-radius: 13px;
+}
 
+.footer-status {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #202a3a;
+    color: #74839b;
     font-size: 13px;
-    font-weight: bold;
 }
 
-.footer {
-    margin-top: 18px;
-
-    text-align: center;
-
-    font-size: 9px;
-    letter-spacing: 2px;
-
-    opacity: .3;
-}
-
-/* =========================================================
-   MODAL
-   ========================================================= */
-
-.modal {
+.modal-backdrop {
     position: fixed;
     inset: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    padding: 20px;
-
     background: rgba(0,0,0,.72);
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
     z-index: 100;
 }
 
-.modal-box {
-    width: min(430px, 100%);
+.modal {
+    width: min(470px, 100%);
+    background: #101722;
+    border: 1px solid #33415a;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 30px 90px rgba(0,0,0,.7);
+}
 
-    padding: 25px;
-
-    border-radius: 18px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #293d70,
-            #0b1229
-        );
-
-    border: 1px solid rgba(255,255,255,.18);
-
-    box-shadow:
-        0 20px 70px rgba(0,0,0,.8);
+.modal-kicker {
+    color: #7790b6;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 3px;
 }
 
 .modal-title {
-    font-size: 22px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-align: center;
+    font-size: 29px;
+    font-weight: 900;
+    margin: 8px 0 10px;
 }
 
-.modal-message {
-    margin-top: 12px;
-
-    text-align: center;
-
+.modal-text {
+    color: #a2aec0;
     line-height: 1.5;
-
-    font-size: 14px;
-    opacity: .8;
 }
 
 .modal-buttons {
-    margin-top: 22px;
-
     display: flex;
-    justify-content: center;
     gap: 10px;
+    margin-top: 25px;
 }
 
-.match-room {
-    margin-top: 15px;
+.modal-buttons button {
+    flex: 1;
+}
 
-    padding: 10px;
-
-    border-radius: 8px;
-
-    background: rgba(0,0,0,.28);
-
-    font-family: monospace;
+.connection {
+    position: fixed;
+    top: 12px;
+    right: 14px;
     font-size: 11px;
+    color: #64748b;
+}
 
-    text-align: center;
+.connection.online {
+    color: #59d991;
+}
 
-    word-break: break-all;
-
-    opacity: .65;
+.connection.offline {
+    color: #ff6666;
 }
 
 @media (max-width: 600px) {
+    body {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 35px;
+    }
 
-    .app {
-        padding: 8px;
+    .room-shell {
+        min-height: calc(100vh - 45px);
+        border-radius: 16px;
+    }
+
+    .header {
+        padding: 20px;
+    }
+
+    .header-game {
+        font-size: 25px;
+    }
+
+    .content {
+        padding: 18px;
     }
 
     .panel {
         padding: 18px;
-        border-radius: 15px;
     }
 
-    h1 {
-        letter-spacing: 3px;
+    .button-row,
+    .lobby-actions {
+        flex-direction: column;
     }
 
-    .section {
-        margin-top: 18px;
-    }
-
-    button {
-        padding: 11px 14px;
+    .button-row button,
+    .lobby-actions button {
+        width: 100%;
     }
 }
 </style>
@@ -440,177 +380,167 @@ button.selected {
 
 <body>
 
-<div class="app">
+<div id="connection" class="connection offline">
+    DISCONNECTED
+</div>
 
-    <div class="panel">
+<div class="room-shell">
+
+    <div class="header">
+        <div class="header-title">GAME ROOM • LOBBY</div>
+        <div id="gameTitle" class="header-game">CHECKERS</div>
+    </div>
+
+    <div class="content">
 
         <!-- =================================================
-             IDENTITY SCREEN
+             IDENTITY
              ================================================= -->
 
-        <div id="identityScreen">
+        <div id="identityScreen" class="panel">
 
-            <h1 id="identityTitle">
-                GAME ROOM
-            </h1>
+            <div class="identity-title">
+                Enter the Game Room
+            </div>
 
             <div class="subtitle">
-                TWO PLAYER MATCHMAKING
+                Choose a player name before entering the lobby.
             </div>
 
-            <div class="section">
+            <input
+                id="nameInput"
+                type="text"
+                maxlength="24"
+                placeholder="Player name"
+                autocomplete="off"
+            >
 
-                <label for="nameInput">
-                    PLAYER NAME
-                </label>
+            <div class="button-row">
 
-                <input
-                    id="nameInput"
-                    type="text"
-                    maxlength="24"
-                    placeholder="Enter your name"
-                    autocomplete="off"
+                <button
+                    id="continueButton"
+                    class="primary"
                 >
-
-                <div class="identity-note">
-                    Your name is shown to other players.
-                </div>
+                    CONTINUE
+                </button>
 
             </div>
 
-            <div class="section">
+            <button
+                id="anonymousButton"
+                class="dark anonymous-button"
+            >
+                CONTINUE AS ANONYMOUS
+            </button>
 
-                <div class="identity-buttons">
-
-                    <button
-                        id="nameContinueBtn"
-                        class="primary">
-                        CONTINUE
-                    </button>
-
-                    <button
-                        id="anonymousBtn">
-                        CONTINUE AS ANONYMOUS
-                    </button>
-
-                </div>
-
-            </div>
+            <div id="identityStatus" class="status"></div>
 
         </div>
 
 
         <!-- =================================================
-             LOBBY SCREEN
+             LOBBY
              ================================================= -->
 
-        <div
-            id="lobbyScreen"
-            class="hidden">
+        <div id="lobbyScreen" class="panel hidden">
 
-            <h1 id="gameTitle">
-                CHECKERS
-            </h1>
-
-            <div
-                class="subtitle"
-                id="lobbySubtitle">
-                FIND ANOTHER PLAYER
+            <div class="lobby-title">
+                <span id="lobbyGameName">CHECKERS</span> LOBBY
             </div>
 
-            <div class="section">
+            <div class="subtitle">
+                Find another player or invite someone waiting.
+            </div>
 
-                <div class="action-buttons">
+            <div class="lobby-actions">
 
-                    <button
-                        id="randomBtn"
-                        class="primary">
-                        FIND RANDOM PLAYER
-                    </button>
+                <button
+                    id="randomButton"
+                    class="primary"
+                >
+                    FIND RANDOM PLAYER
+                </button>
 
-                    <button
-                        id="leaveBtn"
-                        class="danger">
-                        LEAVE LOBBY
-                    </button>
-
-                </div>
+                <button
+                    id="leaveButton"
+                    class="dark"
+                >
+                    LEAVE LOBBY
+                </button>
 
             </div>
 
-            <div class="section">
+            <div class="waiting-heading">
 
-                <div class="lobby-header">
+                <span>
+                    WAITING PLAYERS
+                </span>
 
-                    <div class="lobby-title">
-                        WAITING PLAYERS
-                    </div>
-
-                    <div
-                        class="player-count"
-                        id="playerCount">
-                        0 ONLINE
-                    </div>
-
-                </div>
-
-                <div
-                    class="players"
-                    id="players">
-                </div>
+                <span
+                    id="playerCount"
+                    class="player-count"
+                >
+                    0 players
+                </span>
 
             </div>
 
             <div
-                class="status"
-                id="status">
-                Connecting...
-            </div>
+                id="players"
+                class="players"
+            ></div>
 
-            <div class="footer">
-                GAME ROOM • PRIVATE MATCHMAKING
+            <div
+                id="lobbyStatus"
+                class="footer-status"
+            >
+                Waiting for players...
             </div>
 
         </div>
 
     </div>
-
 </div>
 
 
-<!-- =========================================================
+<!-- =====================================================
      INVITATION MODAL
-     ========================================================= -->
+     ===================================================== -->
 
 <div
     id="inviteModal"
-    class="modal hidden">
+    class="modal-backdrop hidden"
+>
 
-    <div class="modal-box">
+    <div class="modal">
 
-        <div
-            class="modal-title"
-            id="inviteTitle">
+        <div class="modal-kicker">
             GAME INVITATION
         </div>
 
-        <div
-            class="modal-message"
-            id="inviteMessage">
-            A player wants to play.
+        <div class="modal-title">
+            Play with <span id="inviteName">Player</span>?
+        </div>
+
+        <div class="modal-text">
+            Another player has invited you to a game of
+            <strong id="inviteGame">CHECKERS</strong>.
         </div>
 
         <div class="modal-buttons">
 
             <button
-                id="acceptInviteBtn"
-                class="primary">
-                ACCEPT
+                id="declineButton"
+                class="red"
+            >
+                DECLINE
             </button>
 
             <button
-                id="declineInviteBtn">
-                DECLINE
+                id="acceptButton"
+                class="green"
+            >
+                ACCEPT
             </button>
 
         </div>
@@ -620,36 +550,38 @@ button.selected {
 </div>
 
 
-<!-- =========================================================
-     MATCH MODAL
-     ========================================================= -->
+<!-- =====================================================
+     MATCH FOUND MODAL
+     ===================================================== -->
 
 <div
     id="matchModal"
-    class="modal hidden">
+    class="modal-backdrop hidden"
+>
 
-    <div class="modal-box">
+    <div class="modal">
 
-        <div class="modal-title">
+        <div class="modal-kicker">
             MATCH FOUND
         </div>
 
-        <div
-            class="modal-message"
-            id="matchMessage">
-            You have been matched.
+        <div class="modal-title">
+            You're Matched!
         </div>
 
         <div
-            class="match-room"
-            id="matchRoom">
+            id="matchText"
+            class="modal-text"
+        >
+            Your opponent is ready.
         </div>
 
         <div class="modal-buttons">
 
             <button
-                id="enterRoomBtn"
-                class="primary">
+                id="enterRoomButton"
+                class="green"
+            >
                 ENTER ROOM
             </button>
 
@@ -663,6 +595,7 @@ button.selected {
 <script>
 "use strict";
 
+
 /* =========================================================
    GAME INFORMATION
    ========================================================= */
@@ -672,48 +605,85 @@ const params =
         window.location.search
     );
 
+
 const requestedGame =
-    (params.get("game") || "checkers")
-        .toLowerCase()
-        .replace(".html", "");
+    normalizeGame(
+        params.get("game") ||
+        "checkers"
+    );
+
 
 const GAME_FILES = {
-    ttt: "ttt.html",
-    checkers: "checkers.html",
-    navalstrike: "navalstrike.html",
-    carrierstrike: "carrierstrike.html",
-    chess: "chess.html"
+
+    ttt:
+        "ttt.html",
+
+    checkers:
+        "checkers.html",
+
+    navalstrike:
+        "navalstrike.html",
+
+    carrierstrike:
+        "carrierstrike.html",
+
+    chess:
+        "chess.html",
+
+    solitaire:
+        "solitaire.html"
 };
+
 
 const GAME_NAMES = {
-    ttt: "TIC-TAC-TOE",
-    checkers: "CHECKERS",
-    navalstrike: "NAVAL STRIKE",
-    carrierstrike: "CARRIER STRIKE",
-    chess: "CHESS"
+
+    ttt:
+        "TIC-TAC-TOE",
+
+    checkers:
+        "CHECKERS",
+
+    navalstrike:
+        "NAVAL STRIKE",
+
+    carrierstrike:
+        "CARRIER STRIKE",
+
+    chess:
+        "CHESS",
+
+    solitaire:
+        "SOLITAIRE"
 };
-
-const gameFile =
-    GAME_FILES[requestedGame];
-
-const gameName =
-    GAME_NAMES[requestedGame];
 
 
 /* =========================================================
-   VALIDATE GAME
+   STATE
    ========================================================= */
 
-if (!gameFile) {
+let socket = null;
 
-    window.location.href =
-        "index.html";
-}
+let player = null;
+
+let playerName = "";
+
+let anonymous = false;
+
+let pendingInviteFrom = null;
+
+let pendingRoom = null;
+
+let reconnectTimer = null;
 
 
 /* =========================================================
    ELEMENTS
    ========================================================= */
+
+const connection =
+    document.getElementById(
+        "connection"
+    );
 
 const identityScreen =
     document.getElementById(
@@ -725,44 +695,29 @@ const lobbyScreen =
         "lobbyScreen"
     );
 
-const identityTitle =
-    document.getElementById(
-        "identityTitle"
-    );
-
-const gameTitle =
-    document.getElementById(
-        "gameTitle"
-    );
-
-const lobbySubtitle =
-    document.getElementById(
-        "lobbySubtitle"
-    );
-
 const nameInput =
     document.getElementById(
         "nameInput"
     );
 
-const nameContinueBtn =
+const continueButton =
     document.getElementById(
-        "nameContinueBtn"
+        "continueButton"
     );
 
-const anonymousBtn =
+const anonymousButton =
     document.getElementById(
-        "anonymousBtn"
+        "anonymousButton"
     );
 
-const randomBtn =
+const identityStatus =
     document.getElementById(
-        "randomBtn"
+        "identityStatus"
     );
 
-const leaveBtn =
+const lobbyStatus =
     document.getElementById(
-        "leaveBtn"
+        "lobbyStatus"
     );
 
 const playersElement =
@@ -775,9 +730,14 @@ const playerCount =
         "playerCount"
     );
 
-const statusElement =
+const randomButton =
     document.getElementById(
-        "status"
+        "randomButton"
+    );
+
+const leaveButton =
+    document.getElementById(
+        "leaveButton"
     );
 
 const inviteModal =
@@ -785,19 +745,24 @@ const inviteModal =
         "inviteModal"
     );
 
-const inviteMessage =
+const inviteName =
     document.getElementById(
-        "inviteMessage"
+        "inviteName"
     );
 
-const acceptInviteBtn =
+const inviteGame =
     document.getElementById(
-        "acceptInviteBtn"
+        "inviteGame"
     );
 
-const declineInviteBtn =
+const acceptButton =
     document.getElementById(
-        "declineInviteBtn"
+        "acceptButton"
+    );
+
+const declineButton =
+    document.getElementById(
+        "declineButton"
     );
 
 const matchModal =
@@ -805,74 +770,217 @@ const matchModal =
         "matchModal"
     );
 
-const matchMessage =
+const matchText =
     document.getElementById(
-        "matchMessage"
+        "matchText"
     );
 
-const matchRoom =
+const enterRoomButton =
     document.getElementById(
-        "matchRoom"
+        "enterRoomButton"
     );
 
-const enterRoomBtn =
+const gameTitle =
     document.getElementById(
-        "enterRoomBtn"
+        "gameTitle"
+    );
+
+const lobbyGameName =
+    document.getElementById(
+        "lobbyGameName"
     );
 
 
 /* =========================================================
-   UI INITIALIZATION
+   INITIAL DISPLAY
    ========================================================= */
 
-identityTitle.textContent =
-    gameName + " • 2 PLAYER";
+const initialGameName =
+    GAME_NAMES[requestedGame] ||
+    displayGameName(
+        requestedGame
+    );
+
 
 gameTitle.textContent =
-    gameName;
+    initialGameName;
 
-lobbySubtitle.textContent =
-    gameName + " • FIND A PLAYER";
-
-
-/* =========================================================
-   STATE
-   ========================================================= */
-
-let socket = null;
-
-let playerId = null;
-
-let playerName = "Anonymous";
-
-let anonymous = true;
-
-let currentPlayers = [];
-
-let pendingInviteFrom = null;
-
-let pendingRoom = null;
-
-let reconnectTimer = null;
+lobbyGameName.textContent =
+    initialGameName;
 
 
 /* =========================================================
-   WEBSOCKET URL
+   NORMALIZE GAME
    ========================================================= */
 
-function getSocketUrl() {
+function normalizeGame(
+    game
+) {
 
-    const protocol =
-        window.location.protocol === "https:"
-            ? "wss:"
-            : "ws:";
+    if (
+        typeof game !==
+        "string"
+    ) {
+        return "";
+    }
+
+    return game
+        .trim()
+        .toLowerCase()
+        .replace(
+            /\.html$/i,
+            ""
+        );
+}
+
+
+/* =========================================================
+   DISPLAY NAME
+   ========================================================= */
+
+function displayGameName(
+    game
+) {
+
+    if (
+        GAME_NAMES[game]
+    ) {
+        return GAME_NAMES[game];
+    }
+
+    return game
+        .replace(
+            /[-_]+/g,
+            " "
+        )
+        .replace(
+            /\b\w/g,
+            c => c.toUpperCase()
+        );
+}
+
+
+/* =========================================================
+   DISPLAY PLAYER NAME
+   ========================================================= */
+
+function displayPlayerName(
+    item
+) {
+
+    if (!item) {
+        return "Player";
+    }
+
+    if (
+        item.anonymous
+    ) {
+        return "Anonymous";
+    }
 
     return (
-        protocol +
-        "//" +
-        window.location.host +
-        "/rooms"
+        item.name ||
+        "Player"
     );
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function setIdentityStatus(
+    message,
+    type = ""
+) {
+
+    identityStatus.textContent =
+        message;
+
+    identityStatus.className =
+        "status" +
+        (
+            type
+                ? " " + type
+                : ""
+        );
+}
+
+
+function setLobbyStatus(
+    message
+) {
+
+    lobbyStatus.textContent =
+        message;
+}
+
+
+/* =========================================================
+   CONNECTION DISPLAY
+   ========================================================= */
+
+function setConnection(
+    online
+) {
+
+    if (online) {
+
+        connection.textContent =
+            "CONNECTED";
+
+        connection.className =
+            "connection online";
+
+    } else {
+
+        connection.textContent =
+            "DISCONNECTED";
+
+        connection.className =
+            "connection offline";
+    }
+}
+
+
+/* =========================================================
+   SOCKET SEND
+   ========================================================= */
+
+function send(
+    data
+) {
+
+    if (
+        !socket ||
+        socket.readyState !==
+            WebSocket.OPEN
+    ) {
+
+        setLobbyStatus(
+            "Not connected to the game server."
+        );
+
+        return false;
+    }
+
+    try {
+
+        socket.send(
+            JSON.stringify(data)
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "WebSocket send error:",
+            error
+        );
+
+        return false;
+    }
 }
 
 
@@ -882,56 +990,67 @@ function getSocketUrl() {
 
 function connect() {
 
-    if (socket) {
-
-        try {
-            socket.close();
-        } catch (err) {
-        }
-    }
-
-    setStatus(
-        "Connecting to Game Room..."
-    );
-
-    try {
-
-        socket =
-            new WebSocket(
-                getSocketUrl()
-            );
-
-    } catch (err) {
-
-        setStatus(
-            "Could not connect to Game Room."
-        );
-
+    if (
+        socket &&
+        (
+            socket.readyState ===
+                WebSocket.OPEN ||
+            socket.readyState ===
+                WebSocket.CONNECTING
+        )
+    ) {
         return;
     }
+
+
+    const protocol =
+        window.location.protocol ===
+        "https:"
+            ? "wss:"
+            : "ws:";
+
+
+    socket =
+        new WebSocket(
+            protocol +
+            "//" +
+            window.location.host +
+            "/rooms"
+        );
+
 
     socket.addEventListener(
         "open",
         () => {
 
-            setStatus(
-                "Connected. Joining lobby..."
+            setConnection(
+                true
             );
 
+
             /*
-             * IMPORTANT:
+             * THIS MUST BE joinLobby.
              *
-             * The current server uses JOINLOBBY,
-             * not REGISTER.
+             * This is the exact command
+             * used by server 11.js.
              */
+
             send({
-                type: "joinLobby",
-                game: requestedGame,
-                name: playerName,
-                anonymous
+                type:
+                    "joinLobby",
+
+                game:
+                    requestedGame,
+
+                name:
+                    playerName,
+
+                anonymous:
+                    anonymous
             });
         }
     );
+
 
     socket.addEventListener(
         "message",
@@ -946,10 +1065,16 @@ function connect() {
                         event.data
                     );
 
-            } catch (err) {
+            } catch {
+
+                console.error(
+                    "Invalid server message:",
+                    event.data
+                );
 
                 return;
             }
+
 
             handleServerMessage(
                 message
@@ -957,9 +1082,17 @@ function connect() {
         }
     );
 
+
     socket.addEventListener(
         "close",
         () => {
+
+            setConnection(
+                false
+            );
+
+            socket =
+                null;
 
             if (
                 lobbyScreen.classList.contains(
@@ -969,28 +1102,42 @@ function connect() {
                 return;
             }
 
-            setStatus(
-                "Disconnected. Reconnecting..."
+            setLobbyStatus(
+                "Connection lost. Reconnecting..."
             );
+
 
             clearTimeout(
                 reconnectTimer
             );
 
+
             reconnectTimer =
                 setTimeout(
-                    connect,
+                    () => {
+
+                        if (
+                            playerName ||
+                            anonymous
+                        ) {
+
+                            connect();
+                        }
+
+                    },
                     1500
                 );
         }
     );
 
+
     socket.addEventListener(
         "error",
-        () => {
+        error => {
 
-            setStatus(
-                "Connection error."
+            console.error(
+                "Room WebSocket error:",
+                error
             );
         }
     );
@@ -998,121 +1145,169 @@ function connect() {
 
 
 /* =========================================================
-   SEND
+   SERVER MESSAGE HANDLER
    ========================================================= */
 
-function send(message) {
+function handleServerMessage(
+    message
+) {
 
-    if (
-        !socket ||
-        socket.readyState !==
-            WebSocket.OPEN
-    ) {
-
-        setStatus(
-            "Not connected to server."
-        );
-
-        return false;
-    }
-
-    socket.send(
-        JSON.stringify(message)
+    console.log(
+        "ROOM SERVER:",
+        message
     );
 
-    return true;
-}
+
+    switch (
+        message.type
+    ) {
 
 
-/* =========================================================
-   SERVER MESSAGES
-   ========================================================= */
+        /* -----------------------------------------------
+           SERVER CONNECTED
+           ----------------------------------------------- */
 
-function handleServerMessage(message) {
+        case "roomsConnected":
 
-    if (!message) {
-        return;
-    }
-
-    switch (message.type) {
-
-        case "connected":
-
-            playerId =
-                message.playerId ||
-                message.id ||
-                playerId;
+            setConnection(
+                true
+            );
 
             break;
 
 
-        case "registered":
-
-        case "joinedLobby":
+        /* -----------------------------------------------
+           SUCCESSFULLY JOINED LOBBY
+           ----------------------------------------------- */
 
         case "lobbyJoined":
 
-            playerId =
-                message.playerId ||
-                message.id ||
-                playerId;
+            player = {
 
-            setStatus(
-                "You are in the " +
-                gameName +
-                " lobby."
+                id:
+                    message.playerId,
+
+                name:
+                    message.playerName,
+
+                anonymous:
+                    message.anonymous,
+
+                game:
+                    message.game
+            };
+
+
+            gameTitle.textContent =
+                message.gameName ||
+                initialGameName;
+
+            lobbyGameName.textContent =
+                message.gameName ||
+                initialGameName;
+
+
+            identityScreen.classList.add(
+                "hidden"
+            );
+
+            lobbyScreen.classList.remove(
+                "hidden"
+            );
+
+
+            setLobbyStatus(
+                "Waiting for another player..."
             );
 
             break;
 
 
-        case "lobbyState":
+        /* -----------------------------------------------
+           LOBBY PLAYER UPDATE
+           ----------------------------------------------- */
+
+        case "lobbyUpdate":
 
             renderPlayers(
-                message.players || []
+                message.players ||
+                []
             );
 
             break;
 
 
-        case "randomWaiting":
+        /* -----------------------------------------------
+           RANDOM MATCH NOT FOUND
+           ----------------------------------------------- */
 
-            setStatus(
-                "Waiting for another " +
-                gameName +
-                " player..."
+        case "noMatch":
+
+            randomButton.disabled =
+                false;
+
+            setLobbyStatus(
+                message.message ||
+                "No other player is waiting yet."
             );
 
             break;
 
 
-        case "inviteSent":
+        /* -----------------------------------------------
+           INVITATION RECEIVED
+           ----------------------------------------------- */
 
-            setStatus(
-                "Invitation sent."
-            );
-
-            break;
-
-
-        case "inviteReceived":
+        case "invitation":
 
             pendingInviteFrom =
                 message.from ||
-                message.player ||
                 null;
 
-            showInvite(
-                pendingInviteFrom
+
+            inviteName.textContent =
+                displayPlayerName(
+                    pendingInviteFrom
+                );
+
+
+            inviteGame.textContent =
+                message.gameName ||
+                initialGameName;
+
+
+            inviteModal.classList.remove(
+                "hidden"
             );
 
             break;
 
 
+        /* -----------------------------------------------
+           INVITATION SENT
+           ----------------------------------------------- */
+
+        case "inviteSent":
+
+            setLobbyStatus(
+                "Invitation sent to " +
+                displayPlayerName(
+                    message.target
+                ) +
+                "."
+            );
+
+            break;
+
+
+        /* -----------------------------------------------
+           INVITATION DECLINED
+           ----------------------------------------------- */
+
         case "inviteDeclined":
 
-            setStatus(
-                displayName(
+            setLobbyStatus(
+                displayPlayerName(
                     message.player
                 ) +
                 " declined the invitation."
@@ -1121,79 +1316,169 @@ function handleServerMessage(message) {
             break;
 
 
+        /* -----------------------------------------------
+           INVITATION CANCELLED
+           ----------------------------------------------- */
+
         case "inviteCancelled":
 
-            pendingInviteFrom =
-                null;
-
-            hideInvite();
-
-            setStatus(
+            setLobbyStatus(
                 "The invitation was cancelled."
             );
 
             break;
 
 
-        case "matchFound":
+        /* -----------------------------------------------
+           INVITATION ERROR
+           ----------------------------------------------- */
 
-            handleMatch(
-                message
+        case "inviteError":
+
+            setLobbyStatus(
+                message.message ||
+                "The invitation could not be completed."
             );
 
             break;
 
 
-        case "leftLobby":
+        /* -----------------------------------------------
+           MATCH FOUND
+           ----------------------------------------------- */
 
-            setStatus(
-                "You left the lobby."
+        case "roomMatched":
+
+            /*
+             * IMPORTANT:
+             *
+             * server 11.js sends:
+             *
+             * player: "player1"
+             * or
+             * player: "player2"
+             *
+             * It does NOT send playerNumber
+             * or role.
+             */
+
+            pendingRoom = {
+
+                roomId:
+                    message.roomId,
+
+                game:
+                    normalizeGame(
+                        message.game ||
+                        requestedGame
+                    ),
+
+                gameFile:
+                    GAME_FILES[
+                        normalizeGame(
+                            message.game ||
+                            requestedGame
+                        )
+                    ],
+
+                player:
+                    message.player,
+
+                opponent:
+                    message.opponent
+            };
+
+
+            /*
+             * Checkers needs the side.
+             *
+             * server player1 = red
+             * server player2 = black
+             */
+
+            if (
+                pendingRoom.player ===
+                "player1"
+            ) {
+
+                pendingRoom.role =
+                    "red";
+
+                pendingRoom.playerNumber =
+                    "1";
+
+            } else {
+
+                pendingRoom.role =
+                    "black";
+
+                pendingRoom.playerNumber =
+                    "2";
+            }
+
+
+            randomButton.disabled =
+                true;
+
+
+            matchText.textContent =
+                "You are " +
+                (
+                    pendingRoom.player ===
+                    "player1"
+                        ? "Player 1"
+                        : "Player 2"
+                ) +
+                ". Your opponent is " +
+                displayPlayerName(
+                    pendingRoom.opponent
+                ) +
+                ".";
+
+
+            matchModal.classList.remove(
+                "hidden"
             );
 
             break;
 
+
+        /* -----------------------------------------------
+           GENERAL ERROR
+           ----------------------------------------------- */
 
         case "error":
 
-            setStatus(
+            setIdentityStatus(
+                message.message ||
+                "Server error.",
+                "error"
+            );
+
+            setLobbyStatus(
                 message.message ||
                 "Server error."
             );
 
+            randomButton.disabled =
+                false;
+
             break;
 
+
+        /* -----------------------------------------------
+           UNKNOWN / FUTURE SERVER MESSAGE
+           ----------------------------------------------- */
 
         default:
 
-            /*
-             * Do not turn harmless messages into
-             * another room command.
-             */
+            console.log(
+                "Unhandled room message:",
+                message
+            );
+
             break;
     }
-}
-
-
-/* =========================================================
-   DISPLAY NAME
-   ========================================================= */
-
-function displayName(player) {
-
-    if (!player) {
-        return "Anonymous";
-    }
-
-    if (
-        player.anonymous === true
-    ) {
-        return "Anonymous";
-    }
-
-    return (
-        player.name ||
-        "Anonymous"
-    );
 }
 
 
@@ -1201,52 +1486,48 @@ function displayName(player) {
    RENDER PLAYERS
    ========================================================= */
 
-function renderPlayers(players) {
+function renderPlayers(
+    list
+) {
 
-    currentPlayers =
-        Array.isArray(players)
-            ? players
+    playersElement.innerHTML =
+        "";
+
+
+    const availablePlayers =
+        Array.isArray(list)
+            ? list
             : [];
 
-    playersElement.innerHTML = "";
-
-    const others =
-        currentPlayers.filter(
-            player =>
-                player.id !== playerId
-        );
 
     playerCount.textContent =
-        currentPlayers.length +
+        availablePlayers.length +
         (
-            currentPlayers.length === 1
-                ? " ONLINE"
-                : " ONLINE"
+            availablePlayers.length === 1
+                ? " player"
+                : " players"
         );
 
-    if (others.length === 0) {
 
-        const empty =
-            document.createElement(
-                "div"
-            );
+    if (
+        availablePlayers.length ===
+        0
+    ) {
 
-        empty.className =
-            "empty";
-
-        empty.textContent =
-            "No other players are waiting yet.";
-
-        playersElement.appendChild(
-            empty
-        );
+        playersElement.innerHTML =
+            `
+            <div class="empty">
+                No other players are waiting yet.
+            </div>
+            `;
 
         return;
     }
 
+
     for (
-        const player
-        of others
+        const item of
+            availablePlayers
     ) {
 
         const row =
@@ -1257,10 +1538,24 @@ function renderPlayers(players) {
         row.className =
             "player";
 
-        const info =
+
+        const left =
             document.createElement(
                 "div"
             );
+
+        left.className =
+            "player-left";
+
+
+        const dot =
+            document.createElement(
+                "div"
+            );
+
+        dot.className =
+            "player-dot";
+
 
         const name =
             document.createElement(
@@ -1270,55 +1565,94 @@ function renderPlayers(players) {
         name.className =
             "player-name";
 
-        name.textContent =
-            displayName(player);
 
-        const playerStatus =
-            document.createElement(
-                "div"
+        name.textContent =
+            displayPlayerName(
+                item
             );
 
-        playerStatus.className =
-            "player-status";
 
-        playerStatus.textContent =
-            "WAITING TO PLAY";
+        if (
+            player &&
+            item.id ===
+                player.id
+        ) {
 
-        info.appendChild(
+            const you =
+                document.createElement(
+                    "span"
+                );
+
+            you.className =
+                "player-you";
+
+            you.textContent =
+                "(YOU)";
+
+            name.appendChild(
+                you
+            );
+        }
+
+
+        left.appendChild(
+            dot
+        );
+
+        left.appendChild(
             name
         );
 
-        info.appendChild(
-            playerStatus
+
+        row.appendChild(
+            left
         );
 
-        const invite =
-            document.createElement(
-                "button"
+
+        /*
+         * Don't put an INVITE button beside
+         * yourself.
+         */
+
+        if (
+            !player ||
+            item.id !==
+                player.id
+        ) {
+
+            const invite =
+                document.createElement(
+                    "button"
+                );
+
+            invite.className =
+                "primary";
+
+            invite.textContent =
+                "INVITE";
+
+
+            invite.addEventListener(
+                "click",
+                () => {
+
+                    send({
+                        type:
+                            "invite",
+
+                        playerId:
+                            item.id
+                    });
+
+                }
             );
 
-        invite.textContent =
-            "PLAY";
 
-        invite.addEventListener(
-            "click",
-            () => {
+            row.appendChild(
+                invite
+            );
+        }
 
-                send({
-                    type: "invite",
-                    playerId: player.id
-                });
-
-            }
-        );
-
-        row.appendChild(
-            info
-        );
-
-        row.appendChild(
-            invite
-        );
 
         playersElement.appendChild(
             row
@@ -1328,374 +1662,73 @@ function renderPlayers(players) {
 
 
 /* =========================================================
-   INVITATION
+   CONTINUE WITH NAME
    ========================================================= */
 
-function showInvite(player) {
-
-    inviteMessage.textContent =
-        displayName(player) +
-        " wants to play " +
-        gameName +
-        ".";
-
-    inviteModal.classList.remove(
-        "hidden"
-    );
-}
-
-function hideInvite() {
-
-    inviteModal.classList.add(
-        "hidden"
-    );
-}
-
-
-/* =========================================================
-   ACCEPT INVITATION
-   ========================================================= */
-
-acceptInviteBtn.addEventListener(
+continueButton.addEventListener(
     "click",
     () => {
 
-        if (!pendingInviteFrom) {
-            return;
-        }
-
-        /*
-         * IMPORTANT:
-         *
-         * Current server expects:
-         *
-         * acceptInvite
-         *
-         * NOT:
-         *
-         * inviteAccept
-         */
-        send({
-            type: "acceptInvite",
-            playerId:
-                pendingInviteFrom.id
-        });
-
-        hideInvite();
-
-        pendingInviteFrom =
-            null;
-    }
-);
-
-
-/* =========================================================
-   DECLINE INVITATION
-   ========================================================= */
-
-declineInviteBtn.addEventListener(
-    "click",
-    () => {
-
-        if (!pendingInviteFrom) {
-            return;
-        }
-
-        /*
-         * Current server expects:
-         *
-         * declineInvite
-         */
-        send({
-            type: "declineInvite",
-            playerId:
-                pendingInviteFrom.id
-        });
-
-        pendingInviteFrom =
-            null;
-
-        hideInvite();
-    }
-);
-
-
-/* =========================================================
-   MATCH FOUND
-   ========================================================= */
-
-function handleMatch(message) {
-
-    /*
-     * Preserve the COMPLETE server match object.
-     *
-     * It contains:
-     *
-     * roomId
-     * game
-     * gameFile
-     * playerNumber
-     * role
-     * opponent
-     */
-    pendingRoom =
-        message;
-
-    const opponent =
-        message.opponent
-            ? (
-                message.opponent.name ||
-                "Anonymous"
-            )
-            : "Anonymous";
-
-    matchMessage.textContent =
-        "You are playing against " +
-        opponent +
-        ".";
-
-    matchRoom.textContent =
-        "ROOM: " +
-        (
-            message.roomId ||
-            "UNKNOWN"
-        );
-
-    matchModal.classList.remove(
-        "hidden"
-    );
-
-    setStatus(
-        "Match found!"
-    );
-}
-
-
-/* =========================================================
-   ENTER ROOM
-   ========================================================= */
-
-enterRoomBtn.addEventListener(
-    "click",
-    () => {
-
-        if (!pendingRoom) {
-            return;
-        }
-
-        const roomId =
-            pendingRoom.roomId;
-
-        if (!roomId) {
-
-            setStatus(
-                "Match has no room ID."
-            );
-
-            return;
-        }
-
-        /*
-         * Prefer the server's gameFile.
-         * Fall back to our local game map.
-         */
-        const file =
-            pendingRoom.gameFile ||
-            gameFile;
-
-        /*
-         * The server supplies playerNumber
-         * and role.
-         *
-         * Checkers uses:
-         *
-         * Player 1 = RED
-         * Player 2 = BLACK
-         */
-        const playerNumber =
-            pendingRoom.playerNumber ||
-            "1";
-
-        const role =
-            pendingRoom.role ||
-            (
-                String(playerNumber) === "2"
-                    ? "black"
-                    : "red"
-            );
-
-        const url =
-            file +
-            "?room=" +
-            encodeURIComponent(
-                roomId
-            ) +
-            "&player=" +
-            encodeURIComponent(
-                playerNumber
-            ) +
-            "&role=" +
-            encodeURIComponent(
-                role
-            );
-
-        /*
-         * Close the lobby connection before entering
-         * the actual game.
-         */
-        try {
-
-            if (socket) {
-                socket.close();
-            }
-
-        } catch (err) {
-        }
-
-        window.location.href =
-            url;
-    }
-);
-
-
-/* =========================================================
-   NAME LOGIN
-   ========================================================= */
-
-nameContinueBtn.addEventListener(
-    "click",
-    () => {
-
-        const name =
+        const value =
             nameInput.value.trim();
 
-        if (!name) {
+
+        if (!value) {
+
+            setIdentityStatus(
+                "Enter a player name or choose Anonymous.",
+                "error"
+            );
 
             nameInput.focus();
 
-            setStatus(
-                "Enter a name or choose Anonymous."
-            );
-
             return;
         }
 
+
         playerName =
-            name.slice(
+            value.substring(
                 0,
                 24
             );
 
-        anonymous = false;
+        anonymous =
+            false;
 
-        enterLobby();
+
+        setIdentityStatus(
+            "Connecting..."
+        );
+
+
+        connect();
     }
 );
 
 
 /* =========================================================
-   ANONYMOUS LOGIN
+   CONTINUE AS ANONYMOUS
    ========================================================= */
 
-anonymousBtn.addEventListener(
+anonymousButton.addEventListener(
     "click",
     () => {
 
         playerName =
             "Anonymous";
 
-        anonymous = true;
-
-        enterLobby();
-    }
-);
+        anonymous =
+            true;
 
 
-/* =========================================================
-   ENTER LOBBY
-   ========================================================= */
-
-function enterLobby() {
-
-    identityScreen.classList.add(
-        "hidden"
-    );
-
-    lobbyScreen.classList.remove(
-        "hidden"
-    );
-
-    connect();
-}
-
-
-/* =========================================================
-   RANDOM MATCH
-   ========================================================= */
-
-randomBtn.addEventListener(
-    "click",
-    () => {
-
-        setStatus(
-            "Looking for a " +
-            gameName +
-            " player..."
+        setIdentityStatus(
+            "Connecting..."
         );
 
-        /*
-         * Current server command:
-         *
-         * findRandom
-         */
-        send({
-            type: "findRandom"
-        });
+
+        connect();
     }
 );
-
-
-/* =========================================================
-   LEAVE LOBBY
-   ========================================================= */
-
-leaveBtn.addEventListener(
-    "click",
-    () => {
-
-        /*
-         * Current server command:
-         *
-         * leaveRoom
-         */
-        send({
-            type: "leaveRoom"
-        });
-
-        try {
-
-            if (socket) {
-                socket.close();
-            }
-
-        } catch (err) {
-        }
-
-        window.location.href =
-            "index.html";
-    }
-);
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-function setStatus(text) {
-
-    statusElement.textContent =
-        text;
-}
 
 
 /* =========================================================
@@ -1707,21 +1740,253 @@ nameInput.addEventListener(
     event => {
 
         if (
-            event.key === "Enter"
+            event.key ===
+            "Enter"
         ) {
 
-            nameContinueBtn.click();
+            continueButton.click();
         }
     }
 );
 
 
 /* =========================================================
-   INITIAL
+   FIND RANDOM PLAYER
    ========================================================= */
 
-nameInput.focus();
+randomButton.addEventListener(
+    "click",
+    () => {
 
+        randomButton.disabled =
+            true;
+
+
+        setLobbyStatus(
+            "Looking for another player..."
+        );
+
+
+        const sent =
+            send({
+                type:
+                    "findRandom"
+            });
+
+
+        if (!sent) {
+
+            randomButton.disabled =
+                false;
+        }
+    }
+);
+
+
+/* =========================================================
+   ACCEPT INVITATION
+   ========================================================= */
+
+acceptButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            !pendingInviteFrom
+        ) {
+            return;
+        }
+
+
+        /*
+         * The server identifies the invitation
+         * from target.invitedBy.
+         *
+         * It does not actually need playerId here.
+         */
+
+        send({
+            type:
+                "acceptInvite"
+        });
+
+
+        inviteModal.classList.add(
+            "hidden"
+        );
+
+
+        pendingInviteFrom =
+            null;
+
+
+        setLobbyStatus(
+            "Accepting invitation..."
+        );
+    }
+);
+
+
+/* =========================================================
+   DECLINE INVITATION
+   ========================================================= */
+
+declineButton.addEventListener(
+    "click",
+    () => {
+
+        send({
+            type:
+                "declineInvite"
+        });
+
+
+        inviteModal.classList.add(
+            "hidden"
+        );
+
+
+        pendingInviteFrom =
+            null;
+
+
+        setLobbyStatus(
+            "Invitation declined."
+        );
+    }
+);
+
+
+/* =========================================================
+   ENTER MATCHED ROOM
+   ========================================================= */
+
+enterRoomButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            !pendingRoom ||
+            !pendingRoom.roomId
+        ) {
+
+            return;
+        }
+
+
+        const game =
+            pendingRoom.game ||
+            requestedGame;
+
+
+        const gameFile =
+            pendingRoom.gameFile ||
+            GAME_FILES[game];
+
+
+        if (!gameFile) {
+
+            alert(
+                "Game file not found for " +
+                game
+            );
+
+            return;
+        }
+
+
+        /*
+         * These parameters are important.
+         *
+         * Checkers uses them to determine
+         * which side this browser controls.
+         */
+
+        const target =
+            gameFile +
+            "?room=" +
+            encodeURIComponent(
+                pendingRoom.roomId
+            ) +
+            "&player=" +
+            encodeURIComponent(
+                pendingRoom.playerNumber
+            ) +
+            "&role=" +
+            encodeURIComponent(
+                pendingRoom.role
+            );
+
+
+        window.location.href =
+            target;
+    }
+);
+
+
+/* =========================================================
+   LEAVE LOBBY / CLOSE CONNECTION
+   ========================================================= */
+
+leaveButton.addEventListener(
+    "click",
+    () => {
+
+        /*
+         * The current server's leaveRoom command
+         * only closes a private room.
+         *
+         * If we are still in the lobby, simply
+         * closing the WebSocket causes the server's
+         * close handler to remove us from the lobby.
+         */
+
+        if (
+            socket &&
+            socket.readyState ===
+                WebSocket.OPEN
+        ) {
+
+            send({
+                type:
+                    "leaveRoom"
+            });
+
+
+            socket.close();
+        }
+
+
+        window.location.href =
+            "index.html";
+    }
+);
+
+
+/* =========================================================
+   BEFORE LEAVING PAGE
+   ========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        if (
+            socket &&
+            socket.readyState ===
+                WebSocket.OPEN
+        ) {
+
+            try {
+
+                socket.close();
+
+            } catch {
+                /* ignore */
+            }
+        }
+    }
+);
 </script>
 
 </body>
