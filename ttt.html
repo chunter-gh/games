@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>3D Tic-Tac-Toe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ancient Tic-Tac-Toe</title>
 
 <style>
 * {
@@ -13,442 +11,1220 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
     margin: 0;
-    min-height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     background:
-        radial-gradient(circle at center, #182b40 0%, #07111d 65%, #02060a 100%);
-    color: white;
-    font-family: Arial, sans-serif;
+        radial-gradient(circle at 50% 35%, #4b463c 0%, #211f1a 48%, #090909 100%);
+    font-family: Georgia, "Times New Roman", serif;
+    color: #e8d8ad;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
 }
 
-.game {
-    width: min(94vw, 500px);
+/* =========================================================
+   ENTIRE GAME
+   ========================================================= */
+
+#game {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding:
+        max(8px, env(safe-area-inset-top))
+        max(8px, env(safe-area-inset-right))
+        max(8px, env(safe-area-inset-bottom))
+        max(8px, env(safe-area-inset-left));
+    position: relative;
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+#title {
+    flex: 0 0 auto;
     text-align: center;
+    font-size: clamp(20px, 4vh, 48px);
+    letter-spacing: clamp(3px, 0.8vw, 10px);
+    font-weight: bold;
+    color: #d8c08b;
+    text-shadow:
+        0 2px 0 #3b2b13,
+        0 4px 12px #000;
+    line-height: 1;
+    margin-top: 2px;
 }
 
-h1 {
-    margin: 0 0 8px;
-    font-size: 30px;
-    letter-spacing: 3px;
-    text-shadow: 0 3px 8px #000;
-}
+/* =========================================================
+   STATUS
+   ========================================================= */
 
 #status {
-    min-height: 28px;
-    margin-bottom: 14px;
-    font-size: 17px;
-    color: #dcecff;
+    flex: 0 0 auto;
+    text-align: center;
+    font-size: clamp(13px, 2.4vh, 24px);
+    min-height: 1.3em;
+    color: #f1dfae;
+    text-shadow: 0 2px 5px #000;
+    font-weight: bold;
 }
 
-.board {
+/* =========================================================
+   MAIN AREA
+   ========================================================= */
+
+#arena {
+    flex: 1 1 auto;
+    min-height: 0;
     width: 100%;
-    max-width: 390px;
-    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+    overflow: hidden;
+}
+
+/* =========================================================
+   MASSIVE STANDING FRAME
+   ========================================================= */
+
+#monument {
+    /*
+       JS supplies --boardSize so the complete monument always
+       fits inside the available viewport.
+    */
+    width: calc(var(--boardSize) + var(--frameWidth) * 2);
+    height: calc(var(--boardSize) + var(--frameWidth) * 2);
+    position: relative;
+    flex: 0 0 auto;
+    transform: perspective(1200px) rotateX(2deg);
+}
+
+/* Ground shadow */
+#monument::after {
+    content: "";
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    bottom: -2%;
+    height: 8%;
+    border-radius: 50%;
+    background: rgba(0,0,0,.75);
+    filter: blur(10px);
+    z-index: -5;
+}
+
+/* =========================================================
+   FRAME
+   ========================================================= */
+
+.frame {
+    position: absolute;
+    background:
+        linear-gradient(
+            90deg,
+            #171513 0%,
+            #51493b 8%,
+            #a18b62 17%,
+            #534b3c 28%,
+            #24211d 48%,
+            #74664b 68%,
+            #2a2721 88%,
+            #11100e 100%
+        );
+    border: calc(var(--boardSize) * .018) solid #171512;
+    box-shadow:
+        inset 0 0 0 calc(var(--boardSize) * .007) rgba(216,184,116,.45),
+        inset 0 0 calc(var(--boardSize) * .035) rgba(0,0,0,.8),
+        0 10px 18px rgba(0,0,0,.75);
+}
+
+/* left / right */
+.frame.left,
+.frame.right {
+    top: 0;
+    bottom: 0;
+    width: var(--frameWidth);
+}
+
+.frame.left {
+    left: 0;
+}
+
+.frame.right {
+    right: 0;
+}
+
+/* top / bottom */
+.frame.top,
+.frame.bottom {
+    left: 0;
+    right: 0;
+    height: var(--frameWidth);
+}
+
+.frame.top {
+    top: 0;
+}
+
+.frame.bottom {
+    bottom: 0;
+}
+
+/* =========================================================
+   FRAME RIVETS
+   ========================================================= */
+
+.rivet {
+    position: absolute;
+    width: calc(var(--boardSize) * .038);
+    height: calc(var(--boardSize) * .038);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%,
+            #e1c989 0%,
+            #8f784d 28%,
+            #403522 60%,
+            #17130e 100%);
+    border: 1px solid #15120e;
+    box-shadow:
+        1px 2px 3px #000,
+        inset 0 1px 1px rgba(255,255,255,.35);
+    z-index: 4;
+}
+
+.r1 { left: 5%; top: 5%; }
+.r2 { right: 5%; top: 5%; }
+.r3 { left: 5%; bottom: 5%; }
+.r4 { right: 5%; bottom: 5%; }
+
+/* =========================================================
+   BOARD
+   ========================================================= */
+
+#board {
+    position: absolute;
+    width: var(--boardSize);
+    height: var(--boardSize);
+    left: var(--frameWidth);
+    top: var(--frameWidth);
+
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 9px;
-    perspective: 700px;
-}
-
-.cell {
-    aspect-ratio: 1 / 1;
-    min-width: 0;
-    position: relative;
-    border-radius: 12px;
+    grid-template-rows: repeat(3, 1fr);
 
     background:
-        linear-gradient(145deg, #344c65, #101c29);
+        radial-gradient(circle at 45% 40%,
+            #514a3c 0%,
+            #322e27 50%,
+            #1a1815 100%);
 
-    border: 2px solid #425b73;
+    border:
+        calc(var(--boardSize) * .012) solid #15130f;
 
     box-shadow:
-        inset 3px 3px 7px rgba(255,255,255,.12),
-        inset -5px -5px 10px rgba(0,0,0,.65),
-        0 6px 10px rgba(0,0,0,.5);
+        inset 0 0 calc(var(--boardSize) * .025) rgba(0,0,0,.9),
+        inset 0 0 calc(var(--boardSize) * .01) rgba(207,174,104,.3),
+        0 0 calc(var(--boardSize) * .025) rgba(0,0,0,.8);
+}
 
+/* =========================================================
+   GRID LINES
+   ========================================================= */
+
+.cell {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    overflow: hidden;
     cursor: pointer;
+    user-select: none;
+    overflow: hidden;
 }
 
-.cell:active {
-    transform: translateY(2px);
+.cell::before,
+.cell::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
 }
 
-.cell.touch {
-    animation: touchGlow .35s ease-out;
+/* vertical divider */
+.cell:nth-child(2)::before,
+.cell:nth-child(5)::before,
+.cell:nth-child(8)::before {
+    right: 0;
+    top: 4%;
+    bottom: 4%;
+    width: calc(var(--boardSize) * .012);
+    background:
+        linear-gradient(
+            90deg,
+            #17140f,
+            #9d8759,
+            #30291e
+        );
+    box-shadow: 2px 0 4px #000;
 }
 
-@keyframes touchGlow {
-    0% {
-        box-shadow:
-            inset 3px 3px 7px rgba(255,255,255,.12),
-            inset -5px -5px 10px rgba(0,0,0,.65),
-            0 0 0 rgba(80,180,255,0);
-    }
-
-    35% {
-        box-shadow:
-            inset 3px 3px 7px rgba(255,255,255,.18),
-            inset -5px -5px 10px rgba(0,0,0,.65),
-            0 0 28px rgba(70,180,255,.95);
-    }
-
-    100% {
-        box-shadow:
-            inset 3px 3px 7px rgba(255,255,255,.12),
-            inset -5px -5px 10px rgba(0,0,0,.65),
-            0 6px 10px rgba(0,0,0,.5);
-    }
+/* horizontal divider */
+.cell:nth-child(n+4)::after {
+    left: 4%;
+    right: 4%;
+    top: 0;
+    height: calc(var(--boardSize) * .012);
+    background:
+        linear-gradient(
+            90deg,
+            #17140f,
+            #9d8759,
+            #30291e
+        );
+    box-shadow: 0 -2px 4px #000;
 }
 
-.cell.win {
-    animation: winningGlow 1s infinite alternate;
-}
-
-@keyframes winningGlow {
-    from {
-        box-shadow:
-            inset 3px 3px 7px rgba(255,255,255,.12),
-            inset -5px -5px 10px rgba(0,0,0,.65),
-            0 0 8px rgba(255,215,80,.5);
-    }
-
-    to {
-        box-shadow:
-            inset 3px 3px 7px rgba(255,255,255,.12),
-            inset -5px -5px 10px rgba(0,0,0,.65),
-            0 0 28px rgba(255,215,80,1);
-    }
-}
+/* =========================================================
+   PIECES
+   ========================================================= */
 
 .piece {
-    font-size: clamp(52px, 16vw, 88px);
-    line-height: 1;
-    font-weight: bold;
-    user-select: none;
-    animation: pieceDrop .32s cubic-bezier(.2,1.5,.4,1);
+    width: 70%;
+    height: 70%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
+    filter:
+        drop-shadow(
+            calc(var(--boardSize) * .012)
+            calc(var(--boardSize) * .018)
+            calc(var(--boardSize) * .015)
+            rgba(0,0,0,.85)
+        );
 }
 
-@keyframes pieceDrop {
+/* Bronze material */
+.x-piece,
+.o-piece {
+    color: #b88945;
+    text-shadow:
+        1px 1px 0 #3b2410,
+        -1px -1px 0 #e5c27d,
+        2px 4px 5px #000;
+}
+
+/* =========================================================
+   X
+   ========================================================= */
+
+.x-piece::before,
+.x-piece::after {
+    content: "";
+    position: absolute;
+    width: 20%;
+    height: 95%;
+    left: 40%;
+    top: 2.5%;
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #3c2510 0%,
+            #8d5c28 15%,
+            #d0a45d 34%,
+            #a56e32 52%,
+            #553213 76%,
+            #21150b 100%
+        );
+
+    border: 2px solid #2a1b0d;
+
+    box-shadow:
+        inset 2px 0 2px rgba(255,255,255,.35),
+        inset -3px 0 4px rgba(0,0,0,.55);
+}
+
+.x-piece::before {
+    transform: rotate(45deg);
+}
+
+.x-piece::after {
+    transform: rotate(-45deg);
+}
+
+/* =========================================================
+   O
+   ========================================================= */
+
+.o-piece {
+    width: 62%;
+    height: 62%;
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 34% 28%,
+            #e1bf78 0%,
+            #b77e39 23%,
+            #74451d 55%,
+            #3b220e 78%,
+            #171009 100%
+        );
+
+    border:
+        max(3px, calc(var(--boardSize) * .012))
+        solid #2b1a0b;
+
+    box-shadow:
+        inset 0 0 0 calc(var(--boardSize) * .008) rgba(223,183,104,.45),
+        inset 0 0 calc(var(--boardSize) * .018) rgba(0,0,0,.9);
+}
+
+.o-piece::after {
+    content: "";
+    position: absolute;
+    width: 43%;
+    height: 43%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle,
+            #171411 0%,
+            #080807 70%,
+            #020202 100%);
+    box-shadow:
+        inset 2px 2px 3px rgba(0,0,0,.9);
+}
+
+/* =========================================================
+   FIVE PLACEMENT ANIMATIONS
+   ========================================================= */
+
+.anim-hammer {
+    animation: hammer .58s cubic-bezier(.2,1.6,.35,1) both;
+}
+
+@keyframes hammer {
     0% {
-        transform: translateY(-35px) scale(.45) rotateX(60deg);
+        transform: translateY(calc(var(--boardSize) * -.30))
+                   scale(1.7)
+                   rotate(-15deg);
         opacity: 0;
     }
-
-    70% {
-        transform: translateY(5px) scale(1.08) rotateX(-5deg);
+    55% {
+        transform: translateY(calc(var(--boardSize) * .035))
+                   scale(.9)
+                   rotate(4deg);
         opacity: 1;
     }
-
+    75% {
+        transform: translateY(calc(var(--boardSize) * -.012))
+                   scale(1.08);
+    }
     100% {
-        transform: translateY(0) scale(1) rotateX(0);
-        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0);
     }
 }
 
-.x {
-    color: #58b9ff;
-    text-shadow:
-        0 3px 0 #125080,
-        0 6px 12px rgba(0,0,0,.8),
-        0 0 18px rgba(60,170,255,.7);
+.anim-spin {
+    animation: spinIn .65s cubic-bezier(.2,1.3,.3,1) both;
 }
 
-.o {
-    color: #ff6b6b;
-    text-shadow:
-        0 3px 0 #8c2222,
-        0 6px 12px rgba(0,0,0,.8),
-        0 0 18px rgba(255,70,70,.65);
+@keyframes spinIn {
+    0% {
+        transform: scale(.15) rotate(360deg);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.12) rotate(-15deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+.anim-rise {
+    animation: rise .65s cubic-bezier(.25,1.5,.35,1) both;
+}
+
+@keyframes rise {
+    0% {
+        transform: translateY(100%) scale(.65);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-8%) scale(1.08);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+.anim-forge {
+    animation: forge .55s cubic-bezier(.2,1.5,.3,1) both;
+}
+
+@keyframes forge {
+    0% {
+        transform: scale(2.5);
+        opacity: 0;
+        filter:
+            brightness(4)
+            drop-shadow(0 0 20px #ffd875);
+    }
+    35% {
+        opacity: 1;
+        transform: scale(.82);
+        filter:
+            brightness(2)
+            drop-shadow(0 0 18px #ffd875);
+    }
+    65% {
+        transform: scale(1.12);
+        filter:
+            brightness(1.4)
+            drop-shadow(0 0 7px #d29c42);
+    }
+    100% {
+        transform: scale(1);
+        filter:
+            brightness(1)
+            drop-shadow(
+                calc(var(--boardSize) * .012)
+                calc(var(--boardSize) * .018)
+                calc(var(--boardSize) * .015)
+                rgba(0,0,0,.85)
+            );
+    }
+}
+
+.anim-swing {
+    animation: swing .65s cubic-bezier(.2,1.4,.3,1) both;
+    transform-origin: 50% 100%;
+}
+
+@keyframes swing {
+    0% {
+        transform:
+            translateX(-60%)
+            rotate(-65deg)
+            scale(.7);
+        opacity: 0;
+    }
+    55% {
+        transform:
+            translateX(8%)
+            rotate(12deg)
+            scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform:
+            translateX(0)
+            rotate(0)
+            scale(1);
+    }
+}
+
+/* =========================================================
+   WIN EFFECT
+   ========================================================= */
+
+.winner {
+    animation: winnerPulse .7s ease-in-out infinite alternate;
+}
+
+@keyframes winnerPulse {
+    from {
+        filter:
+            drop-shadow(0 0 2px #d6a94d)
+            brightness(1);
+    }
+    to {
+        filter:
+            drop-shadow(0 0 14px #ffd66e)
+            brightness(1.45);
+    }
+}
+
+.draw-cell {
+    animation: drawPulse .7s ease-in-out infinite alternate;
+}
+
+@keyframes drawPulse {
+    from { background: rgba(170,130,55,.04); }
+    to   { background: rgba(170,130,55,.18); }
+}
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+#controls {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(5px, 1vw, 12px);
+    width: 100%;
+    padding-bottom: 2px;
 }
 
 button {
-    margin-top: 22px;
-    padding: 13px 28px;
-    border: 0;
-    border-radius: 10px;
-
-    background: linear-gradient(145deg, #365875, #17293b);
-    color: white;
-
-    font-size: 17px;
+    font-family: Georgia, "Times New Roman", serif;
     font-weight: bold;
+    font-size: clamp(10px, 1.8vh, 18px);
+    letter-spacing: clamp(.5px, .2vw, 2px);
+    color: #ead5a2;
+
+    padding:
+        clamp(6px, 1vh, 11px)
+        clamp(10px, 2vw, 24px);
+
+    border-radius: 5px;
+    border: 2px solid #19140d;
+
+    background:
+        linear-gradient(
+            180deg,
+            #9a7c4a 0%,
+            #5a4528 45%,
+            #302417 100%
+        );
 
     box-shadow:
-        inset 2px 2px 5px rgba(255,255,255,.12),
-        inset -3px -3px 6px rgba(0,0,0,.6),
-        0 5px 10px rgba(0,0,0,.45);
+        inset 0 1px 1px rgba(255,255,255,.35),
+        0 3px 6px #000;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+button:hover {
+    background:
+        linear-gradient(
+            180deg,
+            #b1925b 0%,
+            #705631 45%,
+            #3b2c1c 100%
+        );
 }
 
 button:active {
     transform: translateY(2px);
+    box-shadow:
+        inset 0 2px 3px #111,
+        0 1px 2px #000;
 }
 
-#connection {
-    margin-top: 13px;
-    font-size: 13px;
-    color: #8fa8bd;
+button.active {
+    border-color: #d2ae68;
+    box-shadow:
+        inset 0 0 8px rgba(0,0,0,.8),
+        0 0 8px rgba(216,176,89,.5);
+    color: #fff1c7;
 }
 
-.help {
-    margin-top: 12px;
-    color: #8195a8;
-    font-size: 12px;
+/* =========================================================
+   LANDSCAPE ADJUSTMENT
+   ========================================================= */
+
+@media (orientation: landscape) {
+    #game {
+        padding-top: max(4px, env(safe-area-inset-top));
+        padding-bottom: max(4px, env(safe-area-inset-bottom));
+    }
+
+    #title {
+        font-size: clamp(16px, 5vh, 38px);
+    }
+
+    #status {
+        font-size: clamp(11px, 2.8vh, 19px);
+    }
+}
+
+/* =========================================================
+   VERY SHORT SCREENS
+   ========================================================= */
+
+@media (max-height: 430px) {
+    #title {
+        display: none;
+    }
+
+    #status {
+        font-size: 12px;
+    }
+
+    button {
+        padding: 4px 9px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="game">
+<div id="game">
 
-<h1>3D TIC-TAC-TOE</h1>
+    <div id="title">ANCIENT TIC-TAC-TOE</div>
 
-<div id="status">Connecting...</div>
+    <div id="status">PLAYER X — YOUR TURN</div>
 
-<div class="board" id="board"></div>
+    <div id="arena">
 
-<button onclick="newGame()">NEW GAME</button>
+        <div id="monument">
 
-<div id="connection">Connecting to game server...</div>
+            <div class="frame left"></div>
+            <div class="frame right"></div>
+            <div class="frame top"></div>
+            <div class="frame bottom"></div>
 
-<div class="help">
-Player 1 = X &nbsp; • &nbsp; Player 2 = O
-</div>
+            <div class="rivet r1"></div>
+            <div class="rivet r2"></div>
+            <div class="rivet r3"></div>
+            <div class="rivet r4"></div>
+
+            <div id="board">
+
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button id="twoPlayer" class="active">2 PLAYERS</button>
+        <button id="computer">VS COMPUTER</button>
+        <button id="newGame">NEW GAME</button>
+    </div>
 
 </div>
 
 <script>
 
-const SERVER_URL = "wss://games-z5k2.onrender.com/";
+/* =========================================================
+   GAME STATE
+   ========================================================= */
 
-let socket = null;
-let mySymbol = "";
-let board = Array(9).fill(null);
+const cells = [...document.querySelectorAll(".cell")];
+const board = document.getElementById("board");
+const monument = document.getElementById("monument");
+const arena = document.getElementById("arena");
+const statusText = document.getElementById("status");
+
+const twoPlayerButton = document.getElementById("twoPlayer");
+const computerButton = document.getElementById("computer");
+const newGameButton = document.getElementById("newGame");
+
+let game = Array(9).fill("");
 let currentPlayer = "X";
 let gameOver = false;
-let players = { X: false, O: false };
+let mode = "2P";
 
-function createBoard() {
+/*
+ Five different placement animations.
+ They cycle in order.
+ */
+const animations = [
+    "anim-hammer",
+    "anim-spin",
+    "anim-rise",
+    "anim-forge",
+    "anim-swing"
+];
 
-    const boardElement = document.getElementById("board");
-    boardElement.innerHTML = "";
+let animationNumber = 0;
 
-    for (let i = 0; i < 9; i++) {
+/* =========================================================
+   RESPONSIVE FIT
+   ========================================================= */
 
-        const cell = document.createElement("div");
-        cell.className = "cell";
-        cell.dataset.index = i;
+function fitGame() {
 
-        cell.addEventListener("click", () => play(i));
+    const arenaWidth = arena.clientWidth;
+    const arenaHeight = arena.clientHeight;
 
-        boardElement.appendChild(cell);
-    }
+    if (!arenaWidth || !arenaHeight) return;
+
+    /*
+       The board needs room for the four-sided monument frame.
+       Frame width is proportional to board size.
+    */
+
+    const frameRatio = 0.105;
+
+    /*
+       Total monument dimension is:
+
+       board + two frame widths
+
+       Therefore boardSize is calculated from the smaller
+       available dimension.
+    */
+
+    const usableWidth = arenaWidth * 0.96;
+    const usableHeight = arenaHeight * 0.96;
+
+    const maxBoardFromWidth =
+        usableWidth / (1 + frameRatio * 2);
+
+    const maxBoardFromHeight =
+        usableHeight / (1 + frameRatio * 2);
+
+    let boardSize =
+        Math.min(
+            maxBoardFromWidth,
+            maxBoardFromHeight
+        );
+
+    /*
+       Never allow a microscopic board.
+       The viewport should normally be large enough,
+       but this protects extreme cases.
+    */
+
+    boardSize = Math.max(100, boardSize);
+
+    const frameWidth = boardSize * frameRatio;
+
+    monument.style.setProperty(
+        "--boardSize",
+        boardSize + "px"
+    );
+
+    monument.style.setProperty(
+        "--frameWidth",
+        frameWidth + "px"
+    );
 }
 
-function connectToServer() {
+window.addEventListener("resize", fitGame);
+window.addEventListener("orientationchange", () => {
+    setTimeout(fitGame, 100);
+});
 
-    document.getElementById("connection").textContent =
-        "Connecting to game server...";
+if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", fitGame);
+}
 
-    socket = new WebSocket(SERVER_URL);
+setTimeout(fitGame, 20);
 
-    socket.onopen = function() {
+/* =========================================================
+   WINNING COMBINATIONS
+   ========================================================= */
 
-        document.getElementById("connection").textContent =
-            "Connected to game server";
-    };
+const wins = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
 
-    socket.onmessage = function(event) {
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
 
-        try {
-            const message = JSON.parse(event.data);
+    [0,4,8],
+    [2,4,6]
+];
 
-            if (message.type === "assign") {
-                mySymbol = message.symbol;
-                updateStatus();
-                return;
-            }
+/* =========================================================
+   WIN CHECK
+   ========================================================= */
 
-            if (message.type === "state") {
+function getWinner() {
 
-                board = message.board;
-                currentPlayer = message.currentPlayer;
-                gameOver = message.gameOver;
-                players = message.players;
+    for (const combo of wins) {
 
-                drawBoard();
+        const [a,b,c] = combo;
 
-                if (message.winner) {
-                    showWinner(message.winner);
-                } else if (message.draw) {
-                    document.getElementById("status").textContent =
-                        "DRAW GAME";
-                } else {
-                    updateStatus();
-                }
-
-                return;
-            }
-
-            if (message.type === "error") {
-
-                document.getElementById("connection").textContent =
-                    message.message;
-            }
-
-        } catch (error) {
-            console.log(error);
+        if (
+            game[a] &&
+            game[a] === game[b] &&
+            game[a] === game[c]
+        ) {
+            return {
+                player: game[a],
+                combo
+            };
         }
-    };
+    }
 
-    socket.onclose = function() {
+    if (game.every(Boolean)) {
+        return {
+            player: "DRAW",
+            combo: []
+        };
+    }
 
-        document.getElementById("connection").textContent =
-            "Disconnected from game server";
-
-        document.getElementById("status").textContent =
-            "Disconnected";
-    };
-
-    socket.onerror = function() {
-
-        document.getElementById("connection").textContent =
-            "Server connection error";
-    };
+    return null;
 }
 
-function play(index) {
+/* =========================================================
+   PLACE PIECE
+   ========================================================= */
 
-    if (!socket ||
-        socket.readyState !== WebSocket.OPEN) return;
+function placePiece(index, player) {
 
-    if (!mySymbol) return;
+    game[index] = player;
 
-    if (!players.X || !players.O) return;
+    const cell = cells[index];
+
+    const piece = document.createElement("div");
+
+    piece.classList.add("piece");
+
+    if (player === "X") {
+        piece.classList.add("x-piece");
+    } else {
+        piece.classList.add("o-piece");
+    }
+
+    /*
+       Cycle through the five animations.
+    */
+
+    piece.classList.add(
+        animations[animationNumber % animations.length]
+    );
+
+    animationNumber++;
+
+    cell.appendChild(piece);
+
+    /*
+       Slight impact effect on the board.
+    */
+
+    board.animate(
+        [
+            {
+                transform: "scale(1)"
+            },
+            {
+                transform: "scale(.997)"
+            },
+            {
+                transform: "scale(1)"
+            }
+        ],
+        {
+            duration: 180,
+            easing: "ease-out"
+        }
+    );
+
+    return piece;
+}
+
+/* =========================================================
+   HUMAN MOVE
+   ========================================================= */
+
+function humanMove(index) {
 
     if (gameOver) return;
 
-    if (currentPlayer !== mySymbol) return;
+    if (game[index]) return;
 
-    if (board[index] !== null) return;
+    if (mode === "CPU" && currentPlayer === "O") {
+        return;
+    }
 
-    socket.send(JSON.stringify({
-        type: "move",
-        index: index,
-        symbol: mySymbol
-    }));
+    placePiece(index, currentPlayer);
+
+    finishMove();
 }
 
-function drawBoard() {
+/* =========================================================
+   FINISH MOVE
+   ========================================================= */
 
-    const cells = document.querySelectorAll(".cell");
+function finishMove() {
 
-    cells.forEach((cell, index) => {
+    const result = getWinner();
 
-        cell.innerHTML = "";
-        cell.classList.remove("win");
+    if (result) {
 
-        if (board[index]) {
+        gameOver = true;
 
-            const piece = document.createElement("div");
+        if (result.player === "DRAW") {
 
-            piece.className =
-                "piece " +
-                (board[index] === "X" ? "x" : "o");
+            statusText.textContent = "DRAW — THE BOARD IS COMPLETE";
 
-            piece.textContent = board[index];
+            cells.forEach(cell => {
+                cell.classList.add("draw-cell");
+            });
 
-            cell.appendChild(piece);
+        } else {
+
+            statusText.textContent =
+                "PLAYER " + result.player + " WINS!";
+
+            result.combo.forEach(index => {
+
+                const piece =
+                    cells[index].querySelector(".piece");
+
+                if (piece) {
+                    piece.classList.add("winner");
+                }
+            });
         }
-    });
-}
-
-function updateStatus() {
-
-    const status = document.getElementById("status");
-
-    if (!players.X || !players.O) {
-
-        status.textContent =
-            mySymbol === "X"
-            ? "Waiting for Player 2..."
-            : "Waiting for Player 1...";
 
         return;
     }
 
-    if (gameOver) return;
+    currentPlayer =
+        currentPlayer === "X"
+            ? "O"
+            : "X";
 
-    if (currentPlayer === mySymbol) {
+    if (mode === "CPU" && currentPlayer === "O") {
 
-        status.textContent =
-            "YOUR TURN — " + mySymbol;
+        statusText.textContent =
+            "COMPUTER — THINKING...";
+
+        setTimeout(computerMove, 430);
 
     } else {
 
-        status.textContent =
-            "OPPONENT'S TURN — " +
-            (mySymbol === "X" ? "O" : "X");
+        statusText.textContent =
+            "PLAYER " + currentPlayer + " — YOUR TURN";
     }
 }
 
-function showWinner(winner) {
+/* =========================================================
+   COMPUTER
+   ========================================================= */
 
-    document.getElementById("status").textContent =
-        winner + " WINS!";
+function computerMove() {
 
-    const wins = [
-        [0,1,2],
-        [3,4,5],
-        [6,7,8],
-        [0,3,6],
-        [1,4,7],
-        [2,5,8],
-        [0,4,8],
-        [2,4,6]
-    ];
+    if (gameOver) return;
 
-    for (const [a,b,c] of wins) {
+    if (currentPlayer !== "O") return;
 
-        if (
-            board[a] &&
-            board[a] === board[b] &&
-            board[a] === board[c]
-        ) {
+    const move = findComputerMove();
 
-            const cells = document.querySelectorAll(".cell");
+    if (move === -1) return;
 
-            cells[a].classList.add("win");
-            cells[b].classList.add("win");
-            cells[c].classList.add("win");
+    placePiece(move, "O");
 
-            break;
+    finishMove();
+}
+
+/*
+   Computer logic:
+   1. Win if possible
+   2. Block X
+   3. Take center
+   4. Take a corner
+   5. Take any remaining square
+ */
+
+function findComputerMove() {
+
+    /* Try winning */
+    for (let i = 0; i < 9; i++) {
+
+        if (!game[i]) {
+
+            game[i] = "O";
+
+            if (checkPlayerWin("O")) {
+                game[i] = "";
+                return i;
+            }
+
+            game[i] = "";
         }
     }
+
+    /* Block player */
+    for (let i = 0; i < 9; i++) {
+
+        if (!game[i]) {
+
+            game[i] = "X";
+
+            if (checkPlayerWin("X")) {
+                game[i] = "";
+                return i;
+            }
+
+            game[i] = "";
+        }
+    }
+
+    /* Center */
+    if (!game[4]) {
+        return 4;
+    }
+
+    /* Corners */
+    const corners = [0,2,6,8];
+
+    const availableCorners =
+        corners.filter(i => !game[i]);
+
+    if (availableCorners.length) {
+
+        return availableCorners[
+            Math.floor(
+                Math.random() *
+                availableCorners.length
+            )
+        ];
+    }
+
+    /* Anything left */
+    const available =
+        game
+            .map((value,index) =>
+                value ? -1 : index
+            )
+            .filter(index => index !== -1);
+
+    if (!available.length) {
+        return -1;
+    }
+
+    return available[
+        Math.floor(
+            Math.random() * available.length
+        )
+    ];
 }
 
-function newGame() {
+function checkPlayerWin(player) {
 
-    if (!socket ||
-        socket.readyState !== WebSocket.OPEN) return;
+    return wins.some(combo => {
 
-    socket.send(JSON.stringify({
-        type: "new_game"
-    }));
+        return combo.every(index =>
+            game[index] === player
+        );
+
+    });
 }
 
-createBoard();
-connectToServer();
+/* =========================================================
+   NEW GAME
+   ========================================================= */
+
+function startNewGame() {
+
+    game = Array(9).fill("");
+    currentPlayer = "X";
+    gameOver = false;
+    animationNumber = 0;
+
+    cells.forEach(cell => {
+
+        cell.innerHTML = "";
+
+        cell.classList.remove(
+            "winner",
+            "draw-cell"
+        );
+    });
+
+    statusText.textContent =
+        mode === "CPU"
+            ? "PLAYER X — YOUR TURN"
+            : "PLAYER X — YOUR TURN";
+}
+
+/* =========================================================
+   CELL INPUT
+   ========================================================= */
+
+cells.forEach(cell => {
+
+    cell.addEventListener("click", () => {
+
+        const index =
+            Number(cell.dataset.index);
+
+        humanMove(index);
+    });
+
+});
+
+/*
+   Touch support is naturally handled by click,
+   but prevent double-tap zoom on game cells.
+ */
+
+cells.forEach(cell => {
+
+    cell.addEventListener(
+        "touchstart",
+        event => {
+            event.preventDefault();
+        },
+        { passive: false }
+    );
+
+});
+
+/* =========================================================
+   MODE BUTTONS
+   ========================================================= */
+
+twoPlayerButton.addEventListener("click", () => {
+
+    mode = "2P";
+
+    twoPlayerButton.classList.add("active");
+    computerButton.classList.remove("active");
+
+    startNewGame();
+});
+
+computerButton.addEventListener("click", () => {
+
+    mode = "CPU";
+
+    computerButton.classList.add("active");
+    twoPlayerButton.classList.remove("active");
+
+    startNewGame();
+});
+
+newGameButton.addEventListener(
+    "click",
+    startNewGame
+);
+
+/* =========================================================
+   START
+   ========================================================= */
+
+fitGame();
 
 </script>
 
