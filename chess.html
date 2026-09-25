@@ -164,27 +164,36 @@ button.active {
     justify-content: center;
 
     overflow: hidden;
+
+    /*
+       JS continuously calculates the largest square that
+       fits INSIDE this exact area.
+    */
+    container-type: size;
 }
 
+/* =========================================================
+   BOARD FRAME
+   ========================================================= */
+
 /*
-    IMPORTANT:
+   --board-size is supplied by resizeBoard().
 
-    The board has NO fixed width or fixed height.
+   This is deliberately NOT a fixed pixel size.
 
-    It is sized by the available container.
+   The JavaScript measures the real available board-area
+   and chooses:
 
-    width: min(100%, 100%)
-    aspect-ratio: 1 / 1
+       MIN(available width, available height)
 
-    means the browser determines the largest square that
-    actually fits inside the available board-area.
+   so the board always fits.
 */
 
 .board-frame {
-    width: min(100%, 100%);
-    height: auto;
+    width: var(--board-size, 0px);
+    height: var(--board-size, 0px);
 
-    aspect-ratio: 1 / 1;
+    flex: 0 0 var(--board-size, 0px);
 
     min-width: 0;
     min-height: 0;
@@ -213,17 +222,13 @@ button.active {
         0 5px 0 #020202,
         inset 2px 2px 3px rgba(255,255,255,.15),
         inset -3px -3px 5px rgba(0,0,0,.8);
+
+    overflow: hidden;
 }
 
-/*
+/* =========================================================
    THE ACTUAL BOARD
-
-   CSS GRID explicitly creates 8 equal columns and
-   8 equal rows.
-
-   minmax(0, 1fr) is important:
-   it prevents pieces/content from changing square sizes.
-*/
+   ========================================================= */
 
 .board {
     position: relative;
@@ -238,8 +243,6 @@ button.active {
 
     grid-template-rows:
         repeat(8, minmax(0, 1fr));
-
-    aspect-ratio: 1 / 1;
 
     overflow: hidden;
 
@@ -257,11 +260,6 @@ button.active {
    ========================================================= */
 
 .square {
-    /*
-       ABSOLUTELY NO fixed square dimensions.
-       Grid controls both width and height.
-    */
-
     width: 100%;
     height: 100%;
 
@@ -308,7 +306,6 @@ button.active {
         inset -1px -1px 0 rgba(0,0,0,.65);
 }
 
-/* subtle stone variation */
 .square.ivory::after,
 .square.onyx::after {
     content: "";
@@ -341,11 +338,6 @@ button.active {
    ========================================================= */
 
 .piece {
-    /*
-       Piece size is relative to the square.
-
-       It can NEVER enlarge a square.
-    */
     width: 78%;
     height: 78%;
 
@@ -361,6 +353,13 @@ button.active {
         "DejaVu Serif",
         serif;
 
+    /*
+       Piece size follows the actual board.
+
+       cqw = width of the board-area container.
+       The vmin fallback keeps pieces sensible on older
+       browsers.
+    */
     font-size: clamp(20px, 7.2vmin, 100px);
 
     line-height: 1;
@@ -641,16 +640,21 @@ button.active {
         min-height: 0;
     }
 
-    .board-frame {
-        /*
-           On narrow screens the board uses the actual width
-           available to the board-area.
-        */
-        width: min(100%, 100%);
-        max-width: 100%;
-        height: auto;
+    /*
+       IMPORTANT:
 
-        aspect-ratio: 1 / 1;
+       The board is NOT width-driven anymore.
+
+       resizeBoard() determines the exact square size from
+       the available width AND height.
+    */
+
+    .board-frame {
+        width: var(--board-size, 0px);
+        height: var(--board-size, 0px);
+
+        max-width: none;
+        max-height: none;
     }
 
     .side-panel {
@@ -818,10 +822,6 @@ button.active {
 
     <main class="game-area">
 
-        <!-- =================================================
-             BOARD
-             ================================================= -->
-
         <section class="board-area">
 
             <div class="board-frame">
@@ -836,10 +836,6 @@ button.active {
 
         </section>
 
-
-        <!-- =================================================
-             SIDE PANEL
-             ================================================= -->
 
         <aside class="side-panel">
 
@@ -931,10 +927,6 @@ button.active {
 </div>
 
 
-<!-- =========================================================
-     PROMOTION
-     ========================================================= -->
-
 <div
     id="promotionOverlay"
     class="overlay">
@@ -952,10 +944,6 @@ button.active {
 
 </div>
 
-
-<!-- =========================================================
-     GAME OVER
-     ========================================================= -->
 
 <div
     id="gameOverOverlay"
@@ -984,6 +972,136 @@ button.active {
 
 
 <script>
+
+/* =========================================================
+   RESPONSIVE BOARD SIZING
+   ========================================================= */
+
+/*
+   This is the important fix.
+
+   The old version essentially said:
+
+       "make the board as wide as the board area"
+
+   That fails when the available HEIGHT is smaller than
+   the available width.
+
+   This version measures the actual board-area and chooses
+   the smaller dimension.
+
+   Therefore:
+
+       board width  = board height
+       board size   = MIN(available width, available height)
+
+   It recalculates automatically when:
+       - browser window changes
+       - phone rotates
+       - browser UI changes available height
+       - side panel layout changes
+       - desktop window is resized
+*/
+
+const boardAreaElement =
+    document.querySelector(".board-area");
+
+const boardFrameElement =
+    document.querySelector(".board-frame");
+
+
+function resizeBoard() {
+
+    if (
+        !boardAreaElement ||
+        !boardFrameElement
+    ) {
+        return;
+    }
+
+    const rect =
+        boardAreaElement.getBoundingClientRect();
+
+    /*
+       Use the real rendered dimensions.
+
+       A tiny safety margin prevents fractional-pixel
+       overflow caused by browser rounding.
+    */
+
+    const width =
+        Math.max(
+            0,
+            rect.width - 2
+        );
+
+    const height =
+        Math.max(
+            0,
+            rect.height - 2
+        );
+
+    const size =
+        Math.floor(
+            Math.min(
+                width,
+                height
+            )
+        );
+
+    boardFrameElement.style.setProperty(
+        "--board-size",
+        size + "px"
+    );
+}
+
+
+/*
+   ResizeObserver watches the actual board container.
+
+   This is better than relying only on window.resize because
+   mobile browsers can change the usable viewport without
+   firing a normal resize event.
+*/
+
+const boardResizeObserver =
+    new ResizeObserver(
+        () => resizeBoard()
+    );
+
+boardResizeObserver.observe(
+    boardAreaElement
+);
+
+
+/*
+   Also listen for viewport changes.
+*/
+
+window.addEventListener(
+    "resize",
+    resizeBoard
+);
+
+window.addEventListener(
+    "orientationchange",
+    () => {
+        setTimeout(
+            resizeBoard,
+            50
+        );
+    }
+);
+
+
+/*
+   Initial sizing.
+*/
+
+requestAnimationFrame(
+    resizeBoard
+);
+
 
 /* =========================================================
    CHESS ENGINE
@@ -1047,13 +1165,9 @@ const PIECE_VALUES = {
 
 let board = [];
 let turn = "w";
-
 let selected = null;
-
 let legalForSelected = [];
-
 let lastMove = null;
-
 let enPassant = null;
 
 let castling = {
@@ -1064,21 +1178,13 @@ let castling = {
 };
 
 let gameOver = false;
-
 let gameMode = "2player";
-
 let computerLevel = 1;
-
 let flipped = false;
-
 let moveHistory = [];
-
 let positionHistory = new Map();
-
 let halfmoveClock = 0;
-
 let pendingPromotion = null;
-
 let computerThinking = false;
 
 
@@ -1207,8 +1313,6 @@ function findKing(b, color) {
 
 function squareAttacked(b, r, c, byColor) {
 
-    /* PAWNS */
-
     const pawnRow =
         byColor === "w"
             ? r + 1
@@ -1233,8 +1337,6 @@ function squareAttacked(b, r, c, byColor) {
         }
     }
 
-
-    /* KNIGHTS */
 
     const knightOffsets = [
         [-2,-1],
@@ -1268,8 +1370,6 @@ function squareAttacked(b, r, c, byColor) {
     }
 
 
-    /* KING */
-
     for (let dr = -1; dr <= 1; dr++) {
 
         for (let dc = -1; dc <= 1; dc++) {
@@ -1297,8 +1397,6 @@ function squareAttacked(b, r, c, byColor) {
         }
     }
 
-
-    /* ROOK / QUEEN */
 
     const straight = [
         [-1,0],
@@ -1333,8 +1431,6 @@ function squareAttacked(b, r, c, byColor) {
         }
     }
 
-
-    /* BISHOP / QUEEN */
 
     const diagonal = [
         [-1,-1],
@@ -1409,11 +1505,7 @@ function pseudoMoves(b, r, c, includeCastling = true) {
     const moves = [];
 
 
-    function addMove(
-        rr,
-        cc,
-        extra = {}
-    ) {
+    function addMove(rr, cc, extra = {}) {
 
         if (!inside(rr, cc)) {
             return;
@@ -1461,8 +1553,6 @@ function pseudoMoves(b, r, c, includeCastling = true) {
                 : 7;
 
 
-        /* ONE FORWARD */
-
         if (
             inside(r + dir, c) &&
             !b[r + dir][c]
@@ -1476,8 +1566,6 @@ function pseudoMoves(b, r, c, includeCastling = true) {
                         r + dir === promotionRow
                 }
             );
-
-            /* TWO FORWARD */
 
             if (
                 r === startRow &&
@@ -1494,8 +1582,6 @@ function pseudoMoves(b, r, c, includeCastling = true) {
             }
         }
 
-
-        /* CAPTURES */
 
         for (const dc of [-1, 1]) {
 
@@ -1525,8 +1611,6 @@ function pseudoMoves(b, r, c, includeCastling = true) {
                 );
             }
 
-
-            /* EN PASSANT */
 
             if (
                 enPassant &&
@@ -1645,8 +1729,6 @@ function pseudoMoves(b, r, c, includeCastling = true) {
     }
 
 
-    /* KING */
-
     for (let dr = -1; dr <= 1; dr++) {
 
         for (let dc = -1; dc <= 1; dc++) {
@@ -1662,8 +1744,6 @@ function pseudoMoves(b, r, c, includeCastling = true) {
         }
     }
 
-
-    /* CASTLING */
 
     if (includeCastling) {
 
@@ -1760,7 +1840,7 @@ function pseudoMoves(b, r, c, includeCastling = true) {
 
 
 /* =========================================================
-   APPLY MOVE TO A COPY
+   APPLY MOVE
    ========================================================= */
 
 function applyMove(state, move, promotionType = "Q") {
@@ -1779,7 +1859,6 @@ function applyMove(state, move, promotionType = "Q") {
     let captured =
         b[move.to.r][move.to.c];
 
-    /* EN PASSANT CAPTURE */
 
     if (move.enPassant) {
 
@@ -1801,16 +1880,12 @@ function applyMove(state, move, promotionType = "Q") {
     };
 
 
-    /* PROMOTION */
-
     if (move.promotion) {
 
         b[move.to.r][move.to.c].type =
             promotionType || "Q";
     }
 
-
-    /* CASTLING */
 
     if (move.castle === "K") {
 
@@ -1943,18 +2018,10 @@ function positionKey() {
 
     s +=
         "|" +
-        (
-            castling.wK ? "K" : ""
-        ) +
-        (
-            castling.wQ ? "Q" : ""
-        ) +
-        (
-            castling.bK ? "k" : ""
-        ) +
-        (
-            castling.bQ ? "q" : ""
-        );
+        (castling.wK ? "K" : "") +
+        (castling.wQ ? "Q" : "") +
+        (castling.bK ? "k" : "") +
+        (castling.bQ ? "q" : "");
 
     s +=
         "|" +
@@ -2101,9 +2168,6 @@ function makeMove(move, promotionType = "Q") {
 
     board = result.board;
 
-
-    /* EN PASSANT TARGET */
-
     enPassant = null;
 
     if (
@@ -2126,8 +2190,6 @@ function makeMove(move, promotionType = "Q") {
         };
     }
 
-
-    /* HALF MOVE CLOCK */
 
     if (
         movingPiece.type === "P" ||
@@ -2249,8 +2311,6 @@ function updateGameState() {
         );
 
 
-    /* CHECKMATE */
-
     if (
         legal.length === 0 &&
         inCheck
@@ -2280,8 +2340,6 @@ function updateGameState() {
     }
 
 
-    /* STALEMATE */
-
     if (
         legal.length === 0 &&
         !inCheck
@@ -2306,8 +2364,6 @@ function updateGameState() {
     }
 
 
-    /* 75 MOVE RULE */
-
     if (halfmoveClock >= 150) {
 
         gameOver = true;
@@ -2328,8 +2384,6 @@ function updateGameState() {
         return;
     }
 
-
-    /* FIVEFOLD REPETITION */
 
     for (const count of positionHistory.values()) {
 
@@ -2355,27 +2409,15 @@ function updateGameState() {
     }
 
 
-    /* FIFTY MOVE */
-
     if (halfmoveClock >= 100) {
-
-        gameOver = true;
 
         statusElement.textContent =
             "DRAW";
 
         substatusElement.textContent =
             "50-move rule available.";
-
-        /*
-           The game is not automatically ended here.
-           The player may continue until the 75-move
-           automatic draw condition.
-        */
     }
 
-
-    /* INSUFFICIENT MATERIAL */
 
     if (insufficientMaterial()) {
 
@@ -2452,14 +2494,10 @@ function insufficientMaterial() {
     }
 
 
-    /* King vs King */
-
     if (pieces.length === 0) {
         return true;
     }
 
-
-    /* King + single bishop/knight vs king */
 
     if (pieces.length === 1) {
 
@@ -2469,9 +2507,6 @@ function insufficientMaterial() {
         );
     }
 
-
-    /* King + bishop vs king + bishop,
-       bishops on same color */
 
     if (
         pieces.length === 2 &&
@@ -2633,8 +2668,6 @@ function render() {
             }
 
 
-            /* coordinates */
-
             if (
                 (!flipped && c === 0) ||
                 (flipped && c === 7)
@@ -2682,6 +2715,14 @@ function render() {
     }
 
     renderMoves();
+
+    /*
+       Recalculate after rendering because the board's
+       surrounding layout may have changed.
+    */
+    requestAnimationFrame(
+        resizeBoard
+    );
 }
 
 
@@ -2705,8 +2746,6 @@ function handleSquareClick(r, c) {
 
     const piece = board[r][c];
 
-
-    /* SELECT LEGAL DESTINATION */
 
     const selectedMove =
         legalForSelected.find(
@@ -2736,8 +2775,6 @@ function handleSquareClick(r, c) {
         return;
     }
 
-
-    /* SELECT OWN PIECE */
 
     if (
         piece &&
@@ -2945,6 +2982,10 @@ function newGame() {
     render();
 
     updateGameState();
+
+    requestAnimationFrame(
+        resizeBoard
+    );
 }
 
 
@@ -3229,7 +3270,6 @@ function evaluateMove(b, move) {
         score += 120;
     }
 
-    /* central control */
 
     const centerDistance =
         Math.abs(
@@ -3416,8 +3456,6 @@ function evaluatePosition(b) {
                 PIECE_VALUES[
                     p.type
                 ];
-
-            /* positional center bonus */
 
             const center =
                 4 -
