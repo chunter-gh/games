@@ -2,33 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Naval Destroyer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Naval Strike</title>
 
 <style>
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
     margin: 0;
-    padding: 0;
+    width: 100%;
     min-height: 100%;
-    background:
-        radial-gradient(circle at 50% 10%, #18384a 0%, #07151e 42%, #02080d 100%);
-    color: #e9f5fa;
-    font-family: "Trebuchet MS", Arial, sans-serif;
-}
-
-body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #06121b;
+    color: white;
     overflow-x: hidden;
 }
 
-button {
-    font-family: inherit;
-}
-
-#app {
+body {
     min-height: 100vh;
 }
 
@@ -36,154 +29,113 @@ button {
    START SCREEN
    ========================================================= */
 
-.screen {
+#startScreen {
     min-height: 100vh;
+    position: relative;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 25px;
+    align-items: center;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 25%, rgba(47,111,145,.35), transparent 35%),
+        linear-gradient(#071a27, #031019 70%, #02080d);
 }
 
-.start-panel {
-    width: min(900px, 96vw);
+.oceanGlow {
+    position: absolute;
+    width: 140%;
+    height: 55%;
+    left: -20%;
+    bottom: -20%;
+    background:
+        repeating-linear-gradient(
+            175deg,
+            rgba(40,120,155,.18) 0px,
+            rgba(40,120,155,.18) 2px,
+            transparent 2px,
+            transparent 22px
+        );
+    transform: rotate(-2deg);
+    opacity: .8;
+}
+
+.startPanel {
+    position: relative;
+    z-index: 5;
+    width: min(92vw, 600px);
+    padding: 42px 28px 38px;
     text-align: center;
+    border: 2px solid #426b7d;
+    border-radius: 24px;
+    background: linear-gradient(
+        145deg,
+        rgba(11,34,47,.97),
+        rgba(3,15,23,.97)
+    );
+    box-shadow:
+        0 0 40px rgba(0,180,255,.15),
+        inset 0 0 30px rgba(0,0,0,.55);
 }
 
-.title {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: clamp(52px, 10vw, 105px);
-    letter-spacing: 7px;
-    color: #e9f5f7;
+.gameLogo {
+    font-size: clamp(42px, 10vw, 76px);
+    font-weight: 900;
+    letter-spacing: 5px;
+    color: #e7f8ff;
     text-shadow:
-        0 4px 0 #102a36,
-        0 8px 25px #000;
-    margin-bottom: 3px;
+        0 0 8px #4bd5ff,
+        0 0 25px rgba(50,190,255,.6);
+    margin-bottom: 5px;
 }
 
 .subtitle {
-    color: #7fc6d9;
-    letter-spacing: 7px;
-    font-size: clamp(12px, 2vw, 19px);
-    margin-bottom: 42px;
+    color: #79b6c9;
+    letter-spacing: 4px;
+    font-size: 13px;
+    margin-bottom: 35px;
 }
 
-.destroyer-art {
-    height: 210px;
-    position: relative;
-    margin: 0 auto 35px;
-    overflow: hidden;
-    border-radius: 18px;
-    background:
-        linear-gradient(to bottom,
-            #122c3b 0%,
-            #173f52 35%,
-            #0a2a3a 53%,
-            #08202b 54%,
-            #05151e 100%);
-    border: 1px solid #2f6476;
-    box-shadow: 0 18px 50px #000;
+.shipBadge {
+    font-size: 70px;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,.7));
 }
 
-.cloud {
-    position: absolute;
-    background: rgba(195,215,218,.13);
-    border-radius: 50%;
-    filter: blur(8px);
-}
-
-.cloud.c1 {
-    width: 300px;
-    height: 80px;
-    left: 5%;
-    top: 20px;
-}
-
-.cloud.c2 {
-    width: 350px;
-    height: 100px;
-    right: 0;
-    top: 45px;
-}
-
-.cloud.c3 {
-    width: 260px;
-    height: 70px;
-    left: 42%;
-    top: 5px;
-}
-
-.bow {
-    position: absolute;
-    left: 50%;
-    bottom: -35px;
-    transform: translateX(-50%);
-    width: 360px;
-    height: 170px;
-    background:
-        linear-gradient(155deg, #45545a, #18262d 58%, #0b1419);
-    clip-path: polygon(0 0, 100% 0, 74% 100%, 26% 100%);
-    border-top: 4px solid #718188;
-}
-
-.bridge {
-    position: absolute;
-    left: 50%;
-    bottom: 62px;
-    transform: translateX(-50%);
-    width: 145px;
-    height: 65px;
-    background: #33434a;
-    border: 2px solid #718087;
-    clip-path: polygon(15% 100%, 20% 25%, 35% 25%, 35% 0, 68% 0, 68% 25%, 83% 25%, 88% 100%);
-}
-
-.window-line {
-    position: absolute;
-    left: 50%;
-    bottom: 91px;
-    transform: translateX(-50%);
-    width: 86px;
-    height: 9px;
-    background: #72c7d6;
-    box-shadow: 0 0 12px #53d7ed;
-}
-
-.mode-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.mode-btn {
-    min-width: 245px;
-    min-height: 68px;
-    padding: 15px 28px;
-    border: 1px solid #54899a;
-    border-radius: 10px;
-    background:
-        linear-gradient(#183d4d, #0b222d);
-    color: #ecfaff;
+.modeButton {
+    width: 100%;
+    max-width: 390px;
+    margin: 10px auto;
+    display: block;
+    padding: 17px 20px;
+    border: 2px solid #3b91ae;
+    border-radius: 12px;
+    background: linear-gradient(#174b61, #0b2b3b);
+    color: white;
     font-size: 20px;
-    font-weight: bold;
+    font-weight: 800;
     letter-spacing: 2px;
     cursor: pointer;
-    box-shadow:
-        inset 0 1px rgba(255,255,255,.12),
-        0 8px 25px #0008;
-    transition: .15s;
+    box-shadow: 0 5px 15px rgba(0,0,0,.4);
 }
 
-.mode-btn:hover {
-    transform: translateY(-3px);
-    border-color: #75d4e9;
-    box-shadow:
-        0 0 20px #45b8d055,
-        0 12px 28px #000;
+.modeButton:hover {
+    background: linear-gradient(#216b87, #104258);
+    border-color: #72dfff;
 }
 
-.mode-btn:active {
-    transform: translateY(1px);
+.modeButton:active {
+    transform: scale(.98);
+}
+
+.gameRoomButton {
+    margin-top: 24px;
+    background: #101d24;
+    border-color: #516771;
+    font-size: 15px;
+}
+
+.gameRoomButton:hover {
+    background: #182b34;
 }
 
 /* =========================================================
@@ -192,750 +144,562 @@ button {
 
 #gameScreen {
     display: none;
+    min-height: 100vh;
+    background:
+        linear-gradient(
+            to bottom,
+            #071d2a 0%,
+            #0a3142 32%,
+            #0b4254 55%,
+            #061923 100%
+        );
+    overflow: hidden;
 }
 
-.game {
-    width: min(1500px, 100%);
-    margin: auto;
-    padding: 12px;
-}
-
-.topbar {
+.topBar {
+    height: 68px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 10px 15px;
-    background: linear-gradient(90deg, #091821, #112d39, #091821);
-    border: 1px solid #315564;
-    border-radius: 10px;
-    margin-bottom: 12px;
+    padding: 8px 14px;
+    border-bottom: 2px solid #315e6c;
+    background: rgba(3,15,22,.9);
+    position: relative;
+    z-index: 20;
 }
 
-.logo-small {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: 30px;
+.topTitle {
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 900;
     letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(75,213,255,.5);
 }
 
-.status {
-    color: #86d9e9;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.back-btn {
-    background: #142a34;
-    color: #cdebf1;
-    border: 1px solid #43616d;
+.roomButton {
+    border: 1px solid #526b73;
+    background: #14252d;
+    color: #d9eef4;
     padding: 9px 13px;
-    border-radius: 7px;
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
 }
 
-.battle-layout {
+.roomButton:hover {
+    background: #203b46;
+}
+
+/* =========================================================
+   MAIN BATTLE AREA
+   ========================================================= */
+
+.battlefield {
+    width: min(1400px, 100%);
+    margin: auto;
+    padding: 15px;
+}
+
+.statusBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 9px 14px;
+    background: rgba(2,13,20,.78);
+    border: 1px solid #315d6c;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.statusText {
+    color: #8bdcff;
+    font-weight: bold;
+}
+
+.ammoText {
+    color: #c5dce4;
+}
+
+/* =========================================================
+   OCEAN
+   ========================================================= */
+
+.ocean {
+    position: relative;
+    height: 250px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2px solid #386878;
+    background:
+        linear-gradient(
+            to bottom,
+            #a9d4df 0%,
+            #6fa8b9 23%,
+            #287187 48%,
+            #0c4a60 75%,
+            #062b3a 100%
+        );
+    box-shadow: inset 0 -40px 70px rgba(0,0,0,.45);
+}
+
+.cloud {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(245,253,255,.72);
+    filter: blur(7px);
+}
+
+.cloud.c1 {
+    width: 190px;
+    height: 55px;
+    top: 25px;
+    left: 5%;
+}
+
+.cloud.c2 {
+    width: 250px;
+    height: 65px;
+    top: 55px;
+    right: 7%;
+}
+
+.cloud.c3 {
+    width: 300px;
+    height: 65px;
+    top: 105px;
+    left: 34%;
+}
+
+.cloud.c4 {
+    width: 170px;
+    height: 50px;
+    top: 145px;
+    right: 35%;
+}
+
+.hiddenFleet {
+    position: absolute;
+    left: 50%;
+    top: 43%;
+    transform: translate(-50%, -50%);
+    color: rgba(3,23,30,.22);
+    font-size: 45px;
+    letter-spacing: 25px;
+    user-select: none;
+}
+
+.oceanLabel {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(2,19,27,.65);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #b9e8f4;
+}
+
+/* =========================================================
+   MISSILE TRAJECTORY
+   ========================================================= */
+
+.missile {
+    position: absolute;
+    width: 13px;
+    height: 38px;
+    border-radius: 8px 8px 3px 3px;
+    background: linear-gradient(#ffffff, #9bdcff 45%, #21799c);
+    box-shadow:
+        0 0 8px #b9eeff,
+        0 0 20px #32bfff;
+    z-index: 15;
+    display: none;
+}
+
+.missile::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 30px;
+    left: 1px;
+    top: 30px;
+    background: linear-gradient(
+        transparent,
+        #ffed8a,
+        #ff7a19,
+        transparent
+    );
+    filter: blur(2px);
+}
+
+/* =========================================================
+   LOWER GAME AREA
+   ========================================================= */
+
+.lowerArea {
     display: grid;
-    grid-template-columns: 350px minmax(500px, 1fr);
-    gap: 13px;
+    grid-template-columns: minmax(260px, 390px) 1fr;
+    gap: 18px;
+    margin-top: 16px;
 }
 
 /* =========================================================
    RADAR
    ========================================================= */
 
-.radar-panel {
-    background:
-        linear-gradient(145deg, #081921, #061219);
-    border: 1px solid #315968;
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow: 0 12px 35px #0008;
+.radarPanel,
+.shipPanel {
+    border: 2px solid #315d6c;
+    border-radius: 16px;
+    background: rgba(3,16,24,.9);
+    box-shadow: 0 8px 25px rgba(0,0,0,.3);
 }
 
-.panel-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.panel-heading h2 {
-    margin: 0;
-    font-size: 19px;
+.panelHeader {
+    padding: 11px 14px;
+    border-bottom: 1px solid #315d6c;
+    color: #9fe7fa;
+    font-weight: 900;
     letter-spacing: 2px;
+    font-size: 14px;
 }
 
-.panel-heading span {
-    color: #5fb9cc;
-    font-size: 12px;
+.radarWrap {
+    padding: 13px;
 }
 
 .radar {
-    width: 100%;
-    aspect-ratio: 1;
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(10, 1fr);
-    border: 2px solid #387284;
+    aspect-ratio: 1 / 1;
+    border: 2px solid #4287a0;
+    background: #092531;
+}
+
+.radarCell {
+    position: relative;
+    border: 1px solid rgba(76,166,190,.35);
     background:
-        radial-gradient(circle at center, #103e45 0%, #061b23 70%);
-    position: relative;
-    overflow: hidden;
-}
-
-.radar::before,
-.radar::after {
-    content: "";
-    position: absolute;
-    pointer-events: none;
-}
-
-.radar::before {
-    width: 100%;
-    height: 1px;
-    top: 50%;
-    background: #57d7c644;
-    box-shadow: 0 -25% #57d7c622, 0 25% #57d7c622;
-}
-
-.radar::after {
-    width: 1px;
-    height: 100%;
-    left: 50%;
-    background: #57d7c644;
-}
-
-.radar-cell {
-    position: relative;
-    border-right: 1px solid #28708066;
-    border-bottom: 1px solid #28708066;
-    background: #06232b88;
+        radial-gradient(circle, rgba(45,170,190,.09), transparent 65%);
     cursor: pointer;
-    min-width: 0;
-    transition: .1s;
+    transition: .15s;
 }
 
-.radar-cell:hover {
-    background: #1c687655;
+.radarCell:hover {
+    background: rgba(56,190,218,.22);
+    box-shadow: inset 0 0 12px rgba(71,218,255,.35);
 }
 
-.radar-cell.selected {
-    outline: 2px solid #f4d35e;
-    outline-offset: -2px;
-    background: #806d2d55;
+.radarCell.disabled {
+    cursor: default;
 }
 
-.radar-cell.hit {
-    background:
-        radial-gradient(circle, #ff6655 0 12%, #aa241c 14% 30%, #481713 31% 100%);
-}
-
-.radar-cell.hit::after {
+.radarCell.hit::after {
     content: "✕";
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
-    color: #ffb0a7;
-    font-size: 25px;
-    font-weight: bold;
-    text-shadow: 0 0 8px #f00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ff4d4d;
+    font-size: clamp(14px, 3vw, 26px);
+    font-weight: 900;
+    text-shadow: 0 0 8px #ff0000;
 }
 
-.radar-cell.miss {
-    background: #123e4b;
-}
-
-.radar-cell.miss::after {
+.radarCell.miss::after {
     content: "•";
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
-    color: #7cc7d4;
-    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8eeaff;
+    font-size: clamp(18px, 3vw, 30px);
 }
 
-.radar-labels {
+.radarCell.targeted {
+    animation: radarFlash .35s;
+}
+
+@keyframes radarFlash {
+    0%,100% { background: rgba(50,220,255,.1); }
+    50% { background: rgba(50,220,255,.65); }
+}
+
+.radarLetters {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    font-size: 10px;
-    color: #719aa5;
+    margin-left: 2px;
+    color: #669aaa;
+    font-size: 9px;
     text-align: center;
     margin-top: 5px;
 }
 
-.radar-info {
-    margin-top: 12px;
-    padding: 10px;
-    border: 1px solid #254b58;
-    background: #07151b;
-    border-radius: 8px;
-    color: #9dc2cb;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.legend {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    font-size: 11px;
-    color: #8eabb2;
-}
-
-.legend i {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-right: 4px;
-    vertical-align: -2px;
-    border: 1px solid #547681;
-}
-
-.legend .lh {
-    background: #b52d23;
-}
-
-.legend .lm {
-    background: #123e4b;
-}
-
-.legend .lu {
-    background: #06232b;
-}
-
 /* =========================================================
-   OCEAN / DESTROYER
+   SHIP
    ========================================================= */
 
-.ocean-panel {
-    min-width: 0;
+.shipPanel {
     position: relative;
     overflow: hidden;
-    min-height: 720px;
-    border: 1px solid #355c68;
-    border-radius: 12px;
-    background:
-        linear-gradient(to bottom,
-            #1b3847 0%,
-            #183946 27%,
-            #0d3442 40%,
-            #082431 53%,
-            #06161f 54%,
-            #041017 100%);
-    box-shadow: 0 12px 35px #0008;
 }
 
-.sky {
-    position: absolute;
-    inset: 0 0 45% 0;
+.shipDeck {
+    position: relative;
+    min-height: 430px;
+    padding: 20px;
     background:
-        radial-gradient(ellipse at 30% 40%, #d9e4e3 0%, #aab8b9 17%, transparent 35%),
-        radial-gradient(ellipse at 70% 30%, #dce4e2 0%, #a9b4b5 20%, transparent 38%),
-        linear-gradient(#607b87, #27424f);
-    opacity: .9;
+        linear-gradient(
+            90deg,
+            #10191d,
+            #2b3638 17%,
+            #59605e 50%,
+            #2c3739 83%,
+            #10191d
+        );
+    overflow: hidden;
 }
 
-.sky::after {
+.shipDeck::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(ellipse at 15% 30%, #ffffff33, transparent 22%),
-        radial-gradient(ellipse at 82% 45%, #ffffff22, transparent 25%);
-    filter: blur(12px);
-}
-
-.horizon {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 44%;
-    height: 18%;
-    background:
-        linear-gradient(to bottom,
-            transparent,
-            #7ba1a655 35%,
-            #173f4d 55%,
-            #092632);
-}
-
-.wave {
-    position: absolute;
-    left: -10%;
-    width: 120%;
-    height: 90px;
-    border-radius: 50%;
-    border-top: 2px solid #4d8998aa;
-    opacity: .5;
-}
-
-.w1 { top: 58%; }
-.w2 { top: 66%; transform: translateX(-5%); }
-.w3 { top: 76%; transform: translateX(4%); }
-.w4 { top: 88%; transform: translateX(-3%); }
-
-.ship {
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(650px, 82%);
-    height: 330px;
-}
-
-.ship-hull {
-    position: absolute;
-    left: 4%;
-    right: 4%;
-    bottom: 0;
-    height: 190px;
-    background:
-        linear-gradient(160deg, #536169, #1b292f 55%, #0b151a);
-    clip-path: polygon(0 0, 100% 0, 88% 67%, 69% 100%, 31% 100%, 12% 67%);
-    border-top: 4px solid #75838a;
-    filter: drop-shadow(0 -5px 6px #0008);
-}
-
-.deck {
-    position: absolute;
+    width: 82%;
+    height: 125%;
     left: 9%;
-    right: 9%;
-    bottom: 148px;
-    height: 72px;
-    background:
-        linear-gradient(#6c777b, #303b40);
-    clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
-    border-top: 3px solid #8e9ba0;
-}
-
-.deck-line {
-    position: absolute;
-    left: 17%;
-    right: 17%;
-    bottom: 181px;
-    height: 2px;
-    background: #c6d0d1;
-    opacity: .45;
-}
-
-.bridge-house {
-    position: absolute;
-    left: 31%;
-    bottom: 201px;
-    width: 38%;
-    height: 92px;
-    background:
-        linear-gradient(#56646a, #27363c);
-    clip-path: polygon(8% 100%, 14% 18%, 28% 18%, 28% 0, 72% 0, 72% 18%, 86% 18%, 92% 100%);
-    border: 2px solid #859197;
-}
-
-.bridge-windows {
-    position: absolute;
-    left: 37%;
-    bottom: 255px;
-    width: 26%;
-    height: 16px;
+    top: -12%;
+    clip-path: polygon(27% 0, 73% 0, 100% 100%, 0 100%);
     background:
         repeating-linear-gradient(
             90deg,
-            #7dd0d8 0 14px,
-            #17282f 14px 20px
-        );
-    box-shadow: 0 0 14px #6bd4dd77;
+            rgba(255,255,255,.035) 0,
+            rgba(255,255,255,.035) 2px,
+            transparent 2px,
+            transparent 22px
+        ),
+        linear-gradient(90deg, #252d2e, #616766 50%, #252d2e);
+    border-left: 2px solid #111;
+    border-right: 2px solid #111;
 }
 
-.radar-mast {
+.shipBow {
     position: absolute;
-    left: 48%;
-    bottom: 288px;
-    width: 7px;
-    height: 80px;
-    background: #7c888b;
-}
-
-.radar-dish {
-    position: absolute;
-    left: calc(50% - 27px);
-    bottom: 346px;
-    width: 54px;
-    height: 18px;
-    border: 5px solid #a2aaab;
-    border-radius: 50%;
-    transform: rotate(-12deg);
-}
-
-.gun {
-    position: absolute;
-    left: 50%;
-    bottom: 202px;
-    transform: translateX(-50%);
-    width: 54px;
-    height: 35px;
-    background: #3b474c;
-    border-radius: 50% 50% 10px 10px;
-}
-
-.gun::before {
-    content: "";
-    position: absolute;
-    width: 11px;
-    height: 100px;
-    left: 22px;
-    top: -74px;
-    background: #263338;
-    border-radius: 5px;
-    transform: rotate(-3deg);
-}
-
-/* =========================================================
-   MISSILE BANK
-   ========================================================= */
-
-.missile-bank {
-    position: absolute;
-    left: 9%;
-    right: 9%;
-    bottom: 73px;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 3px;
-    padding: 7px;
-    background: #1a252a;
-    border: 2px solid #69767b;
-    border-radius: 4px;
-    transform: perspective(500px) rotateX(8deg);
-}
-
-.missile {
-    aspect-ratio: 1.8 / 1;
-    border: 1px solid #85949a;
-    border-radius: 2px;
-    background:
-        linear-gradient(90deg, #202c30 0 15%, #a2adb0 16% 22%, #3f4d51 23% 80%, #b5c0c1 81% 87%, #263338 88%);
-    cursor: pointer;
-    position: relative;
-    min-width: 0;
-    transition: .12s;
-}
-
-.missile::after {
-    content: "";
-    position: absolute;
-    right: -3px;
-    top: 25%;
-    width: 4px;
-    height: 50%;
-    border-radius: 50%;
-    background: #c5cacc;
-}
-
-.missile:hover:not(.used) {
-    transform: translateY(-3px);
-    box-shadow: 0 0 10px #f0d37c88;
-}
-
-.missile.used {
-    background: #101719;
-    border-color: #263338;
-    opacity: .35;
-    cursor: default;
-}
-
-.bank-label {
-    position: absolute;
-    left: 10%;
-    bottom: 48px;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: #a9b6ba;
-}
-
-.ammo-count {
-    position: absolute;
-    right: 10%;
-    bottom: 48px;
-    color: #7fd7e5;
-    font-size: 12px;
-}
-
-/* =========================================================
-   FIRE BUTTON / BATTLE HUD
-   ========================================================= */
-
-.fire-area {
-    position: absolute;
-    right: 22px;
-    bottom: 22px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.target-readout {
-    background: #07151cdd;
-    border: 1px solid #3a6975;
-    border-radius: 7px;
-    padding: 9px 13px;
-    font-size: 13px;
-    color: #c8e8ee;
-}
-
-.fire-btn {
-    min-width: 130px;
-    height: 46px;
-    border: 1px solid #d1a83d;
-    border-radius: 7px;
-    background:
-        linear-gradient(#7a5d16, #382b0a);
-    color: #fff4c8;
-    font-size: 17px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
-    box-shadow: 0 0 18px #c89d3544;
-}
-
-.fire-btn:hover:not(:disabled) {
-    background: linear-gradient(#96731d, #4a380c);
-}
-
-.fire-btn:disabled {
-    opacity: .35;
-    cursor: default;
-}
-
-.message {
-    position: absolute;
-    top: 14px;
+    bottom: -90px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10;
-    background: #061219dd;
-    border: 1px solid #4e7480;
-    padding: 9px 18px;
-    border-radius: 8px;
-    color: #d8eef2;
-    font-weight: bold;
-    white-space: nowrap;
-    box-shadow: 0 5px 18px #000;
+    width: 72%;
+    height: 150px;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: linear-gradient(90deg, #263336, #707a79 50%, #263336);
+    z-index: 3;
 }
 
-/* =========================================================
-   MISSILE ANIMATION
-   ========================================================= */
-
-.flying-missile {
+.shipTower {
     position: absolute;
-    width: 10px;
-    height: 34px;
-    background: linear-gradient(#d9e0df 0 20%, #6f7c7d 21% 80%, #222b2e 81%);
-    border-radius: 5px;
-    z-index: 20;
-    box-shadow:
-        0 0 8px #ffce62,
-        0 8px 14px #ff6a2166;
-    pointer-events: none;
-    animation: flyAway 1.15s ease-in forwards;
+    left: 50%;
+    top: 18px;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 90px;
+    background: linear-gradient(#536064, #222c2f);
+    border: 2px solid #12191b;
+    z-index: 4;
+    clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
 }
 
-.flying-missile::after {
+.shipTower::before {
     content: "";
     position: absolute;
-    width: 7px;
-    height: 28px;
-    left: 1px;
-    bottom: -24px;
-    background: linear-gradient(#ffeb83, #ff631e, transparent);
-    filter: blur(2px);
+    width: 65px;
+    height: 22px;
+    left: 41px;
+    top: 22px;
+    background: #0d181c;
+    border: 2px solid #7a9197;
 }
 
-@keyframes flyAway {
-    0% {
-        left: 50%;
-        bottom: 105px;
-        transform: rotate(0deg) scale(1);
-        opacity: 1;
-    }
-    100% {
-        left: 52%;
-        top: 36%;
-        transform: rotate(28deg) scale(.2);
-        opacity: .05;
-    }
-}
-
-.explosion {
+.shipTower::after {
+    content: "";
     position: absolute;
     width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle,
-            #fff 0 7%,
-            #ffd24d 8% 22%,
-            #ff6b27 23% 42%,
-            #b52b1e 43% 58%,
-            transparent 59%);
-    z-index: 21;
-    pointer-events: none;
-    animation: boom .65s ease-out forwards;
+    height: 5px;
+    left: 30px;
+    bottom: 15px;
+    background: #111a1c;
 }
 
-@keyframes boom {
-    0% { transform: scale(.2); opacity: 1; }
-    100% { transform: scale(1.6); opacity: 0; }
+.missileBank {
+    position: relative;
+    z-index: 8;
+    width: min(360px, 90%);
+    margin: 125px auto 0;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    padding: 9px;
+    border: 2px solid #20282a;
+    background: #101719;
+    box-shadow:
+        0 8px 15px rgba(0,0,0,.5),
+        inset 0 0 15px rgba(0,0,0,.8);
+}
+
+.missileCell {
+    aspect-ratio: 1 / 1;
+    border-radius: 3px;
+    background:
+        linear-gradient(
+            135deg,
+            #cfd9d8,
+            #657276 50%,
+            #303b3d
+        );
+    border: 1px solid #12191b;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.25);
+    position: relative;
+}
+
+.missileCell::after {
+    content: "";
+    position: absolute;
+    width: 55%;
+    height: 55%;
+    left: 22%;
+    top: 20%;
+    border-radius: 50%;
+    background: #10191c;
+}
+
+.missileCell.fired {
+    background: #171e20;
+    opacity: .45;
+}
+
+.missileCell.fired::after {
+    background: #05090a;
+}
+
+.ammoCaption {
+    position: relative;
+    z-index: 9;
+    text-align: center;
+    margin-top: 12px;
+    color: #d6e2e4;
+    font-size: 12px;
+    letter-spacing: 2px;
 }
 
 /* =========================================================
-   COMPUTER / END SCREEN
+   RESULT OVERLAY
    ========================================================= */
 
-.computer-status {
-    margin-top: 12px;
-    text-align: center;
-    color: #719da7;
-    font-size: 12px;
-}
-
-.end-overlay {
+#resultOverlay {
+    display: none;
     position: fixed;
     inset: 0;
-    background: #02070bd9;
-    display: none;
+    z-index: 100;
     align-items: center;
     justify-content: center;
-    z-index: 100;
-    padding: 20px;
+    background: rgba(0,8,13,.82);
+    backdrop-filter: blur(5px);
 }
 
-.end-card {
-    width: min(500px, 94vw);
-    background:
-        linear-gradient(145deg, #112c38, #07151c);
-    border: 1px solid #56818d;
-    border-radius: 14px;
-    padding: 35px;
+.resultBox {
+    width: min(90vw, 500px);
+    padding: 38px 25px;
     text-align: center;
-    box-shadow: 0 20px 70px #000;
+    background: linear-gradient(#102e3c, #06141c);
+    border: 2px solid #4d91a8;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(0,190,255,.25);
 }
 
-.end-card h1 {
-    font-family: Impact, sans-serif;
-    letter-spacing: 4px;
-    font-size: 48px;
-    margin: 0 0 12px;
+.resultTitle {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
 }
 
-.end-card p {
-    color: #a8c7ce;
+.resultMessage {
+    color: #a9d8e4;
+    margin-bottom: 25px;
 }
 
-.end-card button {
-    margin-top: 20px;
-    padding: 13px 28px;
-    background: #173d4b;
+.restartButton {
+    border: 2px solid #4c9ab4;
+    background: #103b4c;
     color: white;
-    border: 1px solid #6ba9b8;
-    border-radius: 7px;
+    padding: 13px 25px;
+    border-radius: 10px;
+    font-weight: 900;
     cursor: pointer;
-    font-size: 16px;
 }
 
 /* =========================================================
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 1050px) {
-    .battle-layout {
-        grid-template-columns: 290px minmax(0, 1fr);
-    }
-
-    .ocean-panel {
-        min-height: 650px;
-    }
-}
-
-@media (max-width: 780px) {
-    .battle-layout {
+@media (max-width: 850px) {
+    .lowerArea {
         grid-template-columns: 1fr;
     }
 
-    .radar-panel {
-        max-width: 470px;
+    .radarPanel {
+        max-width: 480px;
+        width: 100%;
         margin: auto;
+    }
+
+    .shipPanel {
         width: 100%;
     }
 
-    .ocean-panel {
-        min-height: 600px;
+    .ocean {
+        height: 190px;
     }
 
-    .missile-bank {
-        bottom: 70px;
-    }
-
-    .fire-area {
-        left: 15px;
-        right: 15px;
-        justify-content: center;
-    }
-
-    .message {
-        font-size: 11px;
+    .shipDeck {
+        min-height: 390px;
     }
 }
 
-@media (max-width: 520px) {
-    .screen {
-        padding: 12px;
-    }
-
-    .title {
-        font-size: 50px;
-        letter-spacing: 3px;
-    }
-
-    .subtitle {
-        letter-spacing: 3px;
-    }
-
-    .destroyer-art {
-        height: 160px;
-    }
-
-    .mode-btn {
-        width: 100%;
-    }
-
-    .logo-small {
-        font-size: 21px;
-    }
-
-    .status {
-        font-size: 11px;
-    }
-
-    .ocean-panel {
-        min-height: 500px;
-    }
-
-    .ship {
-        transform: translateX(-50%) scale(.78);
-        transform-origin: bottom center;
-    }
-
-    .target-readout {
-        font-size: 11px;
+@media (max-width: 500px) {
+    .battlefield {
         padding: 8px;
     }
 
-    .fire-btn {
-        min-width: 105px;
-        font-size: 14px;
+    .topBar {
+        height: 58px;
+    }
+
+    .statusBar {
+        font-size: 11px;
+    }
+
+    .shipDeck {
+        min-height: 350px;
+        padding: 10px;
+    }
+
+    .missileBank {
+        margin-top: 112px;
+        gap: 3px;
+        padding: 6px;
+    }
+
+    .shipTower {
+        width: 120px;
+        height: 75px;
+    }
+
+    .shipTower::before {
+        left: 32px;
+        width: 52px;
     }
 }
 </style>
@@ -943,169 +707,175 @@ button {
 
 <body>
 
-<div id="app">
+<!-- =======================================================
+     START SCREEN
+     ======================================================= -->
 
-    <!-- =====================================================
-         MODE SCREEN
-         ===================================================== -->
+<section id="startScreen">
 
-    <section id="startScreen" class="screen">
-        <div class="start-panel">
+    <div class="oceanGlow"></div>
 
-            <div class="title">NAVAL DESTROYER</div>
-            <div class="subtitle">TACTICAL MISSILE COMMAND</div>
+    <div class="startPanel">
 
-            <div class="destroyer-art">
-                <div class="cloud c1"></div>
-                <div class="cloud c2"></div>
-                <div class="cloud c3"></div>
+        <div class="shipBadge">⚓</div>
 
-                <div class="bow"></div>
-                <div class="bridge"></div>
-                <div class="window-line"></div>
+        <div class="gameLogo">NAVAL STRIKE</div>
+
+        <div class="subtitle">COMMAND • TARGET • FIRE</div>
+
+        <button class="modeButton" onclick="startGame('2PLAYER')">
+            ⚓ 2 PLAYER
+        </button>
+
+        <button class="modeButton" onclick="startGame('COMPUTER')">
+            🎯 VS COMPUTER
+        </button>
+
+        <button class="modeButton gameRoomButton" onclick="goGameRoom()">
+            GAME ROOM
+        </button>
+
+    </div>
+</section>
+
+
+<!-- =======================================================
+     GAME SCREEN
+     ======================================================= -->
+
+<section id="gameScreen">
+
+    <div class="topBar">
+
+        <div class="topTitle">
+            NAVAL STRIKE
+        </div>
+
+        <button class="roomButton" onclick="goGameRoom()">
+            GAME ROOM
+        </button>
+
+    </div>
+
+
+    <main class="battlefield">
+
+        <div class="statusBar">
+
+            <div class="statusText" id="statusText">
+                SELECT A RADAR TARGET
             </div>
 
-            <div class="mode-buttons">
-                <button class="mode-btn" id="twoPlayerBtn">
-                    ⚓ 2 PLAYER
-                </button>
-
-                <button class="mode-btn" id="computerBtn">
-                    ⚙ VS COMPUTER
-                </button>
+            <div class="ammoText">
+                MISSILES:
+                <span id="ammoCount">100</span>
             </div>
 
         </div>
-    </section>
 
 
-    <!-- =====================================================
-         GAME SCREEN
-         ===================================================== -->
+        <!-- OCEAN -->
 
-    <section id="gameScreen">
+        <section class="ocean" id="ocean">
 
-        <div class="game">
+            <div class="cloud c1"></div>
+            <div class="cloud c2"></div>
+            <div class="cloud c3"></div>
+            <div class="cloud c4"></div>
 
-            <div class="topbar">
-                <div class="logo-small">NAVAL DESTROYER</div>
-                <div class="status" id="turnStatus">TARGETING SYSTEM READY</div>
-                <button class="back-btn" id="backBtn">MENU</button>
+            <div class="hiddenFleet">
+                ⚓ 🚢 ⚓
             </div>
 
-            <div class="battle-layout">
+            <div class="oceanLabel">
+                ENEMY WATERS
+            </div>
 
-                <!-- RADAR -->
+            <div class="missile" id="missile"></div>
 
-                <div class="radar-panel">
+        </section>
 
-                    <div class="panel-heading">
-                        <h2>TACTICAL RADAR</h2>
-                        <span>10 × 10</span>
-                    </div>
 
-                    <div id="radar" class="radar"></div>
+        <section class="lowerArea">
 
-                    <div class="radar-labels">
-                        <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
-                        <span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
-                    </div>
+            <!-- RADAR -->
 
-                    <div class="radar-info" id="radarInfo">
-                        Select a radar square to designate your target.
-                    </div>
+            <div class="radarPanel">
 
-                    <div class="legend">
-                        <span><i class="lh"></i> HIT</span>
-                        <span><i class="lm"></i> MISS</span>
-                        <span><i class="lu"></i> UNKNOWN</span>
-                    </div>
-
-                    <div class="computer-status" id="computerStatus">
-                        ENEMY CONTACTS: UNKNOWN
-                    </div>
-
+                <div class="panelHeader">
+                    RADAR TARGETING SYSTEM
                 </div>
 
+                <div class="radarWrap">
 
-                <!-- DESTROYER -->
+                    <div class="radar" id="radar"></div>
 
-                <div class="ocean-panel" id="oceanPanel">
-
-                    <div class="sky"></div>
-                    <div class="horizon"></div>
-
-                    <div class="wave w1"></div>
-                    <div class="wave w2"></div>
-                    <div class="wave w3"></div>
-                    <div class="wave w4"></div>
-
-                    <div class="message" id="battleMessage">
-                        SELECT TARGET
-                    </div>
-
-                    <div class="ship">
-
-                        <div class="ship-hull"></div>
-                        <div class="deck"></div>
-                        <div class="deck-line"></div>
-
-                        <div class="bridge-house"></div>
-                        <div class="bridge-windows"></div>
-
-                        <div class="radar-mast"></div>
-                        <div class="radar-dish"></div>
-
-                        <div class="gun"></div>
-
-                        <div class="missile-bank" id="missileBank"></div>
-
-                        <div class="bank-label">
-                            MISSILE BANK — 100 CELLS
-                        </div>
-
-                        <div class="ammo-count" id="ammoCount">
-                            100 / 100
-                        </div>
-
-                    </div>
-
-                    <div class="fire-area">
-
-                        <div class="target-readout" id="targetReadout">
-                            TARGET: NONE
-                        </div>
-
-                        <button class="fire-btn" id="fireBtn" disabled>
-                            FIRE
-                        </button>
-
+                    <div class="radarLetters">
+                        <span>A</span>
+                        <span>B</span>
+                        <span>C</span>
+                        <span>D</span>
+                        <span>E</span>
+                        <span>F</span>
+                        <span>G</span>
+                        <span>H</span>
+                        <span>I</span>
+                        <span>J</span>
                     </div>
 
                 </div>
 
             </div>
 
+
+            <!-- SHIP -->
+
+            <div class="shipPanel">
+
+                <div class="panelHeader">
+                    FORWARD MISSILE DECK
+                </div>
+
+                <div class="shipDeck">
+
+                    <div class="shipTower"></div>
+
+                    <div class="missileBank" id="missileBank"></div>
+
+                    <div class="ammoCaption">
+                        100-CELL VERTICAL LAUNCH SYSTEM
+                    </div>
+
+                    <div class="shipBow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</section>
+
+
+<!-- =======================================================
+     RESULT
+     ======================================================= -->
+
+<div id="resultOverlay">
+
+    <div class="resultBox">
+
+        <div class="resultTitle" id="resultTitle">
+            TARGET DESTROYED
         </div>
 
-    </section>
+        <div class="resultMessage" id="resultMessage">
+            Enemy fleet eliminated.
+        </div>
 
-</div>
-
-
-<!-- =========================================================
-     END GAME
-     ========================================================= -->
-
-<div class="end-overlay" id="endOverlay">
-
-    <div class="end-card">
-
-        <h1 id="endTitle">MISSION COMPLETE</h1>
-
-        <p id="endText"></p>
-
-        <button id="playAgainBtn">
+        <button class="restartButton" onclick="restartGame()">
             PLAY AGAIN
         </button>
 
@@ -1115,184 +885,27 @@ button {
 
 
 <script>
-"use strict";
 
-/*
-    =========================================================
-    NAVAL DESTROYER
-    Single-file game engine
-
-    Board:
-        10 x 10
-
-    Enemy fleet:
-        Carrier   = 5
-        Battleship = 4
-        Cruiser   = 3
-        Submarine = 3
-        Destroyer = 2
-
-    Player weapons:
-        100 missile cells
-
-    The game engine is deliberately kept separate from
-    the visual interface so the same game can later be
-    connected to the Render multiplayer server.
-    =========================================================
-*/
-
-
-const SIZE = 10;
-
-const SHIPS = [
-    { name: "Carrier", length: 5 },
-    { name: "Battleship", length: 4 },
-    { name: "Cruiser", length: 3 },
-    { name: "Submarine", length: 3 },
-    { name: "Destroyer", length: 2 }
-];
-
-
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
-
-const radar = document.getElementById("radar");
-const missileBank = document.getElementById("missileBank");
-
-const fireBtn = document.getElementById("fireBtn");
-const backBtn = document.getElementById("backBtn");
-
-const targetReadout = document.getElementById("targetReadout");
-const radarInfo = document.getElementById("radarInfo");
-
-const ammoCount = document.getElementById("ammoCount");
-const battleMessage = document.getElementById("battleMessage");
-
-const turnStatus = document.getElementById("turnStatus");
-const computerStatus = document.getElementById("computerStatus");
-
-const endOverlay = document.getElementById("endOverlay");
-const endTitle = document.getElementById("endTitle");
-const endText = document.getElementById("endText");
-const playAgainBtn = document.getElementById("playAgainBtn");
-
-const twoPlayerBtn = document.getElementById("twoPlayerBtn");
-const computerBtn = document.getElementById("computerBtn");
-
+/* =========================================================
+   GAME VARIABLES
+   ========================================================= */
 
 let gameMode = null;
-
-let playerBoard = [];
-let enemyBoard = [];
-
-let playerShips = [];
-let enemyShips = [];
-
-let shots = new Set();
-
-let selectedTarget = null;
-
 let missilesRemaining = 100;
+let gameActive = false;
 
-let gameOver = false;
+let enemyBoard = [];
+let shots = [];
 
-let firing = false;
+let shipsRemaining = 17;
 
 
 /* =========================================================
-   BOARD FUNCTIONS
+   GAME ROOM
    ========================================================= */
 
-function emptyBoard() {
-
-    return Array.from(
-        { length: SIZE },
-        () => Array(SIZE).fill(null)
-    );
-}
-
-
-function randomFleet() {
-
-    const board = emptyBoard();
-    const ships = [];
-
-    for (const template of SHIPS) {
-
-        let placed = false;
-
-        while (!placed) {
-
-            const horizontal = Math.random() < 0.5;
-
-            const row = Math.floor(Math.random() * SIZE);
-            const col = Math.floor(Math.random() * SIZE);
-
-            const cells = [];
-
-            for (let i = 0; i < template.length; i++) {
-
-                const r = horizontal
-                    ? row
-                    : row + i;
-
-                const c = horizontal
-                    ? col + i
-                    : col;
-
-                if (
-                    r < 0 ||
-                    r >= SIZE ||
-                    c < 0 ||
-                    c >= SIZE
-                ) {
-                    cells.length = 0;
-                    break;
-                }
-
-                if (board[r][c] !== null) {
-                    cells.length = 0;
-                    break;
-                }
-
-                cells.push([r, c]);
-            }
-
-            if (cells.length !== template.length) {
-                continue;
-            }
-
-            const ship = {
-                name: template.name,
-                length: template.length,
-                cells,
-                hits: new Set()
-            };
-
-            ships.push(ship);
-
-            for (const [r, c] of cells) {
-                board[r][c] = ship;
-            }
-
-            placed = true;
-        }
-    }
-
-    return { board, ships };
-}
-
-
-function key(r, c) {
-    return `${r},${c}`;
-}
-
-
-function coordName(r, c) {
-
-    const letter = String.fromCharCode(65 + c);
-
-    return `${letter}${r + 1}`;
+function goGameRoom() {
+    window.location.href = "index.html";
 }
 
 
@@ -1304,140 +917,34 @@ function startGame(mode) {
 
     gameMode = mode;
 
-    const player = randomFleet();
-    const enemy = randomFleet();
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
 
-    playerBoard = player.board;
-    playerShips = player.ships;
-
-    enemyBoard = enemy.board;
-    enemyShips = enemy.ships;
-
-    shots.clear();
-
-    selectedTarget = null;
+    createMissileBank();
+    createRadar();
+    createEnemyFleet();
 
     missilesRemaining = 100;
+    shots = [];
+    shipsRemaining = 17;
+    gameActive = true;
 
-    gameOver = false;
-    firing = false;
+    updateAmmo();
 
-    startScreen.style.display = "none";
-    gameScreen.style.display = "block";
-
-    endOverlay.style.display = "none";
-
-    createRadar();
-    createMissileBank();
-
-    updateInterface();
-
-    if (gameMode === "computer") {
-
-        turnStatus.textContent = "YOUR TURN — SELECT TARGET";
-
-        battleMessage.textContent = "SELECT TARGET";
-
+    if (mode === "COMPUTER") {
+        setStatus("VS COMPUTER — SELECT A TARGET");
     } else {
-
-        /*
-            The multiplayer room screen is intentionally
-            part of this same file.
-
-            The actual Render room/server handshake will be
-            connected here without changing the game screen.
-        */
-
-        turnStatus.textContent = "2 PLAYER — ROOM READY";
-
-        battleMessage.textContent = "PLAYER 1 — SELECT TARGET";
+        setStatus("2 PLAYER — SELECT A TARGET");
     }
 }
 
 
 /* =========================================================
-   RADAR
+   STATUS
    ========================================================= */
 
-function createRadar() {
-
-    radar.innerHTML = "";
-
-    for (let r = 0; r < SIZE; r++) {
-
-        for (let c = 0; c < SIZE; c++) {
-
-            const cell = document.createElement("button");
-
-            cell.type = "button";
-
-            cell.className = "radar-cell";
-
-            cell.dataset.row = r;
-            cell.dataset.col = c;
-
-            cell.setAttribute(
-                "aria-label",
-                `Radar ${coordName(r, c)}`
-            );
-
-            cell.addEventListener("click", () => {
-
-                selectTarget(r, c);
-            });
-
-            radar.appendChild(cell);
-        }
-    }
-}
-
-
-function radarCell(r, c) {
-
-    return radar.querySelector(
-        `.radar-cell[data-row="${r}"][data-col="${c}"]`
-    );
-}
-
-
-function selectTarget(r, c) {
-
-    if (gameOver || firing) {
-        return;
-    }
-
-    const k = key(r, c);
-
-    if (shots.has(k)) {
-
-        radarInfo.textContent =
-            `${coordName(r, c)} has already been fired upon.`;
-
-        return;
-    }
-
-    document
-        .querySelectorAll(".radar-cell.selected")
-        .forEach(cell => {
-            cell.classList.remove("selected");
-        });
-
-    const cell = radarCell(r, c);
-
-    cell.classList.add("selected");
-
-    selectedTarget = { r, c };
-
-    targetReadout.textContent =
-        `TARGET: ${coordName(r, c)}`;
-
-    radarInfo.textContent =
-        `Target designated: ${coordName(r, c)}. Missile ready.`;
-
-    fireBtn.disabled = missilesRemaining <= 0;
-
-    battleMessage.textContent =
-        `TARGET ${coordName(r, c)} LOCKED`;
+function setStatus(text) {
+    document.getElementById("statusText").textContent = text;
 }
 
 
@@ -1447,331 +954,322 @@ function selectTarget(r, c) {
 
 function createMissileBank() {
 
-    missileBank.innerHTML = "";
+    const bank = document.getElementById("missileBank");
+
+    bank.innerHTML = "";
 
     for (let i = 0; i < 100; i++) {
 
-        const missile = document.createElement("button");
+        const cell = document.createElement("div");
 
-        missile.type = "button";
+        cell.className = "missileCell";
+        cell.id = "missileCell" + i;
 
-        missile.className = "missile";
-
-        missile.title = `Missile ${i + 1}`;
-
-        missile.dataset.index = i;
-
-        missileBank.appendChild(missile);
+        bank.appendChild(cell);
     }
 }
 
 
-function consumeMissile() {
+function updateAmmo() {
 
-    const missiles =
-        missileBank.querySelectorAll(".missile:not(.used)");
-
-    if (!missiles.length) {
-        return;
-    }
-
-    missiles[0].classList.add("used");
-
-    missilesRemaining--;
-
-    ammoCount.textContent =
-        `${missilesRemaining} / 100`;
+    document.getElementById("ammoCount").textContent =
+        missilesRemaining;
 }
 
 
 /* =========================================================
-   FIRING
+   RADAR
    ========================================================= */
 
-fireBtn.addEventListener("click", fireSelectedTarget);
+function createRadar() {
 
+    const radar = document.getElementById("radar");
 
-function fireSelectedTarget() {
+    radar.innerHTML = "";
 
-    if (
-        !selectedTarget ||
-        gameOver ||
-        firing ||
-        missilesRemaining <= 0
-    ) {
-        return;
+    for (let i = 0; i < 100; i++) {
+
+        const cell = document.createElement("div");
+
+        cell.className = "radarCell";
+        cell.dataset.index = i;
+
+        cell.addEventListener("click", function() {
+            fireAt(i);
+        });
+
+        radar.appendChild(cell);
     }
+}
 
-    firing = true;
 
-    fireBtn.disabled = true;
+/* =========================================================
+   ENEMY FLEET
+   ========================================================= */
 
-    consumeMissile();
+function createEnemyFleet() {
 
-    const { r, c } = selectedTarget;
+    enemyBoard = Array.from(
+        { length: 10 },
+        () => Array(10).fill(0)
+    );
 
-    const coordinate = coordName(r, c);
+    /*
+        Fleet:
 
-    shots.add(key(r, c));
+        Carrier     5
+        Battleship  4
+        Cruiser     3
+        Submarine   3
+        Destroyer   2
 
-    battleMessage.textContent =
-        `MISSILE AWAY — ${coordinate}`;
+        Total = 17
+    */
 
-    turnStatus.textContent =
-        "MISSILE IN FLIGHT";
+    const ships = [5, 4, 3, 3, 2];
 
-    launchMissile(() => {
-
-        resolveShot(r, c);
-
+    ships.forEach(length => {
+        placeShip(length);
     });
 }
 
 
-function launchMissile(callback) {
+function placeShip(length) {
 
-    const missile =
-        document.createElement("div");
+    let placed = false;
 
-    missile.className = "flying-missile";
+    while (!placed) {
 
-    document
-        .getElementById("oceanPanel")
-        .appendChild(missile);
+        const horizontal =
+            Math.random() < 0.5;
 
-    setTimeout(() => {
+        const row =
+            Math.floor(Math.random() * 10);
 
-        missile.remove();
+        const col =
+            Math.floor(Math.random() * 10);
 
-        callback();
+        if (horizontal) {
 
-    }, 1150);
-}
+            if (col + length > 10)
+                continue;
 
+            let clear = true;
 
-/* =========================================================
-   SHOT RESOLUTION
-   ========================================================= */
+            for (let x = 0; x < length; x++) {
 
-function resolveShot(r, c) {
+                if (enemyBoard[row][col + x] !== 0) {
+                    clear = false;
+                    break;
+                }
+            }
 
-    const ship = enemyBoard[r][c];
+            if (!clear)
+                continue;
 
-    const cell = radarCell(r, c);
+            for (let x = 0; x < length; x++) {
+                enemyBoard[row][col + x] = 1;
+            }
 
-    cell.classList.remove("selected");
-
-    selectedTarget = null;
-
-    targetReadout.textContent =
-        "TARGET: NONE";
-
-
-    if (ship) {
-
-        ship.hits.add(key(r, c));
-
-        cell.classList.add("hit");
-
-        createExplosion();
-
-        if (ship.hits.size === ship.length) {
-
-            battleMessage.textContent =
-                `${ship.name.toUpperCase()} DESTROYED`;
-
-            radarInfo.textContent =
-                `DIRECT HIT — ${ship.name} destroyed.`;
+            placed = true;
 
         } else {
 
-            battleMessage.textContent =
-                `DIRECT HIT — ${coordName(r, c)}`;
+            if (row + length > 10)
+                continue;
 
-            radarInfo.textContent =
-                `DIRECT HIT at ${coordName(r, c)}.`;
+            let clear = true;
 
+            for (let y = 0; y < length; y++) {
+
+                if (enemyBoard[row + y][col] !== 0) {
+                    clear = false;
+                    break;
+                }
+            }
+
+            if (!clear)
+                continue;
+
+            for (let y = 0; y < length; y++) {
+                enemyBoard[row + y][col] = 1;
+            }
+
+            placed = true;
         }
-
-        if (allShipsSunk(enemyShips)) {
-
-            finishGame(true);
-
-            return;
-        }
-
-    } else {
-
-        cell.classList.add("miss");
-
-        battleMessage.textContent =
-            `MISS — ${coordName(r, c)}`;
-
-        radarInfo.textContent =
-            `No contact at ${coordName(r, c)}.`;
     }
-
-
-    firing = false;
-
-    updateInterface();
-
-
-    if (
-        gameMode === "computer" &&
-        !gameOver
-    ) {
-
-        setTimeout(computerTurn, 800);
-
-    } else {
-
-        turnStatus.textContent =
-            "YOUR TURN — SELECT TARGET";
-    }
-}
-
-
-function createExplosion() {
-
-    const explosion =
-        document.createElement("div");
-
-    explosion.className = "explosion";
-
-    explosion.style.left =
-        `${42 + Math.random() * 16}%`;
-
-    explosion.style.top =
-        `${32 + Math.random() * 18}%`;
-
-    document
-        .getElementById("oceanPanel")
-        .appendChild(explosion);
-
-    setTimeout(() => {
-        explosion.remove();
-    }, 700);
 }
 
 
 /* =========================================================
-   COMPUTER
+   FIRE
    ========================================================= */
 
-let computerShots = new Set();
+function fireAt(index) {
 
-function computerTurn() {
+    if (!gameActive)
+        return;
 
-    if (gameOver) {
+    if (missilesRemaining <= 0) {
+        setStatus("NO MISSILES REMAIN");
         return;
     }
 
-    turnStatus.textContent =
-        "ENEMY DESTROYER — TARGETING";
+    if (shots.includes(index)) {
+        setStatus("TARGET ALREADY FIRED UPON");
+        return;
+    }
 
-    battleMessage.textContent =
-        "ENEMY MISSILE INCOMING";
+    shots.push(index);
 
-    let r;
-    let c;
+    missilesRemaining--;
+    updateAmmo();
 
-    do {
+    const missileCell =
+        document.getElementById(
+            "missileCell" + missilesRemaining
+        );
 
-        r = Math.floor(Math.random() * SIZE);
-        c = Math.floor(Math.random() * SIZE);
+    if (missileCell) {
+        missileCell.classList.add("fired");
+    }
 
-    } while (computerShots.has(key(r, c)));
+    const radarCell =
+        document.querySelector(
+            `.radarCell[data-index="${index}"]`
+        );
 
-    computerShots.add(key(r, c));
+    radarCell.classList.add("disabled");
+    radarCell.classList.add("targeted");
 
-    setTimeout(() => {
-
-        computerResolveShot(r, c);
-
-    }, 1000);
+    launchMissile(index, radarCell);
 }
 
 
-function computerResolveShot(r, c) {
+/* =========================================================
+   MISSILE ANIMATION
+   ========================================================= */
 
-    const ship = playerBoard[r][c];
+function launchMissile(index, radarCell) {
 
-    if (ship) {
+    const missile =
+        document.getElementById("missile");
 
-        ship.hits.add(key(r, c));
+    const ocean =
+        document.getElementById("ocean");
 
-        battleMessage.textContent =
-            `⚠ ENEMY HIT — ${coordName(r, c)}`;
+    const oceanRect =
+        ocean.getBoundingClientRect();
 
-        computerStatus.textContent =
-            `ENEMY CONTACT: HIT ${coordName(r, c)}`;
+    const targetRect =
+        radarCell.getBoundingClientRect();
 
-        if (ship.hits.size === ship.length) {
+    const startX =
+        oceanRect.width / 2 - 7;
 
-            computerStatus.textContent =
-                `⚠ ${ship.name.toUpperCase()} LOST`;
+    const startY =
+        oceanRect.height - 15;
 
-        }
+    const targetX =
+        targetRect.left +
+        targetRect.width / 2 -
+        oceanRect.left -
+        7;
 
-        if (allShipsSunk(playerShips)) {
+    const targetY =
+        targetRect.top +
+        targetRect.height / 2 -
+        oceanRect.top;
 
-            finishGame(false);
+    missile.style.display = "block";
+    missile.style.left = startX + "px";
+    missile.style.top = startY + "px";
+    missile.style.transform =
+        "rotate(0deg)";
+
+    const dx = targetX - startX;
+    const dy = targetY - startY;
+
+    const angle =
+        Math.atan2(dy, dx) * 180 / Math.PI + 90;
+
+    missile.style.transition =
+        "left .75s cubic-bezier(.2,.7,.3,1), " +
+        "top .75s cubic-bezier(.2,.7,.3,1), " +
+        "transform .2s";
+
+    missile.style.transform =
+        `rotate(${angle}deg)`;
+
+    requestAnimationFrame(() => {
+
+        missile.style.left = targetX + "px";
+        missile.style.top = targetY + "px";
+
+    });
+
+    setTimeout(() => {
+
+        missile.style.display = "none";
+
+        resolveShot(index, radarCell);
+
+    }, 800);
+}
+
+
+/* =========================================================
+   RESOLVE SHOT
+   ========================================================= */
+
+function resolveShot(index, radarCell) {
+
+    const row = Math.floor(index / 10);
+    const col = index % 10;
+
+    if (enemyBoard[row][col] === 1) {
+
+        radarCell.classList.remove("targeted");
+        radarCell.classList.add("hit");
+
+        shipsRemaining--;
+
+        setStatus("DIRECT HIT!");
+
+        if (shipsRemaining <= 0) {
+
+            endGame(
+                "TARGET DESTROYED",
+                "The enemy fleet has been eliminated."
+            );
 
             return;
         }
 
     } else {
 
-        battleMessage.textContent =
-            `ENEMY MISS — ${coordName(r, c)}`;
+        radarCell.classList.remove("targeted");
+        radarCell.classList.add("miss");
 
-        computerStatus.textContent =
-            `ENEMY CONTACT: MISS`;
+        setStatus("MISS — SCANNING FOR TARGET");
+
     }
 
-    turnStatus.textContent =
-        "YOUR TURN — SELECT TARGET";
+    if (missilesRemaining <= 0) {
 
-    battleMessage.textContent =
-        "SELECT TARGET";
+        setTimeout(() => {
 
-    firing = false;
+            if (gameActive) {
 
-    updateInterface();
-}
+                endGame(
+                    "OUT OF MISSILES",
+                    "The enemy fleet survived the attack."
+                );
 
+            }
 
-/* =========================================================
-   GAME STATE
-   ========================================================= */
-
-function allShipsSunk(ships) {
-
-    return ships.every(
-        ship => ship.hits.size >= ship.length
-    );
-}
-
-
-function updateInterface() {
-
-    ammoCount.textContent =
-        `${missilesRemaining} / 100`;
-
-    fireBtn.disabled =
-        !selectedTarget ||
-        firing ||
-        missilesRemaining <= 0 ||
-        gameOver;
-
-    const sunk =
-        enemyShips.filter(
-            ship => ship.hits.size >= ship.length
-        ).length;
-
-    computerStatus.textContent =
-        `ENEMY CONTACTS: ${sunk} / ${enemyShips.length} DESTROYED`;
+        }, 700);
+    }
 }
 
 
@@ -1779,109 +1277,32 @@ function updateInterface() {
    END GAME
    ========================================================= */
 
-function finishGame(playerWon) {
+function endGame(title, message) {
 
-    gameOver = true;
+    gameActive = false;
 
-    firing = false;
+    document.getElementById("resultTitle")
+        .textContent = title;
 
-    fireBtn.disabled = true;
+    document.getElementById("resultMessage")
+        .textContent = message;
 
-    if (playerWon) {
-
-        endTitle.textContent =
-            "ENEMY FLEET DESTROYED";
-
-        endText.textContent =
-            "Excellent work, Captain. All enemy vessels have been neutralized.";
-
-        battleMessage.textContent =
-            "MISSION SUCCESS";
-
-        turnStatus.textContent =
-            "MISSION COMPLETE";
-
-    } else {
-
-        endTitle.textContent =
-            "DESTROYER LOST";
-
-        endText.textContent =
-            "Your fleet has been destroyed.";
-
-        battleMessage.textContent =
-            "MISSION FAILED";
-
-        turnStatus.textContent =
-            "MISSION LOST";
-    }
-
-    setTimeout(() => {
-
-        endOverlay.style.display = "flex";
-
-    }, 700);
+    document.getElementById("resultOverlay")
+        .style.display = "flex";
 }
 
 
 /* =========================================================
-   MENU / RESTART
+   RESTART
    ========================================================= */
 
-backBtn.addEventListener("click", () => {
+function restartGame() {
 
-    gameScreen.style.display = "none";
-
-    startScreen.style.display = "flex";
-
-    gameOver = true;
-
-});
-
-
-playAgainBtn.addEventListener("click", () => {
-
-    endOverlay.style.display = "none";
+    document.getElementById("resultOverlay")
+        .style.display = "none";
 
     startGame(gameMode);
-});
-
-
-twoPlayerBtn.addEventListener("click", () => {
-
-    startGame("two-player");
-});
-
-
-computerBtn.addEventListener("click", () => {
-
-    startGame("computer");
-});
-
-
-/* =========================================================
-   KEYBOARD SUPPORT
-   ========================================================= */
-
-document.addEventListener("keydown", event => {
-
-    if (
-        event.key === "Escape" &&
-        gameScreen.style.display !== "none"
-    ) {
-
-        backBtn.click();
-    }
-
-});
-
-
-/* =========================================================
-   INITIAL STATE
-   ========================================================= */
-
-gameScreen.style.display = "none";
-startScreen.style.display = "flex";
+}
 
 </script>
 
