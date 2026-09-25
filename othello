@@ -1,0 +1,1742 @@
+<script>
+"use strict";
+
+/* =========================================================
+   OTHELLO
+   PLAYER 1 = BLACK
+   PLAYER 2 = IVORY
+========================================================= */
+
+const SIZE = 8;
+
+let boardState = [];
+let currentPlayer = "B";
+let gameOver = false;
+let computerThinking = false;
+let flipping = false;
+
+const directions = [
+    [-1,-1], [-1,0], [-1,1],
+    [0,-1],           [0,1],
+    [1,-1],  [1,0],   [1,1]
+];
+
+/* =========================================================
+   ROOM / PLAYER IDENTITY
+========================================================= */
+
+const params = new URLSearchParams(window.location.search);
+
+const roomId =
+    String(params.get("room") || "").trim();
+
+const rawPlayer =
+    String(params.get("player") || "").trim().toLowerCase();
+
+const playerNumber =
+    rawPlayer === "2" || rawPlayer === "player2"
+        ? "2"
+        : "1";
+
+const myColor =
+    playerNumber === "1" ? "B" : "W";
+
+const onlineMode = !!roomId;
+
+let socket = null;
+let socketConnected = false;
+
+let clientId =
+    "othello_" +
+    Date.now() +
+    "_" +
+    Math.random().toString(36).slice(2);
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const boardElement = document.getElementById("board");
+const turnText = document.getElementById("turnText");
+const message = document.getElementById("message");
+
+const blackScore = document.getElementById("blackScore");
+const whiteScore = document.getElementById("whiteScore");
+
+const blackPlayer = document.getElementById("blackPlayer");
+const whitePlayer = document.getElementById("whitePlayer");
+
+const modeSelect = document.getElementById("mode");
+const difficultySelect = document.getElementById("difficulty");
+const difficultyLabel = document.getElementById("difficultyLabel");
+
+const newGameButton = document.getElementById("newGame");
+const menuButton = document.getElementById("menu");
+
+/* =========================================================
+   INITIAL BOARD
+========================================================= */
+
+function createInitialBoard(sendOnline = true) {
+
+    boardState = Array.from(
+        { length: SIZE },
+        () => Array(SIZE).fill(null)
+    );
+
+    boardState[3][3] = "W";
+    boardState[3][4] = "B";
+    boardState[4][3] = "B";
+    boardState[4][4] = "W";
+
+    currentPlayer = "B";
+    gameOver = false;
+    computerThinking = false;
+    flipping = false;
+
+    if (onlineMode) {
+
+        message.textContent =
+            myColor === "B"
+                ? "YOU ARE BLACK — YOUR MOVE"
+                : "YOU ARE IVORY — WAITING FOR BLACK";
+
+    } else {
+
+        message.textContent =
+            modeSelect.value === "computer"
+                ? "YOUR MOVE"
+                : "PLACE A PIECE TO BEGIN";
+    }
+
+    renderBoard();
+
+    if (
+        onlineMode &&
+        sendOnline &&
+        socketConnected
+    ) {
+        sendState();
+    }
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function inBounds(row, col) {
+    return (
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    );
+}
+
+function opposite(player) {
+    return player === "B" ? "W" : "B";
+}
+
+/* =========================================================
+   AUTHORITATIVE OTHELLO MOVE CHECK
+========================================================= */
+
+/*
+   A legal Othello move MUST:
+
+   1. Be on an empty square.
+   2. Have at least one adjacent opponent piece.
+   3. Continue through one or more opponent pieces.
+   4. Eventually terminate at one of the player's own pieces.
+
+   ALL 8 directions are checked independently.
+*/
+
+function getFlipsOnPosition(state, row, col, player) {
+
+    if (!inBounds(row, col)) {
+        return [];
+    }
+
+    if (state[row][col] !== null) {
+        return [];
+    }
+
+    const enemy = opposite(player);
+    const flips = [];
+
+    for (let d = 0; d < directions.length; d++) {
+
+        const dr = directions[d][0];
+        const dc = directions[d][1];
+
+        let r = row + dr;
+        let c = col + dc;
+
+        const line = [];
+
+        /* First collect consecutive opponent pieces. */
+        while (
+            inBounds(r, c) &&
+            state[r][c] === enemy
+        ) {
+
+            line.push([r, c]);
+
+            r += dr;
+            c += dc;
+        }
+
+        /*
+           Only count the line if the opponent pieces
+           are terminated by our own piece.
+        */
+        if (
+            line.length > 0 &&
+            inBounds(r, c) &&
+            state[r][c] === player
+        ) {
+
+            for (const position of line) {
+                flips.push(position);
+            }
+        }
+    }
+
+    return flips;
+}
+
+/* =========================================================
+   CURRENT BOARD MOVE CHECK
+========================================================= */
+
+function getFlips(row, col, player) {
+
+    return getFlipsOnPosition(
+        boardState,
+        row,
+        col,
+        player
+    );
+}
+
+/* =========================================================
+   ALL LEGAL MOVES
+========================================================= */
+
+function getValidMoves(player) {
+
+    const moves = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if (boardState[row][col] !== null) {
+                continue;
+            }
+
+            const flips =
+                getFlipsOnPosition(
+                    boardState,
+                    row,
+                    col,
+                    player
+                );
+
+            if (flips.length > 0) {
+
+                moves.push({
+                    row,
+                    col,
+                    flips
+                });
+            }
+        }
+    }
+
+    return moves;
+}
+
+/* =========================================================
+   RENDER BOARD
+========================================================= */
+
+function renderBoard() {
+
+    boardElement.innerHTML = "";
+
+    const legalMoves =
+        gameOver
+            ? []
+            : getValidMoves(currentPlayer);
+
+    /*
+       Use a Set so every legal square is marked
+       directly from the authoritative move list.
+    */
+    const legalSet = new Set(
+        legalMoves.map(
+            move => `${move.row},${move.col}`
+        )
+    );
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const cell =
+                document.createElement("div");
+
+            cell.className = "cell";
+
+            if (legalSet.has(`${row},${col}`)) {
+                cell.classList.add("valid");
+            }
+
+            cell.addEventListener(
+                "click",
+                () => handleCellClick(row, col)
+            );
+
+            const value = boardState[row][col];
+
+            if (value) {
+
+                const piece =
+                    document.createElement("div");
+
+                piece.className =
+                    "piece " +
+                    (value === "B"
+                        ? "black"
+                        : "white");
+
+                cell.appendChild(piece);
+            }
+
+            boardElement.appendChild(cell);
+        }
+    }
+
+    updateScore();
+    updateTurn();
+}
+
+/* =========================================================
+   HUMAN CAN MOVE?
+========================================================= */
+
+function canHumanMove() {
+
+    if (
+        gameOver ||
+        flipping ||
+        computerThinking
+    ) {
+        return false;
+    }
+
+    if (onlineMode) {
+        return currentPlayer === myColor;
+    }
+
+    if (
+        modeSelect.value === "computer" &&
+        currentPlayer !== "B"
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+/* =========================================================
+   PLAYER CLICK
+========================================================= */
+
+function handleCellClick(row, col) {
+
+    if (!canHumanMove()) {
+        return;
+    }
+
+    /*
+       IMPORTANT:
+       Recalculate the move from the current authoritative
+       board instead of trusting the visual marker.
+    */
+    const flips =
+        getFlipsOnPosition(
+            boardState,
+            row,
+            col,
+            currentPlayer
+        );
+
+    if (flips.length === 0) {
+
+        message.textContent =
+            "THAT IS NOT A LEGAL MOVE";
+
+        return;
+    }
+
+    makeMove(
+        row,
+        col,
+        flips,
+        currentPlayer,
+        true
+    );
+}
+
+/* =========================================================
+   MAKE MOVE
+========================================================= */
+
+function makeMove(
+    row,
+    col,
+    flips,
+    player,
+    broadcast
+) {
+
+    /*
+       Apply the ENTIRE move to the actual game state
+       immediately.
+
+       This is the important fix.
+
+       The board never temporarily exists in a state where
+       the new piece is present but the captured pieces are
+       still the old color.
+    */
+
+    boardState[row][col] = player;
+
+    for (const [r, c] of flips) {
+        boardState[r][c] = player;
+    }
+
+    if (
+        onlineMode &&
+        broadcast
+    ) {
+
+        sendMove(
+            row,
+            col,
+            flips,
+            player
+        );
+    }
+
+    /*
+       Render the final logical position immediately.
+       Then animate the visual flips.
+    */
+    renderBoard();
+
+    if (flips.length === 0) {
+
+        finishTurn(
+            player,
+            broadcast
+        );
+
+        return;
+    }
+
+    animateFlips(
+        flips,
+        player,
+        broadcast
+    );
+}
+
+/* =========================================================
+   FLIP ANIMATION
+========================================================= */
+
+function animateFlips(
+    flips,
+    player,
+    broadcast
+) {
+
+    flipping = true;
+
+    /*
+       The state has already been changed above.
+       This function ONLY animates the visual pieces.
+    */
+
+    let completed = 0;
+
+    function complete() {
+
+        completed++;
+
+        if (completed >= flips.length) {
+
+            setTimeout(() => {
+
+                flipping = false;
+
+                renderBoard();
+
+                finishTurn(
+                    player,
+                    broadcast
+                );
+
+            }, 80);
+        }
+    }
+
+    flips.forEach(
+        ([row, col], index) => {
+
+            setTimeout(() => {
+
+                const cell =
+                    boardElement.children[
+                        row * SIZE + col
+                    ];
+
+                if (!cell) {
+                    complete();
+                    return;
+                }
+
+                const piece =
+                    cell.querySelector(".piece");
+
+                if (!piece) {
+                    complete();
+                    return;
+                }
+
+                /*
+                   The piece currently visually represents
+                   the old color. Flip it, then change its
+                   appearance halfway through the animation.
+                */
+
+                piece.classList.remove(
+                    "black",
+                    "white"
+                );
+
+                piece.classList.add("flip");
+
+                /*
+                   Determine the old color by looking at the
+                   fact that the game state is already updated.
+                   We therefore temporarily show the opposite
+                   face before switching to the new face.
+                */
+
+                piece.classList.add(
+                    player === "B"
+                        ? "white"
+                        : "black"
+                );
+
+                setTimeout(() => {
+
+                    piece.classList.remove(
+                        "black",
+                        "white"
+                    );
+
+                    piece.classList.add(
+                        player === "B"
+                            ? "black"
+                            : "white"
+                    );
+
+                }, 345);
+
+                setTimeout(() => {
+
+                    piece.classList.remove("flip");
+
+                    complete();
+
+                }, 700);
+
+            }, index * 65);
+        }
+    );
+}
+
+/* =========================================================
+   FINISH TURN
+========================================================= */
+
+function finishTurn(
+    playerWhoMoved,
+    broadcast = true
+) {
+
+    if (gameOver) {
+        return;
+    }
+
+    const nextPlayer =
+        opposite(playerWhoMoved);
+
+    const nextMoves =
+        getValidMoves(nextPlayer);
+
+    if (nextMoves.length > 0) {
+
+        currentPlayer = nextPlayer;
+
+        updateTurnMessage();
+        renderBoard();
+
+        if (
+            !onlineMode &&
+            modeSelect.value === "computer" &&
+            currentPlayer === "W"
+        ) {
+
+            startComputerTurn();
+        }
+
+        if (
+            onlineMode &&
+            broadcast
+        ) {
+
+            sendState();
+        }
+
+        return;
+    }
+
+    /*
+       Official Othello rule:
+       If the next player has no legal move,
+       that player passes and the previous player
+       gets another turn.
+    */
+
+    const samePlayerMoves =
+        getValidMoves(playerWhoMoved);
+
+    if (samePlayerMoves.length > 0) {
+
+        currentPlayer = playerWhoMoved;
+
+        message.textContent =
+            onlineMode
+                ? (
+                    currentPlayer === myColor
+                        ? "OPPONENT HAS NO MOVE — YOUR TURN"
+                        : "OPPONENT HAS NO MOVE"
+                )
+                : "NO LEGAL MOVE — PLAY AGAIN";
+
+        renderBoard();
+
+        if (
+            onlineMode &&
+            broadcast
+        ) {
+            sendState();
+        }
+
+        return;
+    }
+
+    endGame();
+
+    if (
+        onlineMode &&
+        broadcast
+    ) {
+        sendState();
+    }
+}
+
+/* =========================================================
+   TURN MESSAGE
+========================================================= */
+
+function updateTurnMessage() {
+
+    if (gameOver) {
+        return;
+    }
+
+    if (onlineMode) {
+
+        if (currentPlayer === myColor) {
+
+            message.textContent =
+                currentPlayer === "B"
+                    ? "YOUR MOVE — BLACK"
+                    : "YOUR MOVE — IVORY";
+
+        } else {
+
+            message.textContent =
+                currentPlayer === "B"
+                    ? "WAITING FOR BLACK"
+                    : "WAITING FOR IVORY";
+        }
+
+        return;
+    }
+
+    if (currentPlayer === "B") {
+
+        message.textContent =
+            modeSelect.value === "computer"
+                ? "YOUR MOVE"
+                : "BLACK'S TURN";
+
+    } else {
+
+        message.textContent =
+            modeSelect.value === "computer"
+                ? "COMPUTER IS THINKING..."
+                : "IVORY'S TURN";
+    }
+}
+
+/* =========================================================
+   COMPUTER
+========================================================= */
+
+function startComputerTurn() {
+
+    if (
+        gameOver ||
+        onlineMode ||
+        modeSelect.value !== "computer"
+    ) {
+        return;
+    }
+
+    computerThinking = true;
+
+    message.textContent =
+        "COMPUTER IS THINKING...";
+
+    setTimeout(() => {
+
+        if (gameOver) {
+
+            computerThinking = false;
+            return;
+        }
+
+        const moves =
+            getValidMoves("W");
+
+        if (!moves.length) {
+
+            computerThinking = false;
+
+            finishTurn("W");
+
+            return;
+        }
+
+        const selected =
+            chooseComputerMove(moves);
+
+        computerThinking = false;
+
+        makeMove(
+            selected.row,
+            selected.col,
+            selected.flips,
+            "W",
+            false
+        );
+
+    }, 650);
+}
+
+/* =========================================================
+   COMPUTER MOVE SELECTION
+========================================================= */
+
+function chooseComputerMove(moves) {
+
+    const difficulty =
+        difficultySelect.value;
+
+    if (difficulty === "easy") {
+
+        const weighted =
+            moves.map(move => ({
+                move,
+                score:
+                    move.flips.length +
+                    Math.random() * 5
+            }));
+
+        weighted.sort(
+            (a, b) => b.score - a.score
+        );
+
+        return weighted[0].move;
+    }
+
+    if (difficulty === "medium") {
+
+        let bestScore = -Infinity;
+        let bestMoves = [];
+
+        for (const move of moves) {
+
+            const score =
+                evaluateMove(move);
+
+            if (score > bestScore) {
+
+                bestScore = score;
+                bestMoves = [move];
+
+            } else if (score === bestScore) {
+
+                bestMoves.push(move);
+            }
+        }
+
+        return bestMoves[
+            Math.floor(
+                Math.random() * bestMoves.length
+            )
+        ];
+    }
+
+    let bestScore = -Infinity;
+    let bestMoves = [];
+
+    for (const move of moves) {
+
+        const simulated =
+            applyMoveToBoard(
+                boardState,
+                move,
+                "W"
+            );
+
+        const score =
+            minimax(
+                simulated,
+                "B",
+                3,
+                -Infinity,
+                Infinity
+            );
+
+        if (score > bestScore) {
+
+            bestScore = score;
+            bestMoves = [move];
+
+        } else if (score === bestScore) {
+
+            bestMoves.push(move);
+        }
+    }
+
+    return bestMoves[
+        Math.floor(
+            Math.random() * bestMoves.length
+        )
+    ];
+}
+
+/* =========================================================
+   POSITIONAL EVALUATION
+========================================================= */
+
+const positionWeights = [
+    [120,-25,20,5,5,20,-25,120],
+    [-25,-45,-5,-5,-5,-5,-45,-25],
+    [20,-5,15,3,3,15,-5,20],
+    [5,-5,3,3,3,3,-5,5],
+    [5,-5,3,3,3,3,-5,5],
+    [20,-5,15,3,3,15,-5,20],
+    [-25,-45,-5,-5,-5,-5,-45,-25],
+    [120,-25,20,5,5,20,-25,120]
+];
+
+function evaluateMove(move) {
+
+    let score =
+        move.flips.length * 3;
+
+    score +=
+        positionWeights[
+            move.row
+        ][
+            move.col
+        ];
+
+    const simulated =
+        applyMoveToBoard(
+            boardState,
+            move,
+            "W"
+        );
+
+    const opponentMoves =
+        getValidMovesOnBoard(
+            simulated,
+            "B"
+        );
+
+    score -=
+        opponentMoves.length * 2;
+
+    return score;
+}
+
+/* =========================================================
+   MINIMAX
+========================================================= */
+
+function minimax(
+    state,
+    player,
+    depth,
+    alpha,
+    beta
+) {
+
+    const moves =
+        getValidMovesOnBoard(
+            state,
+            player
+        );
+
+    const opponent =
+        opposite(player);
+
+    if (depth === 0) {
+        return evaluateBoard(state);
+    }
+
+    if (!moves.length) {
+
+        const opponentMoves =
+            getValidMovesOnBoard(
+                state,
+                opponent
+            );
+
+        if (!opponentMoves.length) {
+            return evaluateBoard(state);
+        }
+
+        return minimax(
+            state,
+            opponent,
+            depth - 1,
+            alpha,
+            beta
+        );
+    }
+
+    if (player === "W") {
+
+        let value = -Infinity;
+
+        for (const move of moves) {
+
+            const next =
+                applyMoveToBoard(
+                    state,
+                    move,
+                    player
+                );
+
+            value =
+                Math.max(
+                    value,
+                    minimax(
+                        next,
+                        "B",
+                        depth - 1,
+                        alpha,
+                        beta
+                    )
+                );
+
+            alpha =
+                Math.max(alpha, value);
+
+            if (alpha >= beta) {
+                break;
+            }
+        }
+
+        return value;
+
+    } else {
+
+        let value = Infinity;
+
+        for (const move of moves) {
+
+            const next =
+                applyMoveToBoard(
+                    state,
+                    move,
+                    player
+                );
+
+            value =
+                Math.min(
+                    value,
+                    minimax(
+                        next,
+                        "W",
+                        depth - 1,
+                        alpha,
+                        beta
+                    )
+                );
+
+            beta =
+                Math.min(beta, value);
+
+            if (alpha >= beta) {
+                break;
+            }
+        }
+
+        return value;
+    }
+}
+
+/* =========================================================
+   BOARD SIMULATION
+========================================================= */
+
+function cloneBoard(state) {
+
+    return state.map(
+        row => row.slice()
+    );
+}
+
+function applyMoveToBoard(
+    state,
+    move,
+    player
+) {
+
+    const next =
+        cloneBoard(state);
+
+    next[move.row][move.col] = player;
+
+    for (const [r, c] of move.flips) {
+        next[r][c] = player;
+    }
+
+    return next;
+}
+
+function getValidMovesOnBoard(
+    state,
+    player
+) {
+
+    const moves = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if (state[row][col] !== null) {
+                continue;
+            }
+
+            const flips =
+                getFlipsOnPosition(
+                    state,
+                    row,
+                    col,
+                    player
+                );
+
+            if (flips.length > 0) {
+
+                moves.push({
+                    row,
+                    col,
+                    flips
+                });
+            }
+        }
+    }
+
+    return moves;
+}
+
+/* =========================================================
+   BOARD EVALUATION
+========================================================= */
+
+function evaluateBoard(state) {
+
+    let score = 0;
+    let black = 0;
+    let white = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const value = state[row][col];
+
+            if (value === "W") {
+
+                white++;
+
+                score +=
+                    positionWeights[row][col];
+
+            } else if (value === "B") {
+
+                black++;
+
+                score -=
+                    positionWeights[row][col];
+            }
+        }
+    }
+
+    score +=
+        (white - black) * 2;
+
+    return score;
+}
+
+/* =========================================================
+   SCORE
+========================================================= */
+
+function updateScore() {
+
+    let black = 0;
+    let white = 0;
+
+    for (const row of boardState) {
+
+        for (const value of row) {
+
+            if (value === "B") {
+                black++;
+            }
+
+            if (value === "W") {
+                white++;
+            }
+        }
+    }
+
+    blackScore.textContent = black;
+    whiteScore.textContent = white;
+}
+
+/* =========================================================
+   TURN DISPLAY
+========================================================= */
+
+function updateTurn() {
+
+    if (gameOver) {
+        return;
+    }
+
+    if (currentPlayer === "B") {
+
+        turnText.textContent =
+            onlineMode
+                ? (
+                    myColor === "B"
+                        ? "YOUR TURN"
+                        : "BLACK'S TURN"
+                )
+                : "BLACK'S TURN";
+
+        blackPlayer.classList.add("active");
+        whitePlayer.classList.remove("active");
+
+    } else {
+
+        turnText.textContent =
+            onlineMode
+                ? (
+                    myColor === "W"
+                        ? "YOUR TURN"
+                        : "IVORY'S TURN"
+                )
+                : (
+                    modeSelect.value === "computer"
+                        ? "COMPUTER'S TURN"
+                        : "IVORY'S TURN"
+                );
+
+        whitePlayer.classList.add("active");
+        blackPlayer.classList.remove("active");
+    }
+}
+
+/* =========================================================
+   END GAME
+========================================================= */
+
+function endGame() {
+
+    gameOver = true;
+    computerThinking = false;
+
+    let black = 0;
+    let white = 0;
+
+    for (const row of boardState) {
+
+        for (const value of row) {
+
+            if (value === "B") black++;
+            if (value === "W") white++;
+        }
+    }
+
+    if (black > white) {
+
+        message.textContent =
+            `GAME OVER — BLACK ${black} / IVORY ${white}`;
+
+    } else if (white > black) {
+
+        message.textContent =
+            `GAME OVER — IVORY ${white} / BLACK ${black}`;
+
+    } else {
+
+        message.textContent =
+            `GAME OVER — DRAW ${black} / ${white}`;
+    }
+
+    turnText.textContent = "GAME OVER";
+
+    blackPlayer.classList.remove("active");
+    whitePlayer.classList.remove("active");
+}
+
+/* =========================================================
+   ONLINE WEBSOCKET
+========================================================= */
+
+function getWebSocketUrl(path) {
+
+    const protocol =
+        window.location.protocol === "https:"
+            ? "wss:"
+            : "ws:";
+
+    return (
+        protocol +
+        "//" +
+        window.location.host +
+        path
+    );
+}
+
+function connectOnline() {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    if (socket) {
+
+        try {
+            socket.close();
+        } catch (e) {}
+    }
+
+    message.textContent =
+        myColor === "B"
+            ? "CONNECTING — YOU ARE BLACK"
+            : "CONNECTING — YOU ARE IVORY";
+
+    try {
+
+        socket =
+            new WebSocket(
+                getWebSocketUrl("/othello")
+            );
+
+        socket.addEventListener(
+            "open",
+            () => {
+
+                socketConnected = true;
+
+                socket.send(
+                    JSON.stringify({
+                        type: "othelloJoin",
+                        game: "othello",
+                        room: roomId,
+                        player: playerNumber,
+                        color:
+                            myColor === "B"
+                                ? "black"
+                                : "white",
+                        clientId
+                    })
+                );
+
+                message.textContent =
+                    myColor === "B"
+                        ? "CONNECTED — YOU ARE BLACK"
+                        : "CONNECTED — YOU ARE IVORY";
+
+                /*
+                   Only BLACK establishes the initial
+                   authoritative online position.
+                */
+                if (myColor === "B") {
+                    sendState();
+                }
+            }
+        );
+
+        socket.addEventListener(
+            "message",
+            event => {
+
+                let data;
+
+                try {
+                    data = JSON.parse(event.data);
+                } catch (e) {
+                    return;
+                }
+
+                handleOnlineMessage(data);
+            }
+        );
+
+        socket.addEventListener(
+            "close",
+            () => {
+
+                socketConnected = false;
+
+                if (!gameOver) {
+                    message.textContent =
+                        "CONNECTION LOST";
+                }
+            }
+        );
+
+        socket.addEventListener(
+            "error",
+            () => {
+
+                socketConnected = false;
+
+                if (!gameOver) {
+                    message.textContent =
+                        "ONLINE CONNECTION ERROR";
+                }
+            }
+        );
+
+    } catch (error) {
+
+        socketConnected = false;
+
+        message.textContent =
+            "ONLINE CONNECTION ERROR";
+    }
+}
+
+/* =========================================================
+   ONLINE MESSAGE HANDLER
+========================================================= */
+
+function handleOnlineMessage(data) {
+
+    if (!data) {
+        return;
+    }
+
+    if (
+        data.clientId &&
+        data.clientId === clientId
+    ) {
+        return;
+    }
+
+    if (
+        data.game &&
+        String(data.game).toLowerCase() !== "othello"
+    ) {
+        return;
+    }
+
+    if (
+        data.room &&
+        String(data.room) !== roomId
+    ) {
+        return;
+    }
+
+    if (
+        data.roomId &&
+        String(data.roomId) !== roomId
+    ) {
+        return;
+    }
+
+    if (data.type === "othelloMove") {
+
+        receiveOnlineMove(data);
+        return;
+    }
+
+    if (data.type === "othelloState") {
+
+        receiveOnlineState(data);
+        return;
+    }
+
+    if (
+        data.type === "othelloJoin" ||
+        data.type === "othelloConnected"
+    ) {
+
+        if (!gameOver) {
+
+            message.textContent =
+                myColor === "B"
+                    ? "OPPONENT CONNECTED — YOUR MOVE"
+                    : "OPPONENT CONNECTED — WAITING FOR BLACK";
+        }
+    }
+}
+
+/* =========================================================
+   SEND MOVE
+========================================================= */
+
+function sendMove(
+    row,
+    col,
+    flips,
+    player
+) {
+
+    if (
+        !onlineMode ||
+        !socketConnected ||
+        !socket
+    ) {
+        return;
+    }
+
+    socket.send(
+        JSON.stringify({
+            type: "othelloMove",
+            game: "othello",
+            room: roomId,
+            player: playerNumber,
+            color:
+                player === "B"
+                    ? "black"
+                    : "white",
+            row,
+            col,
+            flips,
+            currentPlayer: opposite(player),
+            state: boardState,
+            clientId
+        })
+    );
+}
+
+/* =========================================================
+   SEND STATE
+========================================================= */
+
+function sendState() {
+
+    if (
+        !onlineMode ||
+        !socketConnected ||
+        !socket
+    ) {
+        return;
+    }
+
+    socket.send(
+        JSON.stringify({
+            type: "othelloState",
+            game: "othello",
+            room: roomId,
+            player: playerNumber,
+            state: boardState,
+            currentPlayer,
+            gameOver,
+            clientId
+        })
+    );
+}
+
+/* =========================================================
+   RECEIVE MOVE
+========================================================= */
+
+function receiveOnlineMove(data) {
+
+    if (
+        !onlineMode ||
+        gameOver ||
+        flipping
+    ) {
+        return;
+    }
+
+    if (currentPlayer === myColor) {
+        return;
+    }
+
+    const row = Number(data.row);
+    const col = Number(data.col);
+
+    const player =
+        data.color === "black"
+            ? "B"
+            : data.color === "white"
+                ? "W"
+                : data.player === "1"
+                    ? "B"
+                    : "W";
+
+    if (
+        !Number.isInteger(row) ||
+        !Number.isInteger(col) ||
+        !inBounds(row, col)
+    ) {
+        return;
+    }
+
+    if (player === myColor) {
+        return;
+    }
+
+    /*
+       NEVER trust the opponent's supplied flip list.
+       Calculate it locally from our authoritative board.
+    */
+    const flips =
+        getFlipsOnPosition(
+            boardState,
+            row,
+            col,
+            player
+        );
+
+    if (flips.length === 0) {
+        return;
+    }
+
+    makeMove(
+        row,
+        col,
+        flips,
+        player,
+        false
+    );
+}
+
+/* =========================================================
+   RECEIVE FULL STATE
+========================================================= */
+
+function receiveOnlineState(data) {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    if (
+        !Array.isArray(data.state) ||
+        data.state.length !== SIZE
+    ) {
+        return;
+    }
+
+    for (let row = 0; row < SIZE; row++) {
+
+        if (
+            !Array.isArray(data.state[row]) ||
+            data.state[row].length !== SIZE
+        ) {
+            return;
+        }
+    }
+
+    if (flipping) {
+        return;
+    }
+
+    boardState =
+        data.state.map(
+            row =>
+                row.map(
+                    value =>
+                        value === "B" ||
+                        value === "W"
+                            ? value
+                            : null
+                )
+        );
+
+    currentPlayer =
+        data.currentPlayer === "W"
+            ? "W"
+            : "B";
+
+    gameOver = !!data.gameOver;
+
+    renderBoard();
+
+    if (gameOver) {
+        endGame();
+        return;
+    }
+
+    updateTurnMessage();
+}
+
+/* =========================================================
+   MODE CHANGE
+========================================================= */
+
+modeSelect.addEventListener(
+    "change",
+    () => {
+
+        if (onlineMode) {
+            return;
+        }
+
+        const computer =
+            modeSelect.value === "computer";
+
+        difficultySelect.style.display =
+            computer ? "" : "none";
+
+        difficultyLabel.style.display =
+            computer ? "" : "none";
+
+        createInitialBoard();
+    }
+);
+
+/* =========================================================
+   DIFFICULTY CHANGE
+========================================================= */
+
+difficultySelect.addEventListener(
+    "change",
+    () => {
+
+        if (
+            !onlineMode &&
+            modeSelect.value === "computer" &&
+            !gameOver &&
+            currentPlayer === "W"
+        ) {
+
+            message.textContent =
+                "COMPUTER IS THINKING...";
+        }
+    }
+);
+
+/* =========================================================
+   NEW GAME
+========================================================= */
+
+newGameButton.addEventListener(
+    "click",
+    () => {
+
+        if (onlineMode) {
+
+            if (myColor === "B") {
+
+                createInitialBoard(true);
+
+            } else {
+
+                message.textContent =
+                    "BLACK MUST START THE NEW GAME";
+            }
+
+            return;
+        }
+
+        createInitialBoard();
+    }
+);
+
+/* =========================================================
+   MENU
+========================================================= */
+
+menuButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "index.html";
+    }
+);
+
+/* =========================================================
+   INITIAL UI
+========================================================= */
+
+if (onlineMode) {
+
+    modeSelect.value = "local";
+    modeSelect.disabled = true;
+
+    difficultySelect.style.display = "none";
+    difficultyLabel.style.display = "none";
+
+} else {
+
+    difficultySelect.style.display = "none";
+    difficultyLabel.style.display = "none";
+}
+
+createInitialBoard(false);
+
+if (onlineMode) {
+    connectOnline();
+}
+</script>
