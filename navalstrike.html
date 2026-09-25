@@ -441,10 +441,6 @@ body {
     font-size: 12px;
 }
 
-/* =========================================================
-   STATUS
-========================================================= */
-
 #statusBox {
     margin-top: 20px;
 
@@ -880,162 +876,180 @@ body {
 <body>
 
 <div id="viewport">
-    <div id="stage">
 
-        <!-- =================================================
-             START SCREEN
-        ================================================== -->
+<div id="stage">
 
-        <div id="startScreen">
+<!-- =====================================================
+     START SCREEN
+===================================================== -->
 
-            <h1>NAVAL STRIKE</h1>
+<div id="startScreen">
 
-            <div class="subtitle">
-                MODERN NAVAL COMBAT
-            </div>
+    <h1>NAVAL STRIKE</h1>
 
-            <div class="startButtons">
-                <button class="startButton" onclick="startGame('2player')">
-                    2 PLAYER
-                </button>
+    <div class="subtitle">
+        MODERN NAVAL COMBAT
+    </div>
 
-                <button class="startButton" onclick="startGame('computer')">
-                    VS COMPUTER
-                </button>
-            </div>
+    <div class="startButtons">
 
-            <div class="startFooter">
-                SELECT YOUR TARGET • FIRE • DESTROY THE ENEMY FLEET
-            </div>
+        <button
+            class="startButton"
+            onclick="startGame('2player')">
+            2 PLAYER
+        </button>
 
+        <button
+            class="startButton"
+            onclick="startGame('computer')">
+            VS COMPUTER
+        </button>
+
+    </div>
+
+    <div class="startFooter">
+        SELECT YOUR TARGET • FIRE • DESTROY THE ENEMY FLEET
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     GAME SCREEN
+===================================================== -->
+
+<div id="gameScreen">
+
+    <div class="topBar">
+
+        <div class="gameTitle">
+            NAVAL STRIKE
         </div>
 
-        <!-- =================================================
-             GAME SCREEN
-        ================================================== -->
-
-        <div id="gameScreen">
-
-            <div class="topBar">
-
-                <div class="gameTitle">
-                    NAVAL STRIKE
-                </div>
-
-                <div id="turnDisplay" class="turnDisplay">
-                    READY
-                </div>
-
-                <button class="roomButton" onclick="returnToGameRoom()">
-                    GAME ROOM
-                </button>
-
-            </div>
-
-            <!-- RADAR -->
-
-            <div id="radarPanel">
-
-                <div class="panelTitle">
-                    TARGETING RADAR
-                </div>
-
-                <div id="radar"></div>
-
-                <div class="radarLabels">
-                    <span>A</span>
-                    <span>B</span>
-                    <span>C</span>
-                    <span>D</span>
-                    <span>E</span>
-                    <span>F</span>
-                    <span>G</span>
-                    <span>H</span>
-                    <span>I</span>
-                    <span>J</span>
-                </div>
-
-                <div id="statusBox">
-                    SELECT A TARGET
-                </div>
-
-            </div>
-
-            <!-- OCEAN -->
-
-            <div id="ocean">
-
-                <div class="cloud cloud1"></div>
-                <div class="cloud cloud2"></div>
-                <div class="cloud cloud3"></div>
-
-                <div class="wave wave1"></div>
-                <div class="wave wave2"></div>
-                <div class="wave wave3"></div>
-                <div class="wave wave4"></div>
-
-            </div>
-
-            <!-- DESTROYER -->
-
-            <div id="destroyer">
-
-                <div class="shipWake"></div>
-
-                <div class="shipHull"></div>
-
-                <div class="shipDeck"></div>
-
-                <div class="bridge"></div>
-
-                <div class="bridgeWindow"></div>
-
-                <div class="mast"></div>
-
-                <div class="gun"></div>
-
-                <!-- 100 MISSILES -->
-
-                <div id="missileBank"></div>
-
-            </div>
-
-            <div id="flyingMissile"></div>
-
+        <div
+            id="turnDisplay"
+            class="turnDisplay">
+            READY
         </div>
 
-        <!-- RESULT -->
+        <button
+            class="roomButton"
+            onclick="returnToGameRoom()">
+            GAME ROOM
+        </button>
 
-        <div id="resultOverlay">
+    </div>
 
-            <div class="resultBox">
 
-                <h2 id="resultTitle">
-                    VICTORY
-                </h2>
+    <!-- RADAR -->
 
-                <p id="resultMessage">
-                    Enemy fleet destroyed.
-                </p>
+    <div id="radarPanel">
 
-                <div class="resultButtons">
+        <div class="panelTitle">
+            TARGETING RADAR
+        </div>
 
-                    <button onclick="restartGame()">
-                        PLAY AGAIN
-                    </button>
+        <div id="radar"></div>
 
-                    <button onclick="returnToGameRoom()">
-                        GAME ROOM
-                    </button>
+        <div class="radarLabels">
+            <span>A</span>
+            <span>B</span>
+            <span>C</span>
+            <span>D</span>
+            <span>E</span>
+            <span>F</span>
+            <span>G</span>
+            <span>H</span>
+            <span>I</span>
+            <span>J</span>
+        </div>
 
-                </div>
+        <div id="statusBox">
+            SELECT A TARGET
+        </div>
 
-            </div>
+    </div>
+
+
+    <!-- OCEAN -->
+
+    <div id="ocean">
+
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+        <div class="wave wave3"></div>
+        <div class="wave wave4"></div>
+
+    </div>
+
+
+    <!-- DESTROYER -->
+
+    <div id="destroyer">
+
+        <div class="shipWake"></div>
+
+        <div class="shipHull"></div>
+
+        <div class="shipDeck"></div>
+
+        <div class="bridge"></div>
+
+        <div class="bridgeWindow"></div>
+
+        <div class="mast"></div>
+
+        <div class="gun"></div>
+
+        <div id="missileBank"></div>
+
+    </div>
+
+
+    <div id="flyingMissile"></div>
+
+</div>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div id="resultOverlay">
+
+    <div class="resultBox">
+
+        <h2 id="resultTitle">
+            VICTORY
+        </h2>
+
+        <p id="resultMessage">
+            Enemy fleet destroyed.
+        </p>
+
+        <div class="resultButtons">
+
+            <button onclick="restartGame()">
+                PLAY AGAIN
+            </button>
+
+            <button onclick="returnToGameRoom()">
+                GAME ROOM
+            </button>
 
         </div>
 
     </div>
+
 </div>
+
+</div>
+</div>
+
 
 <script>
 
@@ -1046,26 +1060,44 @@ body {
 const DESIGN_WIDTH = 1600;
 const DESIGN_HEIGHT = 900;
 
-const stage = document.getElementById("stage");
+const stage =
+    document.getElementById("stage");
 
 function resizeStage() {
 
-    const availableWidth = window.innerWidth;
-    const availableHeight = window.innerHeight;
+    const availableWidth =
+        window.innerWidth;
 
-    const scaleX = availableWidth / DESIGN_WIDTH;
-    const scaleY = availableHeight / DESIGN_HEIGHT;
+    const availableHeight =
+        window.innerHeight;
 
-    const scale = Math.min(scaleX, scaleY);
+    const scaleX =
+        availableWidth / DESIGN_WIDTH;
+
+    const scaleY =
+        availableHeight / DESIGN_HEIGHT;
+
+    const scale =
+        Math.min(scaleX, scaleY);
 
     stage.style.transform =
-        "translate(-50%, -50%) scale(" + scale + ")";
+        "translate(-50%, -50%) scale(" +
+        scale +
+        ")";
 }
 
-window.addEventListener("resize", resizeStage);
-window.addEventListener("orientationchange", resizeStage);
+window.addEventListener(
+    "resize",
+    resizeStage
+);
+
+window.addEventListener(
+    "orientationchange",
+    resizeStage
+);
 
 if (window.visualViewport) {
+
     window.visualViewport.addEventListener(
         "resize",
         resizeStage
@@ -1073,6 +1105,588 @@ if (window.visualViewport) {
 }
 
 resizeStage();
+
+
+/* =========================================================
+   SOUND ENGINE
+========================================================= */
+
+let audioContext = null;
+let masterGain = null;
+let oceanGain = null;
+let oceanStarted = false;
+
+
+/*
+   Browsers require a user interaction before
+   Web Audio can begin.
+
+   The Start button calls initAudio().
+*/
+
+function initAudio() {
+
+    if (!audioContext) {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+        masterGain =
+            audioContext.createGain();
+
+        masterGain.gain.value =
+            0.55;
+
+        masterGain.connect(
+            audioContext.destination
+        );
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+
+    startOceanSound();
+}
+
+
+/* =========================================================
+   BASIC TONE
+========================================================= */
+
+function tone(
+    frequency,
+    duration,
+    volume,
+    type = "sine",
+    startFrequency = null
+) {
+
+    if (!audioContext) {
+        return;
+    }
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type =
+        type;
+
+    oscillator.frequency.setValueAtTime(
+        startFrequency || frequency,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        Math.max(20, frequency),
+        now + duration
+    );
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        volume,
+        now + 0.015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(masterGain);
+
+    oscillator.start(now);
+    oscillator.stop(now + duration + 0.02);
+}
+
+
+/* =========================================================
+   NOISE
+========================================================= */
+
+function noise(
+    duration,
+    volume,
+    filterFrequency = 1000
+) {
+
+    if (!audioContext) {
+        return;
+    }
+
+    const bufferSize =
+        audioContext.sampleRate *
+        duration;
+
+    const buffer =
+        audioContext.createBuffer(
+            1,
+            bufferSize,
+            audioContext.sampleRate
+        );
+
+    const data =
+        buffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+
+        data[i] =
+            Math.random() * 2 - 1;
+    }
+
+    const source =
+        audioContext.createBufferSource();
+
+    source.buffer =
+        buffer;
+
+    const filter =
+        audioContext.createBiquadFilter();
+
+    filter.type =
+        "lowpass";
+
+    filter.frequency.value =
+        filterFrequency;
+
+    const gain =
+        audioContext.createGain();
+
+    const now =
+        audioContext.currentTime;
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        volume,
+        now + 0.01
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+    );
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    source.start(now);
+}
+
+
+/* =========================================================
+   BUTTON SOUND
+========================================================= */
+
+function soundButton() {
+
+    tone(
+        720,
+        0.08,
+        0.09,
+        "square"
+    );
+
+    setTimeout(() => {
+
+        tone(
+            1050,
+            0.07,
+            0.07,
+            "square"
+        );
+
+    }, 45);
+}
+
+
+/* =========================================================
+   RADAR BEEP
+========================================================= */
+
+function soundRadar() {
+
+    tone(
+        950,
+        0.08,
+        0.08,
+        "sine",
+        650
+    );
+}
+
+
+/* =========================================================
+   MISSILE LAUNCH
+========================================================= */
+
+function soundLaunch() {
+
+    if (!audioContext) {
+        return;
+    }
+
+    tone(
+        90,
+        0.65,
+        0.23,
+        "sawtooth",
+        45
+    );
+
+    setTimeout(() => {
+
+        noise(
+            0.25,
+            0.16,
+            2600
+        );
+
+    }, 30);
+
+    setTimeout(() => {
+
+        tone(
+            180,
+            0.3,
+            0.12,
+            "square",
+            70
+        );
+
+    }, 100);
+}
+
+
+/* =========================================================
+   MISSILE FLIGHT
+========================================================= */
+
+function soundMissileFlight() {
+
+    if (!audioContext) {
+        return;
+    }
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type =
+        "sawtooth";
+
+    oscillator.frequency.setValueAtTime(
+        400,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        1800,
+        now + 0.65
+    );
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.09,
+        now + 0.08
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.68
+    );
+
+    oscillator.connect(gain);
+    gain.connect(masterGain);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.7);
+}
+
+
+/* =========================================================
+   HIT
+========================================================= */
+
+function soundHit() {
+
+    if (!audioContext) {
+        return;
+    }
+
+    noise(
+        0.65,
+        0.35,
+        1700
+    );
+
+    tone(
+        65,
+        0.75,
+        0.32,
+        "sine",
+        145
+    );
+
+    setTimeout(() => {
+
+        tone(
+            42,
+            0.5,
+            0.22,
+            "sine",
+            80
+        );
+
+    }, 80);
+
+    setTimeout(() => {
+
+        noise(
+            0.35,
+            0.12,
+            700
+        );
+
+    }, 250);
+}
+
+
+/* =========================================================
+   MISS / WATER IMPACT
+========================================================= */
+
+function soundMiss() {
+
+    noise(
+        0.55,
+        0.19,
+        1100
+    );
+
+    tone(
+        210,
+        0.5,
+        0.08,
+        "sine",
+        420
+    );
+
+    setTimeout(() => {
+
+        tone(
+            125,
+            0.35,
+            0.05,
+            "sine",
+            260
+        );
+
+    }, 90);
+}
+
+
+/* =========================================================
+   TURN SOUND
+========================================================= */
+
+function soundTurn() {
+
+    tone(
+        650,
+        0.12,
+        0.1,
+        "sine"
+    );
+
+    setTimeout(() => {
+
+        tone(
+            900,
+            0.18,
+            0.1,
+            "sine"
+        );
+
+    }, 130);
+}
+
+
+/* =========================================================
+   VICTORY SOUND
+========================================================= */
+
+function soundVictory() {
+
+    tone(
+        523,
+        0.25,
+        0.13,
+        "sine"
+    );
+
+    setTimeout(() => {
+
+        tone(
+            659,
+            0.25,
+            0.13,
+            "sine"
+        );
+
+    }, 180);
+
+    setTimeout(() => {
+
+        tone(
+            784,
+            0.4,
+            0.16,
+            "sine"
+        );
+
+    }, 360);
+
+    setTimeout(() => {
+
+        tone(
+            1047,
+            0.7,
+            0.18,
+            "sine"
+        );
+
+    }, 550);
+}
+
+
+/* =========================================================
+   DEFEAT SOUND
+========================================================= */
+
+function soundDefeat() {
+
+    tone(
+        330,
+        0.35,
+        0.12,
+        "sine"
+    );
+
+    setTimeout(() => {
+
+        tone(
+            247,
+            0.45,
+            0.13,
+            "sine"
+        );
+
+    }, 280);
+
+    setTimeout(() => {
+
+        tone(
+            165,
+            0.75,
+            0.16,
+            "sine"
+        );
+
+    }, 600);
+}
+
+
+/* =========================================================
+   OCEAN AMBIENCE
+========================================================= */
+
+function startOceanSound() {
+
+    if (oceanStarted) {
+        return;
+    }
+
+    oceanStarted = true;
+
+    const buffer =
+        audioContext.createBuffer(
+            1,
+            audioContext.sampleRate * 3,
+            audioContext.sampleRate
+        );
+
+    const data =
+        buffer.getChannelData(0);
+
+    for (
+        let i = 0;
+        i < data.length;
+        i++
+    ) {
+
+        data[i] =
+            Math.random() * 2 - 1;
+    }
+
+    const source =
+        audioContext.createBufferSource();
+
+    source.buffer =
+        buffer;
+
+    source.loop =
+        true;
+
+    const filter =
+        audioContext.createBiquadFilter();
+
+    filter.type =
+        "lowpass";
+
+    filter.frequency.value =
+        480;
+
+    oceanGain =
+        audioContext.createGain();
+
+    oceanGain.gain.value =
+        0.018;
+
+    source.connect(filter);
+    filter.connect(oceanGain);
+    oceanGain.connect(masterGain);
+
+    source.start();
+}
+
 
 /* =========================================================
    GAME VARIABLES
@@ -1087,10 +1701,17 @@ let enemyFleet = [];
 let missilesRemaining = 100;
 let gameOver = false;
 
-const radar = document.getElementById("radar");
-const missileBank = document.getElementById("missileBank");
-const statusBox = document.getElementById("statusBox");
-const turnDisplay = document.getElementById("turnDisplay");
+const radar =
+    document.getElementById("radar");
+
+const missileBank =
+    document.getElementById("missileBank");
+
+const statusBox =
+    document.getElementById("statusBox");
+
+const turnDisplay =
+    document.getElementById("turnDisplay");
 
 const flyingMissile =
     document.getElementById("flyingMissile");
@@ -1104,8 +1725,9 @@ const resultTitle =
 const resultMessage =
     document.getElementById("resultMessage");
 
+
 /* =========================================================
-   BUILD MISSILE BANK
+   MISSILE BANK
 ========================================================= */
 
 function buildMissileBank() {
@@ -1114,18 +1736,22 @@ function buildMissileBank() {
 
     for (let i = 0; i < 100; i++) {
 
-        const cell = document.createElement("div");
+        const cell =
+            document.createElement("div");
 
-        cell.className = "missileCell";
+        cell.className =
+            "missileCell";
 
-        cell.dataset.index = i;
+        cell.dataset.index =
+            i;
 
         missileBank.appendChild(cell);
     }
 }
 
+
 /* =========================================================
-   BUILD RADAR
+   RADAR
 ========================================================= */
 
 function buildRadar() {
@@ -1136,16 +1762,39 @@ function buildRadar() {
 
         for (let col = 0; col < 10; col++) {
 
-            const cell = document.createElement("div");
+            const cell =
+                document.createElement("div");
 
-            cell.className = "radarCell";
+            cell.className =
+                "radarCell";
 
-            cell.dataset.row = row;
-            cell.dataset.col = col;
+            cell.dataset.row =
+                row;
+
+            cell.dataset.col =
+                col;
+
+            cell.addEventListener(
+                "mouseenter",
+                () => {
+
+                    if (!gameOver) {
+                        soundRadar();
+                    }
+                }
+            );
 
             cell.addEventListener(
                 "click",
-                () => fireAt(row, col)
+                () => {
+
+                    soundButton();
+
+                    fireAt(
+                        row,
+                        col
+                    );
+                }
             );
 
             radar.appendChild(cell);
@@ -1153,23 +1802,14 @@ function buildRadar() {
     }
 }
 
+
 /* =========================================================
-   RANDOM FLEET
+   FLEET
 ========================================================= */
 
 function createFleet() {
 
     const fleet = [];
-
-    /*
-       Simple fleet:
-
-       Carrier 5
-       Battleship 4
-       Cruiser 3
-       Submarine 3
-       Destroyer 2
-    */
 
     const ships = [
         5,
@@ -1189,20 +1829,32 @@ function createFleet() {
                 Math.random() < 0.5;
 
             const row =
-                Math.floor(Math.random() * 10);
+                Math.floor(
+                    Math.random() * 10
+                );
 
             const col =
-                Math.floor(Math.random() * 10);
+                Math.floor(
+                    Math.random() * 10
+                );
 
             const cells = [];
 
-            for (let i = 0; i < length; i++) {
+            for (
+                let i = 0;
+                i < length;
+                i++
+            ) {
 
                 const r =
-                    horizontal ? row : row + i;
+                    horizontal
+                        ? row
+                        : row + i;
 
                 const c =
-                    horizontal ? col + i : col;
+                    horizontal
+                        ? col + i
+                        : col;
 
                 if (
                     r < 0 ||
@@ -1213,20 +1865,35 @@ function createFleet() {
                     break;
                 }
 
-                cells.push(r + "," + c);
+                cells.push(
+                    r + "," + c
+                );
             }
 
-            if (cells.length !== length) {
+            if (
+                cells.length !==
+                length
+            ) {
                 continue;
             }
 
             let conflict = false;
 
-            for (const existing of fleet) {
+            for (
+                const existing
+                of fleet
+            ) {
 
-                for (const occupied of existing) {
+                for (
+                    const occupied
+                    of existing
+                ) {
 
-                    if (cells.includes(occupied)) {
+                    if (
+                        cells.includes(
+                            occupied
+                        )
+                    ) {
                         conflict = true;
                     }
                 }
@@ -1234,7 +1901,9 @@ function createFleet() {
 
             if (!conflict) {
 
-                fleet.push(cells);
+                fleet.push(
+                    cells
+                );
 
                 placed = true;
             }
@@ -1244,27 +1913,43 @@ function createFleet() {
     return fleet;
 }
 
+
 /* =========================================================
    START GAME
 ========================================================= */
 
 function startGame(mode) {
 
-    gameMode = mode;
+    initAudio();
 
-    gameStarted = true;
-    gameOver = false;
+    soundButton();
 
-    playerShots = [];
+    gameMode =
+        mode;
 
-    missilesRemaining = 100;
+    gameStarted =
+        true;
 
-    enemyFleet = createFleet();
+    gameOver =
+        false;
 
-    document.getElementById("startScreen").style.display =
+    playerShots =
+        [];
+
+    missilesRemaining =
+        100;
+
+    enemyFleet =
+        createFleet();
+
+    document
+        .getElementById("startScreen")
+        .style.display =
         "none";
 
-    document.getElementById("gameScreen").style.display =
+    document
+        .getElementById("gameScreen")
+        .style.display =
         "block";
 
     resultOverlay.style.display =
@@ -1282,82 +1967,132 @@ function startGame(mode) {
             : "PLAYER 1 — YOUR TURN";
 }
 
+
 /* =========================================================
    FIRE
 ========================================================= */
 
 function fireAt(row, col) {
 
-    if (!gameStarted || gameOver) {
+    if (
+        !gameStarted ||
+        gameOver
+    ) {
         return;
     }
 
-    const key = row + "," + col;
+    const key =
+        row + "," + col;
 
-    if (playerShots.includes(key)) {
+    if (
+        playerShots.includes(
+            key
+        )
+    ) {
         return;
     }
 
-    if (missilesRemaining <= 0) {
+    if (
+        missilesRemaining <= 0
+    ) {
         return;
     }
 
-    playerShots.push(key);
+    playerShots.push(
+        key
+    );
 
     missilesRemaining--;
 
     markMissileUsed();
 
-    disableRadarCell(row, col);
+    disableRadarCell(
+        row,
+        col
+    );
 
-    animateMissile(row, col);
+    statusBox.textContent =
+        "MISSILE LAUNCH";
+
+    soundLaunch();
+
+    setTimeout(() => {
+        soundMissileFlight();
+    }, 90);
+
+    animateMissile(
+        row,
+        col
+    );
 }
 
+
 /* =========================================================
-   MARK MISSILE
+   USED MISSILE
 ========================================================= */
 
 function markMissileUsed() {
 
     const used =
-        100 - missilesRemaining;
+        100 -
+        missilesRemaining;
 
     const cell =
-        missileBank.children[used - 1];
+        missileBank.children[
+            used - 1
+        ];
 
     if (cell) {
-        cell.classList.add("used");
+
+        cell.classList.add(
+            "used"
+        );
     }
 }
 
+
 /* =========================================================
-   DISABLE CELL
+   DISABLE RADAR CELL
 ========================================================= */
 
-function disableRadarCell(row, col) {
+function disableRadarCell(
+    row,
+    col
+) {
 
     const index =
         row * 10 + col;
 
     const cell =
-        radar.children[index];
+        radar.children[
+            index
+        ];
 
     if (cell) {
-        cell.classList.add("disabled");
+
+        cell.classList.add(
+            "disabled"
+        );
     }
 }
+
 
 /* =========================================================
    MISSILE ANIMATION
 ========================================================= */
 
-function animateMissile(row, col) {
+function animateMissile(
+    row,
+    col
+) {
 
     flyingMissile.style.display =
         "block";
 
     const radarCell =
-        radar.children[row * 10 + col];
+        radar.children[
+            row * 10 + col
+        ];
 
     const targetRect =
         radarCell.getBoundingClientRect();
@@ -1366,18 +2101,28 @@ function animateMissile(row, col) {
         stage.getBoundingClientRect();
 
     const scale =
-        stageRect.width / DESIGN_WIDTH;
+        stageRect.width /
+        DESIGN_WIDTH;
 
     const targetX =
-        (targetRect.left - stageRect.left) / scale +
+        (
+            targetRect.left -
+            stageRect.left
+        ) / scale +
         radarCell.offsetWidth / 2;
 
     const targetY =
-        (targetRect.top - stageRect.top) / scale +
+        (
+            targetRect.top -
+            stageRect.top
+        ) / scale +
         radarCell.offsetHeight / 2;
 
-    const startX = 850;
-    const startY = 560;
+    const startX =
+        850;
+
+    const startY =
+        560;
 
     flyingMissile.style.left =
         startX + "px";
@@ -1389,30 +2134,41 @@ function animateMissile(row, col) {
         "rotate(0deg)";
 
     const distanceX =
-        targetX - startX;
+        targetX -
+        startX;
 
     const distanceY =
-        targetY - startY;
+        targetY -
+        startY;
 
     const angle =
         Math.atan2(
             distanceY,
             distanceX
-        ) * 180 / Math.PI + 90;
+        ) *
+        180 /
+        Math.PI +
+        90;
 
     flyingMissile.style.transition =
-        "left .65s ease-in, top .65s ease-in, transform .65s ease-in";
+        "left .65s ease-in, " +
+        "top .65s ease-in, " +
+        "transform .65s ease-in";
 
     requestAnimationFrame(() => {
 
         flyingMissile.style.left =
-            (targetX - 6) + "px";
+            (targetX - 6) +
+            "px";
 
         flyingMissile.style.top =
-            (targetY - 30) + "px";
+            (targetY - 30) +
+            "px";
 
         flyingMissile.style.transform =
-            "rotate(" + angle + "deg)";
+            "rotate(" +
+            angle +
+            "deg)";
     });
 
     setTimeout(() => {
@@ -1420,47 +2176,75 @@ function animateMissile(row, col) {
         flyingMissile.style.display =
             "none";
 
-        resolveShot(row, col);
+        resolveShot(
+            row,
+            col
+        );
 
     }, 700);
 }
+
 
 /* =========================================================
    RESOLVE SHOT
 ========================================================= */
 
-function resolveShot(row, col) {
+function resolveShot(
+    row,
+    col
+) {
 
     const key =
         row + "," + col;
 
-    let hit = false;
+    let hit =
+        false;
 
-    for (const ship of enemyFleet) {
+    for (
+        const ship
+        of enemyFleet
+    ) {
 
-        if (ship.includes(key)) {
+        if (
+            ship.includes(
+                key
+            )
+        ) {
+
             hit = true;
+
             break;
         }
     }
 
     const cell =
-        radar.children[row * 10 + col];
+        radar.children[
+            row * 10 + col
+        ];
 
     if (hit) {
 
-        cell.classList.add("hit");
+        cell.classList.add(
+            "hit"
+        );
 
         statusBox.textContent =
             "DIRECT HIT!";
 
+        soundHit();
+
     } else {
 
-        cell.classList.add("miss");
+        cell.classList.add(
+            "miss"
+        );
 
         statusBox.textContent =
             "MISS";
+
+        soundMiss();
     }
+
 
     if (checkVictory()) {
 
@@ -1472,7 +2256,11 @@ function resolveShot(row, col) {
         return;
     }
 
-    if (gameMode === "computer") {
+
+    if (
+        gameMode ===
+        "computer"
+    ) {
 
         turnDisplay.textContent =
             "COMPUTER TURN";
@@ -1486,8 +2274,11 @@ function resolveShot(row, col) {
 
         turnDisplay.textContent =
             "PLAYER 2 — YOUR TURN";
+
+        soundTurn();
     }
 }
+
 
 /* =========================================================
    VICTORY CHECK
@@ -1495,11 +2286,22 @@ function resolveShot(row, col) {
 
 function checkVictory() {
 
-    for (const ship of enemyFleet) {
+    for (
+        const ship
+        of enemyFleet
+    ) {
 
-        for (const cell of ship) {
+        for (
+            const cell
+            of ship
+        ) {
 
-            if (!playerShots.includes(cell)) {
+            if (
+                !playerShots.includes(
+                    cell
+                )
+            ) {
+
                 return false;
             }
         }
@@ -1507,6 +2309,7 @@ function checkVictory() {
 
     return true;
 }
+
 
 /* =========================================================
    COMPUTER TURN
@@ -1518,12 +2321,7 @@ function computerTurn() {
         return;
     }
 
-    /*
-       Placeholder computer action.
-
-       The full two-fleet server-authoritative version
-       will replace this with an actual opponent fleet.
-    */
+    soundTurn();
 
     turnDisplay.textContent =
         "YOUR TURN";
@@ -1532,23 +2330,37 @@ function computerTurn() {
         "COMPUTER FIRED — YOUR TURN";
 }
 
+
 /* =========================================================
    END GAME
 ========================================================= */
 
-function endGame(won, message) {
+function endGame(
+    won,
+    message
+) {
 
-    gameOver = true;
+    gameOver =
+        true;
 
     resultTitle.textContent =
-        won ? "VICTORY" : "DEFEAT";
+        won
+            ? "VICTORY"
+            : "DEFEAT";
 
     resultMessage.textContent =
         message;
 
     resultOverlay.style.display =
         "flex";
+
+    if (won) {
+        soundVictory();
+    } else {
+        soundDefeat();
+    }
 }
+
 
 /* =========================================================
    RESTART
@@ -1556,11 +2368,16 @@ function endGame(won, message) {
 
 function restartGame() {
 
+    soundButton();
+
     resultOverlay.style.display =
         "none";
 
-    startGame(gameMode);
+    startGame(
+        gameMode
+    );
 }
+
 
 /* =========================================================
    GAME ROOM
@@ -1568,9 +2385,37 @@ function restartGame() {
 
 function returnToGameRoom() {
 
+    soundButton();
+
     window.location.href =
         "index.html";
 }
+
+
+/* =========================================================
+   GENERAL BUTTON SOUND
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.tagName ===
+            "BUTTON"
+        ) {
+
+            if (
+                !audioContext &&
+                !event.target.classList.contains(
+                    "startButton"
+                )
+            ) {
+                return;
+            }
+        }
+    }
+);
 
 </script>
 
