@@ -2,23 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
 <title>Ancient Tic-Tac-Toe</title>
 
 <style>
+
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
+
     background:
-        radial-gradient(circle at 50% 35%, #4b463c 0%, #211f1a 48%, #090909 100%);
-    font-family: Georgia, "Times New Roman", serif;
+        radial-gradient(
+            circle at 50% 35%,
+            #4b463c 0%,
+            #211f1a 48%,
+            #090909 100%
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
     color: #e8d8ad;
 }
 
@@ -29,80 +44,231 @@ body {
     touch-action: manipulation;
 }
 
+
+/* =========================================================
+   GAME
+   ========================================================= */
+
 #game {
+
     width: 100vw;
     height: 100dvh;
+
     min-height: 0;
+
     display: flex;
     flex-direction: column;
+
     align-items: center;
     justify-content: space-between;
+
     padding:
         max(8px, env(safe-area-inset-top))
         max(8px, env(safe-area-inset-right))
         max(8px, env(safe-area-inset-bottom))
         max(8px, env(safe-area-inset-left));
+
     position: relative;
 }
 
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
 #title {
+
     flex: 0 0 auto;
+
     text-align: center;
-    font-size: clamp(20px, 4vh, 48px);
-    letter-spacing: clamp(3px, 0.8vw, 10px);
+
+    font-size:
+        clamp(
+            20px,
+            4vh,
+            48px
+        );
+
+    letter-spacing:
+        clamp(
+            3px,
+            .8vw,
+            10px
+        );
+
     font-weight: bold;
+
     color: #d8c08b;
+
     text-shadow:
         0 2px 0 #3b2b13,
         0 4px 12px #000;
+
     line-height: 1;
+
     margin-top: 2px;
 }
 
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
 #status {
+
     flex: 0 0 auto;
+
     text-align: center;
-    font-size: clamp(13px, 2.4vh, 24px);
+
+    font-size:
+        clamp(
+            13px,
+            2.4vh,
+            24px
+        );
+
     min-height: 1.3em;
+
     color: #f1dfae;
-    text-shadow: 0 2px 5px #000;
+
+    text-shadow:
+        0 2px 5px #000;
+
     font-weight: bold;
 }
 
+
+/* =========================================================
+   CONNECTION STATUS
+   ========================================================= */
+
+#connection {
+
+    position: absolute;
+
+    top:
+        max(
+            8px,
+            env(safe-area-inset-top)
+        );
+
+    right:
+        max(
+            8px,
+            env(safe-area-inset-right)
+        );
+
+    font-family: Arial, sans-serif;
+
+    font-size: clamp(9px, 1.5vh, 13px);
+
+    letter-spacing: 1px;
+
+    padding: 4px 7px;
+
+    border-radius: 4px;
+
+    background: rgba(0,0,0,.55);
+
+    color: #b7b7b7;
+
+    z-index: 50;
+}
+
+#connection.connected {
+    color: #b8df9a;
+}
+
+#connection.waiting {
+    color: #e5c26f;
+}
+
+#connection.error {
+    color: #e18c7c;
+}
+
+
+/* =========================================================
+   ARENA
+   ========================================================= */
+
 #arena {
+
     flex: 1 1 auto;
+
     min-height: 0;
+
     width: 100%;
+
     display: flex;
+
     justify-content: center;
     align-items: center;
+
     perspective: 1200px;
+
     overflow: hidden;
 }
 
+
+/* =========================================================
+   MONUMENT
+   ========================================================= */
+
 #monument {
-    width: calc(var(--boardSize) + var(--frameWidth) * 2);
-    height: calc(var(--boardSize) + var(--frameWidth) * 2);
+
+    width:
+        calc(
+            var(--boardSize) +
+            var(--frameWidth) * 2
+        );
+
+    height:
+        calc(
+            var(--boardSize) +
+            var(--frameWidth) * 2
+        );
+
     position: relative;
+
     flex: 0 0 auto;
-    transform: perspective(1200px) rotateX(2deg);
+
+    transform:
+        perspective(1200px)
+        rotateX(2deg);
 }
 
 #monument::after {
+
     content: "";
+
     position: absolute;
+
     left: 5%;
     right: 5%;
+
     bottom: -2%;
+
     height: 8%;
+
     border-radius: 50%;
+
     background: rgba(0,0,0,.75);
+
     filter: blur(10px);
+
     z-index: -5;
 }
 
+
+/* =========================================================
+   METAL FRAME
+   ========================================================= */
+
 .frame {
+
     position: absolute;
+
     background:
         linear-gradient(
             90deg,
@@ -115,17 +281,40 @@ body {
             #2a2721 88%,
             #11100e 100%
         );
-    border: calc(var(--boardSize) * .018) solid #171512;
+
+    border:
+        calc(
+            var(--boardSize) * .018
+        )
+        solid
+        #171512;
+
     box-shadow:
-        inset 0 0 0 calc(var(--boardSize) * .007) rgba(216,184,116,.45),
-        inset 0 0 calc(var(--boardSize) * .035) rgba(0,0,0,.8),
+
+        inset
+        0 0
+        0
+        calc(
+            var(--boardSize) * .007
+        )
+        rgba(216,184,116,.45),
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .035
+        )
+        rgba(0,0,0,.8),
+
         0 10px 18px rgba(0,0,0,.75);
 }
 
 .frame.left,
 .frame.right {
+
     top: 0;
     bottom: 0;
+
     width: var(--frameWidth);
 }
 
@@ -139,8 +328,10 @@ body {
 
 .frame.top,
 .frame.bottom {
+
     left: 0;
     right: 0;
+
     height: var(--frameWidth);
 }
 
@@ -152,82 +343,173 @@ body {
     bottom: 0;
 }
 
+
+/* =========================================================
+   RIVETS
+   ========================================================= */
+
 .rivet {
+
     position: absolute;
-    width: calc(var(--boardSize) * .038);
-    height: calc(var(--boardSize) * .038);
+
+    width:
+        calc(
+            var(--boardSize) * .038
+        );
+
+    height:
+        calc(
+            var(--boardSize) * .038
+        );
+
     border-radius: 50%;
+
     background:
-        radial-gradient(circle at 35% 30%,
+        radial-gradient(
+            circle at 35% 30%,
             #e1c989 0%,
             #8f784d 28%,
             #403522 60%,
-            #17130e 100%);
+            #17130e 100%
+        );
+
     border: 1px solid #15120e;
+
     box-shadow:
         1px 2px 3px #000,
         inset 0 1px 1px rgba(255,255,255,.35);
+
     z-index: 4;
 }
 
-.r1 { left: 5%; top: 5%; }
-.r2 { right: 5%; top: 5%; }
-.r3 { left: 5%; bottom: 5%; }
-.r4 { right: 5%; bottom: 5%; }
+.r1 {
+    left: 5%;
+    top: 5%;
+}
+
+.r2 {
+    right: 5%;
+    top: 5%;
+}
+
+.r3 {
+    left: 5%;
+    bottom: 5%;
+}
+
+.r4 {
+    right: 5%;
+    bottom: 5%;
+}
+
+
+/* =========================================================
+   BOARD
+   ========================================================= */
 
 #board {
+
     position: absolute;
+
     width: var(--boardSize);
     height: var(--boardSize);
+
     left: var(--frameWidth);
     top: var(--frameWidth);
 
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    grid-template-rows:
+        repeat(3, 1fr);
 
     background:
-        radial-gradient(circle at 45% 40%,
+        radial-gradient(
+            circle at 45% 40%,
             #514a3c 0%,
             #322e27 50%,
-            #1a1815 100%);
+            #1a1815 100%
+        );
 
     border:
-        calc(var(--boardSize) * .012) solid #15130f;
+        calc(
+            var(--boardSize) * .012
+        )
+        solid
+        #15130f;
 
     box-shadow:
-        inset 0 0 calc(var(--boardSize) * .025) rgba(0,0,0,.9),
-        inset 0 0 calc(var(--boardSize) * .01) rgba(207,174,104,.3),
-        0 0 calc(var(--boardSize) * .025) rgba(0,0,0,.8);
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .025
+        )
+        rgba(0,0,0,.9),
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .01
+        )
+        rgba(207,174,104,.3),
+
+        0 0
+        calc(
+            var(--boardSize) * .025
+        )
+        rgba(0,0,0,.8);
 }
 
+
+/* =========================================================
+   CELLS
+   ========================================================= */
+
 .cell {
+
     position: relative;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     cursor: pointer;
+
     user-select: none;
+
     overflow: hidden;
 
-    /* IMPORTANT FOR PHONES */
     touch-action: manipulation;
 }
 
 .cell::before,
 .cell::after {
+
     content: "";
+
     position: absolute;
+
     pointer-events: none;
 }
 
 .cell:nth-child(2)::before,
 .cell:nth-child(5)::before,
 .cell:nth-child(8)::before {
+
     right: 0;
+
     top: 4%;
     bottom: 4%;
-    width: calc(var(--boardSize) * .012);
+
+    width:
+        calc(
+            var(--boardSize) * .012
+        );
+
     background:
         linear-gradient(
             90deg,
@@ -235,14 +517,23 @@ body {
             #9d8759,
             #30291e
         );
-    box-shadow: 2px 0 4px #000;
+
+    box-shadow:
+        2px 0 4px #000;
 }
 
 .cell:nth-child(n+4)::after {
+
     left: 4%;
     right: 4%;
+
     top: 0;
-    height: calc(var(--boardSize) * .012);
+
+    height:
+        calc(
+            var(--boardSize) * .012
+        );
+
     background:
         linear-gradient(
             90deg,
@@ -250,17 +541,32 @@ body {
             #9d8759,
             #30291e
         );
-    box-shadow: 0 -2px 4px #000;
+
+    box-shadow:
+        0 -2px 4px #000;
 }
 
+
+/* =========================================================
+   PIECES
+   ========================================================= */
+
 .piece {
+
     width: 70%;
     height: 70%;
+
     position: relative;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     transform-origin: center center;
+
+    pointer-events: none;
+
     filter:
         drop-shadow(
             calc(var(--boardSize) * .012)
@@ -268,28 +574,37 @@ body {
             calc(var(--boardSize) * .015)
             rgba(0,0,0,.85)
         );
-
-    /* Pieces never steal the tap from their cell */
-    pointer-events: none;
 }
 
 .x-piece,
 .o-piece {
+
     color: #b88945;
+
     text-shadow:
         1px 1px 0 #3b2410,
         -1px -1px 0 #e5c27d,
         2px 4px 5px #000;
 }
 
+
+/* =========================================================
+   X
+   ========================================================= */
+
 .x-piece::before,
 .x-piece::after {
+
     content: "";
+
     position: absolute;
+
     width: 20%;
     height: 95%;
+
     left: 40%;
     top: 2.5%;
+
     border-radius: 10px;
 
     background:
@@ -318,9 +633,16 @@ body {
     transform: rotate(-45deg);
 }
 
+
+/* =========================================================
+   O
+   ========================================================= */
+
 .o-piece {
+
     width: 62%;
     height: 62%;
+
     border-radius: 50%;
 
     background:
@@ -334,118 +656,234 @@ body {
         );
 
     border:
-        max(3px, calc(var(--boardSize) * .012))
-        solid #2b1a0b;
+        max(
+            3px,
+            calc(
+                var(--boardSize) * .012
+            )
+        )
+        solid
+        #2b1a0b;
 
     box-shadow:
-        inset 0 0 0 calc(var(--boardSize) * .008) rgba(223,183,104,.45),
-        inset 0 0 calc(var(--boardSize) * .018) rgba(0,0,0,.9);
+        inset
+        0 0
+        0
+        calc(
+            var(--boardSize) * .008
+        )
+        rgba(223,183,104,.45),
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .018
+        )
+        rgba(0,0,0,.9);
 }
 
 .o-piece::after {
+
     content: "";
+
     position: absolute;
+
     width: 43%;
     height: 43%;
+
     border-radius: 50%;
+
     background:
-        radial-gradient(circle,
+        radial-gradient(
+            circle,
             #171411 0%,
             #080807 70%,
-            #020202 100%);
+            #020202 100%
+        );
+
     box-shadow:
         inset 2px 2px 3px rgba(0,0,0,.9);
 }
 
+
+/* =========================================================
+   FIVE ANIMATIONS
+   ========================================================= */
+
 .anim-hammer {
-    animation: hammer .58s cubic-bezier(.2,1.6,.35,1) both;
+
+    animation:
+        hammer
+        .58s
+        cubic-bezier(.2,1.6,.35,1)
+        both;
 }
 
 @keyframes hammer {
+
     0% {
-        transform: translateY(calc(var(--boardSize) * -.30))
-                   scale(1.7)
-                   rotate(-15deg);
+        transform:
+            translateY(
+                calc(
+                    var(--boardSize) * -.30
+                )
+            )
+            scale(1.7)
+            rotate(-15deg);
+
         opacity: 0;
     }
+
     55% {
-        transform: translateY(calc(var(--boardSize) * .035))
-                   scale(.9)
-                   rotate(4deg);
+        transform:
+            translateY(
+                calc(
+                    var(--boardSize) * .035
+                )
+            )
+            scale(.9)
+            rotate(4deg);
+
         opacity: 1;
     }
+
     75% {
-        transform: translateY(calc(var(--boardSize) * -.012))
-                   scale(1.08);
+        transform:
+            translateY(
+                calc(
+                    var(--boardSize) * -.012
+                )
+            )
+            scale(1.08);
     }
+
     100% {
-        transform: translateY(0) scale(1) rotate(0);
+        transform:
+            translateY(0)
+            scale(1)
+            rotate(0);
     }
 }
 
+
 .anim-spin {
-    animation: spinIn .65s cubic-bezier(.2,1.3,.3,1) both;
+
+    animation:
+        spinIn
+        .65s
+        cubic-bezier(.2,1.3,.3,1)
+        both;
 }
 
 @keyframes spinIn {
+
     0% {
-        transform: scale(.15) rotate(360deg);
+        transform:
+            scale(.15)
+            rotate(360deg);
+
         opacity: 0;
     }
+
     70% {
-        transform: scale(1.12) rotate(-15deg);
+        transform:
+            scale(1.12)
+            rotate(-15deg);
+
         opacity: 1;
     }
+
     100% {
-        transform: scale(1) rotate(0);
+        transform:
+            scale(1)
+            rotate(0);
     }
 }
 
+
 .anim-rise {
-    animation: rise .65s cubic-bezier(.25,1.5,.35,1) both;
+
+    animation:
+        rise
+        .65s
+        cubic-bezier(.25,1.5,.35,1)
+        both;
 }
 
 @keyframes rise {
+
     0% {
-        transform: translateY(100%) scale(.65);
+        transform:
+            translateY(100%)
+            scale(.65);
+
         opacity: 0;
     }
+
     60% {
-        transform: translateY(-8%) scale(1.08);
+        transform:
+            translateY(-8%)
+            scale(1.08);
+
         opacity: 1;
     }
+
     100% {
-        transform: translateY(0) scale(1);
+        transform:
+            translateY(0)
+            scale(1);
     }
 }
 
+
 .anim-forge {
-    animation: forge .55s cubic-bezier(.2,1.5,.3,1) both;
+
+    animation:
+        forge
+        .55s
+        cubic-bezier(.2,1.5,.3,1)
+        both;
 }
 
 @keyframes forge {
+
     0% {
         transform: scale(2.5);
+
         opacity: 0;
+
         filter:
             brightness(4)
-            drop-shadow(0 0 20px #ffd875);
+            drop-shadow(
+                0 0 20px #ffd875
+            );
     }
+
     35% {
         opacity: 1;
+
         transform: scale(.82);
+
         filter:
             brightness(2)
-            drop-shadow(0 0 18px #ffd875);
+            drop-shadow(
+                0 0 18px #ffd875
+            );
     }
+
     65% {
         transform: scale(1.12);
+
         filter:
             brightness(1.4)
-            drop-shadow(0 0 7px #d29c42);
+            drop-shadow(
+                0 0 7px #d29c42
+            );
     }
+
     100% {
         transform: scale(1);
+
         filter:
             brightness(1)
             drop-shadow(
@@ -457,26 +895,38 @@ body {
     }
 }
 
+
 .anim-swing {
-    animation: swing .65s cubic-bezier(.2,1.4,.3,1) both;
+
+    animation:
+        swing
+        .65s
+        cubic-bezier(.2,1.4,.3,1)
+        both;
+
     transform-origin: 50% 100%;
 }
 
 @keyframes swing {
+
     0% {
         transform:
             translateX(-60%)
             rotate(-65deg)
             scale(.7);
+
         opacity: 0;
     }
+
     55% {
         transform:
             translateX(8%)
             rotate(12deg)
             scale(1.1);
+
         opacity: 1;
     }
+
     100% {
         transform:
             translateX(0)
@@ -485,51 +935,113 @@ body {
     }
 }
 
+
+/* =========================================================
+   WIN
+   ========================================================= */
+
 .winner {
-    animation: winnerPulse .7s ease-in-out infinite alternate;
+
+    animation:
+        winnerPulse
+        .7s
+        ease-in-out
+        infinite
+        alternate;
 }
 
 @keyframes winnerPulse {
+
     from {
         filter:
-            drop-shadow(0 0 2px #d6a94d)
+            drop-shadow(
+                0 0 2px #d6a94d
+            )
             brightness(1);
     }
+
     to {
         filter:
-            drop-shadow(0 0 14px #ffd66e)
+            drop-shadow(
+                0 0 14px #ffd66e
+            )
             brightness(1.45);
     }
 }
 
+
 .draw-cell {
-    animation: drawPulse .7s ease-in-out infinite alternate;
+
+    animation:
+        drawPulse
+        .7s
+        ease-in-out
+        infinite
+        alternate;
 }
 
 @keyframes drawPulse {
+
     from {
-        background: rgba(170,130,55,.04);
+        background:
+            rgba(170,130,55,.04);
     }
+
     to {
-        background: rgba(170,130,55,.18);
+        background:
+            rgba(170,130,55,.18);
     }
 }
 
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
 #controls {
+
     flex: 0 0 auto;
+
     display: flex;
+
     justify-content: center;
     align-items: center;
-    gap: clamp(5px, 1vw, 12px);
+
+    gap:
+        clamp(
+            5px,
+            1vw,
+            12px
+        );
+
     width: 100%;
+
     padding-bottom: 2px;
 }
 
 button {
-    font-family: Georgia, "Times New Roman", serif;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
     font-weight: bold;
-    font-size: clamp(10px, 1.8vh, 18px);
-    letter-spacing: clamp(.5px, .2vw, 2px);
+
+    font-size:
+        clamp(
+            10px,
+            1.8vh,
+            18px
+        );
+
+    letter-spacing:
+        clamp(
+            .5px,
+            .2vw,
+            2px
+        );
+
     color: #ead5a2;
 
     padding:
@@ -537,6 +1049,7 @@ button {
         clamp(10px, 2vw, 24px);
 
     border-radius: 5px;
+
     border: 2px solid #19140d;
 
     background:
@@ -548,23 +1061,17 @@ button {
         );
 
     box-shadow:
-        inset 0 1px 1px rgba(255,255,255,.35),
+        inset
+        0 1px 1px
+        rgba(255,255,255,.35),
+
         0 3px 6px #000;
 
     cursor: pointer;
+
     white-space: nowrap;
 
     touch-action: manipulation;
-}
-
-button:hover {
-    background:
-        linear-gradient(
-            180deg,
-            #b1925b 0%,
-            #705631 45%,
-            #3b2c1c 100%
-        );
 }
 
 button:active {
@@ -572,29 +1079,70 @@ button:active {
 }
 
 button.active {
+
     border-color: #d2ae68;
+
     box-shadow:
-        inset 0 0 8px rgba(0,0,0,.8),
-        0 0 8px rgba(216,176,89,.5);
+        inset
+        0 0 8px
+        rgba(0,0,0,.8),
+
+        0 0 8px
+        rgba(216,176,89,.5);
+
     color: #fff1c7;
 }
 
+
+/* =========================================================
+   LANDSCAPE
+   ========================================================= */
+
 @media (orientation: landscape) {
+
     #game {
-        padding-top: max(4px, env(safe-area-inset-top));
-        padding-bottom: max(4px, env(safe-area-inset-bottom));
+
+        padding-top:
+            max(
+                4px,
+                env(safe-area-inset-top)
+            );
+
+        padding-bottom:
+            max(
+                4px,
+                env(safe-area-inset-bottom)
+            );
     }
 
     #title {
-        font-size: clamp(16px, 5vh, 38px);
+
+        font-size:
+            clamp(
+                16px,
+                5vh,
+                38px
+            );
     }
 
     #status {
-        font-size: clamp(11px, 2.8vh, 19px);
+
+        font-size:
+            clamp(
+                11px,
+                2.8vh,
+                19px
+            );
     }
 }
 
+
+/* =========================================================
+   VERY SHORT SCREEN
+   ========================================================= */
+
 @media (max-height: 430px) {
+
     #title {
         display: none;
     }
@@ -607,16 +1155,27 @@ button.active {
         padding: 4px 9px;
     }
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div id="game">
 
-    <div id="title">ANCIENT TIC-TAC-TOE</div>
+    <div id="connection">
+        CONNECTING...
+    </div>
 
-    <div id="status">PLAYER X — YOUR TURN</div>
+    <div id="title">
+        ANCIENT TIC-TAC-TOE
+    </div>
+
+    <div id="status">
+        CONNECTING TO GAME SERVER...
+    </div>
+
 
     <div id="arena">
 
@@ -632,57 +1191,181 @@ button.active {
             <div class="rivet r3"></div>
             <div class="rivet r4"></div>
 
+
             <div id="board">
 
-                <div class="cell" data-index="0"></div>
-                <div class="cell" data-index="1"></div>
-                <div class="cell" data-index="2"></div>
+                <div
+                    class="cell"
+                    data-index="0">
+                </div>
 
-                <div class="cell" data-index="3"></div>
-                <div class="cell" data-index="4"></div>
-                <div class="cell" data-index="5"></div>
+                <div
+                    class="cell"
+                    data-index="1">
+                </div>
 
-                <div class="cell" data-index="6"></div>
-                <div class="cell" data-index="7"></div>
-                <div class="cell" data-index="8"></div>
+                <div
+                    class="cell"
+                    data-index="2">
+                </div>
+
+
+                <div
+                    class="cell"
+                    data-index="3">
+                </div>
+
+                <div
+                    class="cell"
+                    data-index="4">
+                </div>
+
+                <div
+                    class="cell"
+                    data-index="5">
+                </div>
+
+
+                <div
+                    class="cell"
+                    data-index="6">
+                </div>
+
+                <div
+                    class="cell"
+                    data-index="7">
+                </div>
+
+                <div
+                    class="cell"
+                    data-index="8">
+                </div>
 
             </div>
+
         </div>
+
     </div>
 
+
     <div id="controls">
-        <button id="twoPlayer" class="active">2 PLAYERS</button>
-        <button id="computer">VS COMPUTER</button>
-        <button id="newGame">NEW GAME</button>
+
+        <button
+            id="twoPlayer"
+            class="active">
+
+            2 PLAYERS
+
+        </button>
+
+
+        <button
+            id="computer">
+
+            VS COMPUTER
+
+        </button>
+
+
+        <button
+            id="newGame">
+
+            NEW GAME
+
+        </button>
+
     </div>
 
 </div>
 
+
 <script>
 
-const cells = [...document.querySelectorAll(".cell")];
-const board = document.getElementById("board");
-const monument = document.getElementById("monument");
-const arena = document.getElementById("arena");
-const statusText = document.getElementById("status");
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
 
-const twoPlayerButton = document.getElementById("twoPlayer");
-const computerButton = document.getElementById("computer");
-const newGameButton = document.getElementById("newGame");
+const cells =
+    [...document.querySelectorAll(".cell")];
 
-let game = Array(9).fill("");
-let currentPlayer = "X";
-let gameOver = false;
-let mode = "2P";
-let animationNumber = 0;
+const board =
+    document.getElementById("board");
+
+const monument =
+    document.getElementById("monument");
+
+const arena =
+    document.getElementById("arena");
+
+const statusText =
+    document.getElementById("status");
+
+const connectionText =
+    document.getElementById("connection");
+
+const twoPlayerButton =
+    document.getElementById("twoPlayer");
+
+const computerButton =
+    document.getElementById("computer");
+
+const newGameButton =
+    document.getElementById("newGame");
+
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+
+let game =
+    Array(9).fill(null);
+
+let mySymbol =
+    null;
+
+let currentPlayer =
+    "X";
+
+let gameOver =
+    false;
+
+let winner =
+    null;
+
+let draw =
+    false;
+
+let mode =
+    "2P";
+
+let socket =
+    null;
+
+let reconnectTimer =
+    null;
+
+let animationNumber =
+    0;
+
+
+/* =========================================================
+   FIVE PLACEMENT ANIMATIONS
+   ========================================================= */
 
 const animations = [
+
     "anim-hammer",
+
     "anim-spin",
+
     "anim-rise",
+
     "anim-forge",
+
     "anim-swing"
+
 ];
+
 
 /* =========================================================
    RESPONSIVE FIT
@@ -690,21 +1373,41 @@ const animations = [
 
 function fitGame() {
 
-    const arenaWidth = arena.clientWidth;
-    const arenaHeight = arena.clientHeight;
+    const arenaWidth =
+        arena.clientWidth;
 
-    if (!arenaWidth || !arenaHeight) return;
+    const arenaHeight =
+        arena.clientHeight;
 
-    const frameRatio = 0.105;
 
-    const usableWidth = arenaWidth * 0.96;
-    const usableHeight = arenaHeight * 0.96;
+    if (
+        !arenaWidth ||
+        !arenaHeight
+    ) {
+        return;
+    }
+
+
+    const frameRatio =
+        0.105;
+
+
+    const usableWidth =
+        arenaWidth * .96;
+
+    const usableHeight =
+        arenaHeight * .96;
+
 
     const maxBoardFromWidth =
-        usableWidth / (1 + frameRatio * 2);
+        usableWidth /
+        (1 + frameRatio * 2);
+
 
     const maxBoardFromHeight =
-        usableHeight / (1 + frameRatio * 2);
+        usableHeight /
+        (1 + frameRatio * 2);
+
 
     let boardSize =
         Math.min(
@@ -712,14 +1415,23 @@ function fitGame() {
             maxBoardFromHeight
         );
 
-    boardSize = Math.max(100, boardSize);
 
-    const frameWidth = boardSize * frameRatio;
+    boardSize =
+        Math.max(
+            100,
+            boardSize
+        );
+
+
+    const frameWidth =
+        boardSize * frameRatio;
+
 
     monument.style.setProperty(
         "--boardSize",
         boardSize + "px"
     );
+
 
     monument.style.setProperty(
         "--frameWidth",
@@ -727,269 +1439,984 @@ function fitGame() {
     );
 }
 
-window.addEventListener("resize", fitGame);
 
-window.addEventListener("orientationchange", () => {
-    setTimeout(fitGame, 100);
-});
+window.addEventListener(
+    "resize",
+    fitGame
+);
+
+
+window.addEventListener(
+    "orientationchange",
+    () => {
+
+        setTimeout(
+            fitGame,
+            100
+        );
+    }
+);
+
 
 if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", fitGame);
+
+    window.visualViewport.addEventListener(
+        "resize",
+        fitGame
+    );
 }
 
-setTimeout(fitGame, 20);
 
 /* =========================================================
-   WINNING COMBINATIONS
+   CONNECTION STATUS
    ========================================================= */
 
-const wins = [
-    [0,1,2],
-    [3,4,5],
-    [6,7,8],
-    [0,3,6],
-    [1,4,7],
-    [2,5,8],
-    [0,4,8],
-    [2,4,6]
-];
+function setConnection(
+    text,
+    state
+) {
+
+    connectionText.textContent =
+        text;
+
+    connectionText.className =
+        state || "";
+}
+
 
 /* =========================================================
-   WIN CHECK
+   CONNECT TO YOUR RENDER SERVER
+   =========================================================
+
+   THIS MATCHES server11.js.
+
+   server11.js creates the WebSocket server on the
+   same HTTP server, and anything other than /checkers
+   is treated as Tic-Tac-Toe.
+
+   Therefore the correct endpoint is:
+
+   wss://games-z5k2.onrender.com/
+
    ========================================================= */
 
-function getWinner() {
+function connectToServer() {
 
-    for (const combo of wins) {
+    if (
+        socket &&
+        (
+            socket.readyState ===
+            WebSocket.OPEN ||
 
-        const [a,b,c] = combo;
+            socket.readyState ===
+            WebSocket.CONNECTING
+        )
+    ) {
+        return;
+    }
 
-        if (
-            game[a] &&
-            game[a] === game[b] &&
-            game[a] === game[c]
-        ) {
-            return {
-                player: game[a],
-                combo
-            };
+
+    setConnection(
+        "CONNECTING...",
+        ""
+    );
+
+
+    statusText.textContent =
+        "CONNECTING TO GAME SERVER...";
+
+
+    try {
+
+        socket =
+            new WebSocket(
+                "wss://games-z5k2.onrender.com/"
+            );
+
+
+    } catch (error) {
+
+        setConnection(
+            "CONNECTION ERROR",
+            "error"
+        );
+
+        scheduleReconnect();
+
+        return;
+    }
+
+
+    socket.addEventListener(
+        "open",
+        () => {
+
+            setConnection(
+                "CONNECTED",
+                "connected"
+            );
+
+            statusText.textContent =
+                "WAITING FOR PLAYER...";
+        }
+    );
+
+
+    socket.addEventListener(
+        "message",
+        event => {
+
+            handleServerMessage(
+                event.data
+            );
+        }
+    );
+
+
+    socket.addEventListener(
+        "close",
+        () => {
+
+            mySymbol = null;
+
+            setConnection(
+                "DISCONNECTED",
+                "error"
+            );
+
+            statusText.textContent =
+                "SERVER CONNECTION LOST";
+
+            scheduleReconnect();
+        }
+    );
+
+
+    socket.addEventListener(
+        "error",
+        () => {
+
+            setConnection(
+                "CONNECTION ERROR",
+                "error"
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   RECONNECT
+   ========================================================= */
+
+function scheduleReconnect() {
+
+    if (reconnectTimer) {
+        return;
+    }
+
+
+    reconnectTimer =
+        setTimeout(
+            () => {
+
+                reconnectTimer =
+                    null;
+
+                connectToServer();
+
+            },
+            2000
+        );
+}
+
+
+/* =========================================================
+   SERVER MESSAGE
+   ========================================================= */
+
+function handleServerMessage(
+    raw
+) {
+
+    let data;
+
+
+    try {
+
+        data =
+            JSON.parse(raw);
+
+    } catch (error) {
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       SERVER ASSIGNS X OR O
+       ----------------------------------------------------- */
+
+    if (
+        data.type ===
+        "assign"
+    ) {
+
+        mySymbol =
+            data.symbol;
+
+
+        setConnection(
+            "CONNECTED — PLAYER " +
+            mySymbol,
+            "connected"
+        );
+
+
+        updateStatus();
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       SERVER STATE
+       ----------------------------------------------------- */
+
+    if (
+        data.type ===
+        "state"
+    ) {
+
+        /*
+         * Make a fresh array so the UI always follows
+         * the server's authoritative board.
+         */
+
+        game =
+            Array.isArray(data.board)
+                ? [...data.board]
+                : Array(9).fill(null);
+
+
+        currentPlayer =
+            data.currentPlayer || "X";
+
+
+        gameOver =
+            Boolean(data.gameOver);
+
+
+        winner =
+            data.winner || null;
+
+
+        draw =
+            Boolean(data.draw);
+
+
+        renderBoard();
+
+        updateStatus();
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       SERVER ERROR
+       ----------------------------------------------------- */
+
+    if (
+        data.type ===
+        "error"
+    ) {
+
+        statusText.textContent =
+            data.message ||
+            "SERVER ERROR";
+
+        return;
+    }
+}
+
+
+/* =========================================================
+   SEND MOVE TO SERVER
+   ========================================================= */
+
+function sendMove(index) {
+
+    if (
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ) {
+        return;
+    }
+
+
+    socket.send(
+        JSON.stringify({
+
+            type: "move",
+
+            index: index
+        })
+    );
+}
+
+
+/* =========================================================
+   SEND NEW GAME
+   ========================================================= */
+
+function sendNewGame() {
+
+    if (
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ) {
+        return;
+    }
+
+
+    socket.send(
+        JSON.stringify({
+
+            type: "new_game"
+        })
+    );
+}
+
+
+/* =========================================================
+   CELL TAP
+   ========================================================= */
+
+function cellPressed(index) {
+
+    /* -----------------------------------------------------
+       COMPUTER MODE IS LOCAL.
+       It does not send moves to the server.
+       ----------------------------------------------------- */
+
+    if (mode === "CPU") {
+
+        humanComputerMove(index);
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       ONLINE 2 PLAYER MODE
+       ----------------------------------------------------- */
+
+    if (
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ) {
+
+        statusText.textContent =
+            "NOT CONNECTED TO SERVER";
+
+        return;
+    }
+
+
+    if (!mySymbol) {
+
+        statusText.textContent =
+            "WAITING FOR PLAYER ASSIGNMENT";
+
+        return;
+    }
+
+
+    if (gameOver) {
+        return;
+    }
+
+
+    if (
+        currentPlayer !==
+        mySymbol
+    ) {
+
+        return;
+    }
+
+
+    if (
+        game[index] !== null
+    ) {
+
+        return;
+    }
+
+
+    /*
+     * Do NOT modify the board locally.
+     *
+     * Send the move to server11.js.
+     *
+     * server11.js validates it and broadcasts
+     * the new authoritative state to both devices.
+     */
+
+    sendMove(index);
+}
+
+
+/* =========================================================
+   RENDER SERVER BOARD
+   ========================================================= */
+
+function renderBoard() {
+
+    cells.forEach(
+        cell => {
+
+            const index =
+                Number(
+                    cell.dataset.index
+                );
+
+
+            const value =
+                game[index];
+
+
+            cell.innerHTML = "";
+
+
+            cell.classList.remove(
+                "draw-cell"
+            );
+
+
+            if (!value) {
+                return;
+            }
+
+
+            const piece =
+                document.createElement(
+                    "div"
+                );
+
+
+            piece.classList.add(
+                "piece"
+            );
+
+
+            if (
+                value === "X"
+            ) {
+
+                piece.classList.add(
+                    "x-piece"
+                );
+
+            } else {
+
+                piece.classList.add(
+                    "o-piece"
+                );
+            }
+
+
+            /*
+             * Only animate newly appearing pieces.
+             *
+             * We compare against the previous rendered
+             * board stored on the cell.
+             */
+
+            if (
+                cell.dataset.value !==
+                value
+            ) {
+
+                piece.classList.add(
+                    animations[
+                        animationNumber %
+                        animations.length
+                    ]
+                );
+
+                animationNumber++;
+            }
+
+
+            cell.dataset.value =
+                value;
+
+
+            cell.appendChild(
+                piece
+            );
+        }
+    );
+
+
+    /*
+     * Clear stale dataset values.
+     */
+
+    cells.forEach(
+        cell => {
+
+            const index =
+                Number(
+                    cell.dataset.index
+                );
+
+
+            if (
+                !game[index]
+            ) {
+
+                cell.dataset.value =
+                    "";
+            }
+        }
+    );
+
+
+    /*
+     * Highlight winning line.
+     */
+
+    if (winner) {
+
+        const line =
+            getWinningLine(
+                winner
+            );
+
+
+        if (line) {
+
+            line.forEach(
+                index => {
+
+                    const piece =
+                        cells[index]
+                            .querySelector(
+                                ".piece"
+                            );
+
+
+                    if (piece) {
+
+                        piece.classList.add(
+                            "winner"
+                        );
+                    }
+                }
+            );
         }
     }
 
-    if (game.every(Boolean)) {
-        return {
-            player: "DRAW",
-            combo: []
-        };
+
+    if (draw) {
+
+        cells.forEach(
+            cell => {
+
+                cell.classList.add(
+                    "draw-cell"
+                );
+            }
+        );
     }
+}
+
+
+/* =========================================================
+   WINNING LINE
+   ========================================================= */
+
+function getWinningLine(
+    player
+) {
+
+    const lines = [
+
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+
+        [0,4,8],
+        [2,4,6]
+    ];
+
+
+    for (
+        const line
+        of lines
+    ) {
+
+        if (
+            line.every(
+                index =>
+                    game[index] ===
+                    player
+            )
+        ) {
+
+            return line;
+        }
+    }
+
 
     return null;
 }
 
-/* =========================================================
-   PLACE PIECE
-   ========================================================= */
-
-function placePiece(index, player) {
-
-    game[index] = player;
-
-    const cell = cells[index];
-
-    const piece = document.createElement("div");
-
-    piece.classList.add("piece");
-
-    if (player === "X") {
-        piece.classList.add("x-piece");
-    } else {
-        piece.classList.add("o-piece");
-    }
-
-    piece.classList.add(
-        animations[animationNumber % animations.length]
-    );
-
-    animationNumber++;
-
-    cell.appendChild(piece);
-
-    board.animate(
-        [
-            { transform: "scale(1)" },
-            { transform: "scale(.997)" },
-            { transform: "scale(1)" }
-        ],
-        {
-            duration: 180,
-            easing: "ease-out"
-        }
-    );
-}
 
 /* =========================================================
-   HUMAN MOVE
+   ONLINE STATUS
    ========================================================= */
 
-function humanMove(index) {
+function updateStatus() {
 
-    if (gameOver) return;
-
-    if (game[index]) return;
-
-    if (mode === "CPU" && currentPlayer === "O") {
+    if (mode !== "2P") {
         return;
     }
 
-    placePiece(index, currentPlayer);
 
-    finishMove();
-}
+    if (!mySymbol) {
 
-/* =========================================================
-   FINISH MOVE
-   ========================================================= */
+        statusText.textContent =
+            "WAITING FOR PLAYER...";
 
-function finishMove() {
+        return;
+    }
 
-    const result = getWinner();
 
-    if (result) {
+    if (
+        !gameOver &&
+        (
+            !game[0] &&
+            !game[1] &&
+            !game[2] &&
+            !game[3] &&
+            !game[4] &&
+            !game[5] &&
+            !game[6] &&
+            !game[7] &&
+            !game[8]
+        )
+    ) {
 
-        gameOver = true;
+        /*
+         * If X is assigned and O hasn't connected,
+         * the server's players state isn't currently
+         * sent to us explicitly. The server does,
+         * however, broadcast a state when a second
+         * player joins.
+         */
 
-        if (result.player === "DRAW") {
+    }
+
+
+    if (gameOver) {
+
+        if (draw) {
 
             statusText.textContent =
                 "DRAW — THE BOARD IS COMPLETE";
 
-            cells.forEach(cell => {
-                cell.classList.add("draw-cell");
-            });
-
-        } else {
-
-            statusText.textContent =
-                "PLAYER " + result.player + " WINS!";
-
-            result.combo.forEach(index => {
-
-                const piece =
-                    cells[index].querySelector(".piece");
-
-                if (piece) {
-                    piece.classList.add("winner");
-                }
-            });
+            return;
         }
 
-        return;
+
+        if (winner) {
+
+            statusText.textContent =
+                "PLAYER " +
+                winner +
+                " WINS!";
+
+            return;
+        }
     }
 
-    currentPlayer =
-        currentPlayer === "X"
-            ? "O"
-            : "X";
 
-    if (mode === "CPU" && currentPlayer === "O") {
+    if (
+        currentPlayer ===
+        mySymbol
+    ) {
 
         statusText.textContent =
-            "COMPUTER — THINKING...";
-
-        setTimeout(computerMove, 430);
+            "PLAYER " +
+            mySymbol +
+            " — YOUR TURN";
 
     } else {
 
         statusText.textContent =
-            "PLAYER " + currentPlayer + " — YOUR TURN";
+            "PLAYER " +
+            currentPlayer +
+            " — OPPONENT'S TURN";
     }
 }
 
+
 /* =========================================================
-   COMPUTER
+   LOCAL COMPUTER MODE
    ========================================================= */
+
+let localGame =
+    Array(9).fill(null);
+
+let localCurrent =
+    "X";
+
+let localOver =
+    false;
+
+let localAnimation =
+    0;
+
+
+function humanComputerMove(
+    index
+) {
+
+    if (localOver) {
+        return;
+    }
+
+
+    if (
+        localCurrent !==
+        "X"
+    ) {
+        return;
+    }
+
+
+    if (
+        localGame[index]
+    ) {
+        return;
+    }
+
+
+    localGame[index] =
+        "X";
+
+
+    renderLocalBoard();
+
+
+    if (
+        finishLocalGame()
+    ) {
+        return;
+    }
+
+
+    localCurrent =
+        "O";
+
+
+    statusText.textContent =
+        "COMPUTER — THINKING...";
+
+
+    setTimeout(
+        computerMove,
+        400
+    );
+}
+
 
 function computerMove() {
 
-    if (gameOver) return;
+    if (localOver) {
+        return;
+    }
 
-    if (currentPlayer !== "O") return;
 
-    const move = findComputerMove();
+    const move =
+        findComputerMove();
 
-    if (move === -1) return;
 
-    placePiece(move, "O");
+    if (
+        move === -1
+    ) {
+        return;
+    }
 
-    finishMove();
+
+    localGame[move] =
+        "O";
+
+
+    renderLocalBoard();
+
+
+    if (
+        finishLocalGame()
+    ) {
+        return;
+    }
+
+
+    localCurrent =
+        "X";
+
+
+    statusText.textContent =
+        "PLAYER X — YOUR TURN";
 }
+
 
 function findComputerMove() {
 
-    /* Win */
-    for (let i = 0; i < 9; i++) {
+    const wins = [
 
-        if (!game[i]) {
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
 
-            game[i] = "O";
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
 
-            if (checkPlayerWin("O")) {
-                game[i] = "";
+        [0,4,8],
+        [2,4,6]
+    ];
+
+
+    /* WIN */
+
+    for (
+        let i = 0;
+        i < 9;
+        i++
+    ) {
+
+        if (!localGame[i]) {
+
+            localGame[i] =
+                "O";
+
+
+            if (
+                localWinner() ===
+                "O"
+            ) {
+
+                localGame[i] =
+                    null;
+
                 return i;
             }
 
-            game[i] = "";
+
+            localGame[i] =
+                null;
         }
     }
 
-    /* Block */
-    for (let i = 0; i < 9; i++) {
 
-        if (!game[i]) {
+    /* BLOCK */
 
-            game[i] = "X";
+    for (
+        let i = 0;
+        i < 9;
+        i++
+    ) {
 
-            if (checkPlayerWin("X")) {
-                game[i] = "";
+        if (!localGame[i]) {
+
+            localGame[i] =
+                "X";
+
+
+            if (
+                localWinner() ===
+                "X"
+            ) {
+
+                localGame[i] =
+                    null;
+
                 return i;
             }
 
-            game[i] = "";
+
+            localGame[i] =
+                null;
         }
     }
 
-    /* Center */
-    if (!game[4]) {
+
+    /* CENTER */
+
+    if (!localGame[4]) {
         return 4;
     }
 
-    /* Corner */
-    const corners = [0,2,6,8];
 
-    const availableCorners =
-        corners.filter(i => !game[i]);
+    /* CORNERS */
 
-    if (availableCorners.length) {
+    const corners =
+        [0,2,6,8]
+            .filter(
+                i =>
+                    !localGame[i]
+            );
 
-        return availableCorners[
+
+    if (
+        corners.length
+    ) {
+
+        return corners[
             Math.floor(
                 Math.random() *
-                availableCorners.length
+                corners.length
             )
         ];
     }
 
-    /* Remaining */
-    const available =
-        game
-            .map((value,index) =>
-                value ? -1 : index
-            )
-            .filter(index => index !== -1);
 
-    if (!available.length) {
+    /* ANY */
+
+    const available =
+        localGame
+            .map(
+                (v,i) =>
+                    v
+                        ? -1
+                        : i
+            )
+            .filter(
+                i =>
+                    i !== -1
+            );
+
+
+    if (
+        !available.length
+    ) {
+
         return -1;
     }
+
 
     return available[
         Math.floor(
@@ -999,113 +2426,447 @@ function findComputerMove() {
     ];
 }
 
-function checkPlayerWin(player) {
 
-    return wins.some(combo => {
+function localWinner() {
 
-        return combo.every(index =>
-            game[index] === player
-        );
+    const lines = [
 
-    });
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+
+        [0,3,6],
+        [1,4,7],
+        [2,4,8],
+
+        [0,4,8],
+        [2,4,6]
+    ];
+
+
+    for (
+        const line
+        of lines
+    ) {
+
+        const [
+            a,
+            b,
+            c
+        ] = line;
+
+
+        if (
+            localGame[a] &&
+            localGame[a] ===
+            localGame[b] &&
+            localGame[a] ===
+            localGame[c]
+        ) {
+
+            return localGame[a];
+        }
+    }
+
+
+    return null;
 }
 
+
+function finishLocalGame() {
+
+    const winner =
+        localWinner();
+
+
+    if (winner) {
+
+        localOver =
+            true;
+
+
+        statusText.textContent =
+            "PLAYER " +
+            winner +
+            " WINS!";
+
+
+        const line =
+            getLocalWinningLine(
+                winner
+            );
+
+
+        if (line) {
+
+            line.forEach(
+                index => {
+
+                    const piece =
+                        cells[index]
+                            .querySelector(
+                                ".piece"
+                            );
+
+
+                    if (piece) {
+
+                        piece.classList.add(
+                            "winner"
+                        );
+                    }
+                }
+            );
+        }
+
+
+        return true;
+    }
+
+
+    if (
+        localGame.every(
+            Boolean
+        )
+    ) {
+
+        localOver =
+            true;
+
+
+        statusText.textContent =
+            "DRAW — THE BOARD IS COMPLETE";
+
+
+        cells.forEach(
+            cell => {
+
+                cell.classList.add(
+                    "draw-cell"
+                );
+            }
+        );
+
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+function getLocalWinningLine(
+    player
+) {
+
+    const lines = [
+
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+
+        [0,4,8],
+        [2,4,6]
+    ];
+
+
+    return lines.find(
+        line =>
+            line.every(
+                index =>
+                    localGame[index] ===
+                    player
+            )
+    );
+}
+
+
+function renderLocalBoard() {
+
+    cells.forEach(
+        cell => {
+
+            cell.innerHTML = "";
+
+            cell.classList.remove(
+                "draw-cell"
+            );
+
+
+            const index =
+                Number(
+                    cell.dataset.index
+                );
+
+
+            const value =
+                localGame[index];
+
+
+            if (!value) {
+                return;
+            }
+
+
+            const piece =
+                document.createElement(
+                    "div"
+                );
+
+
+            piece.classList.add(
+                "piece"
+            );
+
+
+            piece.classList.add(
+                value === "X"
+                    ? "x-piece"
+                    : "o-piece"
+            );
+
+
+            piece.classList.add(
+                animations[
+                    localAnimation %
+                    animations.length
+                ]
+            );
+
+
+            localAnimation++;
+
+
+            cell.appendChild(
+                piece
+            );
+        }
+    );
+}
+
+
 /* =========================================================
-   NEW GAME
+   NEW GAME BUTTON
    ========================================================= */
 
-function startNewGame() {
+function newGame() {
 
-    game = Array(9).fill("");
-    currentPlayer = "X";
-    gameOver = false;
-    animationNumber = 0;
+    if (mode === "CPU") {
 
-    cells.forEach(cell => {
+        localGame =
+            Array(9).fill(null);
 
-        cell.innerHTML = "";
+        localCurrent =
+            "X";
 
-        cell.classList.remove(
-            "winner",
-            "draw-cell"
+        localOver =
+            false;
+
+        localAnimation =
+            0;
+
+
+        cells.forEach(
+            cell => {
+
+                cell.innerHTML = "";
+
+                cell.classList.remove(
+                    "winner",
+                    "draw-cell"
+                );
+
+                cell.dataset.value =
+                    "";
+            }
         );
-    });
 
-    statusText.textContent =
-        "PLAYER X — YOUR TURN";
+
+        statusText.textContent =
+            "PLAYER X — YOUR TURN";
+
+
+        return;
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * This sends the exact message
+     * expected by server11.js.
+     */
+
+    sendNewGame();
 }
 
-/* =========================================================
-   PHONE + DESKTOP INPUT
-   =========================================================
-
-   IMPORTANT:
-   No touchstart preventDefault().
-   Pointer events work for:
-   - phone touch
-   - tablet touch
-   - mouse
-   - stylus
-*/
-
-cells.forEach(cell => {
-
-    cell.addEventListener("pointerup", event => {
-
-        event.preventDefault();
-
-        const index =
-            Number(cell.dataset.index);
-
-        humanMove(index);
-
-    }, { passive: false });
-
-});
 
 /* =========================================================
    MODE BUTTONS
    ========================================================= */
 
-twoPlayerButton.addEventListener("pointerup", event => {
+twoPlayerButton.addEventListener(
+    "pointerup",
+    event => {
 
-    event.preventDefault();
+        event.preventDefault();
 
-    mode = "2P";
+        mode =
+            "2P";
 
-    twoPlayerButton.classList.add("active");
-    computerButton.classList.remove("active");
 
-    startNewGame();
+        twoPlayerButton
+            .classList
+            .add("active");
 
-}, { passive: false });
 
-computerButton.addEventListener("pointerup", event => {
+        computerButton
+            .classList
+            .remove("active");
 
-    event.preventDefault();
 
-    mode = "CPU";
+        /*
+         * Reconnect if necessary.
+         */
 
-    computerButton.classList.add("active");
-    twoPlayerButton.classList.remove("active");
+        if (
+            !socket ||
+            socket.readyState !==
+            WebSocket.OPEN
+        ) {
 
-    startNewGame();
+            connectToServer();
 
-}, { passive: false });
+        } else {
 
-newGameButton.addEventListener("pointerup", event => {
+            renderBoard();
 
-    event.preventDefault();
+            updateStatus();
+        }
 
-    startNewGame();
+    },
+    {
+        passive: false
+    }
+);
 
-}, { passive: false });
+
+computerButton.addEventListener(
+    "pointerup",
+    event => {
+
+        event.preventDefault();
+
+        mode =
+            "CPU";
+
+
+        computerButton
+            .classList
+            .add("active");
+
+
+        twoPlayerButton
+            .classList
+            .remove("active");
+
+
+        localGame =
+            Array(9).fill(null);
+
+        localCurrent =
+            "X";
+
+        localOver =
+            false;
+
+        localAnimation =
+            0;
+
+
+        cells.forEach(
+            cell => {
+
+                cell.innerHTML = "";
+
+                cell.classList.remove(
+                    "winner",
+                    "draw-cell"
+                );
+
+                cell.dataset.value =
+                    "";
+            }
+        );
+
+
+        statusText.textContent =
+            "PLAYER X — YOUR TURN";
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+newGameButton.addEventListener(
+    "pointerup",
+    event => {
+
+        event.preventDefault();
+
+        newGame();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   PHONE / MOUSE / TABLET INPUT
+   ========================================================= */
+
+cells.forEach(
+    cell => {
+
+        cell.addEventListener(
+            "pointerup",
+            event => {
+
+                event.preventDefault();
+
+                const index =
+                    Number(
+                        cell.dataset.index
+                    );
+
+
+                cellPressed(index);
+
+            },
+            {
+                passive: false
+            }
+        );
+    }
+);
+
 
 /* =========================================================
    START
    ========================================================= */
 
 fitGame();
+
+connectToServer();
 
 </script>
 
