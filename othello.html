@@ -58,6 +58,7 @@ body {
     height: 100%;
     height: 100dvh;
 
+    min-width: 0;
     min-height: 0;
 
     display: flex;
@@ -189,6 +190,9 @@ button:disabled {
     min-width: 0;
     min-height: 0;
 
+    width: 100%;
+    height: 100%;
+
     display: flex;
     flex-direction: column;
 
@@ -197,7 +201,8 @@ button:disabled {
     overflow: hidden;
 
     padding:
-        clamp(5px, 1vw, 14px);
+        clamp(4px, .8vh, 10px)
+        clamp(4px, .8vw, 10px);
 }
 
 
@@ -217,15 +222,15 @@ button:disabled {
     justify-content: center;
 
     gap:
-        clamp(8px, 3vw, 35px);
+        clamp(6px, 2vw, 30px);
 
     margin-bottom:
-        clamp(5px, 1vh, 12px);
+        clamp(3px, .7vh, 9px);
 
     font-weight: 900;
 
     font-size:
-        clamp(11px, 1.5vw, 17px);
+        clamp(10px, 1.5vw, 17px);
 
     text-shadow:
         1px 2px 2px #000;
@@ -237,6 +242,8 @@ button:disabled {
     align-items: center;
 
     gap: 6px;
+
+    white-space: nowrap;
 }
 
 .score-piece {
@@ -341,6 +348,7 @@ button:disabled {
     min-height: 0;
 
     width: 100%;
+    height: 100%;
 
     display: flex;
 
@@ -353,27 +361,40 @@ button:disabled {
 
 /* =========================================================
    BOARD FRAME
+   =========================================================
+   
+   IMPORTANT:
+   The board is NOT sized from a fixed vw/vh percentage.
+
+   The board-wrap is the available space left after the
+   header, information row and controls have taken their
+   required space.
+
+   The frame takes the largest square that fits there.
    ========================================================= */
 
 .board-frame {
-    width:
-        min(
-            92vw,
-            82vh,
-            720px
-        );
+    flex: 0 1 auto;
 
-    height:
-        min(
-            92vw,
-            82vh,
-            720px
-        );
+    width: 100%;
+    height: 100%;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    /*
+       Width is allowed to fill the available area.
+       Height is also allowed to fill the available area.
+       The aspect ratio forces the final result square.
+    */
 
     padding:
-        clamp(6px, 1vw, 11px);
+        clamp(5px, .8vw, 11px);
 
-    border-radius: 16px;
+    border-radius:
+        clamp(9px, 1.5vw, 16px);
 
     background:
         linear-gradient(
@@ -392,24 +413,44 @@ button:disabled {
         inset 0 -7px 12px rgba(0,0,0,.8);
 
     position: relative;
+
+    overflow: hidden;
 }
 
-.board-frame::before {
-    content: "";
 
-    position: absolute;
+/*
+   CSS cannot simultaneously use 100% width AND 100% height
+   as independent limits while maintaining a square.
 
-    inset: 4px;
+   These two orientation rules select the limiting dimension.
+*/
 
-    border-radius: 12px;
+@media (orientation: portrait) {
 
-    border:
-        1px solid rgba(255,255,255,.12);
+    .board-frame {
+        width: 100%;
+        height: auto;
 
-    pointer-events: none;
-
-    z-index: 20;
+        max-width: 100%;
+        max-height: 100%;
+    }
 }
+
+@media (orientation: landscape) {
+
+    .board-frame {
+        width: auto;
+        height: 100%;
+
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
+
+
+/* =========================================================
+   BOARD
+   ========================================================= */
 
 .board {
     width: 100%;
@@ -418,16 +459,19 @@ button:disabled {
     display: grid;
 
     grid-template-columns:
-        repeat(8, 1fr);
+        repeat(8, minmax(0, 1fr));
 
     grid-template-rows:
-        repeat(8, 1fr);
+        repeat(8, minmax(0, 1fr));
 
-    gap: 2px;
+    gap:
+        clamp(1px, .25vw, 3px);
 
-    padding: 5px;
+    padding:
+        clamp(3px, .5vw, 5px);
 
-    border-radius: 10px;
+    border-radius:
+        clamp(6px, 1vw, 10px);
 
     background:
         linear-gradient(
@@ -552,9 +596,6 @@ button:disabled {
         0 2px 2px rgba(0,0,0,.95);
 }
 
-
-/* broad polished rim */
-
 .piece::before {
     content: "";
 
@@ -573,9 +614,6 @@ button:disabled {
 
     pointer-events: none;
 }
-
-
-/* large reflected highlight */
 
 .piece::after {
     content: "";
@@ -759,16 +797,16 @@ button:disabled {
         clamp(5px, 1vw, 12px);
 
     margin-top:
-        clamp(5px, 1vh, 12px);
+        clamp(3px, .7vh, 9px);
 }
 
 .controls button {
     min-width:
-        clamp(90px, 16vw, 140px);
+        clamp(80px, 15vw, 140px);
 
     padding:
-        clamp(5px, .8vh, 9px)
-        clamp(8px, 1.3vw, 16px);
+        clamp(4px, .7vh, 9px)
+        clamp(8px, 1.2vw, 16px);
 
     font-size:
         clamp(10px, 1.3vw, 15px);
@@ -1063,30 +1101,23 @@ button:disabled {
 
     .header-buttons button {
         min-height: 28px;
-        padding: 5px 7px;
+
+        padding:
+            5px 7px;
+
         font-size: 10px;
     }
 
     .game {
-        padding: 5px;
+        padding: 4px;
     }
 
     .info {
-        margin-bottom: 4px;
+        margin-bottom: 3px;
     }
 
     .board-frame {
-        width:
-            min(
-                96vw,
-                76vh
-            );
-
-        height:
-            min(
-                96vw,
-                76vh
-            );
+        padding: 5px;
     }
 
     .board {
@@ -1095,7 +1126,7 @@ button:disabled {
     }
 
     .controls {
-        margin-top: 5px;
+        margin-top: 4px;
     }
 
     .mode-box {
@@ -1113,7 +1144,7 @@ button:disabled {
 
 
 /* =========================================================
-   LANDSCAPE
+   SHORT LANDSCAPE
    ========================================================= */
 
 @media (max-height: 550px) and (orientation: landscape) {
@@ -1125,7 +1156,10 @@ button:disabled {
 
     .header-buttons button {
         min-height: 26px;
-        padding: 4px 7px;
+
+        padding:
+            4px 7px;
+
         font-size: 10px;
     }
 
@@ -1134,22 +1168,8 @@ button:disabled {
         font-size: 10px;
     }
 
-    .board-frame {
-        width:
-            min(
-                80vh,
-                72vw
-            );
-
-        height:
-            min(
-                80vh,
-                72vw
-            );
-    }
-
     .controls {
-        margin-top: 4px;
+        margin-top: 3px;
     }
 }
 
@@ -1175,12 +1195,15 @@ button:disabled {
 
     .header-buttons button {
         min-height: 24px;
-        padding: 3px 6px;
+
+        padding:
+            3px 6px;
+
         font-size: 9px;
     }
 
     .game {
-        padding: 3px;
+        padding: 2px 3px;
     }
 
     .info {
@@ -1188,26 +1211,13 @@ button:disabled {
         font-size: 9px;
     }
 
-    .board-frame {
-        width:
-            min(
-                72vh,
-                70vw
-            );
-
-        height:
-            min(
-                72vh,
-                70vw
-            );
-    }
-
     .controls {
-        margin-top: 3px;
+        margin-top: 2px;
     }
 
     .controls button {
         min-height: 24px;
+
         padding-top: 3px;
         padding-bottom: 3px;
     }
@@ -1428,13 +1438,6 @@ const DIRECTIONS = [
 ];
 
 
-/*
-   Position values used by the computer.
-
-   Corners are extremely valuable.
-   Squares next to corners are dangerous.
-*/
-
 const POSITION_VALUES = [
 
     [120, -35,  20,   5,   5,  20, -35, 120],
@@ -1532,10 +1535,6 @@ function startGame(mode) {
         );
 
 
-    /*
-       Official Othello opening.
-    */
-
     board[3][3] = WHITE;
     board[3][4] = BLACK;
     board[4][3] = BLACK;
@@ -1568,7 +1567,7 @@ function startGame(mode) {
 
 
 /* =========================================================
-   NEW GAME BUTTON
+   NEW GAME
    ========================================================= */
 
 function newGame() {
@@ -1735,7 +1734,7 @@ function getLegalMoves(
 
 
 /* =========================================================
-   PLACE HUMAN MOVE
+   HUMAN MOVE
    ========================================================= */
 
 function makeMove(
@@ -1751,11 +1750,6 @@ function makeMove(
         return;
     }
 
-
-    /*
-       During computer mode,
-       the human controls BLACK.
-    */
 
     if (
         gameMode === "computer" &&
@@ -1826,15 +1820,7 @@ function executeMove(
 
     render();
 
-
-    /*
-       Add the flip animation after
-       the board has changed.
-    */
-
-    animateFlips(
-        flips
-    );
+    animateFlips(flips);
 
 
     setTimeout(
@@ -1899,21 +1885,20 @@ function animateFlips(
 
             if (piece) {
 
-                /*
-                   Slightly stagger the flips
-                   to make the captured line
-                   feel physical.
-                */
-
                 const delay =
                     (
-                        Math.abs(row - flips[0][0]) +
-                        Math.abs(col - flips[0][1])
+                        Math.abs(
+                            row - flips[0][0]
+                        ) +
+                        Math.abs(
+                            col - flips[0][1]
+                        )
                     ) * 18;
 
 
                 piece.style.animationDelay =
                     delay + "ms";
+
 
                 piece.classList.add(
                     "flip"
@@ -1962,10 +1947,6 @@ function advanceTurn() {
         );
 
 
-    /*
-       Automatic pass.
-    */
-
     if (
         legal.length === 0
     ) {
@@ -1980,10 +1961,6 @@ function advanceTurn() {
                 other
             );
 
-
-        /*
-           Neither player can move.
-        */
 
         if (
             otherLegal.length === 0
@@ -2015,10 +1992,6 @@ function advanceTurn() {
 
     render();
 
-
-    /*
-       Computer's turn.
-    */
 
     if (
         gameMode === "computer" &&
@@ -2076,12 +2049,6 @@ function computerMove() {
     }
 
 
-    /*
-       Search several plies with minimax.
-       The board is small enough for this
-       depth to run comfortably in-browser.
-    */
-
     let bestMove =
         moves[0];
 
@@ -2111,12 +2078,6 @@ function computerMove() {
                 Infinity
             );
 
-
-        /*
-           Small random amount prevents
-           identical-looking choices when
-           moves are strategically equivalent.
-        */
 
         const finalScore =
             score +
@@ -2150,7 +2111,7 @@ function computerMove() {
 
 
 /* =========================================================
-   APPLY MOVE TO COPY
+   APPLY MOVE TO BOARD
    ========================================================= */
 
 function applyMoveToBoard(
@@ -2246,14 +2207,14 @@ function getLegalMovesForBoard(
 
 
     for (
-        let row=0;
-        row<8;
+        let row = 0;
+        row < 8;
         row++
     ) {
 
         for (
-            let col=0;
-            col<8;
+            let col = 0;
+            col < 8;
             col++
         ) {
 
@@ -2407,10 +2368,6 @@ function minimax(
     }
 
 
-    /*
-       Forced pass.
-    */
-
     if (
         myMoves.length === 0
     ) {
@@ -2424,11 +2381,6 @@ function minimax(
         );
     }
 
-
-    /*
-       White maximizes.
-       Black minimizes.
-    */
 
     if (
         player === WHITE
@@ -2483,55 +2435,52 @@ function minimax(
     }
 
 
-    else {
-
-        let value =
-            Infinity;
+    let value =
+        Infinity;
 
 
-        for (
-            const move of myMoves
+    for (
+        const move of myMoves
+    ) {
+
+        const next =
+            applyMoveToBoard(
+                state,
+                move.row,
+                move.col,
+                player
+            );
+
+
+        value =
+            Math.min(
+                value,
+                minimax(
+                    next,
+                    other,
+                    depth - 1,
+                    alpha,
+                    beta
+                )
+            );
+
+
+        beta =
+            Math.min(
+                beta,
+                value
+            );
+
+
+        if (
+            beta <= alpha
         ) {
-
-            const next =
-                applyMoveToBoard(
-                    state,
-                    move.row,
-                    move.col,
-                    player
-                );
-
-
-            value =
-                Math.min(
-                    value,
-                    minimax(
-                        next,
-                        other,
-                        depth - 1,
-                        alpha,
-                        beta
-                    )
-                );
-
-
-            beta =
-                Math.min(
-                    beta,
-                    value
-                );
-
-
-            if (
-                beta <= alpha
-            ) {
-                break;
-            }
+            break;
         }
-
-
-        return value;
     }
+
+
+    return value;
 }
 
 
@@ -2555,14 +2504,14 @@ function evaluateBoard(
 
 
     for (
-        let row=0;
-        row<8;
+        let row = 0;
+        row < 8;
         row++
     ) {
 
         for (
-            let col=0;
-            col<8;
+            let col = 0;
+            col < 8;
             col++
         ) {
 
@@ -2647,14 +2596,14 @@ function render() {
 
 
     for (
-        let row=0;
-        row<8;
+        let row = 0;
+        row < 8;
         row++
     ) {
 
         for (
-            let col=0;
-            col<8;
+            let col = 0;
+            col < 8;
             col++
         ) {
 
@@ -2662,6 +2611,7 @@ function render() {
                 document.createElement(
                     "div"
                 );
+
 
             square.className =
                 "square";
@@ -2764,14 +2714,14 @@ function updateScore() {
 
 
     for (
-        let row=0;
-        row<8;
+        let row = 0;
+        row < 8;
         row++
     ) {
 
         for (
-            let col=0;
-            col<8;
+            let col = 0;
+            col < 8;
             col++
         ) {
 
@@ -2898,14 +2848,14 @@ function finishGame() {
 
 
     for (
-        let row=0;
-        row<8;
+        let row = 0;
+        row < 8;
         row++
     ) {
 
         for (
-            let col=0;
-            col<8;
+            let col = 0;
+            col < 8;
             col++
         ) {
 
