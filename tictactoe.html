@@ -1,0 +1,4078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Tic-Tac-Toe</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #4b463c 0%,
+            #211f1a 48%,
+            #090909 100%
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    color: #e8d8ad;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: manipulation;
+}
+
+#game {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        max(8px, env(safe-area-inset-top))
+        max(8px, env(safe-area-inset-right))
+        max(8px, env(safe-area-inset-bottom))
+        max(8px, env(safe-area-inset-left));
+
+    position: relative;
+}
+
+#title {
+    flex: 0 0 auto;
+
+    text-align: center;
+
+    font-size:
+        clamp(
+            20px,
+            4vh,
+            48px
+        );
+
+    letter-spacing:
+        clamp(
+            3px,
+            .8vw,
+            10px
+        );
+
+    font-weight: bold;
+
+    color: #d8c08b;
+
+    text-shadow:
+        0 2px 0 #3b2b13,
+        0 4px 12px #000;
+
+    line-height: 1;
+
+    margin-top: 2px;
+}
+
+#status {
+    flex: 0 0 auto;
+
+    text-align: center;
+
+    font-size:
+        clamp(
+            13px,
+            2.4vh,
+            24px
+        );
+
+    min-height: 1.3em;
+
+    color: #f1dfae;
+
+    text-shadow:
+        0 2px 5px #000;
+
+    font-weight: bold;
+}
+
+#connection {
+    position: absolute;
+
+    top:
+        max(
+            8px,
+            env(safe-area-inset-top)
+        );
+
+    right:
+        max(
+            8px,
+            env(safe-area-inset-right)
+        );
+
+    font-family: Arial, sans-serif;
+
+    font-size:
+        clamp(
+            9px,
+            1.5vh,
+            13px
+        );
+
+    letter-spacing: 1px;
+
+    padding: 4px 7px;
+
+    border-radius: 4px;
+
+    background: rgba(0,0,0,.55);
+
+    color: #b7b7b7;
+
+    z-index: 50;
+}
+
+#connection.connected {
+    color: #b8df9a;
+}
+
+#connection.waiting {
+    color: #e5c26f;
+}
+
+#connection.error {
+    color: #e18c7c;
+}
+
+#arena {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    perspective: 1200px;
+
+    overflow: hidden;
+}
+
+#monument {
+    width:
+        calc(
+            var(--boardSize) +
+            var(--frameWidth) * 2
+        );
+
+    height:
+        calc(
+            var(--boardSize) +
+            var(--frameWidth) * 2
+        );
+
+    position: relative;
+
+    flex: 0 0 auto;
+
+    transform:
+        perspective(1200px)
+        rotateX(2deg);
+}
+
+#monument::after {
+    content: "";
+
+    position: absolute;
+
+    left: 5%;
+    right: 5%;
+
+    bottom: -2%;
+
+    height: 8%;
+
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.75);
+
+    filter: blur(10px);
+
+    z-index: -5;
+}
+
+.frame {
+    position: absolute;
+
+    background:
+        linear-gradient(
+            90deg,
+            #171513 0%,
+            #51493b 8%,
+            #a18b62 17%,
+            #534b3c 28%,
+            #24211d 48%,
+            #74664b 68%,
+            #2a2721 88%,
+            #11100e 100%
+        );
+
+    border:
+        calc(
+            var(--boardSize) * .018
+        )
+        solid
+        #171512;
+
+    box-shadow:
+        inset
+        0 0
+        0
+        calc(
+            var(--boardSize) * .007
+        )
+        rgba(216,184,116,.45),
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .035
+        )
+        rgba(0,0,0,.8),
+
+        0 10px 18px rgba(0,0,0,.75);
+}
+
+.frame.left,
+.frame.right {
+    top: 0;
+    bottom: 0;
+    width: var(--frameWidth);
+}
+
+.frame.left {
+    left: 0;
+}
+
+.frame.right {
+    right: 0;
+}
+
+.frame.top,
+.frame.bottom {
+    left: 0;
+    right: 0;
+    height: var(--frameWidth);
+}
+
+.frame.top {
+    top: 0;
+}
+
+.frame.bottom {
+    bottom: 0;
+}
+
+.rivet {
+    position: absolute;
+
+    width:
+        calc(
+            var(--boardSize) * .038
+        );
+
+    height:
+        calc(
+            var(--boardSize) * .038
+        );
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #e1c989 0%,
+            #8f784d 28%,
+            #403522 60%,
+            #17130e 100%
+        );
+
+    border: 1px solid #15120e;
+
+    box-shadow:
+        1px 2px 3px #000,
+        inset 0 1px 1px rgba(255,255,255,.35);
+
+    z-index: 4;
+}
+
+.r1 {
+    left: 5%;
+    top: 5%;
+}
+
+.r2 {
+    right: 5%;
+    top: 5%;
+}
+
+.r3 {
+    left: 5%;
+    bottom: 5%;
+}
+
+.r4 {
+    right: 5%;
+    bottom: 5%;
+}
+
+#board {
+    position: absolute;
+
+    width: var(--boardSize);
+    height: var(--boardSize);
+
+    left: var(--frameWidth);
+    top: var(--frameWidth);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    grid-template-rows:
+        repeat(3, 1fr);
+
+    background:
+        radial-gradient(
+            circle at 45% 40%,
+            #514a3c 0%,
+            #322e27 50%,
+            #1a1815 100%
+        );
+
+    border:
+        calc(
+            var(--boardSize) * .012
+        )
+        solid
+        #15130f;
+
+    box-shadow:
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .025
+        )
+        rgba(0,0,0,.9),
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .01
+        )
+        rgba(207,174,104,.3),
+
+        0 0
+        calc(
+            var(--boardSize) * .025
+        )
+        rgba(0,0,0,.8);
+}
+
+.cell {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    overflow: hidden;
+
+    touch-action: manipulation;
+}
+
+.cell::before,
+.cell::after {
+    content: "";
+
+    position: absolute;
+
+    pointer-events: none;
+}
+
+.cell:nth-child(2)::before,
+.cell:nth-child(5)::before,
+.cell:nth-child(8)::before {
+    right: 0;
+
+    top: 4%;
+    bottom: 4%;
+
+    width:
+        calc(
+            var(--boardSize) * .012
+        );
+
+    background:
+        linear-gradient(
+            90deg,
+            #17140f,
+            #9d8759,
+            #30291e
+        );
+
+    box-shadow:
+        2px 0 4px #000;
+}
+
+.cell:nth-child(n+4)::after {
+    left: 4%;
+    right: 4%;
+
+    top: 0;
+
+    height:
+        calc(
+            var(--boardSize) * .012
+        );
+
+    background:
+        linear-gradient(
+            90deg,
+            #17140f,
+            #9d8759,
+            #30291e
+        );
+
+    box-shadow:
+        0 -2px 4px #000;
+}
+
+.piece {
+    width: 70%;
+    height: 70%;
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transform-origin: center center;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            calc(var(--boardSize) * .012)
+            calc(var(--boardSize) * .018)
+            calc(var(--boardSize) * .015)
+            rgba(0,0,0,.85)
+        );
+}
+
+.x-piece,
+.o-piece {
+    color: #b88945;
+
+    text-shadow:
+        1px 1px 0 #3b2410,
+        -1px -1px 0 #e5c27d,
+        2px 4px 5px #000;
+}
+
+.x-piece::before,
+.x-piece::after {
+    content: "";
+
+    position: absolute;
+
+    width: 20%;
+    height: 95%;
+
+    left: 40%;
+    top: 2.5%;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #3c2510 0%,
+            #8d5c28 15%,
+            #d0a45d 34%,
+            #a56e32 52%,
+            #553213 76%,
+            #21150b 100%
+        );
+
+    border: 2px solid #2a1b0d;
+
+    box-shadow:
+        inset 2px 0 2px rgba(255,255,255,.35),
+        inset -3px 0 4px rgba(0,0,0,.55);
+}
+
+.x-piece::before {
+    transform: rotate(45deg);
+}
+
+.x-piece::after {
+    transform: rotate(-45deg);
+}
+
+.o-piece {
+    width: 62%;
+    height: 62%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 34% 28%,
+            #e1bf78 0%,
+            #b77e39 23%,
+            #74451d 55%,
+            #3b220e 78%,
+            #171009 100%
+        );
+
+    border:
+        max(
+            3px,
+            calc(
+                var(--boardSize) * .012
+            )
+        )
+        solid
+        #2b1a0b;
+
+    box-shadow:
+        inset
+        0 0
+        0
+        calc(
+            var(--boardSize) * .008
+        )
+        rgba(223,183,104,.45),
+
+        inset
+        0 0
+        calc(
+            var(--boardSize) * .018
+        )
+        rgba(0,0,0,.9);
+}
+
+.o-piece::after {
+    content: "";
+
+    position: absolute;
+
+    width: 43%;
+    height: 43%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #171411 0%,
+            #080807 70%,
+            #020202 100%
+        );
+
+    box-shadow:
+        inset 2px 2px 3px rgba(0,0,0,.9);
+}
+
+.anim-hammer {
+    animation:
+        hammer
+        .58s
+        cubic-bezier(.2,1.6,.35,1)
+        both;
+}
+
+@keyframes hammer {
+    0% {
+        transform:
+            translateY(
+                calc(
+                    var(--boardSize) * -.30
+                )
+            )
+            scale(1.7)
+            rotate(-15deg);
+
+        opacity: 0;
+    }
+
+    55% {
+        transform:
+            translateY(
+                calc(
+                    var(--boardSize) * .035
+                )
+            )
+            scale(.9)
+            rotate(4deg);
+
+        opacity: 1;
+    }
+
+    75% {
+        transform:
+            translateY(
+                calc(
+                    var(--boardSize) * -.012
+                )
+            )
+            scale(1.08);
+    }
+
+    100% {
+        transform:
+            translateY(0)
+            scale(1)
+            rotate(0);
+    }
+}
+
+.anim-spin {
+    animation:
+        spinIn
+        .65s
+        cubic-bezier(.2,1.3,.3,1)
+        both;
+}
+
+@keyframes spinIn {
+    0% {
+        transform:
+            scale(.15)
+            rotate(360deg);
+
+        opacity: 0;
+    }
+
+    70% {
+        transform:
+            scale(1.12)
+            rotate(-15deg);
+
+        opacity: 1;
+    }
+
+    100% {
+        transform:
+            scale(1)
+            rotate(0);
+    }
+}
+
+.anim-rise {
+    animation:
+        rise
+        .65s
+        cubic-bezier(.25,1.5,.35,1)
+        both;
+}
+
+@keyframes rise {
+    0% {
+        transform:
+            translateY(100%)
+            scale(.65);
+
+        opacity: 0;
+    }
+
+    60% {
+        transform:
+            translateY(-8%)
+            scale(1.08);
+
+        opacity: 1;
+    }
+
+    100% {
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+.anim-forge {
+    animation:
+        forge
+        .55s
+        cubic-bezier(.2,1.5,.3,1)
+        both;
+}
+
+@keyframes forge {
+    0% {
+        transform: scale(2.5);
+
+        opacity: 0;
+
+        filter:
+            brightness(4)
+            drop-shadow(
+                0 0 20px #ffd875
+            );
+    }
+
+    35% {
+        opacity: 1;
+
+        transform: scale(.82);
+
+        filter:
+            brightness(2)
+            drop-shadow(
+                0 0 18px #ffd875
+            );
+    }
+
+    65% {
+        transform: scale(1.12);
+
+        filter:
+            brightness(1.4)
+            drop-shadow(
+                0 0 7px #d29c42
+            );
+    }
+
+    100% {
+        transform: scale(1);
+
+        filter:
+            brightness(1)
+            drop-shadow(
+                calc(var(--boardSize) * .012)
+                calc(var(--boardSize) * .018)
+                calc(var(--boardSize) * .015)
+                rgba(0,0,0,.85)
+            );
+    }
+}
+
+.anim-swing {
+    animation:
+        swing
+        .65s
+        cubic-bezier(.2,1.4,.3,1)
+        both;
+
+    transform-origin: 50% 100%;
+}
+
+@keyframes swing {
+    0% {
+        transform:
+            translateX(-60%)
+            rotate(-65deg)
+            scale(.7);
+
+        opacity: 0;
+    }
+
+    55% {
+        transform:
+            translateX(8%)
+            rotate(12deg)
+            scale(1.1);
+
+        opacity: 1;
+    }
+
+    100% {
+        transform:
+            translateX(0)
+            rotate(0)
+            scale(1);
+    }
+}
+
+.winner {
+    animation:
+        winnerPulse
+        .7s
+        ease-in-out
+        infinite
+        alternate;
+}
+
+@keyframes winnerPulse {
+    from {
+        filter:
+            drop-shadow(
+                0 0 2px #d6a94d
+            )
+            brightness(1);
+    }
+
+    to {
+        filter:
+            drop-shadow(
+                0 0 14px #ffd66e
+            )
+            brightness(1.45);
+    }
+}
+
+.draw-cell {
+    animation:
+        drawPulse
+        .7s
+        ease-in-out
+        infinite
+        alternate;
+}
+
+@keyframes drawPulse {
+    from {
+        background:
+            rgba(170,130,55,.04);
+    }
+
+    to {
+        background:
+            rgba(170,130,55,.18);
+    }
+}
+
+#controls {
+    flex: 0 0 auto;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap:
+        clamp(
+            5px,
+            1vw,
+            12px
+        );
+
+    width: 100%;
+
+    padding-bottom: 2px;
+
+    flex-wrap: wrap;
+}
+
+button {
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-weight: bold;
+
+    font-size:
+        clamp(
+            10px,
+            1.8vh,
+            18px
+        );
+
+    letter-spacing:
+        clamp(
+            .5px,
+            .2vw,
+            2px
+        );
+
+    color: #ead5a2;
+
+    padding:
+        clamp(6px, 1vh, 11px)
+        clamp(10px, 2vw, 24px);
+
+    border-radius: 5px;
+
+    border: 2px solid #19140d;
+
+    background:
+        linear-gradient(
+            180deg,
+            #9a7c4a 0%,
+            #5a4528 45%,
+            #302417 100%
+        );
+
+    box-shadow:
+        inset
+        0 1px 1px
+        rgba(255,255,255,.35),
+
+        0 3px 6px #000;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    touch-action: manipulation;
+}
+
+button:active {
+    transform: translateY(2px);
+}
+
+button.active {
+    border-color: #d2ae68;
+
+    box-shadow:
+        inset
+        0 0 8px
+        rgba(0,0,0,.8),
+
+        0 0 8px
+        rgba(216,176,89,.5);
+
+    color: #fff1c7;
+}
+
+@media (orientation: landscape) {
+
+    #game {
+        padding-top:
+            max(
+                4px,
+                env(safe-area-inset-top)
+            );
+
+        padding-bottom:
+            max(
+                4px,
+                env(safe-area-inset-bottom)
+            );
+    }
+
+    #title {
+        font-size:
+            clamp(
+                16px,
+                5vh,
+                38px
+            );
+    }
+
+    #status {
+        font-size:
+            clamp(
+                11px,
+                2.8vh,
+                19px
+            );
+    }
+}
+
+@media (max-height: 430px) {
+
+    #title {
+        display: none;
+    }
+
+    #status {
+        font-size: 12px;
+    }
+
+    button {
+        padding: 4px 9px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="connection">
+        NOT CONNECTED
+    </div>
+
+    <div id="title">
+        TIC-TAC-TOE
+    </div>
+
+    <div id="status">
+        SELECT A GAME MODE
+    </div>
+
+    <div id="arena">
+
+        <div id="monument">
+
+            <div class="frame left"></div>
+            <div class="frame right"></div>
+            <div class="frame top"></div>
+            <div class="frame bottom"></div>
+
+            <div class="rivet r1"></div>
+            <div class="rivet r2"></div>
+            <div class="rivet r3"></div>
+            <div class="rivet r4"></div>
+
+            <div id="board">
+
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="controls">
+
+        <button id="twoPlayer">
+            2 PLAYERS
+        </button>
+
+        <button id="computer">
+            VS COMPUTER
+        </button>
+
+        <button id="newGame">
+            NEW GAME
+        </button>
+
+        <button id="gameRoom">
+            GAME ROOM
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const cells =
+    [...document.querySelectorAll(".cell")];
+
+const monument =
+    document.getElementById("monument");
+
+const arena =
+    document.getElementById("arena");
+
+const statusText =
+    document.getElementById("status");
+
+const connectionText =
+    document.getElementById("connection");
+
+const twoPlayerButton =
+    document.getElementById("twoPlayer");
+
+const computerButton =
+    document.getElementById("computer");
+
+const newGameButton =
+    document.getElementById("newGame");
+
+const gameRoomButton =
+    document.getElementById("gameRoom");
+
+
+/* =========================================================
+   ROOM IDENTITY
+   ========================================================= */
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const roomId =
+    urlParams.get("room") ||
+    urlParams.get("roomId") ||
+    "";
+
+const rawPlayer =
+    String(
+        urlParams.get("player") || ""
+    ).toLowerCase();
+
+/*
+ * IMPORTANT:
+ *
+ * Do NOT automatically assume that an absent player
+ * parameter means Player 1.
+ *
+ * A room connection must be assigned by the server.
+ *
+ * CPU mode is completely separate and still uses X.
+ */
+
+let requestedPlayer =
+    null;
+
+if (
+    rawPlayer === "1" ||
+    rawPlayer === "player1"
+) {
+
+    requestedPlayer = 1;
+
+} else if (
+    rawPlayer === "2" ||
+    rawPlayer === "player2"
+) {
+
+    requestedPlayer = 2;
+}
+
+let myPlayer =
+    requestedPlayer;
+
+let mySymbol =
+    requestedPlayer === 1
+        ? "X"
+        : requestedPlayer === 2
+            ? "O"
+            : null;
+
+
+/* =========================================================
+   ONLINE GAME STATE
+   ========================================================= */
+
+let game =
+    Array(9).fill(null);
+
+let confirmedGame =
+    Array(9).fill(null);
+
+let currentPlayer =
+    "X";
+
+let confirmedCurrentPlayer =
+    "X";
+
+let gameOver =
+    false;
+
+let winner =
+    null;
+
+let draw =
+    false;
+
+
+/*
+ * A page with no room parameter has not selected
+ * an online game yet.
+ *
+ * A page with a room parameter is coming from
+ * the matchmaking lobby and must wait for the
+ * server to identify it as Player 1, Player 2,
+ * or spectator.
+ */
+let mode =
+    roomId
+        ? "2P"
+        : "NONE";
+
+let socket =
+    null;
+
+let reconnectTimer =
+    null;
+
+let reconnectDelay =
+    1500;
+
+let socketGeneration =
+    0;
+
+
+/*
+ * A room connection starts in the waiting state.
+ *
+ * This prevents the page from displaying
+ * "PLAYER X — YOUR TURN" before the server
+ * has actually assigned the connection.
+ */
+let waitingForServer =
+    Boolean(roomId);
+
+let localMoveLock =
+    Boolean(roomId);
+
+let serverAssigned =
+    false;
+
+let opponentConnected =
+    false;
+
+let spectator =
+    false;
+
+let lastServerStateKey =
+    "";
+
+let lastLocalMove =
+    null;
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+let animationNumber =
+    0;
+
+const animations = [
+    "anim-hammer",
+    "anim-spin",
+    "anim-rise",
+    "anim-forge",
+    "anim-swing"
+];
+
+
+/* =========================================================
+   BOARD FIT
+   ========================================================= */
+
+function fitGame() {
+
+    const arenaWidth =
+        arena.clientWidth;
+
+    const arenaHeight =
+        arena.clientHeight;
+
+    if (
+        !arenaWidth ||
+        !arenaHeight
+    ) {
+        return;
+    }
+
+    const frameRatio =
+        0.105;
+
+    const usableWidth =
+        arenaWidth * .96;
+
+    const usableHeight =
+        arenaHeight * .96;
+
+    const maxBoardFromWidth =
+        usableWidth /
+        (1 + frameRatio * 2);
+
+    const maxBoardFromHeight =
+        usableHeight /
+        (1 + frameRatio * 2);
+
+    let boardSize =
+        Math.min(
+            maxBoardFromWidth,
+            maxBoardFromHeight
+        );
+
+    boardSize =
+        Math.max(
+            100,
+            boardSize
+        );
+
+    const frameWidth =
+        boardSize * frameRatio;
+
+    monument.style.setProperty(
+        "--boardSize",
+        boardSize + "px"
+    );
+
+    monument.style.setProperty(
+        "--frameWidth",
+        frameWidth + "px"
+    );
+}
+
+window.addEventListener(
+    "resize",
+    fitGame
+);
+
+window.addEventListener(
+    "orientationchange",
+    () => {
+        setTimeout(
+            fitGame,
+            100
+        );
+    }
+);
+
+if (window.visualViewport) {
+
+    window.visualViewport.addEventListener(
+        "resize",
+        fitGame
+    );
+}
+
+
+/* =========================================================
+   CONNECTION DISPLAY
+   ========================================================= */
+
+function setConnection(
+    text,
+    state
+) {
+
+    connectionText.textContent =
+        text;
+
+    connectionText.className =
+        state || "";
+}
+
+
+/* =========================================================
+   SAFE SOCKET SEND
+   ========================================================= */
+
+function sendMessage(
+    message
+) {
+
+    if (
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ) {
+        return false;
+    }
+
+    try {
+
+        socket.send(
+            JSON.stringify(message)
+        );
+
+        return true;
+
+    } catch (error) {
+
+        return false;
+    }
+}
+
+
+/* =========================================================
+   CONNECT TO TTT SERVER
+   ========================================================= */
+
+function connectToServer() {
+
+    if (
+        mode !== "2P"
+    ) {
+        return;
+    }
+
+    if (!roomId) {
+
+        statusText.textContent =
+            "PRESS 2 PLAYERS TO ENTER THE LOBBY";
+
+        setConnection(
+            "NOT CONNECTED",
+            ""
+        );
+
+        return;
+    }
+
+    if (
+        socket &&
+        (
+            socket.readyState ===
+            WebSocket.OPEN ||
+
+            socket.readyState ===
+            WebSocket.CONNECTING
+        )
+    ) {
+        return;
+    }
+
+    const thisGeneration =
+        ++socketGeneration;
+
+    /*
+     * The server has not assigned this connection yet.
+     */
+    waitingForServer =
+        true;
+
+    localMoveLock =
+        true;
+
+    serverAssigned =
+        false;
+
+    spectator =
+        false;
+
+    opponentConnected =
+        false;
+
+    setConnection(
+        "CONNECTING...",
+        ""
+    );
+
+    statusText.textContent =
+        "CONNECTING TO GAME SERVER...";
+
+    try {
+
+        socket =
+            new WebSocket(
+                "wss://games-z5k2.onrender.com/ttt"
+            );
+
+    } catch (error) {
+
+        setConnection(
+            "CONNECTION ERROR",
+            "error"
+        );
+
+        statusText.textContent =
+            "CONNECTION ERROR";
+
+        scheduleReconnect();
+
+        return;
+    }
+
+    socket.addEventListener(
+        "open",
+        () => {
+
+            if (
+                thisGeneration !==
+                socketGeneration
+            ) {
+                return;
+            }
+
+            reconnectDelay =
+                1500;
+
+            /*
+             * STAY WAITING until the server
+             * actually assigns the player.
+             */
+            waitingForServer =
+                true;
+
+            localMoveLock =
+                true;
+
+            setConnection(
+                "CONNECTED",
+                "connected"
+            );
+
+            /*
+             * ONE normal join message only.
+             */
+            const joinMessage = {
+                type: "join",
+                room: roomId,
+                roomId: roomId,
+                game: "tictactoe"
+            };
+
+            /*
+             * If the lobby supplied a player number,
+             * pass it along. Otherwise the server
+             * chooses the player/spectator role.
+             */
+            if (
+                requestedPlayer === 1 ||
+                requestedPlayer === 2
+            ) {
+
+                joinMessage.player =
+                    requestedPlayer;
+            }
+
+            sendMessage(
+                joinMessage
+            );
+
+            statusText.textContent =
+                "WAITING FOR GAME SERVER...";
+        }
+    );
+
+    socket.addEventListener(
+        "message",
+        event => {
+
+            if (
+                thisGeneration !==
+                socketGeneration
+            ) {
+                return;
+            }
+
+            handleServerMessage(
+                event.data
+            );
+        }
+    );
+
+    socket.addEventListener(
+        "close",
+        () => {
+
+            if (
+                thisGeneration !==
+                socketGeneration
+            ) {
+                return;
+            }
+
+            waitingForServer =
+                true;
+
+            localMoveLock =
+                true;
+
+            serverAssigned =
+                false;
+
+            spectator =
+                false;
+
+            opponentConnected =
+                false;
+
+            setConnection(
+                "DISCONNECTED",
+                "error"
+            );
+
+            statusText.textContent =
+                "SERVER CONNECTION LOST";
+
+            scheduleReconnect();
+        }
+    );
+
+    socket.addEventListener(
+        "error",
+        () => {
+
+            if (
+                thisGeneration !==
+                socketGeneration
+            ) {
+                return;
+            }
+
+            setConnection(
+                "CONNECTION ERROR",
+                "error"
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   RECONNECT
+   ========================================================= */
+
+function scheduleReconnect() {
+
+    if (
+        mode !== "2P" ||
+        !roomId
+    ) {
+        return;
+    }
+
+    if (reconnectTimer) {
+        return;
+    }
+
+    reconnectTimer =
+        setTimeout(
+            () => {
+
+                reconnectTimer =
+                    null;
+
+                connectToServer();
+
+                reconnectDelay =
+                    Math.min(
+                        reconnectDelay * 1.5,
+                        8000
+                    );
+
+            },
+            reconnectDelay
+        );
+}
+
+
+/* =========================================================
+   ROOM FILTER
+   ========================================================= */
+
+function messageBelongsToThisRoom(
+    data
+) {
+
+    if (
+        data.room !== undefined &&
+        data.room !== null &&
+        String(data.room) !== ""
+    ) {
+
+        if (
+            roomId &&
+            String(data.room) !==
+            String(roomId)
+        ) {
+            return false;
+        }
+    }
+
+    if (
+        data.roomId !== undefined &&
+        data.roomId !== null &&
+        String(data.roomId) !== ""
+    ) {
+
+        if (
+            roomId &&
+            String(data.roomId) !==
+            String(roomId)
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+/* =========================================================
+   NORMALIZE SYMBOL
+   ========================================================= */
+
+function normalizeSymbol(
+    value
+) {
+
+    if (
+        value === "X" ||
+        value === "x"
+    ) {
+        return "X";
+    }
+
+    if (
+        value === "O" ||
+        value === "o" ||
+        value === "0"
+    ) {
+        return "O";
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   NORMALIZE PLAYER
+   ========================================================= */
+
+function normalizePlayer(
+    value
+) {
+
+    if (
+        value === 1 ||
+        value === "1" ||
+        String(value).toLowerCase() ===
+            "player1"
+    ) {
+        return 1;
+    }
+
+    if (
+        value === 2 ||
+        value === "2" ||
+        String(value).toLowerCase() ===
+            "player2"
+    ) {
+        return 2;
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   SERVER MESSAGE HANDLER
+   ========================================================= */
+
+function handleServerMessage(
+    raw
+) {
+
+    let data;
+
+    try {
+
+        data =
+            JSON.parse(raw);
+
+    } catch (error) {
+
+        return;
+    }
+
+    if (
+        !messageBelongsToThisRoom(data)
+    ) {
+        return;
+    }
+
+
+    /* =====================================================
+       ASSIGNMENT
+       ===================================================== */
+
+    if (
+        data.type ===
+        "assign"
+    ) {
+
+        const assignedSymbol =
+            normalizeSymbol(
+                data.symbol ||
+                data.mySymbol ||
+                data.playerSymbol ||
+                data.mark
+            );
+
+        const assignedPlayer =
+            normalizePlayer(
+                data.player
+            );
+
+        /*
+         * A real player assignment must contain
+         * a valid player/symbol identity.
+         */
+        if (
+            assignedSymbol ||
+            assignedPlayer
+        ) {
+
+            spectator =
+                false;
+
+            serverAssigned =
+                true;
+
+            if (assignedSymbol) {
+
+                mySymbol =
+                    assignedSymbol;
+            }
+
+            if (assignedPlayer) {
+
+                myPlayer =
+                    assignedPlayer;
+
+            } else if (assignedSymbol) {
+
+                myPlayer =
+                    assignedSymbol === "X"
+                        ? 1
+                        : 2;
+            }
+
+            if (!mySymbol) {
+
+                mySymbol =
+                    myPlayer === 1
+                        ? "X"
+                        : "O";
+            }
+
+            waitingForServer =
+                false;
+
+            localMoveLock =
+                false;
+
+            setConnection(
+                "PLAYER " + mySymbol,
+                "connected"
+            );
+
+            updateStatus();
+
+        } else {
+
+            /*
+             * An assignment without a valid player
+             * identity is not treated as Player 1.
+             */
+            waitingForServer =
+                true;
+
+            localMoveLock =
+                true;
+
+            statusText.textContent =
+                "WAITING FOR PLAYER ASSIGNMENT";
+        }
+
+        return;
+    }
+
+
+    /* =====================================================
+       TTT CONNECTED
+       ===================================================== */
+
+    if (
+        data.type ===
+        "tttConnected"
+    ) {
+
+        if (
+            data.player ===
+            "spectator" ||
+            String(data.role || "").toLowerCase() ===
+                "spectator" ||
+            data.spectator === true
+        ) {
+
+            /*
+             * This connection is NOT a player.
+             */
+            spectator =
+                true;
+
+            serverAssigned =
+                false;
+
+            myPlayer =
+                null;
+
+            mySymbol =
+                null;
+
+            waitingForServer =
+                true;
+
+            localMoveLock =
+                true;
+
+            opponentConnected =
+                true;
+
+            setConnection(
+                "SPECTATOR",
+                "waiting"
+            );
+
+            statusText.textContent =
+                "GAME IS FULL — SPECTATING";
+
+            return;
+        }
+
+        const symbol =
+            normalizeSymbol(
+                data.symbol ||
+                data.mySymbol ||
+                data.playerSymbol ||
+                data.mark
+            );
+
+        const assignedPlayer =
+            normalizePlayer(
+                data.player
+            );
+
+        if (
+            symbol ||
+            assignedPlayer
+        ) {
+
+            spectator =
+                false;
+
+            serverAssigned =
+                true;
+
+            if (symbol) {
+
+                mySymbol =
+                    symbol;
+            }
+
+            if (assignedPlayer) {
+
+                myPlayer =
+                    assignedPlayer;
+
+            } else if (symbol) {
+
+                myPlayer =
+                    symbol === "X"
+                        ? 1
+                        : 2;
+            }
+
+            if (!mySymbol) {
+
+                mySymbol =
+                    myPlayer === 1
+                        ? "X"
+                        : "O";
+            }
+
+            opponentConnected =
+                true;
+
+            waitingForServer =
+                false;
+
+            localMoveLock =
+                false;
+
+            setConnection(
+                "PLAYER " + mySymbol,
+                "connected"
+            );
+
+            updateStatus();
+
+        } else {
+
+            /*
+             * Connected does not automatically mean
+             * Player 1.
+             */
+            waitingForServer =
+                true;
+
+            localMoveLock =
+                true;
+
+            setConnection(
+                "CONNECTED",
+                "waiting"
+            );
+
+            statusText.textContent =
+                "WAITING FOR PLAYER ASSIGNMENT";
+        }
+
+        return;
+    }
+
+
+    /* =====================================================
+       PLAYER JOINED
+       ===================================================== */
+
+    if (
+        data.type ===
+        "playerJoined"
+    ) {
+
+        opponentConnected =
+            true;
+
+        updateStatus();
+
+        return;
+    }
+
+
+    /* =====================================================
+       FULL SERVER STATE
+       ===================================================== */
+
+    if (
+        data.type ===
+        "state" ||
+        data.type ===
+        "tttState"
+    ) {
+
+        applyServerState(
+            data
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       INDIVIDUAL MOVE
+       ===================================================== */
+
+    if (
+        data.type ===
+        "move" ||
+        data.type ===
+        "tttMove"
+    ) {
+
+        applyServerMove(
+            data
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       OPPONENT LEFT
+       ===================================================== */
+
+    if (
+        data.type ===
+        "opponentLeft"
+    ) {
+
+        opponentConnected =
+            false;
+
+        localMoveLock =
+            false;
+
+        setConnection(
+            "OPPONENT LEFT",
+            "waiting"
+        );
+
+        statusText.textContent =
+            "OPPONENT LEFT THE GAME";
+
+        return;
+    }
+
+
+    /* =====================================================
+       NEW GAME / RESET STATE
+       ===================================================== */
+
+    if (
+        data.type ===
+        "newGame" ||
+        data.type ===
+        "tttNewGame" ||
+        data.type ===
+        "reset"
+    ) {
+
+        if (
+            Array.isArray(data.board)
+        ) {
+
+            applyServerState(
+                data
+            );
+
+        } else {
+
+            resetOnlineBoard();
+        }
+
+        return;
+    }
+
+
+    /* =====================================================
+       ERROR
+       ===================================================== */
+
+    if (
+        data.type ===
+        "error"
+    ) {
+
+        game =
+            confirmedGame.slice();
+
+        currentPlayer =
+            confirmedCurrentPlayer;
+
+        const result =
+            calculateGameResult(
+                game
+            );
+
+        gameOver =
+            result.gameOver;
+
+        winner =
+            result.winner;
+
+        draw =
+            result.draw;
+
+        localMoveLock =
+            false;
+
+        lastLocalMove =
+            null;
+
+        /*
+         * A server error does not make a spectator
+         * into a player.
+         */
+        if (!spectator) {
+
+            waitingForServer =
+                false;
+        }
+
+        renderBoard();
+
+        statusText.textContent =
+            data.message ||
+            "SERVER ERROR";
+
+        return;
+    }
+}
+
+
+/* =========================================================
+   GET BOARD FROM SERVER MESSAGE
+   ========================================================= */
+
+function extractBoard(
+    data
+) {
+
+    if (
+        Array.isArray(data.board) &&
+        data.board.length === 9
+    ) {
+        return data.board;
+    }
+
+    if (
+        Array.isArray(data.game) &&
+        data.game.length === 9
+    ) {
+        return data.game;
+    }
+
+    if (
+        Array.isArray(data.cells) &&
+        data.cells.length === 9
+    ) {
+        return data.cells;
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   APPLY SERVER STATE
+   ========================================================= */
+
+function applyServerState(
+    data
+) {
+
+    const serverBoard =
+        extractBoard(data);
+
+    if (
+        !serverBoard
+    ) {
+        return;
+    }
+
+    const nextBoard =
+        serverBoard.map(
+            value =>
+                normalizeSymbol(value)
+        );
+
+    const nextCurrent =
+        normalizeSymbol(
+            data.currentPlayer ||
+            data.turn ||
+            data.nextPlayer
+        ) ||
+        calculateNextPlayer(
+            nextBoard
+        );
+
+    const result =
+        calculateGameResult(
+            nextBoard
+        );
+
+    const nextWinner =
+        normalizeSymbol(
+            data.winner
+        ) ||
+        result.winner;
+
+    const nextDraw =
+        data.draw !== undefined
+            ? Boolean(data.draw)
+            : result.draw;
+
+    const nextGameOver =
+        data.gameOver !== undefined
+            ? Boolean(data.gameOver)
+            : result.gameOver;
+
+    const stateKey =
+        JSON.stringify({
+            board: nextBoard,
+            currentPlayer: nextCurrent,
+            gameOver: nextGameOver,
+            winner: nextWinner,
+            draw: nextDraw
+        });
+
+    lastServerStateKey =
+        stateKey;
+
+    confirmedGame =
+        nextBoard.slice();
+
+    confirmedCurrentPlayer =
+        nextCurrent;
+
+    game =
+        nextBoard.slice();
+
+    currentPlayer =
+        nextCurrent;
+
+    winner =
+        nextWinner;
+
+    draw =
+        nextDraw;
+
+    gameOver =
+        nextGameOver;
+
+    /*
+     * A spectator can receive state but must remain
+     * unable to play.
+     */
+    if (spectator) {
+
+        waitingForServer =
+            true;
+
+        localMoveLock =
+            true;
+
+    } else {
+
+        waitingForServer =
+            false;
+
+        localMoveLock =
+            false;
+    }
+
+    lastLocalMove =
+        null;
+
+    renderBoard();
+
+    updateStatus();
+}
+
+
+/* =========================================================
+   EXTRACT MOVE INDEX
+   ========================================================= */
+
+function extractMoveIndex(
+    data
+) {
+
+    const candidates = [
+        data.index,
+        data.cell,
+        data.position,
+        data.move
+    ];
+
+    for (
+        const value
+        of candidates
+    ) {
+
+        if (
+            value === undefined ||
+            value === null
+        ) {
+            continue;
+        }
+
+        const number =
+            Number(value);
+
+        if (
+            Number.isInteger(number) &&
+            number >= 0 &&
+            number <= 8
+        ) {
+
+            return number;
+        }
+    }
+
+    return -1;
+}
+
+
+/* =========================================================
+   APPLY SERVER MOVE
+   ========================================================= */
+
+function applyServerMove(
+    data
+) {
+
+    const index =
+        extractMoveIndex(data);
+
+    if (
+        index < 0
+    ) {
+        return;
+    }
+
+    const symbol =
+        normalizeSymbol(
+            data.symbol ||
+            data.playerSymbol ||
+            data.mark ||
+            data.player
+        ) ||
+        symbolFromPlayer(
+            data.player
+        );
+
+    if (!symbol) {
+        return;
+    }
+
+    /*
+     * If this is our own move echo, the local
+     * board already contains it.
+     */
+    if (
+        !spectator &&
+        symbol === mySymbol &&
+        lastLocalMove === index
+    ) {
+
+        confirmedGame =
+            game.slice();
+
+        confirmedCurrentPlayer =
+            currentPlayer;
+
+        localMoveLock =
+            false;
+
+        lastLocalMove =
+            null;
+
+        waitingForServer =
+            false;
+
+        updateStatus();
+
+        return;
+    }
+
+    /*
+     * If the move is already on the board,
+     * it is a duplicate server message.
+     */
+    if (
+        game[index] === symbol
+    ) {
+
+        if (!spectator) {
+
+            localMoveLock =
+                false;
+        }
+
+        return;
+    }
+
+    /*
+     * Never overwrite an existing different
+     * player's move.
+     */
+    if (
+        game[index] !== null
+    ) {
+        return;
+    }
+
+    game[index] =
+        symbol;
+
+    currentPlayer =
+        symbol === "X"
+            ? "O"
+            : "X";
+
+    const result =
+        calculateGameResult(
+            game
+        );
+
+    gameOver =
+        result.gameOver;
+
+    winner =
+        result.winner;
+
+    draw =
+        result.draw;
+
+    confirmedGame =
+        game.slice();
+
+    confirmedCurrentPlayer =
+        currentPlayer;
+
+    if (spectator) {
+
+        waitingForServer =
+            true;
+
+        localMoveLock =
+            true;
+
+    } else {
+
+        localMoveLock =
+            false;
+
+        waitingForServer =
+            false;
+    }
+
+    lastLocalMove =
+        null;
+
+    renderBoard();
+
+    updateStatus();
+}
+
+
+/* =========================================================
+   SYMBOL FROM PLAYER
+   ========================================================= */
+
+function symbolFromPlayer(
+    player
+) {
+
+    const directSymbol =
+        normalizeSymbol(player);
+
+    if (directSymbol) {
+        return directSymbol;
+    }
+
+    const p =
+        normalizePlayer(
+            player
+        );
+
+    if (p === 1) {
+        return "X";
+    }
+
+    if (p === 2) {
+        return "O";
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   CALCULATE NEXT PLAYER
+   ========================================================= */
+
+function calculateNextPlayer(
+    boardState
+) {
+
+    let x =
+        0;
+
+    let o =
+        0;
+
+    boardState.forEach(
+        value => {
+
+            if (value === "X") {
+                x++;
+            }
+
+            if (value === "O") {
+                o++;
+            }
+        }
+    );
+
+    return x <= o
+        ? "X"
+        : "O";
+}
+
+
+/* =========================================================
+   SEND MOVE
+   ========================================================= */
+
+function sendMove(
+    index
+) {
+
+    if (
+        spectator ||
+        !serverAssigned ||
+        (
+            myPlayer !== 1 &&
+            myPlayer !== 2
+        ) ||
+        !mySymbol
+    ) {
+
+        return false;
+    }
+
+    return sendMessage({
+        type: "move",
+
+        index: index,
+
+        room: roomId,
+        roomId: roomId,
+
+        player: myPlayer,
+        symbol: mySymbol,
+
+        game: "tictactoe"
+    });
+}
+
+
+/* =========================================================
+   SEND NEW GAME
+   ========================================================= */
+
+function sendNewGame() {
+
+    /*
+     * Spectators are never allowed to start/reset
+     * an online game.
+     */
+    if (
+        spectator ||
+        !serverAssigned ||
+        (
+            myPlayer !== 1 &&
+            myPlayer !== 2
+        ) ||
+        !mySymbol
+    ) {
+
+        statusText.textContent =
+            "ONLY PLAYERS CAN START A NEW GAME";
+
+        return false;
+    }
+
+    return sendMessage({
+        type: "new_game",
+
+        room: roomId,
+        roomId: roomId,
+
+        player: myPlayer,
+        symbol: mySymbol,
+
+        game: "tictactoe"
+    });
+}
+
+
+/* =========================================================
+   CELL PRESS
+   ========================================================= */
+
+function cellPressed(
+    index
+) {
+
+    if (mode === "NONE") {
+
+        statusText.textContent =
+            "SELECT 2 PLAYERS OR VS COMPUTER";
+
+        return;
+    }
+
+    if (mode === "CPU") {
+
+        humanComputerMove(index);
+
+        return;
+    }
+
+    /*
+     * Spectators can see the board but cannot play.
+     */
+    if (spectator) {
+
+        statusText.textContent =
+            "SPECTATORS CANNOT PLAY";
+
+        return;
+    }
+
+    if (
+        !serverAssigned ||
+        !mySymbol ||
+        (
+            myPlayer !== 1 &&
+            myPlayer !== 2
+        )
+    ) {
+
+        statusText.textContent =
+            "WAITING FOR PLAYER ASSIGNMENT";
+
+        return;
+    }
+
+    if (
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ) {
+
+        statusText.textContent =
+            "NOT CONNECTED TO SERVER";
+
+        return;
+    }
+
+    if (gameOver) {
+        return;
+    }
+
+    if (waitingForServer) {
+        return;
+    }
+
+    if (
+        localMoveLock
+    ) {
+        return;
+    }
+
+    if (
+        currentPlayer !==
+        mySymbol
+    ) {
+        return;
+    }
+
+    if (
+        game[index] !== null
+    ) {
+        return;
+    }
+
+    /*
+     * Make the move locally immediately.
+     */
+    lastLocalMove =
+        index;
+
+    game[index] =
+        mySymbol;
+
+    currentPlayer =
+        mySymbol === "X"
+            ? "O"
+            : "X";
+
+    const result =
+        calculateGameResult(
+            game
+        );
+
+    gameOver =
+        result.gameOver;
+
+    winner =
+        result.winner;
+
+    draw =
+        result.draw;
+
+    renderBoard();
+
+    updateStatus();
+
+    /*
+     * Lock another local click until the server
+     * confirms or rejects the move.
+     */
+    localMoveLock =
+        true;
+
+    const accepted =
+        sendMove(index);
+
+    if (accepted) {
+
+        waitingForServer =
+            false;
+
+        return;
+    }
+
+    /*
+     * Send failed.
+     * Restore the last confirmed server state.
+     */
+    game =
+        confirmedGame.slice();
+
+    currentPlayer =
+        confirmedCurrentPlayer;
+
+    const restored =
+        calculateGameResult(
+            game
+        );
+
+    gameOver =
+        restored.gameOver;
+
+    winner =
+        restored.winner;
+
+    draw =
+        restored.draw;
+
+    localMoveLock =
+        false;
+
+    lastLocalMove =
+        null;
+
+    renderBoard();
+
+    statusText.textContent =
+        "CONNECTION LOST";
+}
+
+
+/* =========================================================
+   RENDER BOARD
+   ========================================================= */
+
+function renderBoard() {
+
+    cells.forEach(
+        cell => {
+
+            const index =
+                Number(
+                    cell.dataset.index
+                );
+
+            const value =
+                game[index];
+
+            cell.innerHTML = "";
+
+            cell.classList.remove(
+                "draw-cell"
+            );
+
+            if (!value) {
+
+                cell.dataset.value =
+                    "";
+
+                return;
+            }
+
+            const piece =
+                document.createElement(
+                    "div"
+                );
+
+            piece.classList.add(
+                "piece"
+            );
+
+            if (
+                value === "X"
+            ) {
+
+                piece.classList.add(
+                    "x-piece"
+                );
+
+            } else {
+
+                piece.classList.add(
+                    "o-piece"
+                );
+            }
+
+            if (
+                cell.dataset.value !==
+                value
+            ) {
+
+                piece.classList.add(
+                    animations[
+                        animationNumber %
+                        animations.length
+                    ]
+                );
+
+                animationNumber++;
+            }
+
+            cell.dataset.value =
+                value;
+
+            cell.appendChild(
+                piece
+            );
+        }
+    );
+
+    if (winner) {
+
+        const line =
+            getWinningLine(
+                winner,
+                game
+            );
+
+        if (line) {
+
+            line.forEach(
+                index => {
+
+                    const piece =
+                        cells[index]
+                            .querySelector(
+                                ".piece"
+                            );
+
+                    if (piece) {
+
+                        piece.classList.add(
+                            "winner"
+                        );
+                    }
+                }
+            );
+        }
+    }
+
+    if (draw) {
+
+        cells.forEach(
+            cell => {
+
+                cell.classList.add(
+                    "draw-cell"
+                );
+            }
+        );
+    }
+}
+
+
+/* =========================================================
+   WINNING LINE
+   ========================================================= */
+
+function getWinningLine(
+    player,
+    boardState
+) {
+
+    const lines = [
+
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+
+        [0,4,8],
+        [2,4,6]
+    ];
+
+    for (
+        const line
+        of lines
+    ) {
+
+        if (
+            line.every(
+                index =>
+                    boardState[index] ===
+                    player
+            )
+        ) {
+
+            return line;
+        }
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   CALCULATE RESULT
+   ========================================================= */
+
+function calculateGameResult(
+    boardState
+) {
+
+    const xLine =
+        getWinningLine(
+            "X",
+            boardState
+        );
+
+    if (xLine) {
+
+        return {
+            gameOver: true,
+            winner: "X",
+            draw: false
+        };
+    }
+
+    const oLine =
+        getWinningLine(
+            "O",
+            boardState
+        );
+
+    if (oLine) {
+
+        return {
+            gameOver: true,
+            winner: "O",
+            draw: false
+        };
+    }
+
+    if (
+        boardState.every(
+            value => Boolean(value)
+        )
+    ) {
+
+        return {
+            gameOver: true,
+            winner: null,
+            draw: true
+        };
+    }
+
+    return {
+        gameOver: false,
+        winner: null,
+        draw: false
+    };
+}
+
+
+/* =========================================================
+   ONLINE STATUS
+   ========================================================= */
+
+function updateStatus() {
+
+    if (
+        mode === "NONE"
+    ) {
+
+        statusText.textContent =
+            "SELECT A GAME MODE";
+
+        return;
+    }
+
+    if (
+        mode !== "2P"
+    ) {
+        return;
+    }
+
+    /*
+     * Spectator status always takes priority.
+     */
+    if (spectator) {
+
+        statusText.textContent =
+            "GAME IS FULL — SPECTATING";
+
+        return;
+    }
+
+    /*
+     * Do not display a player turn until
+     * the server has actually assigned us.
+     */
+    if (
+        !serverAssigned ||
+        !mySymbol ||
+        (
+            myPlayer !== 1 &&
+            myPlayer !== 2
+        )
+    ) {
+
+        if (waitingForServer) {
+
+            statusText.textContent =
+                "WAITING FOR GAME SERVER...";
+
+        } else {
+
+            statusText.textContent =
+                "WAITING FOR PLAYER ASSIGNMENT";
+        }
+
+        return;
+    }
+
+    if (gameOver) {
+
+        if (draw) {
+
+            statusText.textContent =
+                "DRAW — THE BOARD IS COMPLETE";
+
+            return;
+        }
+
+        if (winner) {
+
+            if (
+                winner ===
+                mySymbol
+            ) {
+
+                statusText.textContent =
+                    "PLAYER " +
+                    mySymbol +
+                    " WINS!";
+
+            } else {
+
+                statusText.textContent =
+                    "PLAYER " +
+                    winner +
+                    " WINS!";
+            }
+
+            return;
+        }
+    }
+
+    if (waitingForServer) {
+
+        statusText.textContent =
+            "WAITING FOR GAME SERVER...";
+
+        return;
+    }
+
+    if (
+        currentPlayer ===
+        mySymbol
+    ) {
+
+        statusText.textContent =
+            "PLAYER " +
+            mySymbol +
+            " — YOUR TURN";
+
+    } else {
+
+        statusText.textContent =
+            "PLAYER " +
+            currentPlayer +
+            " — OPPONENT'S TURN";
+    }
+}
+
+
+/* =========================================================
+   RESET ONLINE BOARD
+   ========================================================= */
+
+function resetOnlineBoard() {
+
+    game =
+        Array(9).fill(null);
+
+    confirmedGame =
+        Array(9).fill(null);
+
+    currentPlayer =
+        "X";
+
+    confirmedCurrentPlayer =
+        "X";
+
+    gameOver =
+        false;
+
+    winner =
+        null;
+
+    draw =
+        false;
+
+    localMoveLock =
+        spectator ||
+        !serverAssigned;
+
+    waitingForServer =
+        spectator ||
+        !serverAssigned;
+
+    lastLocalMove =
+        null;
+
+    lastServerStateKey =
+        "";
+
+    renderBoard();
+
+    updateStatus();
+}
+
+
+/* =========================================================
+   LOCAL CPU MODE
+   ========================================================= */
+
+let localGame =
+    Array(9).fill(null);
+
+let localCurrent =
+    "X";
+
+let localOver =
+    false;
+
+let localAnimation =
+    0;
+
+let computerTimer =
+    null;
+
+
+function humanComputerMove(
+    index
+) {
+
+    if (localOver) {
+        return;
+    }
+
+    if (
+        localCurrent !==
+        "X"
+    ) {
+        return;
+    }
+
+    if (
+        localGame[index]
+    ) {
+        return;
+    }
+
+    localGame[index] =
+        "X";
+
+    renderLocalBoard();
+
+    if (
+        finishLocalGame()
+    ) {
+        return;
+    }
+
+    localCurrent =
+        "O";
+
+    statusText.textContent =
+        "COMPUTER — THINKING...";
+
+    if (computerTimer) {
+
+        clearTimeout(
+            computerTimer
+        );
+    }
+
+    computerTimer =
+        setTimeout(
+            () => {
+
+                computerTimer =
+                    null;
+
+                computerMove();
+
+            },
+            400
+        );
+}
+
+
+function computerMove() {
+
+    if (localOver) {
+        return;
+    }
+
+    const move =
+        findComputerMove();
+
+    if (
+        move === -1
+    ) {
+        return;
+    }
+
+    localGame[move] =
+        "O";
+
+    renderLocalBoard();
+
+    if (
+        finishLocalGame()
+    ) {
+        return;
+    }
+
+    localCurrent =
+        "X";
+
+    statusText.textContent =
+        "PLAYER X — YOUR TURN";
+}
+
+
+function findComputerMove() {
+
+    for (
+        let i = 0;
+        i < 9;
+        i++
+    ) {
+
+        if (!localGame[i]) {
+
+            localGame[i] =
+                "O";
+
+            if (
+                localWinner() ===
+                "O"
+            ) {
+
+                localGame[i] =
+                    null;
+
+                return i;
+            }
+
+            localGame[i] =
+                null;
+        }
+    }
+
+    for (
+        let i = 0;
+        i < 9;
+        i++
+    ) {
+
+        if (!localGame[i]) {
+
+            localGame[i] =
+                "X";
+
+            if (
+                localWinner() ===
+                "X"
+            ) {
+
+                localGame[i] =
+                    null;
+
+                return i;
+            }
+
+            localGame[i] =
+                null;
+        }
+    }
+
+    if (!localGame[4]) {
+        return 4;
+    }
+
+    const corners =
+        [0,2,6,8]
+            .filter(
+                i =>
+                    !localGame[i]
+            );
+
+    if (
+        corners.length
+    ) {
+
+        return corners[
+            Math.floor(
+                Math.random() *
+                corners.length
+            )
+        ];
+    }
+
+    const available =
+        localGame
+            .map(
+                (v,i) =>
+                    v
+                        ? -1
+                        : i
+            )
+            .filter(
+                i =>
+                    i !== -1
+            );
+
+    if (
+        !available.length
+    ) {
+
+        return -1;
+    }
+
+    return available[
+        Math.floor(
+            Math.random() *
+            available.length
+        )
+    ];
+}
+
+
+function localWinner() {
+
+    const lines = [
+
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+
+        [0,4,8],
+        [2,4,6]
+    ];
+
+    for (
+        const line
+        of lines
+    ) {
+
+        const [
+            a,
+            b,
+            c
+        ] = line;
+
+        if (
+            localGame[a] &&
+            localGame[a] ===
+            localGame[b] &&
+            localGame[a] ===
+            localGame[c]
+        ) {
+
+            return localGame[a];
+        }
+    }
+
+    return null;
+}
+
+
+function finishLocalGame() {
+
+    const localWinnerValue =
+        localWinner();
+
+    if (localWinnerValue) {
+
+        localOver =
+            true;
+
+        statusText.textContent =
+            "PLAYER " +
+            localWinnerValue +
+            " WINS!";
+
+        const line =
+            getWinningLine(
+                localWinnerValue,
+                localGame
+            );
+
+        if (line) {
+
+            line.forEach(
+                index => {
+
+                    const piece =
+                        cells[index]
+                            .querySelector(
+                                ".piece"
+                            );
+
+                    if (piece) {
+
+                        piece.classList.add(
+                            "winner"
+                        );
+                    }
+                }
+            );
+        }
+
+        return true;
+    }
+
+    if (
+        localGame.every(
+            Boolean
+        )
+    ) {
+
+        localOver =
+            true;
+
+        statusText.textContent =
+            "DRAW — THE BOARD IS COMPLETE";
+
+        cells.forEach(
+            cell => {
+
+                cell.classList.add(
+                    "draw-cell"
+                );
+            }
+        );
+
+        return true;
+    }
+
+    return false;
+}
+
+
+function renderLocalBoard() {
+
+    cells.forEach(
+        cell => {
+
+            cell.innerHTML = "";
+
+            cell.classList.remove(
+                "draw-cell"
+            );
+
+            const index =
+                Number(
+                    cell.dataset.index
+                );
+
+            const value =
+                localGame[index];
+
+            if (!value) {
+
+                cell.dataset.value =
+                    "";
+
+                return;
+            }
+
+            const piece =
+                document.createElement(
+                    "div"
+                );
+
+            piece.classList.add(
+                "piece"
+            );
+
+            piece.classList.add(
+                value === "X"
+                    ? "x-piece"
+                    : "o-piece"
+            );
+
+            piece.classList.add(
+                animations[
+                    localAnimation %
+                    animations.length
+                ]
+            );
+
+            localAnimation++;
+
+            cell.dataset.value =
+                value;
+
+            cell.appendChild(
+                piece
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   NEW GAME
+   ========================================================= */
+
+function newGame() {
+
+    if (mode === "NONE") {
+
+        statusText.textContent =
+            "SELECT 2 PLAYERS OR VS COMPUTER";
+
+        return;
+    }
+
+    if (mode === "CPU") {
+
+        if (computerTimer) {
+
+            clearTimeout(
+                computerTimer
+            );
+
+            computerTimer =
+                null;
+        }
+
+        localGame =
+            Array(9).fill(null);
+
+        localCurrent =
+            "X";
+
+        localOver =
+            false;
+
+        localAnimation =
+            0;
+
+        cells.forEach(
+            cell => {
+
+                cell.innerHTML = "";
+
+                cell.classList.remove(
+                    "winner",
+                    "draw-cell"
+                );
+
+                cell.dataset.value =
+                    "";
+            }
+        );
+
+        statusText.textContent =
+            "PLAYER X — YOUR TURN";
+
+        return;
+    }
+
+    /*
+     * Spectators cannot start/reset the game.
+     */
+    if (spectator) {
+
+        statusText.textContent =
+            "ONLY PLAYERS CAN START A NEW GAME";
+
+        return;
+    }
+
+    /*
+     * Do not allow a connection that has not
+     * received a real player assignment to
+     * send a new-game command.
+     */
+    if (
+        !serverAssigned ||
+        !mySymbol ||
+        (
+            myPlayer !== 1 &&
+            myPlayer !== 2
+        )
+    ) {
+
+        statusText.textContent =
+            "WAITING FOR PLAYER ASSIGNMENT";
+
+        return;
+    }
+
+    if (
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ) {
+
+        statusText.textContent =
+            "NOT CONNECTED TO SERVER";
+
+        return;
+    }
+
+    localMoveLock =
+        true;
+
+    lastLocalMove =
+        null;
+
+    resetOnlineBoard();
+
+    localMoveLock =
+        true;
+
+    const accepted =
+        sendNewGame();
+
+    if (!accepted) {
+
+        localMoveLock =
+            false;
+
+        updateStatus();
+
+        return;
+    }
+
+    statusText.textContent =
+        "STARTING NEW GAME...";
+}
+
+
+/* =========================================================
+   2 PLAYER BUTTON
+   ========================================================= */
+
+twoPlayerButton.addEventListener(
+    "pointerup",
+    event => {
+
+        event.preventDefault();
+
+        /*
+         * 2 PLAYERS always enters the generic
+         * matchmaking lobby.
+         */
+
+        window.location.href =
+            "rooms.html?game=tictactoe.html";
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   COMPUTER BUTTON
+   ========================================================= */
+
+computerButton.addEventListener(
+    "pointerup",
+    event => {
+
+        event.preventDefault();
+
+        mode =
+            "CPU";
+
+        computerButton
+            .classList
+            .add("active");
+
+        twoPlayerButton
+            .classList
+            .remove("active");
+
+        /*
+         * CPU mode never uses the online server.
+         */
+        if (socket) {
+
+            socketGeneration++;
+
+            try {
+                socket.close();
+            } catch (error) {
+            }
+
+            socket =
+                null;
+        }
+
+        if (reconnectTimer) {
+
+            clearTimeout(
+                reconnectTimer
+            );
+
+            reconnectTimer =
+                null;
+        }
+
+        waitingForServer =
+            false;
+
+        opponentConnected =
+            false;
+
+        localMoveLock =
+            false;
+
+        serverAssigned =
+            false;
+
+        spectator =
+            false;
+
+        myPlayer =
+            1;
+
+        mySymbol =
+            "X";
+
+        if (computerTimer) {
+
+            clearTimeout(
+                computerTimer
+            );
+
+            computerTimer =
+                null;
+        }
+
+        localGame =
+            Array(9).fill(null);
+
+        localCurrent =
+            "X";
+
+        localOver =
+            false;
+
+        localAnimation =
+            0;
+
+        cells.forEach(
+            cell => {
+
+                cell.innerHTML = "";
+
+                cell.classList.remove(
+                    "winner",
+                    "draw-cell"
+                );
+
+                cell.dataset.value =
+                    "";
+            }
+        );
+
+        setConnection(
+            "COMPUTER MODE",
+            "connected"
+        );
+
+        statusText.textContent =
+            "PLAYER X — YOUR TURN";
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   NEW GAME BUTTON
+   ========================================================= */
+
+newGameButton.addEventListener(
+    "pointerup",
+    event => {
+
+        event.preventDefault();
+
+        newGame();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   GAME ROOM BUTTON
+   ========================================================= */
+
+gameRoomButton.addEventListener(
+    "pointerup",
+    event => {
+
+        event.preventDefault();
+
+        /*
+         * GAME ROOM returns to the main game menu.
+         */
+
+        window.location.href =
+            "index.html";
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   BOARD INPUT
+   ========================================================= */
+
+cells.forEach(
+    cell => {
+
+        cell.addEventListener(
+            "pointerup",
+            event => {
+
+                event.preventDefault();
+
+                const index =
+                    Number(
+                        cell.dataset.index
+                    );
+
+                cellPressed(index);
+
+            },
+            {
+                passive: false
+            }
+        );
+    }
+);
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+fitGame();
+
+renderBoard();
+
+if (roomId) {
+
+    /*
+     * A matched room automatically connects.
+     *
+     * The page remains in WAITING state until
+     * the server actually identifies the connection
+     * as Player 1, Player 2, or spectator.
+     */
+
+    setConnection(
+        "CONNECTING...",
+        ""
+    );
+
+    waitingForServer =
+        true;
+
+    localMoveLock =
+        true;
+
+    statusText.textContent =
+        "CONNECTING TO GAME SERVER...";
+
+    connectToServer();
+
+} else {
+
+    mode =
+        "NONE";
+
+    waitingForServer =
+        false;
+
+    localMoveLock =
+        false;
+
+    statusText.textContent =
+        "SELECT A GAME MODE";
+
+    setConnection(
+        "NOT CONNECTED",
+        ""
+    );
+}
+
+</script>
+
+</body>
+</html>
