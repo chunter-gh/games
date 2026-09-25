@@ -85,9 +85,24 @@ body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+
     display: flex;
     flex-direction: column;
+
     gap: clamp(7px, 1.5vh, 16px);
+
+    /*
+     * The menu can now contain any number of games.
+     * When there are many games the buttons shrink,
+     * and only the menu itself can scroll if necessary.
+     */
+    max-height: 72vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 4px 6px;
+
+    scrollbar-width: thin;
 }
 
 .game-button {
@@ -95,6 +110,8 @@ body {
     width: 100%;
     height: clamp(62px, 10vh, 82px);
     margin: 0;
+    flex-shrink: 1;
+
     border: 1px solid rgba(255,255,255,.35);
     border-radius: 22px;
 
@@ -143,6 +160,7 @@ body {
 .button-text {
     text-align: left;
     margin-left: 15px;
+    min-width: 0;
 }
 
 .button-title {
@@ -150,13 +168,116 @@ body {
     font-weight: 900;
     letter-spacing: 1px;
     text-shadow: 0 2px 4px #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .button-subtitle {
     margin-top: 3px;
     font-size: 12px;
     color: #c9e5fa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+
+/* =========================================================
+   AUTOMATIC MENU SIZING
+   Based on the number of games discovered.
+========================================================= */
+
+/* 5-7 games */
+
+.menu.many-games {
+    gap: clamp(6px, 1vh, 10px);
+    max-height: 76vh;
+}
+
+.menu.many-games .game-button {
+    height: clamp(54px, 7.5vh, 68px);
+    border-radius: 17px;
+}
+
+.menu.many-games .icon {
+    width: 48px;
+    font-size: 31px;
+}
+
+.menu.many-games .button-title {
+    font-size: clamp(17px, 4.3vw, 22px);
+}
+
+.menu.many-games .button-subtitle {
+    font-size: 11px;
+}
+
+
+/* 8-11 games */
+
+.menu.lots-of-games {
+    gap: 5px;
+    max-height: 78vh;
+}
+
+.menu.lots-of-games .game-button {
+    height: clamp(47px, 6.3vh, 58px);
+    border-radius: 14px;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+.menu.lots-of-games .icon {
+    width: 43px;
+    font-size: 27px;
+}
+
+.menu.lots-of-games .button-text {
+    margin-left: 10px;
+}
+
+.menu.lots-of-games .button-title {
+    font-size: clamp(15px, 3.8vw, 20px);
+}
+
+.menu.lots-of-games .button-subtitle {
+    margin-top: 1px;
+    font-size: 10px;
+}
+
+
+/* 12+ games */
+
+.menu.huge-game-list {
+    gap: 4px;
+    max-height: 80vh;
+}
+
+.menu.huge-game-list .game-button {
+    height: clamp(42px, 5.4vh, 51px);
+    border-radius: 11px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+.menu.huge-game-list .icon {
+    width: 37px;
+    font-size: 23px;
+}
+
+.menu.huge-game-list .button-text {
+    margin-left: 7px;
+}
+
+.menu.huge-game-list .button-title {
+    font-size: clamp(14px, 3.4vw, 18px);
+}
+
+.menu.huge-game-list .button-subtitle {
+    display: none;
+}
+
 
 /* GROUND */
 
@@ -1298,6 +1419,7 @@ body {
 
     .menu {
         top: 48%;
+        max-height: 72vh;
     }
 
     .game-button {
@@ -1335,6 +1457,7 @@ body {
     .menu {
         width: min(70vw, 380px);
         top: 52%;
+        max-height: 76vh;
     }
 
     .game-button {
@@ -1347,6 +1470,42 @@ body {
 
     .footer {
         display: none;
+    }
+}
+
+
+/* =========================================================
+   MANY-GAME OVERRIDES FOR SHORT SCREENS
+   These only affect the game menu.
+========================================================= */
+
+@media (max-height: 650px) {
+
+    .menu.many-games .game-button {
+        height: 50px;
+    }
+
+    .menu.lots-of-games .game-button {
+        height: 44px;
+    }
+
+    .menu.huge-game-list .game-button {
+        height: 39px;
+    }
+}
+
+@media (max-height: 500px) {
+
+    .menu.many-games .game-button {
+        height: 43px;
+    }
+
+    .menu.lots-of-games .game-button {
+        height: 39px;
+    }
+
+    .menu.huge-game-list .game-button {
+        height: 35px;
     }
 }
 </style>
@@ -1704,6 +1863,45 @@ async function loadGames() {
                 });
 
 
+        /*
+           AUTOMATIC MENU SIZE
+
+           1-4 games  = normal
+           5-7 games  = smaller
+           8-11 games = compact
+           12+ games  = very compact
+        */
+
+        gameMenu.classList.remove(
+            "many-games",
+            "lots-of-games",
+            "huge-game-list"
+        );
+
+        if (htmlGames.length >= 5 &&
+            htmlGames.length < 8) {
+
+            gameMenu.classList.add(
+                "many-games"
+            );
+        }
+
+        if (htmlGames.length >= 8 &&
+            htmlGames.length < 12) {
+
+            gameMenu.classList.add(
+                "lots-of-games"
+            );
+        }
+
+        if (htmlGames.length >= 12) {
+
+            gameMenu.classList.add(
+                "huge-game-list"
+            );
+        }
+
+
         htmlGames.forEach(filename => {
 
             gameMenu.appendChild(
@@ -1753,6 +1951,16 @@ async function loadGames() {
             );
 
         });
+
+        /*
+           Apply sizing to the fallback list too.
+        */
+
+        gameMenu.classList.remove(
+            "many-games",
+            "lots-of-games",
+            "huge-game-list"
+        );
 
         console.error(
             "Automatic game discovery failed:",
