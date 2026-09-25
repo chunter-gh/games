@@ -1,0 +1,2929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Othello</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    background:
+        radial-gradient(circle at center top, #29332d 0%, #111613 55%, #080a09 100%);
+    color: #f1eadb;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: hidden;
+}
+
+.table {
+    width: 100%;
+    max-width: 900px;
+    min-height: 100vh;
+    padding: 18px 12px 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.game {
+    width: min(94vw, 760px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-size: clamp(32px, 8vw, 58px);
+    line-height: 1;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    text-align: center;
+    color: #f0e8d7;
+    text-shadow:
+        0 3px 0 #080a09,
+        0 5px 14px rgba(0,0,0,.8);
+    margin-top: 4px;
+}
+
+.subtitle {
+    margin-top: 6px;
+    margin-bottom: 15px;
+    color: #b9b19f;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.status {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1.35fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.player {
+    min-height: 58px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    background: rgba(20,24,21,.92);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 5px 16px rgba(0,0,0,.35);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+}
+
+.player-name {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #a9a292;
+}
+
+.score {
+    margin-top: 2px;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.turn {
+    min-height: 58px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(53,62,55,.95), rgba(24,29,25,.95));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6px 8px;
+    font-size: clamp(12px, 3vw, 17px);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #eee7d9;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 5px 16px rgba(0,0,0,.35);
+}
+
+.board-shadow {
+    width: min(92vw, 650px);
+    aspect-ratio: 1;
+    padding: 12px;
+    border-radius: 17px;
+    background:
+        linear-gradient(145deg, #161b17, #050706);
+    box-shadow:
+        0 18px 40px rgba(0,0,0,.65),
+        inset 0 2px 3px rgba(255,255,255,.05);
+}
+
+.board {
+    width: 100%;
+    height: 100%;
+    padding: 7px;
+    border-radius: 11px;
+    background:
+        linear-gradient(145deg, #69492b, #382415 50%, #6a4a2c);
+    box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,.35),
+        inset 0 2px 5px rgba(255,255,255,.08);
+}
+
+.felt {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 40%, #177443 0%, #0c5b31 52%, #074624 100%);
+    box-shadow:
+        inset 0 0 20px rgba(0,0,0,.45);
+}
+
+.grid {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+}
+
+.cell {
+    position: relative;
+    border-right: 1px solid rgba(0,0,0,.48);
+    border-bottom: 1px solid rgba(0,0,0,.48);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.cell:nth-child(8n) {
+    border-right: 0;
+}
+
+.cell:nth-last-child(-n+8) {
+    border-bottom: 0;
+}
+
+.cell:hover {
+    background: rgba(255,255,255,.035);
+}
+
+.cell.disabled {
+    cursor: default;
+}
+
+.dot {
+    width: 18%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(235,225,193,.28);
+    box-shadow:
+        0 0 8px rgba(235,225,193,.16);
+    pointer-events: none;
+}
+
+.stone {
+    width: 82%;
+    height: 82%;
+    border-radius: 50%;
+    position: relative;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    box-shadow:
+        inset -7px -8px 12px rgba(0,0,0,.34),
+        inset 5px 5px 9px rgba(255,255,255,.12),
+        0 4px 6px rgba(0,0,0,.42);
+}
+
+.stone.black {
+    background:
+        radial-gradient(circle at 32% 27%, #555 0%, #252525 23%, #0d0d0d 65%, #030303 100%);
+}
+
+.stone.white {
+    background:
+        radial-gradient(circle at 32% 27%, #fffdf4 0%, #e5dfcf 28%, #aaa394 72%, #736d62 100%);
+}
+
+.stone.flip {
+    animation: flipStone .36s ease-in-out;
+}
+
+@keyframes flipStone {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    49% {
+        transform: rotateX(90deg);
+    }
+
+    50% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+.message {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 13px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(13,16,14,.88);
+    color: #d9d1c1;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.35;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 4px 15px rgba(0,0,0,.3);
+}
+
+.controls {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+label {
+    color: #aaa393;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+select,
+button {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, #303731, #1c211d);
+    color: #eee8dc;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 3px 9px rgba(0,0,0,.3);
+}
+
+button:hover,
+select:hover {
+    background:
+        linear-gradient(180deg, #3a443c, #222922);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: default;
+}
+
+#difficultyLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 560px) {
+    .table {
+        padding-top: 10px;
+    }
+
+    .game {
+        width: 96vw;
+    }
+
+    .title {
+        font-size: 34px;
+        letter-spacing: 3px;
+    }
+
+    .subtitle {
+        font-size: 9px;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
+    }
+
+    .status {
+        gap: 4px;
+    }
+
+    .player,
+    .turn {
+        min-height: 51px;
+    }
+
+    .player-name {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    .score {
+        font-size: 20px;
+    }
+
+    .turn {
+        font-size: 11px;
+    }
+
+    .board-shadow {
+        padding: 7px;
+        border-radius: 12px;
+    }
+
+    .board {
+        padding: 4px;
+    }
+
+    .message {
+        font-size: 12px;
+        min-height: 44px;
+    }
+
+    .controls {
+        gap: 6px;
+    }
+
+    select,
+    button {
+        padding: 8px 9px;
+        font-size: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="table">
+
+    <div class="game">
+
+        <div class="title">Othello</div>
+        <div class="subtitle">Stone &amp; Felt Edition</div>
+
+        <div class="status">
+
+            <div class="player">
+                <div class="player-name">Black</div>
+                <div class="score" id="blackScore">2</div>
+            </div>
+
+            <div class="turn" id="turnText">
+                YOUR MOVE
+            </div>
+
+            <div class="player">
+                <div class="player-name">Ivory</div>
+                <div class="score" id="whiteScore">2</div>
+            </div>
+
+        </div>
+
+        <div class="board-shadow">
+            <div class="board">
+                <div class="felt">
+                    <div class="grid" id="board"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="message" id="message">
+            Starting game...
+        </div>
+
+        <div class="controls">
+
+            <div class="control-group">
+                <label for="mode">Mode</label>
+
+                <select id="mode">
+                    <option value="local">2 Players</option>
+                    <option value="computer">Computer</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="difficultyLabel">
+
+                <label for="difficulty">AI</label>
+
+                <select id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+
+            </div>
+
+            <button id="newGame">New Game</button>
+            <button id="menu">Menu</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   OTHELLO
+   2 PLAYER ROOM / WEBSOCKET VERSION
+   ========================================================= */
+
+const SIZE = 8;
+
+const EMPTY = "";
+const BLACK = "B";
+const WHITE = "W";
+
+const DIRECTIONS = [
+    [-1, -1],
+    [-1,  0],
+    [-1,  1],
+    [ 0, -1],
+    [ 0,  1],
+    [ 1, -1],
+    [ 1,  0],
+    [ 1,  1]
+];
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const boardElement = document.getElementById("board");
+const blackScoreElement = document.getElementById("blackScore");
+const whiteScoreElement = document.getElementById("whiteScore");
+const turnTextElement = document.getElementById("turnText");
+const messageElement = document.getElementById("message");
+
+const modeElement = document.getElementById("mode");
+const difficultyElement = document.getElementById("difficulty");
+const difficultyLabel = document.getElementById("difficultyLabel");
+
+const newGameButton = document.getElementById("newGame");
+const menuButton = document.getElementById("menu");
+
+/* =========================================================
+   ROOM / PLAYER
+   ========================================================= */
+
+const params = new URLSearchParams(window.location.search);
+
+const roomId =
+    params.get("room") ||
+    params.get("roomId") ||
+    "";
+
+let playerNumber = parseInt(
+    params.get("player") ||
+    params.get("playerNumber") ||
+    "1",
+    10
+);
+
+if (playerNumber !== 1 && playerNumber !== 2) {
+    playerNumber = 1;
+}
+
+const onlineMode = roomId !== "";
+
+const myColor =
+    playerNumber === 1
+        ? BLACK
+        : WHITE;
+
+const opponentColor =
+    myColor === BLACK
+        ? WHITE
+        : BLACK;
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+
+let boardState = createInitialBoard();
+
+let currentPlayer = BLACK;
+
+let gameOver = false;
+let computerThinking = false;
+let flipping = false;
+
+let socket = null;
+let socketOpen = false;
+
+let opponentConnected = false;
+
+let receivedInitialState = false;
+
+let gameStarted = false;
+
+let lastMove = null;
+
+/*
+ * In online mode Player 1/Black owns the initial game state.
+ * Player 2 never creates a competing initial state.
+ */
+let authoritativePlayer = onlineMode
+    ? 1
+    : 0;
+
+/* =========================================================
+   INITIAL BOARD
+   ========================================================= */
+
+function createInitialBoard() {
+
+    const state = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        state[row] = [];
+
+        for (let col = 0; col < SIZE; col++) {
+            state[row][col] = EMPTY;
+        }
+    }
+
+    state[3][3] = WHITE;
+    state[3][4] = BLACK;
+    state[4][3] = BLACK;
+    state[4][4] = WHITE;
+
+    return state;
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function inside(row, col) {
+
+    return (
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    );
+}
+
+function opposite(player) {
+
+    return player === BLACK
+        ? WHITE
+        : BLACK;
+}
+
+function playerName(player) {
+
+    return player === BLACK
+        ? "BLACK"
+        : "IVORY";
+}
+
+function playerNumberForColor(player) {
+
+    return player === BLACK
+        ? 1
+        : 2;
+}
+
+function colorForPlayerNumber(number) {
+
+    return number === 2
+        ? WHITE
+        : BLACK;
+}
+
+/* =========================================================
+   MOVE CALCULATION
+   ========================================================= */
+
+function getFlipsOnPosition(state, row, col, player) {
+
+    if (!inside(row, col)) {
+        return [];
+    }
+
+    if (state[row][col] !== EMPTY) {
+        return [];
+    }
+
+    const enemy = opposite(player);
+    const flips = [];
+
+    for (const [dr, dc] of DIRECTIONS) {
+
+        let r = row + dr;
+        let c = col + dc;
+
+        const directionFlips = [];
+
+        while (inside(r, c) && state[r][c] === enemy) {
+
+            directionFlips.push([r, c]);
+
+            r += dr;
+            c += dc;
+        }
+
+        if (
+            directionFlips.length > 0 &&
+            inside(r, c) &&
+            state[r][c] === player
+        ) {
+            flips.push(...directionFlips);
+        }
+    }
+
+    return flips;
+}
+
+function getValidMovesOnBoard(state, player) {
+
+    const moves = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const flips =
+                getFlipsOnPosition(
+                    state,
+                    row,
+                    col,
+                    player
+                );
+
+            if (flips.length > 0) {
+
+                moves.push({
+                    row,
+                    col,
+                    flips
+                });
+            }
+        }
+    }
+
+    return moves;
+}
+
+function getValidMoves(player) {
+
+    return getValidMovesOnBoard(
+        boardState,
+        player
+    );
+}
+
+/* =========================================================
+   APPLY MOVE
+   ========================================================= */
+
+function applyMoveToBoard(state, row, col, player) {
+
+    const flips =
+        getFlipsOnPosition(
+            state,
+            row,
+            col,
+            player
+        );
+
+    if (flips.length === 0) {
+        return null;
+    }
+
+    state[row][col] = player;
+
+    for (const [r, c] of flips) {
+        state[r][c] = player;
+    }
+
+    return flips;
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function renderBoard(validMoves = []) {
+
+    boardElement.innerHTML = "";
+
+    const validMap = new Map();
+
+    for (const move of validMoves) {
+
+        validMap.set(
+            move.row + "," + move.col,
+            true
+        );
+    }
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const cell = document.createElement("div");
+
+            cell.className = "cell";
+
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+
+            const value = boardState[row][col];
+
+            if (value === BLACK || value === WHITE) {
+
+                const stone =
+                    document.createElement("div");
+
+                stone.className =
+                    "stone " +
+                    (value === BLACK
+                        ? "black"
+                        : "white");
+
+                cell.appendChild(stone);
+
+            } else if (
+                validMap.has(row + "," + col)
+            ) {
+
+                const dot =
+                    document.createElement("div");
+
+                dot.className = "dot";
+
+                cell.appendChild(dot);
+            }
+
+            cell.addEventListener(
+                "click",
+                () => handleCellClick(row, col)
+            );
+
+            boardElement.appendChild(cell);
+        }
+    }
+
+    updateScore();
+
+    updateBoardInteractivity();
+}
+
+/* =========================================================
+   SCORE
+   ========================================================= */
+
+function updateScore() {
+
+    let black = 0;
+    let white = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if (boardState[row][col] === BLACK) {
+                black++;
+            }
+
+            if (boardState[row][col] === WHITE) {
+                white++;
+            }
+        }
+    }
+
+    blackScoreElement.textContent = black;
+    whiteScoreElement.textContent = white;
+}
+
+/* =========================================================
+   MESSAGE / TURN DISPLAY
+   ========================================================= */
+
+function setTurnMessage(text) {
+
+    turnTextElement.textContent = text;
+}
+
+function setMessage(text) {
+
+    messageElement.textContent = text;
+}
+
+function showWaitingForOpponent() {
+
+    setTurnMessage("WAITING");
+
+    if (playerNumber === 1) {
+        setMessage("Waiting for Player 2 to join...");
+    } else {
+        setMessage("Waiting for Player 1 to start...");
+    }
+}
+
+function showYourTurn() {
+
+    setTurnMessage("YOUR MOVE");
+
+    setMessage(
+        "Your turn — " +
+        playerName(myColor) +
+        "."
+    );
+}
+
+function showOpponentTurn() {
+
+    setTurnMessage("OPPONENT");
+
+    setMessage(
+        "Waiting for " +
+        playerName(opponentColor) +
+        "..."
+    );
+}
+
+function updateTurnDisplay() {
+
+    if (gameOver) {
+        return;
+    }
+
+    if (onlineMode) {
+
+        if (!opponentConnected) {
+            showWaitingForOpponent();
+            return;
+        }
+
+        if (!gameStarted) {
+            showWaitingForOpponent();
+            return;
+        }
+
+        if (currentPlayer === myColor) {
+            showYourTurn();
+        } else {
+            showOpponentTurn();
+        }
+
+        return;
+    }
+
+    if (currentPlayer === BLACK) {
+        setTurnMessage("BLACK");
+        setMessage("Black's turn.");
+    } else {
+        setTurnMessage("IVORY");
+        setMessage("Ivory's turn.");
+    }
+}
+
+/* =========================================================
+   BOARD INTERACTIVITY
+   ========================================================= */
+
+function updateBoardInteractivity() {
+
+    const cells =
+        boardElement.querySelectorAll(".cell");
+
+    const myTurn =
+        !gameOver &&
+        !flipping &&
+        (
+            !onlineMode
+            || (
+                opponentConnected &&
+                gameStarted &&
+                currentPlayer === myColor
+            )
+        );
+
+    cells.forEach(cell => {
+
+        const row =
+            parseInt(cell.dataset.row, 10);
+
+        const col =
+            parseInt(cell.dataset.col, 10);
+
+        const valid =
+            getFlipsOnPosition(
+                boardState,
+                row,
+                col,
+                currentPlayer
+            ).length > 0;
+
+        if (!myTurn || !valid) {
+            cell.classList.add("disabled");
+        } else {
+            cell.classList.remove("disabled");
+        }
+    });
+}
+
+/* =========================================================
+   HANDLE CLICK
+   ========================================================= */
+
+function handleCellClick(row, col) {
+
+    if (gameOver) {
+        return;
+    }
+
+    if (flipping || computerThinking) {
+        return;
+    }
+
+    if (onlineMode) {
+
+        if (!opponentConnected) {
+            return;
+        }
+
+        if (!gameStarted) {
+            return;
+        }
+
+        if (currentPlayer !== myColor) {
+            return;
+        }
+    } else {
+
+        if (
+            modeElement.value === "computer" &&
+            currentPlayer === WHITE
+        ) {
+            return;
+        }
+    }
+
+    const flips =
+        getFlipsOnPosition(
+            boardState,
+            row,
+            col,
+            currentPlayer
+        );
+
+    if (flips.length === 0) {
+        return;
+    }
+
+    makeMove(
+        row,
+        col,
+        currentPlayer,
+        true
+    );
+}
+
+/* =========================================================
+   MAKE MOVE
+   ========================================================= */
+
+function makeMove(
+    row,
+    col,
+    player,
+    localMove
+) {
+
+    if (gameOver || flipping) {
+        return false;
+    }
+
+    const flips =
+        getFlipsOnPosition(
+            boardState,
+            row,
+            col,
+            player
+        );
+
+    if (flips.length === 0) {
+        return false;
+    }
+
+    /*
+     * IMPORTANT:
+     * Update the authoritative board FIRST.
+     *
+     * This prevents an online client from sending a board
+     * where the newly placed stone exists but the flips
+     * have not happened yet.
+     */
+
+    boardState[row][col] = player;
+
+    for (const [r, c] of flips) {
+        boardState[r][c] = player;
+    }
+
+    lastMove = {
+        row,
+        col,
+        player,
+        flips
+    };
+
+    currentPlayer = opposite(player);
+
+    /*
+     * Send the fully updated move to the other player.
+     */
+
+    if (
+        onlineMode &&
+        localMove &&
+        socketOpen
+    ) {
+        sendOnlineMove(
+            row,
+            col,
+            player,
+            flips
+        );
+    }
+
+    /*
+     * Render the completed logical state.
+     */
+
+    renderBoard([]);
+
+    /*
+     * Animate the pieces that flipped.
+     */
+
+    animateFlipVisuals(flips);
+
+    /*
+     * Continue the game after the animation.
+     */
+
+    setTimeout(() => {
+
+        flipping = false;
+
+        finishTurn();
+
+    }, 380);
+
+    return true;
+}
+
+/* =========================================================
+   VISUAL FLIP ANIMATION
+   ========================================================= */
+
+function animateFlipVisuals(flips) {
+
+    if (!flips || flips.length === 0) {
+        return;
+    }
+
+    flipping = true;
+
+    const cells =
+        boardElement.querySelectorAll(".cell");
+
+    for (const [row, col] of flips) {
+
+        const index =
+            row * SIZE + col;
+
+        const cell = cells[index];
+
+        if (!cell) {
+            continue;
+        }
+
+        const stone =
+            cell.querySelector(".stone");
+
+        if (!stone) {
+            continue;
+        }
+
+        stone.classList.add("flip");
+
+        setTimeout(() => {
+
+            stone.classList.remove("flip");
+
+        }, 380);
+    }
+
+    updateBoardInteractivity();
+}
+
+/* =========================================================
+   FINISH TURN
+   ========================================================= */
+
+function finishTurn() {
+
+    if (gameOver) {
+        return;
+    }
+
+    const moves =
+        getValidMoves(currentPlayer);
+
+    if (moves.length > 0) {
+
+        updateTurnDisplay();
+
+        renderBoard(moves);
+
+        /*
+         * Computer turn.
+         */
+
+        if (
+            !onlineMode &&
+            modeElement.value === "computer" &&
+            currentPlayer === WHITE
+        ) {
+
+            computerTurn();
+
+        }
+
+        return;
+    }
+
+    /*
+     * Current player has no move.
+     * Othello requires a pass.
+     */
+
+    const passedPlayer = currentPlayer;
+
+    const nextPlayer =
+        opposite(currentPlayer);
+
+    const nextMoves =
+        getValidMoves(nextPlayer);
+
+    if (nextMoves.length === 0) {
+
+        endGame();
+
+        return;
+    }
+
+    currentPlayer = nextPlayer;
+
+    if (onlineMode && socketOpen) {
+
+        sendOnlinePass(
+            passedPlayer,
+            currentPlayer
+        );
+    }
+
+    /*
+     * Tell the appropriate player about the pass.
+     */
+
+    if (onlineMode) {
+
+        if (currentPlayer === myColor) {
+
+            setTurnMessage("YOUR MOVE");
+
+            setMessage(
+                playerName(passedPlayer) +
+                " has no legal move. Your turn."
+            );
+
+        } else {
+
+            setTurnMessage("OPPONENT");
+
+            setMessage(
+                playerName(passedPlayer) +
+                " has no legal move. Waiting for " +
+                playerName(currentPlayer) +
+                "."
+            );
+        }
+
+    } else {
+
+        setTurnMessage(playerName(currentPlayer));
+
+        setMessage(
+            playerName(passedPlayer) +
+            " has no legal move. " +
+            playerName(currentPlayer) +
+            " continues."
+        );
+    }
+
+    renderBoard(nextMoves);
+
+    if (
+        !onlineMode &&
+        modeElement.value === "computer" &&
+        currentPlayer === WHITE
+    ) {
+        computerTurn();
+    }
+}
+
+/* =========================================================
+   GAME OVER
+   ========================================================= */
+
+function endGame() {
+
+    gameOver = true;
+
+    const black =
+        countPieces(BLACK);
+
+    const white =
+        countPieces(WHITE);
+
+    let result;
+
+    if (black > white) {
+
+        result =
+            "BLACK WINS " +
+            black +
+            "–" +
+            white;
+
+    } else if (white > black) {
+
+        result =
+            "IVORY WINS " +
+            white +
+            "–" +
+            black;
+
+    } else {
+
+        result =
+            "DRAW " +
+            black +
+            "–" +
+            white;
+    }
+
+    setTurnMessage("GAME OVER");
+
+    if (onlineMode) {
+
+        if (
+            (myColor === BLACK && black > white) ||
+            (myColor === WHITE && white > black)
+        ) {
+
+            setMessage(
+                "Game over — you win. " +
+                result
+            );
+
+        } else if (black === white) {
+
+            setMessage(
+                "Game over — draw. " +
+                result
+            );
+
+        } else {
+
+            setMessage(
+                "Game over — opponent wins. " +
+                result
+            );
+        }
+
+        if (socketOpen) {
+            sendOnlineGameOver(
+                black,
+                white
+            );
+        }
+
+    } else {
+
+        setMessage(result);
+    }
+
+    renderBoard([]);
+
+    updateBoardInteractivity();
+}
+
+function countPieces(player) {
+
+    let count = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if (boardState[row][col] === player) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+/* =========================================================
+   COMPUTER AI
+   ========================================================= */
+
+const POSITION_WEIGHTS = [
+    [120, -20, 20,  5,  5, 20, -20, 120],
+    [-20, -40, -5, -5, -5, -5, -40, -20],
+    [ 20,  -5, 15,  3,  3, 15,  -5,  20],
+    [  5,  -5,  3,  3,  3,  3,  -5,   5],
+    [  5,  -5,  3,  3,  3,  3,  -5,   5],
+    [ 20,  -5, 15,  3,  3, 15,  -5,  20],
+    [-20, -40, -5, -5, -5, -5, -40, -20],
+    [120, -20, 20,  5,  5, 20, -20, 120]
+];
+
+function cloneBoard(state) {
+
+    return state.map(row => row.slice());
+}
+
+function evaluateBoard(state) {
+
+    let score = 0;
+
+    for (let row = 0; row < SIZE; row++) {
+
+        for (let col = 0; col < SIZE; col++) {
+
+            if (state[row][col] === WHITE) {
+                score += POSITION_WEIGHTS[row][col];
+            }
+
+            if (state[row][col] === BLACK) {
+                score -= POSITION_WEIGHTS[row][col];
+            }
+        }
+    }
+
+    const whiteMoves =
+        getValidMovesOnBoard(
+            state,
+            WHITE
+        ).length;
+
+    const blackMoves =
+        getValidMovesOnBoard(
+            state,
+            BLACK
+        ).length;
+
+    score +=
+        (whiteMoves - blackMoves) * 4;
+
+    return score;
+}
+
+function minimax(
+    state,
+    depth,
+    maximizing
+) {
+
+    if (depth <= 0) {
+        return evaluateBoard(state);
+    }
+
+    const player =
+        maximizing
+            ? WHITE
+            : BLACK;
+
+    const moves =
+        getValidMovesOnBoard(
+            state,
+            player
+        );
+
+    if (moves.length === 0) {
+
+        const opponentMoves =
+            getValidMovesOnBoard(
+                state,
+                opposite(player)
+            );
+
+        if (opponentMoves.length === 0) {
+            return evaluateBoard(state);
+        }
+
+        return minimax(
+            state,
+            depth - 1,
+            !maximizing
+        );
+    }
+
+    if (maximizing) {
+
+        let best = -Infinity;
+
+        for (const move of moves) {
+
+            const next =
+                cloneBoard(state);
+
+            applyMoveToBoard(
+                next,
+                move.row,
+                move.col,
+                WHITE
+            );
+
+            best =
+                Math.max(
+                    best,
+                    minimax(
+                        next,
+                        depth - 1,
+                        false
+                    )
+                );
+        }
+
+        return best;
+
+    } else {
+
+        let best = Infinity;
+
+        for (const move of moves) {
+
+            const next =
+                cloneBoard(state);
+
+            applyMoveToBoard(
+                next,
+                move.row,
+                move.col,
+                BLACK
+            );
+
+            best =
+                Math.min(
+                    best,
+                    minimax(
+                        next,
+                        depth - 1,
+                        true
+                    )
+                );
+        }
+
+        return best;
+    }
+}
+
+function chooseComputerMove() {
+
+    const moves =
+        getValidMovesOnBoard(
+            boardState,
+            WHITE
+        );
+
+    if (moves.length === 0) {
+        return null;
+    }
+
+    const difficulty =
+        difficultyElement.value;
+
+    if (difficulty === "easy") {
+
+        return moves[
+            Math.floor(
+                Math.random() * moves.length
+            )
+        ];
+    }
+
+    let depth;
+
+    if (difficulty === "medium") {
+        depth = 3;
+    } else {
+        depth = 5;
+    }
+
+    let bestMove = moves[0];
+    let bestScore = -Infinity;
+
+    for (const move of moves) {
+
+        const next =
+            cloneBoard(boardState);
+
+        applyMoveToBoard(
+            next,
+            move.row,
+            move.col,
+            WHITE
+        );
+
+        let score =
+            minimax(
+                next,
+                depth - 1,
+                false
+            );
+
+        /*
+         * Small positional bonus to make the AI
+         * prefer strategically useful squares.
+         */
+
+        score +=
+            POSITION_WEIGHTS[
+                move.row
+            ][move.col];
+
+        if (score > bestScore) {
+
+            bestScore = score;
+            bestMove = move;
+        }
+    }
+
+    return bestMove;
+}
+
+function computerTurn() {
+
+    if (
+        gameOver ||
+        onlineMode ||
+        modeElement.value !== "computer" ||
+        currentPlayer !== WHITE
+    ) {
+        return;
+    }
+
+    computerThinking = true;
+
+    setTurnMessage("THINKING");
+    setMessage("The computer is thinking...");
+
+    renderBoard([]);
+
+    setTimeout(() => {
+
+        if (gameOver) {
+            computerThinking = false;
+            return;
+        }
+
+        const move =
+            chooseComputerMove();
+
+        if (!move) {
+
+            computerThinking = false;
+
+            finishTurn();
+
+            return;
+        }
+
+        computerThinking = false;
+
+        makeMove(
+            move.row,
+            move.col,
+            WHITE,
+            false
+        );
+
+    }, 350);
+}
+
+/* =========================================================
+   WEBSOCKET
+   ========================================================= */
+
+function connectOnline() {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    /*
+     * Use the same host that delivered the game.
+     */
+
+    const protocol =
+        window.location.protocol === "https:"
+            ? "wss:"
+            : "ws:";
+
+    const wsUrl =
+        protocol +
+        "//" +
+        window.location.host +
+        "/othello";
+
+    setTurnMessage("CONNECTING");
+    setMessage("Connecting to the game room...");
+
+    try {
+
+        socket = new WebSocket(wsUrl);
+
+    } catch (error) {
+
+        setTurnMessage("ERROR");
+        setMessage("Could not connect to the game room.");
+        return;
+    }
+
+    socket.addEventListener(
+        "open",
+        () => {
+
+            socketOpen = true;
+
+            /*
+             * Tell the server who we are and which room
+             * we belong to.
+             *
+             * Keep these fields explicit so the existing
+             * server can associate the player with the room.
+             */
+
+            sendJSON({
+                type: "othelloJoin",
+                room: roomId,
+                roomId: roomId,
+                player: playerNumber,
+                playerNumber: playerNumber
+            });
+
+            if (playerNumber === 1) {
+
+                /*
+                 * Player 1 owns the initial state.
+                 */
+
+                boardState =
+                    createInitialBoard();
+
+                currentPlayer = BLACK;
+
+                gameStarted = false;
+
+                renderBoard(
+                    getValidMoves(BLACK)
+                );
+
+                showWaitingForOpponent();
+
+            } else {
+
+                /*
+                 * Player 2 MUST NOT create/send a competing
+                 * initial state.
+                 */
+
+                showWaitingForOpponent();
+
+                renderBoard([]);
+            }
+        }
+    );
+
+    socket.addEventListener(
+        "message",
+        event => {
+
+            handleSocketMessage(
+                event.data
+            );
+        }
+    );
+
+    socket.addEventListener(
+        "close",
+        () => {
+
+            socketOpen = false;
+
+            if (!gameOver) {
+
+                opponentConnected = false;
+
+                setTurnMessage("DISCONNECTED");
+
+                setMessage(
+                    "The other player disconnected."
+                );
+
+                updateBoardInteractivity();
+            }
+        }
+    );
+
+    socket.addEventListener(
+        "error",
+        () => {
+
+            socketOpen = false;
+
+            if (!gameOver) {
+
+                setTurnMessage("CONNECTION");
+
+                setMessage(
+                    "There was a connection problem with the game room."
+                );
+            }
+        }
+    );
+}
+
+/* =========================================================
+   SOCKET SEND
+   ========================================================= */
+
+function sendJSON(data) {
+
+    if (
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+    ) {
+        return false;
+    }
+
+    try {
+
+        socket.send(
+            JSON.stringify(data)
+        );
+
+        return true;
+
+    } catch (error) {
+
+        return false;
+    }
+}
+
+function sendOnlineMove(
+    row,
+    col,
+    player,
+    flips
+) {
+
+    sendJSON({
+        type: "othelloMove",
+
+        room: roomId,
+        roomId: roomId,
+
+        player: playerNumber,
+        playerNumber: playerNumber,
+
+        color: player,
+
+        row: row,
+        col: col,
+
+        flips: flips,
+
+        state: boardState,
+
+        currentPlayer: currentPlayer,
+
+        gameStarted: true
+    });
+}
+
+function sendOnlineState() {
+
+    sendJSON({
+        type: "othelloState",
+
+        room: roomId,
+        roomId: roomId,
+
+        player: playerNumber,
+        playerNumber: playerNumber,
+
+        state: boardState,
+
+        currentPlayer: currentPlayer,
+
+        gameStarted: gameStarted,
+
+        gameOver: gameOver
+    });
+}
+
+function sendOnlinePass(
+    passedPlayer,
+    nextPlayer
+) {
+
+    sendJSON({
+        type: "othelloPass",
+
+        room: roomId,
+        roomId: roomId,
+
+        player: playerNumber,
+        playerNumber: playerNumber,
+
+        passedColor: passedPlayer,
+        nextColor: nextPlayer,
+
+        state: boardState,
+
+        currentPlayer: nextPlayer,
+
+        gameStarted: gameStarted
+    });
+}
+
+function sendOnlineGameOver(
+    black,
+    white
+) {
+
+    sendJSON({
+        type: "othelloGameOver",
+
+        room: roomId,
+        roomId: roomId,
+
+        player: playerNumber,
+        playerNumber: playerNumber,
+
+        state: boardState,
+
+        black: black,
+        white: white,
+
+        gameOver: true
+    });
+}
+
+/* =========================================================
+   SOCKET RECEIVE
+   ========================================================= */
+
+function parseIncomingData(raw) {
+
+    if (
+        typeof raw !== "string"
+    ) {
+        return null;
+    }
+
+    try {
+
+        return JSON.parse(raw);
+
+    } catch (error) {
+
+        return null;
+    }
+}
+
+function handleSocketMessage(raw) {
+
+    const data =
+        parseIncomingData(raw);
+
+    if (!data) {
+        return;
+    }
+
+    /*
+     * Ignore messages explicitly intended for another room.
+     */
+
+    const incomingRoom =
+        data.roomId ||
+        data.room ||
+        null;
+
+    if (
+        incomingRoom &&
+        roomId &&
+        String(incomingRoom) !== String(roomId)
+    ) {
+        return;
+    }
+
+    const type =
+        data.type ||
+        data.event ||
+        data.action ||
+        "";
+
+    switch (type) {
+
+        case "othelloJoin":
+        case "othelloConnected":
+
+            handleOnlineConnected(data);
+            break;
+
+        case "othelloMove":
+
+            handleOnlineMove(data);
+            break;
+
+        case "othelloState":
+
+            handleOnlineState(data);
+            break;
+
+        case "othelloPass":
+
+            handleOnlinePass(data);
+            break;
+
+        case "othelloGameOver":
+
+            handleOnlineGameOver(data);
+            break;
+
+        case "othelloDisconnect":
+
+            handleOnlineDisconnect(data);
+            break;
+
+        default:
+
+            /*
+             * Do not treat unrelated room/server messages
+             * as an Othello error.
+             */
+
+            break;
+    }
+}
+
+/* =========================================================
+   ONLINE CONNECTION
+   ========================================================= */
+
+function handleOnlineConnected(data) {
+
+    let incomingPlayer =
+        parseInt(
+            data.playerNumber ||
+            data.player ||
+            "0",
+            10
+        );
+
+    /*
+     * If the server announces Player 2 joining,
+     * Player 1 starts the game.
+     */
+
+    if (
+        incomingPlayer === 2 &&
+        playerNumber === 1
+    ) {
+
+        opponentConnected = true;
+
+        gameStarted = true;
+
+        boardState =
+            createInitialBoard();
+
+        currentPlayer = BLACK;
+
+        gameOver = false;
+
+        receivedInitialState = true;
+
+        setTurnMessage("YOUR MOVE");
+
+        setMessage(
+            "Player 2 connected. Black goes first."
+        );
+
+        renderBoard(
+            getValidMoves(BLACK)
+        );
+
+        sendOnlineState();
+
+        return;
+    }
+
+    /*
+     * If Player 1 announces himself to Player 2,
+     * Player 2 waits for the authoritative state.
+     */
+
+    if (
+        incomingPlayer === 1 &&
+        playerNumber === 2
+    ) {
+
+        opponentConnected = true;
+
+        setTurnMessage("WAITING");
+
+        setMessage(
+            "Player 1 connected. Waiting for Black to start..."
+        );
+
+        return;
+    }
+
+    /*
+     * Some server implementations may send a generic
+     * connected notification without a player number.
+     */
+
+    if (!incomingPlayer) {
+
+        opponentConnected = true;
+
+        if (playerNumber === 1) {
+
+            if (!gameStarted) {
+
+                gameStarted = true;
+
+                boardState =
+                    createInitialBoard();
+
+                currentPlayer = BLACK;
+
+                renderBoard(
+                    getValidMoves(BLACK)
+                );
+
+                sendOnlineState();
+            }
+
+        } else {
+
+            showWaitingForOpponent();
+        }
+    }
+}
+
+/* =========================================================
+   ONLINE MOVE
+   ========================================================= */
+
+function handleOnlineMove(data) {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    const sender =
+        parseInt(
+            data.playerNumber ||
+            data.player ||
+            "0",
+            10
+        );
+
+    /*
+     * Never process our own move again.
+     */
+
+    if (
+        sender &&
+        sender === playerNumber
+    ) {
+        return;
+    }
+
+    const incomingColor =
+        data.color ||
+        colorForPlayerNumber(sender);
+
+    if (
+        incomingColor !== BLACK &&
+        incomingColor !== WHITE
+    ) {
+        return;
+    }
+
+    if (incomingColor !== currentPlayer) {
+        return;
+    }
+
+    const row =
+        parseInt(data.row, 10);
+
+    const col =
+        parseInt(data.col, 10);
+
+    if (
+        !Number.isInteger(row) ||
+        !Number.isInteger(col) ||
+        !inside(row, col)
+    ) {
+        return;
+    }
+
+    /*
+     * Validate the move against our current board.
+     */
+
+    const flips =
+        getFlipsOnPosition(
+            boardState,
+            row,
+            col,
+            incomingColor
+        );
+
+    if (flips.length === 0) {
+
+        /*
+         * If the sender supplied a complete state,
+         * we can recover from a minor timing difference.
+         */
+
+        if (
+            Array.isArray(data.state) &&
+            isValidBoard(data.state)
+        ) {
+
+            boardState =
+                normalizeBoard(data.state);
+
+            currentPlayer =
+                normalizePlayer(
+                    data.currentPlayer
+                );
+
+            gameStarted = true;
+
+            receivedInitialState = true;
+
+            renderBoard(
+                getValidMoves(currentPlayer)
+            );
+
+            updateTurnDisplay();
+        }
+
+        return;
+    }
+
+    /*
+     * Apply the opponent's move locally.
+     */
+
+    boardState[row][col] =
+        incomingColor;
+
+    for (const [r, c] of flips) {
+        boardState[r][c] =
+            incomingColor;
+    }
+
+    currentPlayer =
+        opposite(incomingColor);
+
+    gameStarted = true;
+
+    receivedInitialState = true;
+
+    renderBoard([]);
+
+    animateFlipVisuals(flips);
+
+    setTimeout(() => {
+
+        flipping = false;
+
+        finishTurn();
+
+    }, 380);
+}
+
+/* =========================================================
+   ONLINE STATE
+   ========================================================= */
+
+function handleOnlineState(data) {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    const sender =
+        parseInt(
+            data.playerNumber ||
+            data.player ||
+            "0",
+            10
+        );
+
+    /*
+     * Player 2 should accept Player 1's authoritative
+     * initial state.
+     *
+     * Player 1 should not overwrite its own state from
+     * an echoed message.
+     */
+
+    if (
+        sender &&
+        sender === playerNumber
+    ) {
+        return;
+    }
+
+    if (
+        !Array.isArray(data.state) ||
+        !isValidBoard(data.state)
+    ) {
+        return;
+    }
+
+    /*
+     * A state from Player 1 is authoritative for startup.
+     */
+
+    if (
+        playerNumber === 2 &&
+        sender === 1
+    ) {
+
+        boardState =
+            normalizeBoard(data.state);
+
+        currentPlayer =
+            normalizePlayer(
+                data.currentPlayer
+            );
+
+        gameStarted =
+            data.gameStarted !== false;
+
+        gameOver =
+            data.gameOver === true;
+
+        opponentConnected = true;
+
+        receivedInitialState = true;
+
+        if (gameOver) {
+            renderBoard([]);
+            updateScore();
+            return;
+        }
+
+        renderBoard(
+            getValidMoves(currentPlayer)
+        );
+
+        updateTurnDisplay();
+
+        return;
+    }
+
+    /*
+     * For later synchronization, accept a valid state
+     * from the opponent.
+     */
+
+    if (
+        sender === 1 ||
+        sender === 2
+    ) {
+
+        boardState =
+            normalizeBoard(data.state);
+
+        currentPlayer =
+            normalizePlayer(
+                data.currentPlayer
+            );
+
+        gameStarted =
+            data.gameStarted !== false;
+
+        gameOver =
+            data.gameOver === true;
+
+        receivedInitialState = true;
+
+        renderBoard(
+            gameOver
+                ? []
+                : getValidMoves(currentPlayer)
+        );
+
+        updateTurnDisplay();
+    }
+}
+
+/* =========================================================
+   ONLINE PASS
+   ========================================================= */
+
+function handleOnlinePass(data) {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    const sender =
+        parseInt(
+            data.playerNumber ||
+            data.player ||
+            "0",
+            10
+        );
+
+    if (
+        sender &&
+        sender === playerNumber
+    ) {
+        return;
+    }
+
+    if (
+        Array.isArray(data.state) &&
+        isValidBoard(data.state)
+    ) {
+
+        boardState =
+            normalizeBoard(data.state);
+    }
+
+    const nextPlayer =
+        normalizePlayer(
+            data.nextColor ||
+            data.currentPlayer
+        );
+
+    currentPlayer = nextPlayer;
+
+    gameStarted = true;
+
+    renderBoard(
+        getValidMoves(currentPlayer)
+    );
+
+    if (currentPlayer === myColor) {
+
+        setTurnMessage("YOUR MOVE");
+
+        setMessage(
+            playerName(
+                data.passedColor ||
+                opponentColor
+            ) +
+            " has no legal move. Your turn."
+        );
+
+    } else {
+
+        setTurnMessage("OPPONENT");
+
+        setMessage(
+            playerName(
+                data.passedColor ||
+                opponentColor
+            ) +
+            " passed. Waiting for " +
+            playerName(currentPlayer) +
+            "."
+        );
+    }
+}
+
+/* =========================================================
+   ONLINE GAME OVER
+   ========================================================= */
+
+function handleOnlineGameOver(data) {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    if (
+        Array.isArray(data.state) &&
+        isValidBoard(data.state)
+    ) {
+
+        boardState =
+            normalizeBoard(data.state);
+    }
+
+    gameOver = true;
+
+    const black =
+        Number.isFinite(Number(data.black))
+            ? Number(data.black)
+            : countPieces(BLACK);
+
+    const white =
+        Number.isFinite(Number(data.white))
+            ? Number(data.white)
+            : countPieces(WHITE);
+
+    setTurnMessage("GAME OVER");
+
+    if (black === white) {
+
+        setMessage(
+            "Game over — draw. " +
+            black +
+            "–" +
+            white
+        );
+
+    } else {
+
+        const winner =
+            black > white
+                ? BLACK
+                : WHITE;
+
+        if (winner === myColor) {
+
+            setMessage(
+                "Game over — you win. " +
+                black +
+                "–" +
+                white
+            );
+
+        } else {
+
+            setMessage(
+                "Game over — opponent wins. " +
+                black +
+                "–" +
+                white
+            );
+        }
+    }
+
+    renderBoard([]);
+}
+
+/* =========================================================
+   ONLINE DISCONNECT
+   ========================================================= */
+
+function handleOnlineDisconnect(data) {
+
+    if (!onlineMode) {
+        return;
+    }
+
+    opponentConnected = false;
+
+    if (!gameOver) {
+
+        setTurnMessage("DISCONNECTED");
+
+        setMessage(
+            "The other player left the game."
+        );
+
+        updateBoardInteractivity();
+    }
+}
+
+/* =========================================================
+   STATE VALIDATION
+   ========================================================= */
+
+function isValidBoard(state) {
+
+    if (!Array.isArray(state)) {
+        return false;
+    }
+
+    if (state.length !== SIZE) {
+        return false;
+    }
+
+    for (let row = 0; row < SIZE; row++) {
+
+        if (
+            !Array.isArray(state[row]) ||
+            state[row].length !== SIZE
+        ) {
+            return false;
+        }
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const value =
+                state[row][col];
+
+            if (
+                value !== EMPTY &&
+                value !== BLACK &&
+                value !== WHITE
+            ) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function normalizeBoard(state) {
+
+    const result = [];
+
+    for (let row = 0; row < SIZE; row++) {
+
+        result[row] = [];
+
+        for (let col = 0; col < SIZE; col++) {
+
+            const value =
+                state[row][col];
+
+            result[row][col] =
+                value === BLACK
+                    ? BLACK
+                    : value === WHITE
+                        ? WHITE
+                        : EMPTY;
+        }
+    }
+
+    return result;
+}
+
+function normalizePlayer(value) {
+
+    if (
+        value === BLACK ||
+        value === WHITE
+    ) {
+        return value;
+    }
+
+    if (
+        String(value) === "2"
+    ) {
+        return WHITE;
+    }
+
+    return BLACK;
+}
+
+/* =========================================================
+   NEW GAME
+   ========================================================= */
+
+function startNewGame() {
+
+    gameOver = false;
+    computerThinking = false;
+    flipping = false;
+    lastMove = null;
+
+    /*
+     * ONLINE:
+     *
+     * Player 1 / Black is authoritative for starting
+     * the new game.
+     */
+
+    if (onlineMode) {
+
+        if (!socketOpen) {
+
+            setTurnMessage("OFFLINE");
+
+            setMessage(
+                "Not connected to the game room."
+            );
+
+            return;
+        }
+
+        if (playerNumber !== 1) {
+
+            setTurnMessage("WAITING");
+
+            setMessage(
+                "Player 1 / Black must start the new game."
+            );
+
+            return;
+        }
+
+        if (!opponentConnected) {
+
+            setTurnMessage("WAITING");
+
+            setMessage(
+                "Waiting for Player 2..."
+            );
+
+            return;
+        }
+
+        boardState =
+            createInitialBoard();
+
+        currentPlayer = BLACK;
+
+        gameStarted = true;
+
+        receivedInitialState = true;
+
+        renderBoard(
+            getValidMoves(BLACK)
+        );
+
+        setTurnMessage("YOUR MOVE");
+
+        setMessage(
+            "New game started. Black goes first."
+        );
+
+        sendJSON({
+            type: "othelloState",
+
+            room: roomId,
+            roomId: roomId,
+
+            player: 1,
+            playerNumber: 1,
+
+            state: boardState,
+
+            currentPlayer: BLACK,
+
+            gameStarted: true,
+
+            gameOver: false,
+
+            newGame: true
+        });
+
+        return;
+    }
+
+    /*
+     * LOCAL GAME
+     */
+
+    boardState =
+        createInitialBoard();
+
+    currentPlayer = BLACK;
+
+    gameStarted = true;
+
+    renderBoard(
+        getValidMoves(BLACK)
+    );
+
+    updateTurnDisplay();
+}
+
+/* =========================================================
+   MODE CHANGE
+   ========================================================= */
+
+function updateModeUI() {
+
+    const computer =
+        modeElement.value === "computer";
+
+    difficultyLabel.classList.toggle(
+        "hidden",
+        !computer
+    );
+}
+
+modeElement.addEventListener(
+    "change",
+    () => {
+
+        if (onlineMode) {
+
+            /*
+             * Room games always remain 2-player.
+             */
+
+            modeElement.value = "local";
+
+            setMessage(
+                "Online rooms use 2-player mode."
+            );
+
+            return;
+        }
+
+        updateModeUI();
+
+        startNewGame();
+    }
+);
+
+difficultyElement.addEventListener(
+    "change",
+    () => {
+
+        if (
+            !onlineMode &&
+            modeElement.value === "computer"
+        ) {
+
+            setMessage(
+                "Difficulty changed."
+            );
+        }
+    }
+);
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+newGameButton.addEventListener(
+    "click",
+    () => {
+        startNewGame();
+    }
+);
+
+menuButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "index.html";
+    }
+);
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+function initialize() {
+
+    /*
+     * Online rooms are always 2-player.
+     */
+
+    if (onlineMode) {
+
+        modeElement.value = "local";
+
+        modeElement.disabled = true;
+
+        difficultyLabel.classList.add(
+            "hidden"
+        );
+
+        newGameButton.disabled = false;
+
+        boardState =
+            createInitialBoard();
+
+        currentPlayer = BLACK;
+
+        gameStarted = false;
+
+        opponentConnected = false;
+
+        receivedInitialState = false;
+
+        renderBoard([]);
+
+        showWaitingForOpponent();
+
+        connectOnline();
+
+        return;
+    }
+
+    /*
+     * Local game.
+     */
+
+    modeElement.disabled = false;
+
+    updateModeUI();
+
+    boardState =
+        createInitialBoard();
+
+    currentPlayer = BLACK;
+
+    gameStarted = true;
+
+    renderBoard(
+        getValidMoves(BLACK)
+    );
+
+    setTurnMessage("BLACK");
+
+    setMessage(
+        "Black's turn."
+    );
+}
+
+initialize();
+
+</script>
+
+</body>
+</html>
