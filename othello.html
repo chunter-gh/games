@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Othello — Stone & Felt</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Georgia, "Times New Roman", serif;
+    background:
+        radial-gradient(circle at 50% 20%, #302b25 0%, #171512 48%, #080807 100%);
+    color: #eee;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1400px;
+}
+
+/* ---------------------------------------------------------
+   TABLE
+--------------------------------------------------------- */
+
+.table {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            ellipse at 50% 40%,
+            rgba(115, 101, 82, 0.16),
+            transparent 55%
+        ),
+        repeating-linear-gradient(
+            92deg,
+            rgba(255,255,255,0.018) 0px,
+            rgba(255,255,255,0.018) 1px,
+            transparent 1px,
+            transparent 5px
+        ),
+        linear-gradient(145deg, #191714, #0b0a09 70%);
+    z-index: -3;
+}
+
+.table::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 35%,
+            rgba(0,0,0,.55) 100%
+        );
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   GAME WRAPPER
+--------------------------------------------------------- */
+
+.game {
+    width: min(94vw, 1050px);
+    height: min(96vh, 900px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.4vh, 16px);
+    transform-style: preserve-3d;
+}
+
+/* ---------------------------------------------------------
+   TITLE
+--------------------------------------------------------- */
+
+.title {
+    text-align: center;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-size: clamp(18px, 2.5vw, 30px);
+    color: #d9d0bf;
+    text-shadow:
+        0 2px 2px #000,
+        0 0 18px rgba(255,255,255,.08);
+    margin-bottom: 2px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: clamp(10px, 1.2vw, 13px);
+    letter-spacing: .24em;
+    color: #887f70;
+    text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------
+   STATUS PANEL
+--------------------------------------------------------- */
+
+.status {
+    width: min(90vw, 760px);
+    min-height: 42px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(72,68,61,.92),
+            rgba(28,26,23,.96)
+        );
+
+    border: 1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+        0 7px 15px rgba(0,0,0,.55),
+        inset 0 1px 1px rgba(255,255,255,.12),
+        inset 0 -2px 4px rgba(0,0,0,.7);
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #cfc8bb;
+    font-size: clamp(11px, 1.5vw, 15px);
+    white-space: nowrap;
+}
+
+.player.active {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,.3);
+}
+
+.mini-disc {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    box-shadow:
+        inset 2px 2px 3px rgba(255,255,255,.35),
+        inset -3px -4px 5px rgba(0,0,0,.45),
+        0 2px 4px #000;
+}
+
+.mini-black {
+    background:
+        radial-gradient(circle at 30% 24%, #777 0%, #252525 16%, #050505 55%, #000 100%);
+}
+
+.mini-white {
+    background:
+        radial-gradient(circle at 30% 24%, #fff 0%, #e4ded1 27%, #bdb5a6 72%, #777064 100%);
+}
+
+.turn {
+    text-align: center;
+    color: #b5aa98;
+    font-size: clamp(11px, 1.4vw, 14px);
+}
+
+/* ---------------------------------------------------------
+   BOARD OUTER STONE
+--------------------------------------------------------- */
+
+.board-shadow {
+    position: relative;
+    width: min(88vw, 760px);
+    aspect-ratio: 1 / 1;
+
+    transform:
+        rotateX(7deg)
+        rotateZ(0deg)
+        translateZ(0);
+
+    transform-style: preserve-3d;
+
+    filter:
+        drop-shadow(0 28px 25px rgba(0,0,0,.78))
+        drop-shadow(0 8px 8px rgba(0,0,0,.7));
+}
+
+/* Main stone slab */
+
+.board {
+    position: absolute;
+    inset: 0;
+
+    padding: clamp(18px, 3vw, 30px);
+
+    border-radius: clamp(14px, 2vw, 24px);
+
+    background:
+        radial-gradient(
+            ellipse at 25% 18%,
+            rgba(255,255,255,.16),
+            transparent 24%
+        ),
+        radial-gradient(
+            ellipse at 75% 80%,
+            rgba(0,0,0,.28),
+            transparent 38%
+        ),
+        repeating-radial-gradient(
+            ellipse at 30% 35%,
+            rgba(255,255,255,.025) 0px,
+            rgba(255,255,255,.025) 1px,
+            transparent 2px,
+            transparent 9px
+        ),
+        linear-gradient(
+            135deg,
+            #69645b,
+            #38352f 30%,
+            #24221e 65%,
+            #4d4941
+        );
+
+    border: 2px solid #777166;
+
+    box-shadow:
+        inset 0 2px 2px rgba(255,255,255,.22),
+        inset 0 -7px 12px rgba(0,0,0,.7),
+        inset 4px 0 7px rgba(255,255,255,.06),
+        0 5px 0 #161411,
+        0 9px 0 #0d0c0a;
+}
+
+/* Faux stone thickness */
+
+.board::before {
+    content: "";
+    position: absolute;
+    left: 3%;
+    right: 3%;
+    bottom: -13px;
+    height: 18px;
+
+    border-radius: 0 0 18px 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #302e29,
+            #11100e
+        );
+
+    transform: translateZ(-1px);
+
+    box-shadow:
+        0 5px 5px rgba(0,0,0,.7),
+        inset 0 2px 2px rgba(255,255,255,.07);
+}
+
+/* Stone highlights */
+
+.board::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+
+    border-radius: 17px;
+
+    border: 1px solid rgba(255,255,255,.07);
+
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   FELT
+--------------------------------------------------------- */
+
+.felt {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    border-radius: 9px;
+
+    overflow: visible;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,.028) 0px,
+            rgba(255,255,255,.028) 1px,
+            transparent 1px,
+            transparent 3px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(0,0,0,.035) 0px,
+            rgba(0,0,0,.035) 1px,
+            transparent 1px,
+            transparent 4px
+        ),
+        radial-gradient(
+            ellipse at 28% 20%,
+            rgba(80,130,82,.45),
+            transparent 42%
+        ),
+        radial-gradient(
+            ellipse at 75% 75%,
+            rgba(0,0,0,.22),
+            transparent 50%
+        ),
+        linear-gradient(
+            135deg,
+            #163f29,
+            #0d2c1d 50%,
+            #123923
+        );
+
+    border: 5px solid #29261f;
+
+    box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.06),
+        inset 0 7px 14px rgba(0,0,0,.38),
+        inset 0 -6px 12px rgba(0,0,0,.38);
+}
+
+/* Felt fiber effect */
+
+.felt::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    border-radius: 4px;
+
+    background:
+        repeating-linear-gradient(
+            25deg,
+            rgba(255,255,255,.022) 0px,
+            rgba(255,255,255,.022) 1px,
+            transparent 1px,
+            transparent 6px
+        ),
+        repeating-linear-gradient(
+            115deg,
+            rgba(0,0,0,.028) 0px,
+            rgba(0,0,0,.028) 1px,
+            transparent 1px,
+            transparent 5px
+        );
+
+    opacity: .9;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   GRID
+--------------------------------------------------------- */
+
+.grid {
+    position: absolute;
+    inset: 4.5%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+
+    border: 2px solid rgba(3,16,9,.72);
+
+    box-shadow:
+        0 0 0 1px rgba(170,205,160,.08),
+        0 2px 4px rgba(0,0,0,.4);
+}
+
+.cell {
+    position: relative;
+
+    border-right: 1px solid rgba(0,0,0,.62);
+    border-bottom: 1px solid rgba(0,0,0,.62);
+
+    cursor: pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.018),
+            rgba(0,0,0,.018)
+        );
+
+    transition:
+        background .15s ease;
+}
+
+.cell:nth-child(8n) {
+    border-right: none;
+}
+
+.cell:nth-last-child(-n+8) {
+    border-bottom: none;
+}
+
+.cell:hover {
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.09),
+            transparent 65%
+        );
+}
+
+.cell.valid::after {
+    content: "";
+    position: absolute;
+    width: 14%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    left: 43%;
+    top: 43%;
+
+    background: rgba(220,205,164,.2);
+
+    box-shadow:
+        0 0 12px rgba(230,210,160,.15);
+}
+
+/* ---------------------------------------------------------
+   PIECES
+--------------------------------------------------------- */
+
+.piece {
+    position: absolute;
+
+    width: 72%;
+    height: 72%;
+
+    left: 14%;
+    top: 14%;
+
+    border-radius: 50%;
+
+    transform-style: preserve-3d;
+
+    cursor: default;
+
+    box-shadow:
+        0 8px 7px rgba(0,0,0,.42),
+        0 3px 2px rgba(0,0,0,.55);
+
+    animation: placePiece .28s cubic-bezier(.18,.9,.25,1.15);
+}
+
+.piece::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    border-radius: 50%;
+
+    transform: translateZ(3px);
+
+    pointer-events: none;
+}
+
+.piece::after {
+    content: "";
+    position: absolute;
+
+    left: 13%;
+    top: 9%;
+
+    width: 35%;
+    height: 22%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255,255,255,.48),
+            rgba(255,255,255,.08) 48%,
+            transparent 75%
+        );
+
+    transform: rotate(-25deg);
+
+    filter: blur(1px);
+
+    pointer-events: none;
+}
+
+/* Black onyx */
+
+.black {
+    background:
+        radial-gradient(
+            circle at 29% 22%,
+            #858585 0%,
+            #343434 8%,
+            #111 27%,
+            #020202 60%,
+            #151515 83%,
+            #000 100%
+        );
+
+    border: 1px solid #777;
+
+    box-shadow:
+        inset 3px 3px 5px rgba(255,255,255,.18),
+        inset -5px -6px 8px rgba(0,0,0,.9),
+        inset 0 -2px 3px rgba(255,255,255,.08),
+        0 9px 7px rgba(0,0,0,.55),
+        0 2px 2px rgba(0,0,0,.8);
+}
+
+.black::before {
+    background:
+        repeating-radial-gradient(
+            circle at 42% 45%,
+            transparent 0px,
+            transparent 12px,
+            rgba(255,255,255,.025) 13px,
+            transparent 15px
+        );
+}
+
+/* Ivory stone */
+
+.white {
+    background:
+        radial-gradient(
+            circle at 27% 20%,
+            #fffdf5 0%,
+            #eee8d9 17%,
+            #d3cbbb 48%,
+            #aaa291 78%,
+            #756e62 100%
+        );
+
+    border: 1px solid #aaa18f;
+
+    box-shadow:
+        inset 3px 3px 5px rgba(255,255,255,.72),
+        inset -5px -6px 8px rgba(0,0,0,.35),
+        inset 0 -2px 3px rgba(255,255,255,.3),
+        0 9px 7px rgba(0,0,0,.48),
+        0 2px 2px rgba(0,0,0,.75);
+}
+
+.white::before {
+    background:
+        repeating-linear-gradient(
+            117deg,
+            transparent 0px,
+            transparent 19px,
+            rgba(100,88,72,.08) 20px,
+            transparent 22px,
+            transparent 45px
+        );
+}
+
+/* ---------------------------------------------------------
+   PIECE FLIP
+--------------------------------------------------------- */
+
+.flip-black-to-white {
+    animation: flipToWhite .65s cubic-bezier(.25,.7,.2,1) forwards;
+}
+
+.flip-white-to-black {
+    animation: flipToBlack .65s cubic-bezier(.25,.7,.2,1) forwards;
+}
+
+@keyframes flipToWhite {
+    0% {
+        transform: rotateX(0deg);
+    }
+    48% {
+        transform: rotateX(90deg) scale(1.04);
+    }
+    50% {
+        transform: rotateX(90deg) scale(1.04);
+    }
+    100% {
+        transform: rotateX(180deg);
+    }
+}
+
+@keyframes flipToBlack {
+    0% {
+        transform: rotateX(180deg);
+    }
+    48% {
+        transform: rotateX(270deg) scale(1.04);
+    }
+    50% {
+        transform: rotateX(270deg) scale(1.04);
+    }
+    100% {
+        transform: rotateX(360deg);
+    }
+}
+
+@keyframes placePiece {
+    0% {
+        opacity: 0;
+        transform: translateY(-18px) scale(.75);
+    }
+
+    65% {
+        opacity: 1;
+        transform: translateY(3px) scale(1.04);
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ---------------------------------------------------------
+   CONTROLS
+--------------------------------------------------------- */
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    appearance: none;
+
+    border: 1px solid #777064;
+    border-radius: 8px;
+
+    padding: 9px 18px;
+
+    color: #e9e3d7;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 13px;
+    letter-spacing: .08em;
+
+    background:
+        linear-gradient(
+            180deg,
+            #514c44,
+            #25231f
+        );
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.18),
+        0 3px 5px rgba(0,0,0,.5);
+
+    cursor: pointer;
+
+    transition:
+        transform .1s ease,
+        background .15s ease;
+}
+
+button:hover {
+    background:
+        linear-gradient(
+            180deg,
+            #625c52,
+            #302d27
+        );
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,.5);
+}
+
+/* ---------------------------------------------------------
+   SCORE
+--------------------------------------------------------- */
+
+.score {
+    min-width: 150px;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: .1em;
+    color: #9f9688;
+}
+
+.score strong {
+    color: #e0d7c8;
+    font-size: 16px;
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+--------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .game {
+        width: 98vw;
+        height: 98vh;
+        gap: 7px;
+    }
+
+    .title {
+        font-size: 18px;
+    }
+
+    .subtitle {
+        font-size: 9px;
+    }
+
+    .status {
+        width: 94vw;
+        padding: 6px 10px;
+    }
+
+    .board-shadow {
+        width: min(94vw, 650px);
+    }
+
+    .board {
+        padding: 17px;
+    }
+
+    .controls button {
+        padding: 8px 13px;
+        font-size: 11px;
+    }
+}
+
+@media (max-height: 700px) {
+
+    .title,
+    .subtitle {
+        display: none;
+    }
+
+    .game {
+        gap: 5px;
+    }
+
+    .board-shadow {
+        width: min(80vh, 90vw);
+    }
+
+    .status {
+        min-height: 34px;
+    }
+
+    .controls button {
+        padding: 6px 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="table"></div>
+
+<main class="game">
+
+    <div>
+        <div class="title">Othello</div>
+        <div class="subtitle">Stone &amp; Felt Edition</div>
+    </div>
+
+    <div class="status">
+
+        <div class="player" id="blackPlayer">
+            <span class="mini-disc mini-black"></span>
+            <span>BLACK</span>
+            <span id="blackScore">2</span>
+        </div>
+
+        <div class="turn" id="turnText">
+            BLACK'S TURN
+        </div>
+
+        <div class="player" id="whitePlayer">
+            <span class="mini-disc mini-white"></span>
+            <span>IVORY</span>
+            <span id="whiteScore">2</span>
+        </div>
+
+    </div>
+
+    <div class="board-shadow">
+
+        <div class="board">
+
+            <div class="felt">
+
+                <div class="grid" id="board"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="score" id="message">
+        PLACE A PIECE TO BEGIN
+    </div>
+
+    <div class="controls">
+        <button id="newGame">NEW GAME</button>
+    </div>
+
+</main>
+
+<script>
+"use strict";
+
+/* =========================================================
+   OTHELLO
+   ========================================================= */
+
+const SIZE = 8;
+
+let boardState = [];
+let currentPlayer = "B";
+let gameOver = false;
+let flipping = false;
+
+const boardElement = document.getElementById("board");
+const turnText = document.getElementById("turnText");
+const message = document.getElementById("message");
+const blackScore = document.getElementById("blackScore");
+const whiteScore = document.getElementById("whiteScore");
+const blackPlayer = document.getElementById("blackPlayer");
+const whitePlayer = document.getElementById("whitePlayer");
+const newGameButton = document.getElementById("newGame");
+
+/* ---------------------------------------------------------
+   DIRECTIONS
+--------------------------------------------------------- */
+
+const directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1]
+];
+
+/* ---------------------------------------------------------
+   INITIAL BOARD
+--------------------------------------------------------- */
+
+function createInitialBoard() {
+
+    boardState = Array.from(
+        { length: SIZE },
+        () => Array(SIZE).fill(null)
+    );
+
+    boardState[3][3] = "W";
+    boardState[3][4] = "B";
+    boardState[4][3] = "B";
+    boardState[4][4] = "W";
+
+    currentPlayer = "B";
+    gameOver = false;
+    flipping = false;
+
+    renderBoard();
+
+    message.textContent = "PLACE A PIECE TO BEGIN";
+}
+
+/* ---------------------------------------------------------
+   BOARD HELPERS
+--------------------------------------------------------- */
+
+function inBounds(row, col) {
+    return (
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    );
+}
+
+function opposite(player) {
+    return player === "B" ? "W" : "B";
+}
+
+function getFlips(row, col, player) {
+
+    if (!inBounds(row, col)) {
+        return [];
+    }
+
+    if (boardState[row][col] !== null) {
+        return [];
+    }
+
+    const enemy = opposite(player);
+    const result = [];
+
+    for (const [dr, dc] of directions) {
+
+        let r = row + dr;
+        let c = col + dc;
+        const line = [];
+
+        while (
+            inBounds(r, c) &&
+            boardState[r][c] === enemy
+        ) {
+            line.push([r, c]);
+            r += dr;
+            c += dc;
+        }
+
+        if (
+            line.length > 0 &&
+            inBounds(r, c) &&
+            boardState[r][c] === player
+        ) {
+            result.push(...line);
+        }
+    }
+
+    return result;
+}
+
+function validMoves(player) {
+
+    const moves = [];
+
+    for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+
+            if (getFlips(r, c, player).length > 0) {
+                moves.push([r, c]);
+            }
+        }
+    }
+
+    return moves;
+}
+
+/* ---------------------------------------------------------
+   RENDER
+--------------------------------------------------------- */
+
+function renderBoard() {
+
+    boardElement.innerHTML = "";
+
+    const moves = gameOver
+        ? []
+        : validMoves(currentPlayer);
+
+    for (let r = 0; r < SIZE; r++) {
+
+        for (let c = 0; c < SIZE; c++) {
+
+            const cell = document.createElement("div");
+
+            cell.className = "cell";
+
+            if (
+                moves.some(
+                    ([mr, mc]) => mr === r && mc === c
+                )
+            ) {
+                cell.classList.add("valid");
+            }
+
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+
+            cell.addEventListener(
+                "click",
+                () => handleCellClick(r, c)
+            );
+
+            const value = boardState[r][c];
+
+            if (value) {
+
+                const piece = document.createElement("div");
+
+                piece.className =
+                    "piece " +
+                    (value === "B" ? "black" : "white");
+
+                cell.appendChild(piece);
+            }
+
+            boardElement.appendChild(cell);
+        }
+    }
+
+    updateScore();
+    updateTurn();
+}
+
+/* ---------------------------------------------------------
+   CLICK
+--------------------------------------------------------- */
+
+function handleCellClick(row, col) {
+
+    if (gameOver || flipping) {
+        return;
+    }
+
+    const flips = getFlips(
+        row,
+        col,
+        currentPlayer
+    );
+
+    if (flips.length === 0) {
+
+        message.textContent =
+            "THAT IS NOT A LEGAL MOVE";
+
+        return;
+    }
+
+    makeMove(row, col, flips);
+}
+
+/* ---------------------------------------------------------
+   MOVE
+--------------------------------------------------------- */
+
+function makeMove(row, col, flips) {
+
+    const player = currentPlayer;
+
+    boardState[row][col] = player;
+
+    renderBoard();
+
+    const cellIndex = row * SIZE + col;
+    const cell = boardElement.children[cellIndex];
+
+    if (cell) {
+
+        const piece = cell.querySelector(".piece");
+
+        if (piece) {
+            piece.style.animation =
+                "placePiece .35s cubic-bezier(.18,.9,.25,1.15)";
+        }
+    }
+
+    if (flips.length > 0) {
+
+        flipping = true;
+
+        setTimeout(
+            () => flipPieces(flips, player),
+            180
+        );
+
+    } else {
+
+        finishTurn(player);
+    }
+}
+
+/* ---------------------------------------------------------
+   FLIP PIECES
+--------------------------------------------------------- */
+
+function flipPieces(flips, player) {
+
+    let completed = 0;
+
+    for (const [row, col] of flips) {
+
+        boardState[row][col] = player;
+
+        const index = row * SIZE + col;
+        const cell = boardElement.children[index];
+
+        if (!cell) {
+            completed++;
+            continue;
+        }
+
+        const piece = cell.querySelector(".piece");
+
+        if (!piece) {
+            completed++;
+            continue;
+        }
+
+        const oldPlayer = opposite(player);
+
+        piece.classList.remove(
+            oldPlayer === "B" ? "black" : "white"
+        );
+
+        /*
+         * The piece itself is flipped in 3D.
+         * At the halfway point the material changes,
+         * making the motion read as a real two-sided disc.
+         */
+
+        if (player === "W") {
+
+            piece.classList.add(
+                "flip-black-to-white"
+            );
+
+        } else {
+
+            piece.classList.add(
+                "flip-white-to-black"
+            );
+        }
+
+        setTimeout(() => {
+
+            piece.classList.remove(
+                "black",
+                "white",
+                "flip-black-to-white",
+                "flip-white-to-black"
+            );
+
+            piece.classList.add(
+                player === "B" ? "black" : "white"
+            );
+
+            completed++;
+
+            if (completed === flips.length) {
+
+                flipping = false;
+
+                renderBoard();
+
+                finishTurn(player);
+            }
+
+        }, 650);
+    }
+}
+
+/* ---------------------------------------------------------
+   TURN
+--------------------------------------------------------- */
+
+function finishTurn(playerWhoMoved) {
+
+    const nextPlayer = opposite(playerWhoMoved);
+
+    const nextMoves = validMoves(nextPlayer);
+
+    if (nextMoves.length > 0) {
+
+        currentPlayer = nextPlayer;
+
+        message.textContent =
+            "YOUR MOVE";
+
+        renderBoard();
+
+        return;
+    }
+
+    /*
+     * Opponent has no legal move.
+     * Check whether the player who just moved
+     * can move again.
+     */
+
+    const currentMoves = validMoves(playerWhoMoved);
+
+    if (currentMoves.length > 0) {
+
+        currentPlayer = playerWhoMoved;
+
+        message.textContent =
+            "NO LEGAL MOVE — PLAY AGAIN";
+
+        renderBoard();
+
+        return;
+    }
+
+    endGame();
+}
+
+/* ---------------------------------------------------------
+   END GAME
+--------------------------------------------------------- */
+
+function endGame() {
+
+    gameOver = true;
+
+    let black = 0;
+    let white = 0;
+
+    for (let r = 0; r < SIZE; r++) {
+
+        for (let c = 0; c < SIZE; c++) {
+
+            if (boardState[r][c] === "B") {
+                black++;
+            }
+
+            if (boardState[r][c] === "W") {
+                white++;
+            }
+        }
+    }
+
+    if (black > white) {
+
+        message.textContent =
+            `GAME OVER — BLACK ${black} / IVORY ${white}`;
+
+    } else if (white > black) {
+
+        message.textContent =
+            `GAME OVER — IVORY ${white} / BLACK ${black}`;
+
+    } else {
+
+        message.textContent =
+            `GAME OVER — DRAW ${black} / ${white}`;
+    }
+
+    turnText.textContent = "GAME OVER";
+
+    blackPlayer.classList.remove("active");
+    whitePlayer.classList.remove("active");
+}
+
+/* ---------------------------------------------------------
+   SCORE
+--------------------------------------------------------- */
+
+function updateScore() {
+
+    let black = 0;
+    let white = 0;
+
+    for (let r = 0; r < SIZE; r++) {
+
+        for (let c = 0; c < SIZE; c++) {
+
+            if (boardState[r][c] === "B") {
+                black++;
+            }
+
+            if (boardState[r][c] === "W") {
+                white++;
+            }
+        }
+    }
+
+    blackScore.textContent = black;
+    whiteScore.textContent = white;
+}
+
+/* ---------------------------------------------------------
+   TURN DISPLAY
+--------------------------------------------------------- */
+
+function updateTurn() {
+
+    if (gameOver) {
+        return;
+    }
+
+    if (currentPlayer === "B") {
+
+        turnText.textContent =
+            "BLACK'S TURN";
+
+        blackPlayer.classList.add("active");
+        whitePlayer.classList.remove("active");
+
+    } else {
+
+        turnText.textContent =
+            "IVORY'S TURN";
+
+        whitePlayer.classList.add("active");
+        blackPlayer.classList.remove("active");
+    }
+}
+
+/* ---------------------------------------------------------
+   NEW GAME
+--------------------------------------------------------- */
+
+newGameButton.addEventListener(
+    "click",
+    createInitialBoard
+);
+
+/* ---------------------------------------------------------
+   START
+--------------------------------------------------------- */
+
+createInitialBoard();
+
+</script>
+
+</body>
+</html>
