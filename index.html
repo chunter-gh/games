@@ -757,11 +757,11 @@ body {
     z-index: 4;
 }
 
-/* Eyes centered above the oval snout */
+/* Eyes */
 
 .dog-eye {
     position: absolute;
-    top: 40px;
+    top: 34px;
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -775,11 +775,11 @@ body {
 }
 
 .dog-eye.left {
-    left: 22px;
+    left: 12px;
 }
 
 .dog-eye.right {
-    left: 44px;
+    left: 34px;
 }
 
 /* Mouth */
@@ -910,6 +910,162 @@ body {
 @keyframes dogTailWag {
     from { transform: rotate(-27deg); }
     to   { transform: rotate(12deg); }
+}
+
+/* =========================================================
+   LADYBUG
+========================================================= */
+
+.ladybug-wrapper {
+    position: absolute;
+    z-index: 15;
+    left: -30px;
+    bottom: clamp(42px, 7vh, 58px);
+    width: 24px;
+    height: 22px;
+    animation: ladybugWalk 22s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes ladybugWalk {
+    0% {
+        left: -30px;
+        bottom: clamp(42px, 7vh, 58px);
+    }
+
+    18% {
+        left: 18%;
+        bottom: clamp(50px, 8vh, 68px);
+    }
+
+    34% {
+        left: 38%;
+        bottom: clamp(39px, 6vh, 52px);
+    }
+
+    51% {
+        left: 56%;
+        bottom: clamp(57px, 9vh, 75px);
+    }
+
+    69% {
+        left: 73%;
+        bottom: clamp(43px, 7vh, 60px);
+    }
+
+    84% {
+        left: 89%;
+        bottom: clamp(52px, 8vh, 70px);
+    }
+
+    100% {
+        left: calc(100% + 30px);
+        bottom: clamp(45px, 7vh, 62px);
+    }
+}
+
+.ladybug {
+    position: relative;
+    width: 24px;
+    height: 22px;
+    transform: rotate(-8deg);
+    animation: ladybugBounce .28s ease-in-out infinite alternate;
+}
+
+@keyframes ladybugBounce {
+    from {
+        transform: rotate(-8deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(8deg) translateY(-2px);
+    }
+}
+
+.ladybug-body {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 20px;
+    height: 19px;
+    border-radius: 50% 50% 48% 48%;
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #ff6b5f,
+            #d82020 65%,
+            #8d1111 100%
+        );
+    border: 2px solid #4c0d0d;
+}
+
+.ladybug-body::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: -1px;
+    width: 2px;
+    height: 17px;
+    background: #2a0808;
+}
+
+.ladybug-spot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #160707;
+}
+
+.ladybug-spot.one {
+    left: 4px;
+    top: 4px;
+}
+
+.ladybug-spot.two {
+    left: 13px;
+    top: 4px;
+}
+
+.ladybug-spot.three {
+    left: 4px;
+    top: 11px;
+}
+
+.ladybug-spot.four {
+    left: 13px;
+    top: 11px;
+}
+
+.ladybug-head {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 7px;
+    height: 10px;
+    border-radius: 50%;
+    background: #171010;
+    z-index: 2;
+}
+
+.ladybug-antenna {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-top: 1px solid #171010;
+    border-radius: 50%;
+}
+
+.ladybug-antenna.one {
+    left: -3px;
+    top: 0;
+    transform: rotate(-25deg);
+}
+
+.ladybug-antenna.two {
+    left: -2px;
+    top: 13px;
+    transform: rotate(25deg);
 }
 
 /* =========================================================
@@ -1286,6 +1442,30 @@ body {
                 <div class="dog-tongue"></div>
 
             </div>
+
+        </div>
+
+    </div>
+
+    <!-- LADYBUG -->
+
+    <div class="ladybug-wrapper">
+
+        <div class="ladybug">
+
+            <div class="ladybug-antenna one"></div>
+            <div class="ladybug-antenna two"></div>
+
+            <div class="ladybug-body">
+
+                <div class="ladybug-spot one"></div>
+                <div class="ladybug-spot two"></div>
+                <div class="ladybug-spot three"></div>
+                <div class="ladybug-spot four"></div>
+
+            </div>
+
+            <div class="ladybug-head"></div>
 
         </div>
 
