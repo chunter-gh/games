@@ -427,6 +427,47 @@ body {
     background: #59402a;
 }
 
+
+.ant-trail {
+    position: absolute;
+    z-index: 23;
+    right: calc(clamp(25px, 8vw, 105px) + clamp(52px, 8vw, 82px) - 8px);
+    bottom: clamp(12px, 2.5vh, 24px);
+    width: 76px;
+    height: 13px;
+    pointer-events: none;
+}
+.ant {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #14120f;
+    box-shadow: -5px 0 0 -1px #14120f, 5px 0 0 1px #14120f;
+    animation: antWalk 7s linear infinite;
+}
+.ant::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 3px;
+    width: 14px;
+    height: 5px;
+    background: linear-gradient(65deg, transparent 42%, #14120f 43% 49%, transparent 50%),
+                linear-gradient(115deg, transparent 42%, #14120f 43% 49%, transparent 50%);
+}
+.ant:nth-child(2) { animation-delay: -2.3s; }
+.ant:nth-child(3) { animation-delay: -4.6s; }
+@keyframes antWalk {
+    0% { transform: translateX(0) translateY(0); opacity: 0; }
+    8% { opacity: 1; }
+    45% { transform: translateX(-35px) translateY(-2px); }
+    90% { opacity: 1; }
+    100% { transform: translateX(-68px) translateY(0); opacity: 0; }
+}
+
 /* GROUND */
 
 .ground {
@@ -1775,6 +1816,7 @@ body {
 
     <div class="ground"></div>
     <div class="anthill" aria-hidden="true"></div>
+    <div class="ant-trail" aria-hidden="true"><span class="ant"></span><span class="ant"></span><span class="ant"></span></div>
 
 
 
