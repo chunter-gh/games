@@ -39,7 +39,7 @@ const online=Boolean(room),mine=me-1,clientId=crypto.randomUUID?crypto.randomUUI
 const el=id=>document.getElementById(id),canvas=el("rink"),ctx=canvas.getContext("2d");
 let W=800,H=500,r=28,puckR=12,goalHalf=85,players=[],puck={},score=[0,0],paused=0,over=false;
 let target=[null,null],mouseInside=false,last=0,socket=null,socketOpen=false,reconnectTimer=null,lastSend=0,lastInput=0,audio=null;
-let ready=false,messageAt=0;
+let ready=false,messageAt=0,cpuStrikeCooldown=0;
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function status(text,seconds=1.8){el("status").textContent=text;messageAt=performance.now()+seconds*1000;}
 function audioReady(){try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();}catch{}}
@@ -67,7 +67,7 @@ function resetPuck(toward=0){
 }
 function newGame(){
   if(online&&me===2){send({type:"hockeyNewGameRequest"});return;}
-  score=[0,0];over=false;players=[{x:W*.17,y:H/2,vx:0,vy:0},{x:W*.83,y:H/2,vx:0,vy:0}];
+  score=[0,0];over=false;cpuStrikeCooldown=0;players=[{x:W*.17,y:H/2,vx:0,vy:0},{x:W*.83,y:H/2,vx:0,vy:0}];
   resetPuck(0);ready=true;
   el("blueScore").textContent="0";el("redScore").textContent="0";
   status("Face-off! Blue defends left; red defends right.",2.2);
@@ -102,12 +102,21 @@ function physics(dt){
   if(paused>0){paused=Math.max(0,paused-dt);return;}
   if(over)return;
   const cpu=players[1];
+  cpuStrikeCooldown=Math.max(0,cpuStrikeCooldown-dt);
   if(!online){
-    const at={x:puck.x>W*.48?clamp(puck.x+W*.055,W*.58,W*.89):W*.81,
-      y:clamp(puck.y,r+8,H-r-8)};
-    target[1]=at;
+    // Approach from the right, behind the puck, before striking left.
+    const chase=puck.x>W*.48;
+    target[1]={
+      x:chase?clamp(puck.x+r+puckR+16,W*.56,W-r-8):W*.81,
+      y:clamp(puck.y+puck.vy*.045,r+8,H-r-8)
+    };
   }
   players.forEach((p,i)=>steer(p,target[i],i,dt));
+  if(!online&&cpuStrikeCooldown===0&&puck.x>W*.48&&
+     cpu.x>puck.x+r*.35&&Math.hypot(cpu.x-puck.x,cpu.y-puck.y)<r+puckR+22){
+    strike(1);
+    cpuStrikeCooldown=.55;
+  }
   const speed=Math.hypot(puck.vx,puck.vy),steps=Math.max(1,Math.ceil(speed*dt/Math.max(4,puckR)));
   const step=dt/steps;
   for(let s=0;s<steps;s++){
