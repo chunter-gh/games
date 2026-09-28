@@ -32,26 +32,33 @@ h2{margin:10px 0;font-size:18px;color:#f4d58e;font-weight:normal;letter-spacing:
 .chip.selected{outline:3px solid #ffd870;outline-offset:3px;transform:translateY(-3px)}
 .bet-panel{min-width:0}
 .table-scroll{overflow-x:auto;padding:8px 3px 13px;scrollbar-color:#b89050 #173526}
-.table-felt{display:grid;grid-template-columns:112px 48px minmax(0,1fr);gap:6px;min-width:560px;padding:13px;border:7px solid #694523;border-radius:28px;background:radial-gradient(circle at 65% 35%,#146049,#063b2d 75%);box-shadow:inset 0 0 0 3px #d0a75f,inset 0 0 32px #001a12,0 8px 18px #0009}
-.table-felt button{position:relative;isolation:isolate;border:1.5px solid #e5d49e;border-radius:2px;color:#fff5dc;background:transparent;min-height:42px;font:800 13px Arial,sans-serif;cursor:pointer;text-shadow:0 1px 2px #0009}
+.table-felt{display:grid;grid-template-columns:56px repeat(12,minmax(0,1fr)) 62px;grid-template-rows:repeat(3,55px) 46px 46px;gap:0;min-width:770px;padding:22px 18px 24px;border:7px solid #694523;border-radius:28px;background:radial-gradient(circle at 65% 35%,#096d48,#00603e 75%);box-shadow:inset 0 0 0 3px #d0a75f,inset 0 0 32px #001a12,0 8px 18px #0009}
+.table-felt button{position:relative;isolation:isolate;border:1.5px solid #e9e7d7;border-radius:0;color:#fff;background:transparent;min-height:0;font:800 13px Arial,sans-serif;cursor:pointer;text-shadow:0 1px 2px #0009}
 .table-felt button:active{transform:scale(.96)}
 .placed-chip{position:absolute;right:2px;bottom:2px;display:grid;place-items:center;width:23px;height:23px;border:3px dashed #f9e6c7;border-radius:50%;box-shadow:0 2px 5px #000c,inset 0 0 0 1px #fff9;background:#377eaa;color:#fff;font:900 9px Arial,sans-serif;text-shadow:0 1px 1px #000;pointer-events:none}
 .placed-chip[data-value="10"]{background:#b93339}.placed-chip[data-value="25"]{background:#278756}.placed-chip[data-value="100"]{background:#272b32}
 .number-area button{align-items:flex-start;justify-content:flex-start;text-align:left;padding:3px}
 .number-area .placed-chip{right:1px;bottom:1px;width:20px;height:20px;font-size:8px;border-width:2px}
 .table-felt button.has-bet{box-shadow:inset 0 0 0 2px #e9c96b}
-.table-felt button.red{background:#ad3033}.table-felt button.black{background:#171d1e}.table-felt button.green{background:#087642}
-.outside{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,1fr);gap:3px;grid-row:1/3}
-.outside button{font-size:11px;line-height:1.1;min-width:0;padding:2px;white-space:normal}
-.outside .dozen{grid-column:1/-1;background:#185744}
-.zeros{display:grid;grid-template-rows:1fr 1fr;gap:3px;grid-row:1/3}
-.zeros button{font-size:17px}
-.number-area{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(3,1fr);gap:3px;min-width:0}
-.number-area button{min-width:0;padding:0;font-size:clamp(11px,1.05vw,15px)}
-.column-bets{grid-column:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
-.column-bets button{min-height:34px;font-size:11px}
+.table-felt button.red,.table-felt button.black,.table-felt button.green{background:transparent}
+.zeros{grid-column:1;grid-row:1/4;display:grid;grid-template-rows:repeat(2,1fr)}
+.zeros button{display:grid;place-items:center;font-size:18px}
+.zero-oval{display:grid;place-items:center;width:90%;aspect-ratio:1.5;border:2px solid white;border-radius:50%;background:#006b47}
+.number-area{grid-column:2/14;grid-row:1/4;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(3,1fr);min-width:0}
+.number-area button{display:grid;place-items:center;min-width:0;padding:0;font-size:16px}
+.number-oval{display:grid;place-items:center;width:min(85%,39px);aspect-ratio:.95;border-radius:50%;background:#272727;box-shadow:0 1px 3px #002518aa}
+.number-area button.red .number-oval{background:#c52c37}
+.column-bets{grid-column:14;grid-row:1/4;display:grid;grid-template-rows:repeat(3,1fr)}
+.column-bets button{font-size:12px;line-height:1.1}
+.dozens{grid-column:2/14;grid-row:4;display:grid;grid-template-columns:repeat(3,1fr)}
+.dozens button{font-size:17px}
+.outside{grid-column:2/14;grid-row:5;display:grid;grid-template-columns:repeat(6,1fr)}
+.outside button{font-size:13px;line-height:1.1;padding:2px;white-space:normal}
+.diamond{display:block;width:27px;height:27px;margin:auto;transform:rotate(45deg);border:3px solid #fff;background:#c52c37}
+.black-diamond{background:#222}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .table-note{margin:1px 4px 7px;color:#d2bd86;font:11px Arial,sans-serif;letter-spacing:.04em}
-@media(max-width:600px){.table-felt{min-width:560px}.table-note{font-size:10px}}
+@media(max-width:600px){.table-felt{min-width:770px}.table-note{font-size:10px}}
 .bet-list{font-family:Arial,sans-serif;color:#d7c89e;line-height:1.5;min-height:45px;font-size:13px;max-height:90px;overflow:auto}
 .history{font-family:Arial,sans-serif;color:#bfa77f;font-size:12px}
 .history strong{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;margin:0 3px;background:#333}
@@ -66,7 +73,7 @@ h2{margin:10px 0;font-size:18px;color:#f4d58e;font-weight:normal;letter-spacing:
 <header><div><h1>ROULETTE</h1><p class="sub">THE GAME ROOM · AMERICAN DOUBLE-ZERO WHEEL</p></div><button id="menu">GAME ROOM</button></header>
 <main>
 <section class="wheel-panel"><div class="wheel-frame"><canvas id="wheel" aria-label="American double-zero roulette wheel with spinning ball"></canvas></div><div class="result" id="result" role="status" aria-live="polite">Place your chips, then spin the wheel.</div><div class="actions"><button class="spin" id="spin">SPIN WHEEL</button><button id="clear">CLEAR BETS</button></div><p class="help">Play points only. Red or black and other even bets pay 1:1; a single number pays 35:1.</p></section>
-<section class="bet-panel"><div class="balance"><span>POINTS <span id="balance">1,000</span></span><span>ON TABLE <span id="wager">0</span></span></div><h2>CHOOSE A CHIP</h2><div class="chips" id="chips"><button class="chip selected" data-value="5">5</button><button class="chip" data-value="10">10</button><button class="chip" data-value="25">25</button><button class="chip" data-value="100">100</button></div><h2>PLACE YOUR BETS</h2><div class="table-note">Select a chip, then tap a space on the table. Swipe sideways on a narrow screen.</div><div class="table-scroll"><div class="table-felt" id="table"><div class="outside" id="betTypes"><button class="red" data-kind="red">RED</button><button class="black" data-kind="black">BLACK</button><button class="dozen" data-kind="dozen1">1ST 12</button><button data-kind="low">1–18</button><button data-kind="odd">ODD</button><button class="dozen" data-kind="dozen2">2ND 12</button><button data-kind="even">EVEN</button><button data-kind="high">19–36</button><button class="dozen" data-kind="dozen3">3RD 12</button></div><div class="zeros" id="zeros"></div><div class="number-area" id="numbers"></div><div class="column-bets" id="columnBets"><button data-kind="column3">TOP ROW 2:1</button><button data-kind="column2">MID ROW 2:1</button><button data-kind="column1">LOW ROW 2:1</button></div></div></div><h2>ON THE TABLE</h2><div class="bet-list" id="betList">No bets placed.</div><h2>RECENT SPINS</h2><div class="history" id="history">No spins yet.</div></section>
+<section class="bet-panel"><div class="balance"><span>POINTS <span id="balance">1,000</span></span><span>ON TABLE <span id="wager">0</span></span></div><h2>CHOOSE A CHIP</h2><div class="chips" id="chips"><button class="chip selected" data-value="5">5</button><button class="chip" data-value="10">10</button><button class="chip" data-value="25">25</button><button class="chip" data-value="100">100</button></div><h2>PLACE YOUR BETS</h2><div class="table-note">Select a chip, then tap a space on the table. Swipe sideways on a narrow screen.</div><div class="table-scroll"><div class="table-felt" id="table"><div class="zeros" id="zeros"></div><div class="number-area" id="numbers"></div><div class="column-bets" id="columnBets"><button data-kind="column3">2 to 1</button><button data-kind="column2">2 to 1</button><button data-kind="column1">2 to 1</button></div><div class="dozens" id="dozens"><button data-kind="dozen1">1st 12</button><button data-kind="dozen2">2nd 12</button><button data-kind="dozen3">3rd 12</button></div><div class="outside" id="betTypes"><button data-kind="low">1 to 18</button><button data-kind="even">EVEN</button><button class="red" data-kind="red" aria-label="RED"><span class="diamond" aria-hidden="true"></span><span class="sr-only">RED</span></button><button class="black" data-kind="black" aria-label="BLACK"><span class="diamond black-diamond" aria-hidden="true"></span><span class="sr-only">BLACK</span></button><button data-kind="odd">ODD</button><button data-kind="high">19 to 36</button></div></div></div><h2>ON THE TABLE</h2><div class="bet-list" id="betList">No bets placed.</div><h2>RECENT SPINS</h2><div class="history" id="history">No spins yet.</div></section>
 </main>
 </div>
 <script>
@@ -282,18 +289,21 @@ function frame(time){
   draw();requestAnimationFrame(frame);
 }
 for(const n of [0,"00"]){
-  const button=document.createElement("button");button.textContent=n;button.className="green";
+  const button=document.createElement("button");button.className="green";
+  const oval=document.createElement("span");oval.className="zero-oval";oval.textContent=n;button.appendChild(oval);
   button.addEventListener("click",()=>place("number",n,"NUMBER "+n,button));el("zeros").appendChild(button);
 }
 for(let row=0;row<3;row++)for(let col=0;col<12;col++){
   const n=(col+1)*3-row;
-  const button=document.createElement("button");button.textContent=n;button.className=color(n);
+  const button=document.createElement("button");button.className=color(n);
+  const oval=document.createElement("span");oval.className="number-oval";oval.textContent=n;button.appendChild(oval);
   button.addEventListener("click",()=>place("number",n,"NUMBER "+n,button));el("numbers").appendChild(button);
 }
 el("table").addEventListener("click",event=>{
   const button=event.target.closest("button[data-kind]");if(!button)return;
-  button.dataset.betLabel??=button.textContent;
-  place(button.dataset.kind,null,button.dataset.betLabel,button);
+  const kind=button.dataset.kind;
+  button.dataset.betLabel??=kind==="red"?"RED":kind==="black"?"BLACK":kind.startsWith("column")?button.textContent+" "+({column3:"TOP ROW",column2:"MID ROW",column1:"LOW ROW"}[kind]):button.textContent;
+  place(kind,null,button.dataset.betLabel,button);
 });
 el("chips").addEventListener("click",event=>{
   const button=event.target.closest("button[data-value]");if(!button)return;
