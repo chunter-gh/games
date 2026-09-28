@@ -286,15 +286,12 @@ body {
 
 .palm-trunk {
     position: absolute;
-    left: 20%;
+    left: 0;
     bottom: 0;
+    width: 100%;
     height: calc(100% - 38px);
-    width: 52%;
-    border-radius: 35% 55% 8% 8%;
-    clip-path: polygon(78% 0, 100% 0, 72% 22%, 55% 48%, 35% 74%, 23% 100%, 0 100%, 12% 72%, 30% 45%, 48% 20%);
-    background: repeating-linear-gradient(175deg, #b47a3a 0 13px, #805022 14px 17px, #c9924b 18px 30px);
-    border: 2px solid #70451f;
-    box-shadow: 5px 5px 9px rgba(0,0,0,.3);
+    overflow: visible;
+    filter: drop-shadow(5px 5px 5px rgba(0,0,0,.3));
 }
 
 .palm-crown {
@@ -1565,7 +1562,23 @@ body {
 
     <!-- PALM TREE -->
     <div class="palm-tree" aria-hidden="true">
-        <div class="palm-trunk"></div>
+        <svg class="palm-trunk" viewBox="0 0 140 500" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <linearGradient id="palmBark" x1="0" x2="1">
+                    <stop offset="0" stop-color="#75451f"/>
+                    <stop offset=".45" stop-color="#c9924b"/>
+                    <stop offset="1" stop-color="#8b5729"/>
+                </linearGradient>
+            </defs>
+            <path d="M 23 500 C 8 400 16 315 45 245 C 80 165 115 100 88 0
+                     L 110 0 C 136 105 99 183 70 258 C 41 335 38 421 48 500 Z"
+                  fill="url(#palmBark)" stroke="#70451f" stroke-width="3"/>
+            <path d="M 20 440 Q 34 445 42 434 M 19 380 Q 37 385 48 370
+                     M 26 320 Q 47 326 58 309 M 47 255 Q 67 263 78 244
+                     M 74 190 Q 97 200 105 178 M 91 125 Q 116 134 120 111
+                     M 96 62 Q 115 68 116 51"
+                  fill="none" stroke="#805022" stroke-width="5" opacity=".8"/>
+        </svg>
         <div class="palm-crown">
             <span class="palm-frond"></span><span class="palm-frond"></span>
             <span class="palm-frond"></span><span class="palm-frond"></span>
