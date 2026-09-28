@@ -350,7 +350,7 @@ body {
     z-index: 10;
     right: clamp(24px, 7vw, 100px);
     top: clamp(100px, 15vh, 165px);
-    width: clamp(64px, 10vw, 106px);
+    width: clamp(80px, 12vw, 128px);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #fffbd0 0%, #ffe969 35%, #ffbd35 72%, #ec8520 100%);
@@ -366,7 +366,7 @@ body {
     background: repeating-conic-gradient(from 0deg, rgba(255,216,87,.95) 0deg 8deg, transparent 9deg 24deg);
     -webkit-mask: radial-gradient(circle, transparent 0 48%, #000 53% 76%, transparent 82%);
     mask: radial-gradient(circle, transparent 0 48%, #000 53% 76%, transparent 82%);
-    animation: sunRays 16s linear infinite;
+    animation: sunRays 2.4s ease-in-out infinite alternate;
 }
 .sun::after {
     content: "";
@@ -381,7 +381,10 @@ body {
     from { transform: scale(.97); box-shadow: 0 0 14px 6px rgba(255,202,67,.5), 0 0 45px 20px rgba(255,164,36,.16); }
     to { transform: scale(1.05); box-shadow: 0 0 25px 14px rgba(255,202,67,.8), 0 0 80px 38px rgba(255,164,36,.28); }
 }
-@keyframes sunRays { to { transform: rotate(360deg); } }
+@keyframes sunRays {
+    from { transform: scale(.88); opacity: .45; filter: blur(2px); }
+    to { transform: scale(1.25); opacity: 1; filter: blur(0); }
+}
 @keyframes sunCorona {
     from { transform: scale(.75); opacity: .7; }
     to { transform: scale(1.18); opacity: 0; }
