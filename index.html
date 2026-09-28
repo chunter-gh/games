@@ -271,9 +271,9 @@ body {
     position: absolute;
     z-index: 25;
     left: clamp(28px, 5vw, 68px);
-    top: calc(clamp(12px, 3vh, 28px) + clamp(34px, 8vw, 62px) + 8px);
+    top: calc(clamp(12px, 3vh, 28px) + clamp(34px, 8vw, 62px) + 58px);
     bottom: clamp(35px, 6vh, 45px);
-    width: clamp(135px, 19vw, 180px);
+    width: clamp(205px, 28vw, 285px);
     pointer-events: none;
     transform-origin: bottom center;
     animation: palmSway 4s ease-in-out infinite alternate;
@@ -297,7 +297,7 @@ body {
 .palm-crown {
     position: absolute;
     top: 0;
-    left: 85%;
+    left: 82%;
     width: 0;
     height: 0;
 }
@@ -323,7 +323,7 @@ body {
 
 .palm-face {
     position: absolute;
-    left: 58%;
+    left: 77%;
     top: 58px;
     width: 23%;
     height: 26px;
@@ -1563,7 +1563,7 @@ body {
 
     <!-- PALM TREE -->
     <div class="palm-tree" aria-hidden="true">
-        <svg class="palm-trunk" viewBox="0 0 140 500" preserveAspectRatio="none" aria-hidden="true">
+        <svg class="palm-trunk" viewBox="0 0 240 500" preserveAspectRatio="none" aria-hidden="true">
             <defs>
                 <linearGradient id="palmBark" x1="0" x2="1">
                     <stop offset="0" stop-color="#75451f"/>
@@ -1571,13 +1571,13 @@ body {
                     <stop offset="1" stop-color="#8b5729"/>
                 </linearGradient>
             </defs>
-            <path d="M 20 500 C 17 385 40 295 67 218 C 92 145 105 65 114 0
-                     L 137 0 C 128 90 115 170 90 243 C 62 326 42 413 48 500 Z"
+            <path d="M 18 500 C 18 375 45 305 100 230 C 158 150 195 75 190 0
+                     L 216 0 C 221 84 179 172 124 251 C 70 329 48 405 48 500 Z"
                   fill="url(#palmBark)" stroke="#70451f" stroke-width="3"/>
-            <path d="M 18 440 Q 35 445 45 434 M 23 380 Q 44 386 54 370
-                     M 36 320 Q 59 327 68 309 M 57 255 Q 80 264 89 245
-                     M 76 190 Q 100 198 109 178 M 96 125 Q 119 133 126 112
-                     M 107 62 Q 128 68 132 52"
+            <path d="M 18 440 Q 35 446 45 434 M 25 380 Q 49 389 61 369
+                     M 49 320 Q 76 333 88 309 M 83 255 Q 112 268 126 244
+                     M 129 190 Q 160 202 172 177 M 165 125 Q 196 137 207 109
+                     M 187 62 Q 210 71 216 49"
                   fill="none" stroke="#805022" stroke-width="5" opacity=".8"/>
         </svg>
         <div class="palm-crown">
