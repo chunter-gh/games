@@ -1639,6 +1639,47 @@ body {
         height: 35px;
     }
 }
+
+/* Two balanced stacks of game tiles. */
+.menu.two-columns {
+    width: min(94vw, 780px);
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--menu-rows, 1), auto);
+    gap: clamp(6px, 1.1vh, 11px) clamp(7px, 1.5vw, 16px);
+    max-height: 78vh;
+    padding: 5px;
+}
+
+.menu.two-columns .game-button {
+    min-width: 0;
+    height: clamp(55px, 8vh, 76px);
+    padding: 0 clamp(8px, 1.2vw, 20px);
+}
+
+.menu.two-columns .icon {
+    width: clamp(28px, 3vw, 46px);
+    font-size: clamp(23px, 3vw, 34px);
+}
+
+.menu.two-columns .button-text {
+    margin-left: clamp(5px, 1vw, 13px);
+}
+
+.menu.two-columns .button-title {
+    font-size: clamp(12px, 2.6vw, 20px);
+}
+
+@media (max-width: 560px) {
+    .menu.two-columns .game-button {
+        border-radius: 14px;
+        height: clamp(53px, 8vh, 67px);
+    }
+    .menu.two-columns .button-subtitle {
+        display: none;
+    }
+}
 </style>
 </head>
 
@@ -2031,6 +2072,12 @@ async function loadGames() {
             "many-games",
             "lots-of-games",
             "huge-game-list"
+        );
+
+        gameMenu.classList.add("two-columns");
+        gameMenu.style.setProperty(
+            "--menu-rows",
+            Math.max(1, Math.ceil(htmlGames.length / 2))
         );
 
         if (htmlGames.length >= 5 &&
