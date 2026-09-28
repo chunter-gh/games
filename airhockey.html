@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Game Room - Air Hockey</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071827;color:white;font-family:Arial,Helvetica,sans-serif}
+.app{height:100%;height:100dvh;display:flex;flex-direction:column;gap:7px;padding:max(6px,env(safe-area-inset-top)) 8px max(6px,env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(20px,4vw,38px);letter-spacing:.08em;color:#d9f7ff;text-shadow:0 0 14px #22c7ff}
+.score{display:flex;align-items:center;gap:clamp(9px,3vw,22px);font-size:clamp(23px,4vw,40px);font-weight:900}
+.score .blue{color:#68d7ff}.score .red{color:#ff9688}.score small{display:block;text-align:center;font-size:10px;letter-spacing:.08em;color:#b7d2d9}
+.controls{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+button{font:inherit;cursor:pointer;border:1px solid #75c5d6;border-radius:7px;padding:8px 11px;color:white;background:linear-gradient(#275f76,#10394e);font-size:clamp(10px,1.8vw,13px);font-weight:800}
+button.active{border-color:#ffe08a;background:#4a634c}
+button:focus-visible{outline:3px solid #ffe08a;outline-offset:2px}
+.status{min-height:26px;display:grid;place-items:center;text-align:center;font-size:clamp(12px,2vw,17px);font-weight:bold;color:#ffe3a0}
+.arena{flex:1;min-height:0;position:relative;border-radius:18px;border:5px solid #415e71;box-shadow:0 0 0 2px #9cc8d7,0 12px 25px #0009,inset 0 0 25px #000;overflow:hidden}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.hint{text-align:center;margin:0;font-size:clamp(10px,1.9vw,13px);color:#c2dbe4;line-height:1.25}
+@media(max-height:500px){.app{gap:3px}header{flex-wrap:nowrap}.controls button{padding:5px 7px}.status{min-height:20px}.hint{display:none}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><h1>AIR HOCKEY</h1><div class="score"><div class="blue"><small id="blueLabel">YOU</small><span id="blueScore">0</span></div><span>:</span><div class="red"><small id="redLabel">COMPUTER</small><span id="redScore">0</span></div></div><div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div></header>
+<div class="status" id="status" role="status" aria-live="polite">Move your mallet to strike the puck.</div>
+<div class="arena" id="arena"><canvas id="rink" aria-label="Air hockey rink. Blue defends left, red defends right."></canvas></div>
+<p class="hint">Move the mouse to steer your mallet; left click for a power strike. On touch, drag your mallet and tap STRIKE. First to 7 goals wins.</p>
+<button id="strike" hidden>STRIKE</button>
+</main>
+<script>
+"use strict";
+const params=new URLSearchParams(location.search),room=params.get("room")||"";
+const me=["2","player2","player 2","p2"].includes(String(params.get("player")||"").toLowerCase())?2:1;
+const online=Boolean(room),mine=me-1,clientId=crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+const el=id=>document.getElementById(id),canvas=el("rink"),ctx=canvas.getContext("2d");
+let W=800,H=500,r=28,puckR=12,goalHalf=85,players=[],puck={},score=[0,0],paused=0,over=false;
+let target=[null,null],mouseInside=false,last=0,socket=null,socketOpen=false,reconnectTimer=null,lastSend=0,lastInput=0,audio=null;
+let ready=false,messageAt=0;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function status(text,seconds=1.8){el("status").textContent=text;messageAt=performance.now()+seconds*1000;}
+function audioReady(){try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();}catch{}}
+function ping(freq=240,duration=.07,vol=.08){
+  if(!audio)return;const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;
+  o.type="triangle";o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(Math.max(40,freq*.45),t+duration);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);
+  o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+duration+.01);
+}
+function resize(){
+  const rect=canvas.getBoundingClientRect(),oldW=W,oldH=H;
+  W=Math.max(250,rect.width);H=Math.max(180,rect.height);
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  r=clamp(Math.min(W,H)*.055,14,36);puckR=clamp(Math.min(W,H)*.024,8,16);
+  goalHalf=clamp(H*.18,38,120);
+  if(players.length){for(const p of players){p.x=p.x/oldW*W;p.y=p.y/oldH*H;}puck.x=puck.x/oldW*W;puck.y=puck.y/oldH*H;}
+}
+function resetPuck(toward=0){
+  puck={x:W/2,y:H/2,vx:(toward===0?1:-1)*W*.33,vy:(Math.random()-.5)*H*.45};
+  paused=.8;
+  players[0].x=W*.17;players[0].y=H/2;
+  players[1].x=W*.83;players[1].y=H/2;
+  target=[null,null];
+}
+function newGame(){
+  if(online&&me===2){send({type:"hockeyNewGameRequest"});return;}
+  score=[0,0];over=false;players=[{x:W*.17,y:H/2,vx:0,vy:0},{x:W*.83,y:H/2,vx:0,vy:0}];
+  resetPuck(0);ready=true;
+  el("blueScore").textContent="0";el("redScore").textContent="0";
+  status("Face-off! Blue defends left; red defends right.",2.2);
+  snapshot();
+}
+function scoreGoal(team){
+  score[team]++;el("blueScore").textContent=score[0];el("redScore").textContent=score[1];
+  ping(520,.4,.17);
+  if(score[team]>=7){over=true;paused=999;status((team===mine?"YOU WIN!":online?"OPPONENT WINS!":"COMPUTER WINS!")+" Start a new game.",999);}
+  else {resetPuck(1-team);status((team===mine?"GOAL!":"Opponent scores.")+" Face-off!",2);}
+  snapshot();
+}
+function steer(p,at,team,dt){
+  if(!at)return;
+  const minX=team===0?r+8:W/2+r+6,maxX=team===0?W/2-r-6:W-r-8;
+  const x=clamp(at.x,minX,maxX),y=clamp(at.y,r+8,H-r-8);
+  const dx=x-p.x,dy=y-p.y,dist=Math.hypot(dx,dy),step=Math.min(dist,Math.min(W,H)*2.8*dt);
+  const oldX=p.x,oldY=p.y;
+  if(dist>0){p.x+=dx/dist*step;p.y+=dy/dist*step;}
+  p.vx=dt?(p.x-oldX)/dt:0;p.vy=dt?(p.y-oldY)/dt:0;
+}
+function strike(team){
+  if(!ready||over||paused>0)return;
+  const p=players[team],dx=puck.x-p.x,dy=puck.y-p.y,d=Math.hypot(dx,dy);
+  if(d>r+puckR+Math.min(W,H)*.12)return;
+  const dir=team===0?1:-1;
+  puck.vx=dir*Math.min(W*1.35,Math.max(W*.85,Math.abs(puck.vx)+W*.3));
+  puck.vy=clamp(dy/Math.max(1,d)*H*.7,-H*.8,H*.8);
+  puck.x=p.x+dir*(r+puckR+2);ping(330,.15,.18);
+}
+function physics(dt){
+  if(paused>0){paused=Math.max(0,paused-dt);return;}
+  if(over)return;
+  const cpu=players[1];
+  if(!online){
+    const at={x:puck.x>W*.48?clamp(puck.x+W*.055,W*.58,W*.89):W*.81,
+      y:clamp(puck.y,r+8,H-r-8)};
+    target[1]=at;
+  }
+  players.forEach((p,i)=>steer(p,target[i],i,dt));
+  const speed=Math.hypot(puck.vx,puck.vy),steps=Math.max(1,Math.ceil(speed*dt/Math.max(4,puckR)));
+  const step=dt/steps;
+  for(let s=0;s<steps;s++){
+    puck.x+=puck.vx*step;puck.y+=puck.vy*step;
+    if(puck.y<puckR+7){puck.y=puckR+7;puck.vy=Math.abs(puck.vy)*.96;ping(130,.03,.025);}
+    if(puck.y>H-puckR-7){puck.y=H-puckR-7;puck.vy=-Math.abs(puck.vy)*.96;ping(130,.03,.025);}
+    if(puck.x<puckR+6||puck.x>W-puckR-6){
+      if(Math.abs(puck.y-H/2)<goalHalf-puckR*.3){
+        scoreGoal(puck.x>W/2?0:1);return;
+      }
+      puck.x=clamp(puck.x,puckR+6,W-puckR-6);puck.vx*=-.96;ping(160,.04,.04);
+    }
+    for(const p of players){
+      const dx=puck.x-p.x,dy=puck.y-p.y,d=Math.hypot(dx,dy),touch=r+puckR;
+      if(d<touch&&d>.001){
+        const nx=dx/d,ny=dy/d,relative=(puck.vx-p.vx)*nx+(puck.vy-p.vy)*ny;
+        puck.x=p.x+nx*(touch+1);puck.y=p.y+ny*(touch+1);
+        if(relative<0){
+          puck.vx+=(Math.max(0,-relative)*1.65+Math.min(W,H)*.12)*nx+p.vx*.27;
+          puck.vy+=(Math.max(0,-relative)*1.65+Math.min(W,H)*.12)*ny+p.vy*.27;
+          const v=Math.hypot(puck.vx,puck.vy),cap=Math.min(W,H)*2.15;
+          if(v>cap){puck.vx*=cap/v;puck.vy*=cap/v;}
+          ping(260+Math.min(350,v*.15),.055,.08);
+        }
+      }
+    }
+  }
+  puck.vx*=Math.pow(.997,dt*60);puck.vy*=Math.pow(.997,dt*60);
+  if(Math.hypot(puck.vx,puck.vy)<W*.11)puck.vx+=(puck.x<W/2?1:-1)*W*.07*dt;
+}
+function draw(){
+  const g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,"#a9dce4");g.addColorStop(.5,"#e0f3f1");g.addColorStop(1,"#a1d3da");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // Blue and red glow under the polished table.
+  ctx.fillStyle="#4acbff1b";ctx.fillRect(0,0,W/2,H);
+  ctx.fillStyle="#ff776a1a";ctx.fillRect(W/2,0,W/2,H);
+  ctx.strokeStyle="#fff";ctx.lineWidth=5;ctx.strokeRect(5,5,W-10,H-10);
+  ctx.strokeStyle="#477c8b";ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+  ctx.beginPath();ctx.arc(W/2,H/2,Math.min(W,H)*.14,0,7);ctx.stroke();
+  for(const [x,color] of [[0,"#52bff0"],[W,"#f47d6f"]]){
+    ctx.strokeStyle=color;ctx.lineWidth=9;ctx.beginPath();
+    ctx.moveTo(x,H/2-goalHalf);ctx.lineTo(x,H/2+goalHalf);ctx.stroke();
+  }
+  ctx.fillStyle="#245d6b20";
+  for(let y=25;y<H;y+=28)for(let x=25;x<W;x+=28){ctx.beginPath();ctx.arc(x,y,1.6,0,7);ctx.fill();}
+  players.forEach((p,i)=>{
+    ctx.save();ctx.shadowColor="#06303d99";ctx.shadowBlur=14;ctx.shadowOffsetY=5;
+    const grad=ctx.createRadialGradient(p.x-r*.35,p.y-r*.4,2,p.x,p.y,r);
+    if(i===0){grad.addColorStop(0,"#a4edff");grad.addColorStop(.4,"#159ed8");grad.addColorStop(1,"#05517f");}
+    else{grad.addColorStop(0,"#ffd1ba");grad.addColorStop(.4,"#ef5e50");grad.addColorStop(1,"#9a1e2b");}
+    ctx.fillStyle=grad;ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle="#f2ffff";ctx.stroke();ctx.restore();
+    ctx.fillStyle="#d8edf2";ctx.beginPath();ctx.arc(p.x,p.y,r*.37,0,7);ctx.fill();
+    if(i===mine){ctx.strokeStyle="#ffe476";ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,r+6,0,7);ctx.stroke();}
+  });
+  ctx.save();ctx.shadowColor="#153f4b99";ctx.shadowBlur=10;ctx.shadowOffsetY=4;
+  const pg=ctx.createRadialGradient(puck.x-puckR*.3,puck.y-puckR*.3,1,puck.x,puck.y,puckR);
+  pg.addColorStop(0,"#777f87");pg.addColorStop(.55,"#202b34");pg.addColorStop(1,"#050e15");
+  ctx.fillStyle=pg;ctx.beginPath();ctx.arc(puck.x,puck.y,puckR,0,7);ctx.fill();
+  ctx.strokeStyle="#c7dbe2";ctx.lineWidth=2;ctx.stroke();ctx.restore();
+  if(paused>0&&!over){ctx.fillStyle="#062638aa";ctx.fillRect(W/2-95,H/2-27,190,54);ctx.fillStyle="white";ctx.textAlign="center";ctx.font="bold 23px Arial";ctx.fillText("FACE-OFF",W/2,H/2+8);}
+}
+function send(msg){
+  if(!socketOpen||!socket||socket.readyState!==WebSocket.OPEN)return;
+  socket.send(JSON.stringify({game:"airhockey",room,clientId,player:me,...msg}));
+}
+function snapshot(){
+  if(!online||me!==1||!socketOpen||!ready)return;
+  send({type:"hockeyState",state:{w:W,h:H,players:players.map(p=>({x:p.x/W,y:p.y/H})),
+    puck:{x:puck.x/W,y:puck.y/H},score,paused,over}});
+}
+function receive(msg){
+  if(!msg||msg.game!=="airhockey"||String(msg.room||"")!==room||msg.clientId===clientId||Number(msg.player)===me)return;
+  if(me===1){
+    if(msg.type==="hockeyJoin"){snapshot();return;}
+    if(msg.type==="hockeyNewGameRequest"){newGame();return;}
+    if(msg.type==="hockeyMove"&&Number.isFinite(msg.x)&&Number.isFinite(msg.y))
+      target[1]={x:clamp(msg.x,0,1)*W,y:clamp(msg.y,0,1)*H};
+    if(msg.type==="hockeyStrike")strike(1);
+    return;
+  }
+  if(msg.type!=="hockeyState"||!msg.state||!Array.isArray(msg.state.players)||msg.state.players.length!==2)return;
+  const state=msg.state;ready=true;
+  players=state.players.map(p=>({x:p.x*W,y:p.y*H,vx:0,vy:0}));
+  puck={x:state.puck.x*W,y:state.puck.y*H,vx:0,vy:0};
+  score=state.score;paused=state.paused;over=state.over;
+  el("blueScore").textContent=score[0];el("redScore").textContent=score[1];
+  if(over)status(score[1]>score[0]?"YOU WIN!":"BLUE WINS. TRY AGAIN!",999);
+  else if(performance.now()>messageAt)el("status").textContent="Red controls the right half. First to 7 wins.";
+}
+function connect(){
+  if(!online||socketOpen||(socket&&socket.readyState===WebSocket.CONNECTING))return;
+  socket=new WebSocket((location.protocol==="https:"?"wss:":"ws:")+"//"+location.host+"/checkers");
+  socket.addEventListener("open",()=>{socketOpen=true;send({type:"hockeyJoin"});if(me===1)snapshot();});
+  socket.addEventListener("message",event=>{try{receive(JSON.parse(event.data));}catch{}});
+  socket.addEventListener("close",()=>{
+    socketOpen=false;status("Connection lost · reconnecting...",999);
+    if(!reconnectTimer)reconnectTimer=setTimeout(()=>{reconnectTimer=null;connect();},1500);
+  });
+  socket.addEventListener("error",()=>{socketOpen=false;});
+}
+function point(event){
+  const rect=canvas.getBoundingClientRect();
+  return {x:clamp(event.clientX-rect.left,0,W),y:clamp(event.clientY-rect.top,0,H)};
+}
+function move(event){
+  const p=point(event);target[mine]=p;
+  if(online&&me===2&&performance.now()-lastInput>28){
+    send({type:"hockeyMove",x:p.x/W,y:p.y/H});lastInput=performance.now();
+  }
+}
+canvas.addEventListener("pointermove",event=>{if(event.pointerType==="mouse"||event.buttons)move(event);});
+canvas.addEventListener("pointerdown",event=>{
+  audioReady();move(event);
+  if(event.pointerType!=="mouse")canvas.setPointerCapture(event.pointerId);
+  if(event.pointerType==="mouse"&&event.button===0){if(online&&me===2)send({type:"hockeyStrike"});else strike(0);}
+  event.preventDefault();
+});
+canvas.addEventListener("contextmenu",event=>event.preventDefault());
+el("strike").addEventListener("click",()=>{audioReady();if(online&&me===2)send({type:"hockeyStrike"});else strike(0);});
+el("twoPlayer").addEventListener("click",()=>{if(socket)socket.close();location.href="rooms.html?game=airhockey";});
+el("computer").addEventListener("click",()=>{if(socket)socket.close();location.href="airhockey.html";});
+el("newGame").addEventListener("click",newGame);
+el("menu").addEventListener("click",()=>{if(socket)socket.close();location.href="index.html";});
+el("twoPlayer").classList.toggle("active",online);el("computer").classList.toggle("active",!online);
+if(online){el("blueLabel").textContent="BLUE";el("redLabel").textContent="RED";if(me===2)el("strike").hidden=false;}
+else el("strike").hidden=false;
+const observer=new ResizeObserver(resize);observer.observe(el("arena"));resize();
+if(!online||me===1)newGame();else status("Connecting to Player 1...",999);
+if(online)connect();
+function loop(time){
+  const dt=Math.min((time-last)/1000||0,.04);last=time;
+  if(ready&&(!online||me===1)){physics(dt);if(online&&time-lastSend>55){snapshot();lastSend=time;}}
+  if(ready)draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
