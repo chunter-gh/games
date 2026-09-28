@@ -76,7 +76,7 @@ const me = ["2", "player2", "player 2", "p2"].includes(rawPlayer) ? 2 : 1;
 const online = Boolean(roomId);
 const clientId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
 const el = id => document.getElementById(id);
-let game = null, socket = null, socketOpen = false, reconnectTimer = null, selectedWild = null, cpuTimer = null;
+let game = null, socket = null, socketOpen = false, reconnectTimer = null, syncTimer = null, selectedWild = null, cpuTimer = null;
 function ready() { return !online || socketOpen; }
 
 function makeDeck() {
@@ -184,7 +184,19 @@ function send(message) {
   try { socket.send(JSON.stringify({game: "uno", room: roomId, clientId, player: me, ...message})); return true; }
   catch { return false; }
 }
-function broadcastState() { if (online) send({type: "unoState", state: game}); }
+function stopSync() { if (syncTimer) clearTimeout(syncTimer); syncTimer = null; }
+function broadcastState() {
+  if (!online || !game) return;
+  send({type: "unoState", state: game});
+  stopSync();
+  const round = game.round, revision = game.revision;
+  const retry = () => {
+    if (!game || game.round !== round || game.revision !== revision) return;
+    send({type: "unoState", state: game});
+    syncTimer = setTimeout(retry, 1500);
+  };
+  syncTimer = setTimeout(retry, 1500);
+}
 function validState(state) {
   return state && Array.isArray(state.deck) && Array.isArray(state.hands) && state.hands.length === 2 &&
     state.hands.every(Array.isArray) && Array.isArray(state.discard) && state.discard.length &&
@@ -194,11 +206,17 @@ function validState(state) {
 function receive(message) {
   if (!message || message.clientId === clientId || message.game !== "uno" ||
       String(message.room || "") !== roomId || String(message.player) === String(me)) return;
+  if (message.type === "unoAck") {
+    if (game && message.round === game.round && message.revision >= game.revision) stopSync();
+    return;
+  }
   if (message.type === "unoJoin") { if (game) broadcastState(); return; }
   if (message.type === "unoNewGameRequest") { if (me === 1) { game = deal(); broadcastState(); render(); } return; }
   if (message.type !== "unoState" || !validState(message.state)) return;
   if (me === 1 && game && message.state.round !== game.round) return;
+  send({type: "unoAck", round: message.state.round, revision: message.state.revision});
   if (!game || message.state.round !== game.round || message.state.revision > game.revision) {
+    stopSync();
     game = message.state; selectedWild = null; el("colorPicker").hidden = true; render();
   }
 }
