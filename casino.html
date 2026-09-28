@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Casino • Game Room</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Arial,sans-serif}
+body{color:white;background:radial-gradient(circle at 50% 15%,#244b72 0%,#10243c 45%,#06101d 100%)}
+.casino-room{position:relative;min-height:100dvh;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.glow{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);left:50%;top:-130px;transform:translateX(-50%);pointer-events:none}
+.title-area{position:relative;z-index:1;text-align:center;padding-top:clamp(24px,5vh,55px)}
+.title{margin:0;font-size:clamp(34px,8vw,62px);font-weight:900;letter-spacing:4px;text-shadow:0 3px 0 #14283e,0 6px 12px rgba(0,0,0,.8),0 0 20px rgba(120,200,255,.45)}
+.subtitle{margin-top:5px;font-size:clamp(10px,1.7vw,13px);letter-spacing:5px;color:#b9d7ee}
+.menu{position:relative;z-index:1;width:min(82vw,370px);margin:auto;display:flex;flex-direction:column;gap:12px;padding:20px 6px}
+.game-button{width:100%;min-height:82px;border:1px solid rgba(255,255,255,.35);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 45%,rgba(0,0,0,.18)),linear-gradient(135deg,#28699e,#123557);box-shadow:inset 0 2px 2px rgba(255,255,255,.35),inset 0 -7px 12px rgba(0,0,0,.25),0 10px 20px rgba(0,0,0,.45);color:white;cursor:pointer;display:flex;align-items:center;padding:0 25px;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
+.game-button:active{transform:scale(.96);box-shadow:inset 0 5px 12px rgba(0,0,0,.35),0 4px 8px rgba(0,0,0,.4)}
+.game-button:focus-visible,.back:focus-visible{outline:3px solid #f8d78e;outline-offset:4px}
+.icon{width:55px;flex-shrink:0;font-size:38px;text-align:center;filter:drop-shadow(0 4px 4px rgba(0,0,0,.65))}
+.button-text{text-align:left;margin-left:15px;min-width:0}
+.button-title{font-size:clamp(19px,5vw,25px);font-weight:900;letter-spacing:1px;text-shadow:0 2px 4px #000}
+.button-subtitle{margin-top:3px;font-size:12px;color:#c9e5fa}
+.back{position:relative;z-index:1;margin:0 0 clamp(20px,5vh,48px);padding:11px 18px;border:1px solid #8bb6d0;border-radius:12px;color:#d7eafa;text-decoration:none;font-size:13px;font-weight:bold;letter-spacing:.08em;background:#0c253cbd}
+.back:hover{background:#244b72}
+@media(max-width:450px){.game-button{min-height:70px;padding:0 18px}.icon{width:43px;font-size:31px}}
+</style>
+</head>
+<body>
+<div class="casino-room">
+  <div class="glow" aria-hidden="true"></div>
+  <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
+  <nav class="menu" aria-label="Casino games">
+    <a class="game-button" href="roulette.html"><span class="icon" aria-hidden="true">🎰</span><span class="button-text"><span class="button-title">ROULETTE</span><span class="button-subtitle">Place • Spin • Win</span></span></a>
+  </nav>
+  <a class="back" href="index.html">← GAME ROOM</a>
+</div>
+</body>
+</html>
