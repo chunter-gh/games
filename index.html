@@ -390,6 +390,43 @@ body {
     to { transform: scale(1.18); opacity: 0; }
 }
 
+
+/* ANTHILL */
+.anthill {
+    position: absolute;
+    z-index: 22;
+    right: clamp(25px, 8vw, 105px);
+    bottom: clamp(12px, 2.5vh, 24px);
+    width: clamp(52px, 8vw, 82px);
+    height: clamp(26px, 4vw, 43px);
+    border-radius: 60% 60% 12% 12%;
+    background: radial-gradient(ellipse at 35% 28%, #c58b4e, #956034 60%, #664024 100%);
+    border-bottom: 3px solid #50331f;
+    box-shadow: inset -9px -5px 9px rgba(65,33,14,.3), 4px 4px 7px rgba(0,0,0,.35);
+    pointer-events: none;
+}
+.anthill::before {
+    content: "";
+    position: absolute;
+    left: 40%;
+    top: 42%;
+    width: 22%;
+    height: 25%;
+    border-radius: 50%;
+    background: #342218;
+    box-shadow: inset 2px 2px 3px rgba(0,0,0,.6);
+}
+.anthill::after {
+    content: "";
+    position: absolute;
+    left: -12%;
+    bottom: -2px;
+    width: 124%;
+    height: 5px;
+    border-radius: 50%;
+    background: #59402a;
+}
+
 /* GROUND */
 
 .ground {
@@ -1737,6 +1774,7 @@ body {
     </div>
 
     <div class="ground"></div>
+    <div class="anthill" aria-hidden="true"></div>
 
 
 
