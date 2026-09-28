@@ -270,39 +270,37 @@ body {
 .palm-tree {
     position: absolute;
     z-index: 25;
-    left: clamp(-34px, -2vw, -12px);
+    left: clamp(12px, 3vw, 34px);
     top: calc(clamp(12px, 3vh, 28px) + clamp(34px, 8vw, 62px) + 8px);
     bottom: clamp(35px, 6vh, 45px);
-    width: clamp(105px, 17vw, 170px);
+    width: clamp(135px, 19vw, 180px);
     pointer-events: none;
     transform-origin: bottom center;
     animation: palmSway 4s ease-in-out infinite alternate;
 }
 
 @keyframes palmSway {
-    from { transform: rotate(-2deg); }
-    to { transform: rotate(2deg); }
+    from { transform: rotate(-.6deg); }
+    to { transform: rotate(1.2deg); }
 }
 
 .palm-trunk {
     position: absolute;
-    left: 42%;
+    left: 20%;
     bottom: 0;
     height: calc(100% - 38px);
-    width: 18%;
-    min-width: 14px;
-    border-radius: 48% 48% 35% 35%;
+    width: 52%;
+    border-radius: 35% 55% 8% 8%;
+    clip-path: polygon(78% 0, 100% 0, 72% 22%, 55% 48%, 35% 74%, 23% 100%, 0 100%, 12% 72%, 30% 45%, 48% 20%);
     background: repeating-linear-gradient(175deg, #b47a3a 0 13px, #805022 14px 17px, #c9924b 18px 30px);
     border: 2px solid #70451f;
-    transform: rotate(5deg);
-    transform-origin: bottom center;
     box-shadow: 5px 5px 9px rgba(0,0,0,.3);
 }
 
 .palm-crown {
     position: absolute;
     top: 0;
-    left: 49%;
+    left: 68%;
     width: 0;
     height: 0;
 }
@@ -328,7 +326,7 @@ body {
 
 .palm-face {
     position: absolute;
-    left: 39%;
+    left: 58%;
     top: 58px;
     width: 23%;
     height: 26px;
