@@ -396,22 +396,22 @@ body {
     position: absolute;
     z-index: 22;
     right: clamp(25px, 8vw, 105px);
-    bottom: clamp(12px, 2.5vh, 24px);
+    bottom: calc(clamp(75px, 14vh, 115px) - 9px);
     width: clamp(72px, 10vw, 100px);
     height: clamp(50px, 7vw, 72px);
-    border-radius: 48% 48% 8% 8% / 78% 78% 8% 8%;
-    background: radial-gradient(ellipse at 35% 30%, #d0a064, #a16a39 56%, #694123 100%);
+    clip-path: polygon(0 100%, 31% 14%, 35% 5%, 65% 5%, 69% 14%, 100% 100%);
+    background: linear-gradient(115deg, #b9834a, #d2a36a 35%, #88532d 82%, #654024);
     box-shadow: inset -12px -8px 11px rgba(64,34,17,.35), 4px 5px 7px rgba(0,0,0,.35);
     pointer-events: none;
 }
 .anthill::before {
     content: "";
     position: absolute;
-    left: 39%;
-    bottom: 6px;
-    width: 25%;
-    height: 20%;
-    border-radius: 50% 50% 35% 35%;
+    left: 35%;
+    top: 3%;
+    width: 30%;
+    height: 13%;
+    border-radius: 50%;
     background: #2b1b12;
     box-shadow: inset 2px 2px 3px #110c09, 0 0 0 2px rgba(89,52,27,.7);
 }
@@ -429,9 +429,9 @@ body {
     position: absolute;
     z-index: 23;
     right: calc(clamp(25px, 8vw, 105px) + clamp(72px, 10vw, 100px) / 2);
-    bottom: clamp(12px, 2.5vh, 24px);
+    bottom: calc(clamp(75px, 14vh, 115px) + clamp(50px, 7vw, 72px) - 19px);
     width: 95px;
-    height: 36px;
+    height: 78px;
     pointer-events: none;
 }
 .ant {
@@ -463,10 +463,10 @@ body {
 .ant:nth-child(7) { animation-delay: -6s; }
 .ant:nth-child(8) { animation-delay: -7s; }
 @keyframes antWalk {
-    0% { transform: translate(0, -12px) scale(.7); opacity: 0; }
+    0% { transform: translate(0, 0) scale(.7); opacity: 0; }
     8% { opacity: 1; }
     90% { opacity: 1; }
-    100% { transform: translate(-82px, 18px) scale(1.25); opacity: 0; }
+    100% { transform: translate(-82px, 72px) scale(1.25); opacity: 0; }
 }
 
 /* GROUND */
