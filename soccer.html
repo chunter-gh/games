@@ -34,7 +34,7 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:1000/560;border-radius:
 <div class="status" id="status" role="status" aria-live="polite">Your kickoff. Take the ball upfield!</div>
 <div class="pitch-wrap"><canvas id="pitch" width="1000" height="560" aria-label="Soccer field, your blue team attacks to the right"></canvas></div>
 <div class="actions"><button id="pass">PASS</button><button id="shoot" class="shoot">SHOOT</button><button id="switch">SWITCH PLAYER</button></div>
-<p class="help">Blue attacks right. Click or tap a blue player to select; drag on the field to move. Tap another blue player to pass. Shoot toward the right goal. First to 3 wins.</p>
+<p class="help">Blue attacks right. On PC, move the mouse to steer, left click to pass, right click to shoot. Click a teammate to select or pass to them. On touch, drag to move and use PASS / SHOOT. First to 3 wins.</p>
 </main>
 <script>
 "use strict";
@@ -269,6 +269,20 @@ function point(event){
 canvas.addEventListener("pointerdown",event=>{
   if(matchOver)return;
   const pos=point(event),mate=players.filter(p=>p.team===0).find(p=>distance(p,pos)<p.r+13);
+  if(event.pointerType==="mouse"){
+    pointer=pos;dragging=true;
+    if(event.button===2){shoot();event.preventDefault();return;}
+    if(event.button!==0)return;
+    if(mate&&(!ball.owner||ball.owner.team!==0)){
+      selected=mate.id;
+    }else if(mate&&ball.owner&&mate!==ball.owner){
+      passTo(mate);
+    }else{
+      pass();
+    }
+    event.preventDefault();
+    return;
+  }
   if(mate){
     if(ball.owner&&ball.owner.team===0&&mate!==ball.owner&&freeze===0){passTo(mate);return;}
     selected=mate.id;
@@ -279,10 +293,15 @@ canvas.addEventListener("pointerdown",event=>{
   canvas.setPointerCapture(event.pointerId);
   event.preventDefault();
 });
-canvas.addEventListener("pointermove",event=>{if(dragging)pointer=point(event);});
+canvas.addEventListener("pointermove",event=>{
+  if(event.pointerType==="mouse"&&!matchOver){pointer=point(event);dragging=true;}
+  else if(dragging)pointer=point(event);
+});
+canvas.addEventListener("contextmenu",event=>event.preventDefault());
 function endPointer(){dragging=false;pointer=null;}
-canvas.addEventListener("pointerup",endPointer);
+canvas.addEventListener("pointerup",event=>{if(event.pointerType!=="mouse")endPointer();});
 canvas.addEventListener("pointercancel",endPointer);
+canvas.addEventListener("pointerleave",event=>{if(event.pointerType==="mouse")endPointer();});
 document.getElementById("pass").addEventListener("click",pass);
 document.getElementById("shoot").addEventListener("click",shoot);
 document.getElementById("switch").addEventListener("click",switchPlayer);
