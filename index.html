@@ -1427,6 +1427,26 @@ body {
 }
 
 
+.bulldog-wrapper.escape {
+    animation: dogEscape 2.4s cubic-bezier(.15,.8,.15,1) forwards !important;
+    animation-play-state: running !important;
+}
+
+.bulldog-wrapper.escape .bulldog {
+    animation: none;
+    transform: scaleX(-1);
+}
+
+.bulldog-wrapper.escape .dog-leg {
+    animation-duration: .18s;
+}
+
+@keyframes dogEscape {
+    from { right: var(--dog-current-right); }
+    to { right: -225px; }
+}
+
+
 /* Sniff/Bark bubbles */
 
 .bark {
@@ -2364,6 +2384,22 @@ function startInteraction() {
             "escape"
         );
 
+        const dogRect =
+            bulldog.getBoundingClientRect();
+
+        bulldog.style.setProperty(
+            "--dog-current-right",
+            roomRect.right - dogRect.right + "px"
+        );
+
+        bulldog.classList.remove(
+            "meeting"
+        );
+
+        bulldog.classList.add(
+            "escape"
+        );
+
     }, 2750);
 
 
@@ -2396,7 +2432,7 @@ function startInteraction() {
 
 
         bulldog.classList.remove(
-            "meeting"
+            "escape"
         );
 
         bulldog.style.animation =
@@ -2412,6 +2448,10 @@ function startInteraction() {
 
         bulldog.style.removeProperty(
             "right"
+        );
+
+        bulldog.style.removeProperty(
+            "--dog-current-right"
         );
 
 
