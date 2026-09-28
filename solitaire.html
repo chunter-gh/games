@@ -1851,7 +1851,8 @@ function beginDrag(
         active:true,
         moved:false,
         originalParents:[],
-        originalNextSiblings:[]
+        originalNextSiblings:[],
+        originalZIndexes:[]
     };
 
     suppressClick=false;
@@ -1890,6 +1891,10 @@ function beginDrag(
 
         dragged.originalNextSiblings.push(
             element.nextSibling
+        );
+
+        dragged.originalZIndexes.push(
+            element.style.zIndex
         );
 
         dragLayer.appendChild(element);
@@ -1995,7 +2000,7 @@ function clearDragVisuals() {
 
     restoreDraggedElements();
 
-    dragged.elements.forEach(element=>{
+    dragged.elements.forEach((element,i)=>{
 
         element.classList.remove(
             "dragging",
@@ -2009,7 +2014,7 @@ function clearDragVisuals() {
         element.style.height="";
         element.style.transform="";
         element.style.pointerEvents="";
-        element.style.zIndex="";
+        element.style.zIndex=dragged.originalZIndexes[i];
         element.style.margin="";
     });
 }
