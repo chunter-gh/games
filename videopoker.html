@@ -8,20 +8,20 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#09090f;color:#fff2ce}
 body{background:radial-gradient(circle at 50% 5%,#402036,#100d19 60%,#050609)}
-.app{min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:clamp(7px,2vw,22px);gap:9px}
-.topbar{width:min(100%,940px);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.app{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(6px,1.5vh,18px);gap:clamp(5px,1vh,10px)}
+.topbar{width:min(100%,900px,calc((100dvh - 55px)*1.24));display:flex;align-items:center;justify-content:space-between;gap:12px}
 .topbar h1{margin:0;font:900 clamp(20px,4vw,33px) Georgia,serif;letter-spacing:.12em;color:#f9d377;text-shadow:0 0 15px #f2ac5b8c}
 .back{border:1px solid #cba567;border-radius:8px;padding:9px 13px;background:#392221;color:#ffe7b8;font-weight:800;cursor:pointer}
-.cabinet{width:min(100%,940px);border:clamp(7px,1.4vw,15px) solid #a86227;border-radius:clamp(22px,4vw,45px);padding:clamp(9px,1.8vw,18px);background:linear-gradient(130deg,#782b33,#c0712c 18%,#6a2b29 40%,#35151d 70%,#a6532f);box-shadow:inset 0 0 0 3px #ffd991,inset 0 0 22px #230c12,0 25px 45px #000b}
-.marquee{position:relative;border:4px solid #cf9a48;border-radius:20px 20px 6px 6px;text-align:center;padding:13px 12px 9px;background:linear-gradient(#5e1e2c,#210b1e 55%,#761e35);box-shadow:inset 0 0 18px #fc869067,0 0 12px #ffb64179}
+.cabinet{width:min(100%,900px,calc((100dvh - 55px)*1.24));border:clamp(7px,1.1vw,13px) solid #b6bdc4;border-radius:clamp(20px,3vw,38px);padding:clamp(7px,1.2vw,15px);background:linear-gradient(112deg,#f5f7f8 0%,#aeb6bd 9%,#e5e8e9 18%,#686e78 32%,#d8dde0 48%,#717984 66%,#d7dcdf 85%,#f3f5f5 100%);box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #59606a,inset 0 0 23px #1c212a,0 22px 38px #000c}
+.marquee{position:relative;border:4px solid #d7dde2;border-radius:20px 20px 6px 6px;text-align:center;padding:13px 12px 9px;background:linear-gradient(#5e1e2c,#210b1e 55%,#761e35);box-shadow:inset 0 0 18px #fc869067,0 0 12px #ffb64179}
 .marquee::before,.marquee::after{content:"";position:absolute;left:12px;right:12px;height:6px;background:repeating-radial-gradient(circle at 5px 3px,#fff7bf 0 2px,#ed9f42 3px,transparent 5px 15px);filter:drop-shadow(0 0 5px #ffe99b);animation:bulbs 1.7s ease-in-out infinite}
 .marquee::before{top:2px}.marquee::after{bottom:2px;animation-delay:-.85s}
 @keyframes bulbs{50%{opacity:.45}}
 .marquee .small{font-size:clamp(9px,1.5vw,13px);letter-spacing:.4em;color:#ffdd8a;font-weight:800}
 .marquee .name{font:italic 900 clamp(29px,6vw,60px) Georgia,serif;color:#ffe6a1;text-shadow:0 2px 0 #722025,0 0 8px #ffb955,0 0 23px #f05f4d;line-height:1.05}
 .marquee .tag{font-size:clamp(9px,1.5vw,12px);letter-spacing:.23em;color:#ffd6ae}
-.screen-frame{margin-top:10px;border:7px solid #272c35;border-radius:18px;padding:clamp(7px,1.4vw,14px);background:linear-gradient(130deg,#60646b,#1b1d25 42%,#636570);box-shadow:inset 0 0 0 2px #a8a6a0,inset 0 0 15px #000,0 10px 17px #220d13}
-.screen{border:2px solid #9c7199;border-radius:7px;padding:clamp(7px,1.4vw,15px);background:radial-gradient(circle at 50% 35%,#244780,#112751 58%,#081431);box-shadow:inset 0 0 40px #060b2c,0 0 14px #ad8df66a;min-height:480px}
+.screen-frame{margin-top:8px;border:6px solid #333943;border-radius:17px;padding:clamp(6px,1vw,11px);background:linear-gradient(125deg,#f0f3f4,#737d88 18%,#252d38 46%,#acb5bd 79%,#f5f7f8);box-shadow:inset 0 0 0 2px #f2f4f5,inset 0 0 13px #000,0 7px 14px #242830}
+.screen{border:2px solid #9c7199;border-radius:7px;padding:clamp(7px,1.4vw,15px);background:radial-gradient(circle at 50% 35%,#244780,#112751 58%,#081431);box-shadow:inset 0 0 40px #060b2c,0 0 14px #ad8df66a;min-height:0}
 .pay-title{text-align:center;font-weight:900;letter-spacing:.17em;color:#ffde82;text-shadow:0 0 7px #f99c34;font-size:clamp(12px,2vw,17px);margin:1px 0 7px}
 .paytable{width:100%;border-collapse:separate;border-spacing:2px;font-size:clamp(9px,1.5vw,13px);font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
 .paytable th,.paytable td{padding:4px 2px;border:1px solid #4967a1;text-align:center;background:#172e62;white-space:nowrap}
@@ -46,20 +46,23 @@ body{background:radial-gradient(circle at 50% 5%,#402036,#100d19 60%,#050609)}
 .message{text-align:center;min-height:37px;display:grid;place-items:center;color:#ffdf8b;text-shadow:0 0 7px #e48934;font-weight:900;font-size:clamp(13px,2.2vw,19px);letter-spacing:.04em}
 .message.jackpot{animation:winFlashText .45s infinite alternate}
 @keyframes winFlashText{to{color:#fff;filter:drop-shadow(0 0 12px #ffde6a)}}
-.console{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:13px;padding:12px;border:3px solid #d89d53;border-radius:11px;background:linear-gradient(#4d2c2b,#291c22);box-shadow:inset 0 3px 6px #0008}
+.console{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px;padding:clamp(7px,1vw,11px);border:3px solid #e3e9ec;border-radius:11px;background:linear-gradient(#8f98a2,#434b56 45%,#aab3ba);box-shadow:inset 0 3px 6px #242936,0 2px 8px #0008}
 .meter{min-width:105px;padding:7px 10px;border:2px inset #8f8670;border-radius:5px;background:#0c1521;color:#77f2a0;font-family:monospace;text-shadow:0 0 6px #48e683}
 .meter span{display:block;font:700 10px Arial,sans-serif;letter-spacing:.14em;color:#ffe5ad;text-shadow:none}
 .meter strong{font-size:clamp(17px,3vw,27px)}
 .buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;flex:1}
 .buttons button{min-height:51px;border:2px solid #f4d18b;border-radius:10px;padding:7px clamp(9px,1.6vw,19px);background:linear-gradient(#f2d286,#bd863b 50%,#8e522c);color:#322020;font-weight:900;font-size:clamp(11px,1.7vw,16px);box-shadow:inset 0 2px 2px #fff8,inset 0 -4px 4px #693f2f,0 4px 7px #0009;cursor:pointer;touch-action:manipulation}
-.buttons button.primary{background:linear-gradient(#e9af76,#cb513f 50%,#832c32);color:#fff7dd;border-color:#ffd48b;font-size:clamp(13px,2vw,18px)}
+.buttons button.primary{min-width:125px;min-height:58px;background:linear-gradient(#ffc6a0,#e85434 46%,#9b2631);color:#fff9e8;border-color:#fff0bb;font-size:clamp(15px,2.1vw,21px);letter-spacing:.07em;text-shadow:0 2px 2px #7e1d1f;box-shadow:inset 0 2px 2px #fff9,inset 0 -5px 6px #70202b,0 0 14px #ff6c4eaa,0 5px 8px #000b}
+.buttons button.primary.draw-ready{background:linear-gradient(#fffbc8,#ffd657 40%,#e99122 78%,#ae4d1b);color:#4b210f;border-color:white;text-shadow:0 1px #fff9;box-shadow:inset 0 2px 3px #fff,inset 0 -5px 6px #a8561e,0 0 0 3px #ffe08477,0 0 24px #ffca42,0 5px 9px #000a;animation:drawGlow 1.3s ease-in-out infinite}
+@keyframes drawGlow{50%{box-shadow:inset 0 2px 3px #fff,inset 0 -5px 6px #a8561e,0 0 0 4px #fff4a099,0 0 34px #ffdb66,0 5px 9px #000a}}
 .buttons button:active{transform:translateY(3px);box-shadow:inset 0 3px 6px #0007}
 button:focus-visible{outline:3px solid white;outline-offset:3px}
 button:disabled{opacity:.48;cursor:default}
 .foot{max-width:850px;text-align:center;color:#b7a39c;font-size:11px;line-height:1.4}
+@media(max-height:700px){.marquee{padding:8px 10px 6px}.marquee .name{font-size:clamp(26px,4.2vw,45px)}.paytable th,.paytable td{padding:2px 2px}.cards{margin:8px 0 5px}.card{aspect-ratio:.9}.hold{min-height:29px}.message{min-height:27px}.buttons button{min-height:43px}.buttons button.primary{min-height:49px}.foot{margin:0}}
 @media(max-width:650px){.screen{min-height:0}.paytable{border-spacing:1px}.paytable th,.paytable td{padding:3px 1px}.paytable th:first-child,.paytable td:first-child{width:32%;padding-left:3px}.card .corner{left:3px;top:3px}.card .corner.bottom{right:3px;bottom:3px}.console{justify-content:center;padding:8px}.meter{min-width:90px}.buttons{order:3;width:100%}.buttons button{flex:1;min-width:75px}.marquee{padding-top:11px}}
 @media(max-width:380px){.paytable{font-size:8px}.hold{letter-spacing:0}.buttons{gap:5px}.buttons button{min-width:66px;padding:5px}.meter{min-width:80px}}
-@media(prefers-reduced-motion:reduce){.marquee::before,.marquee::after,.paytable tr.win td,.message.jackpot{animation:none}}
+@media(prefers-reduced-motion:reduce){.marquee::before,.marquee::after,.paytable tr.win td,.message.jackpot,.buttons button.primary.draw-ready{animation:none}}
 </style>
 </head>
 <body>
@@ -148,7 +151,8 @@ function drawCards(){
 function render(){
   drawCards();
   el("balance").textContent=money(balance);el("betMeter").textContent=money(bet)+" / "+money(lastWin);
-  el("deal").textContent=phase==="holding"?"DRAW":"DEAL";
+  el("deal").textContent=phase==="holding"?"DRAW CARDS":"DEAL";
+  el("deal").classList.toggle("draw-ready",phase==="holding");
   el("deal").disabled=phase==="animating"||(phase!=="holding"&&balance<bet);
   el("betOne").disabled=phase==="holding"||phase==="animating";
   el("maxBet").disabled=phase==="holding"||phase==="animating"||balance<5;
