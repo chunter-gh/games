@@ -1031,11 +1031,14 @@ twoPlayerButton.addEventListener("click",()=>{
 computerButton.addEventListener("click",()=>{
 
     if(onlineMode){
+        if(socket){
+            try{socket.close();}catch(e){}
+        }
+        window.location.href="othello.html";
         return;
     }
 
     computerMode=true;
-    computerButton.disabled=true;
     difficultyElement.disabled=false;
 
     resetGame();
@@ -1174,7 +1177,7 @@ function initialize(){
 
         computerMode=false;
         difficultyElement.disabled=true;
-        computerButton.disabled=true;
+        computerButton.disabled=false;
 
         /*
          * BOTH PLAYERS start with the identical initial
@@ -1195,7 +1198,7 @@ function initialize(){
 
         computerMode=true;
         difficultyElement.disabled=false;
-        computerButton.disabled=true;
+        computerButton.disabled=false;
 
         renderScores();
         renderBoard(getValidMoves(currentPlayer));
