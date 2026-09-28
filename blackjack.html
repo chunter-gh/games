@@ -73,7 +73,7 @@ function initial(){return {phase:"betting",dealer:[],seats:[makeSeat(true,"IVORY
 let state=initial();
 const money=n=>"$"+n.toLocaleString();
 function beep(f=550,d=.07){try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(audio.destination);o.start(t);o.stop(t+d+.01);}catch{}}
-function score(cards){let sum=0,aces=0;for(const card of cards){sum+=Math.min(10,card.rank);if(card.rank===14)aces++;}while(aces&&sum+10<=21){sum+=10;aces--;}return sum;}
+function score(cards){let sum=0,aces=0;for(const card of cards){sum+=card.rank===14?1:Math.min(10,card.rank);if(card.rank===14)aces++;}while(aces&&sum+10<=21){sum+=10;aces--;}return sum;}
 function natural(hand){return !hand.split&&hand.cards.length===2&&score(hand.cards)===21;}
 function cardValue(c){return Math.min(10,c.rank);}
 function newShoe(){shoe=[];for(let pack=0;pack<6;pack++)for(let suit=0;suit<4;suit++)for(let rank=2;rank<=14;rank++)shoe.push({rank,suit});for(let i=shoe.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shoe[i],shoe[j]]=[shoe[j],shoe[i]];}}
@@ -183,7 +183,7 @@ function cardElement(card,hidden=false){
     div.appendChild(svg);
   }return div;
 }
-function renderDealer(){const area=el("dealerCards");area.replaceChildren();state.dealer.forEach((c,i)=>area.appendChild(cardElement(c,i===1&&state.phase==="playing")));el("dealerTotal").textContent=state.dealer.length?(state.phase==="playing"?Math.min(10,state.dealer[0].rank):score(state.dealer)):"—";}
+function renderDealer(){const area=el("dealerCards");area.replaceChildren();state.dealer.forEach((c,i)=>area.appendChild(cardElement(c,i===1&&state.phase==="playing")));el("dealerTotal").textContent=state.dealer.length?(state.phase==="playing"?score([state.dealer[0]]):score(state.dealer)):"—";}
 function renderSeats(){
   for(let i=0;i<2;i++){
     const seat=state.seats[i],box=el("seat"+i);box.replaceChildren();box.className="seat"+(!seat.active?" empty":"")+(state.phase==="playing"&&state.activeSeat===i?" turn":"");
