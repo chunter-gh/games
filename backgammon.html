@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Game Room - Backgammon</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Arial,sans-serif;color:#f6ead3;background:#101c28}
+body{background:radial-gradient(circle at 50% 12%,#344f60,#111c29 65%,#080e16)}
+.app{max-width:1250px;min-height:100dvh;margin:auto;padding:clamp(9px,2vw,22px);display:flex;flex-direction:column;gap:13px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{margin:0;font:900 clamp(27px,5vw,51px) Georgia,serif;letter-spacing:.09em;color:#f3d9a1;text-shadow:0 3px 8px #000}
+.sub{font-size:12px;letter-spacing:.24em;color:#bdc8cf;margin:3px 0}
+button,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}
+button:focus-visible,select:focus-visible{outline:3px solid #ffe08b;outline-offset:2px}
+.menu-link,.controls button,.mode button{border:1px solid #bd9d68;border-radius:9px;background:linear-gradient(#785b3a,#3d2b20);color:#fff0ce;font-weight:800;padding:10px 14px;box-shadow:0 3px 9px #0007}
+.menu-link{font-size:12px;letter-spacing:.08em}
+.mode{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mode button.active{outline:2px solid #ffe08b;background:linear-gradient(#956d3c,#684321)}
+.mode select{border:1px solid #ad9468;border-radius:7px;padding:10px;background:#1b3041;color:#fff}
+.status{min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;border:1px solid #7c644a;border-radius:10px;background:#1c2b37;color:#ffe3a8;font-weight:800;line-height:1.35}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.player-card{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #766049;border-radius:8px;background:#21313c;font-weight:700;font-size:13px}
+.player-card.active{border-color:#f6d084;box-shadow:0 0 11px #e7b75b70}
+.swatch{width:19px;height:19px;border-radius:50%;border:2px solid #d1bd95;box-shadow:inset 0 1px 3px #0008}
+.swatch.ivory{background:#e8d4a9}.swatch.oxblood{background:#8d303d}
+.dice{display:flex;align-items:center;justify-content:center;gap:7px;min-height:49px}
+.die{display:grid;place-items:center;width:42px;height:42px;border:2px solid #d5c59f;border-radius:8px;background:linear-gradient(#fffaf0,#d5c7aa);color:#392c26;font-size:26px;font-weight:900;box-shadow:0 3px 5px #0007}
+.die.used{opacity:.35}.dice-caption{color:#cfc3a7;font-size:12px}
+.board-shell{padding:13px;border:8px solid #7d4b2b;border-radius:15px;background:linear-gradient(130deg,#a76b3b,#5b341f);box-shadow:inset 0 0 0 3px #d49a5a,0 18px 35px #000b}
+.board{position:relative;display:grid;grid-template-rows:1fr 1fr;min-height:clamp(340px,54vw,570px);border:4px solid #332a23;background:repeating-linear-gradient(100deg,#286269 0,#286269 25px,#20545c 45px,#2b6c70 70px);overflow:hidden}
+.board::after{content:"";position:absolute;left:calc(50% - 16px);top:0;bottom:0;width:32px;background:linear-gradient(90deg,#5a311d,#ad7447 44%,#6b3b22);box-shadow:0 0 0 3px #3b281f,inset 0 0 9px #2b170f;pointer-events:none}
+.board-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr)) minmax(24px,.65fr) repeat(6,minmax(0,1fr));min-width:0;position:relative}
+.point{position:relative;min-width:0;border:0;background:none;color:#f8ead3;padding:0;touch-action:manipulation}
+.point::before{content:"";position:absolute;left:3px;right:3px;height:91%;background:#d7a36d;clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 1px 2px #0007)}
+.point.dark::before{background:#8b3d42}
+.bottom .point::before{bottom:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.top .point::before{top:0}
+.point.selected::before{background:#e9c973;filter:drop-shadow(0 0 9px #ffe69e)}
+.point.legal::after{content:"";position:absolute;left:32%;top:45%;width:36%;aspect-ratio:1;border:3px solid #fff1a9;border-radius:50%;background:#fbe4a166;box-shadow:0 0 12px #fff5;pointer-events:none}
+.point-number{position:absolute;z-index:1;left:0;right:0;color:#fff9df;font-size:10px;font-weight:800;text-shadow:0 1px 3px #000}
+.top .point-number{top:3px}.bottom .point-number{bottom:3px}
+.stack{position:absolute;z-index:2;left:0;right:0;display:flex;align-items:center;flex-direction:column;pointer-events:none}
+.top .stack{top:20px}.bottom .stack{bottom:20px;flex-direction:column-reverse}
+.checker{width:min(79%,45px);aspect-ratio:1;border:3px solid #c8a76c;border-radius:50%;box-shadow:inset 0 2px 3px #fff5,inset 0 -4px 5px #0007,0 3px 5px #0009;display:grid;place-items:center;font:bold 11px Arial,sans-serif}
+.checker+.checker{margin-top:-12px}.bottom .checker+.checker{margin-top:0;margin-bottom:-12px}
+.checker.ivory{background:radial-gradient(circle at 35% 25%,#fff8e9,#e1c999 62%,#af8962);color:#3b3029}
+.checker.oxblood{background:radial-gradient(circle at 35% 25%,#c96870,#87303c 60%,#481b28);color:#fff1df}
+.bar-gap{position:relative;z-index:1;pointer-events:none}
+.tray{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
+.tray-side{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tray button{border:1px solid #ae966f;border-radius:8px;min-width:86px;min-height:45px;padding:6px 9px;background:#243c42;color:#fbe8c5;font-weight:800}
+.tray button.selected,.tray button.legal{border-color:#ffe293;box-shadow:0 0 0 2px #f1cf74}
+.tray button .count{font-size:18px;display:block}
+.controls{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap}
+.controls button.primary{background:linear-gradient(#c89445,#72501e);border-color:#f2d189;color:white;font-size:17px;padding:12px 24px}
+.help{margin:0;color:#c0cbd0;font-size:12px;line-height:1.5;text-align:center}
+@media(max-width:600px){.board-shell{padding:5px;border-width:5px}.board{min-height:clamp(300px,95vw,430px)}.board::after{left:calc(50% - 10px);width:20px}.board-row{grid-template-columns:repeat(6,minmax(0,1fr)) minmax(15px,.65fr) repeat(6,minmax(0,1fr))}.point::before{left:1px;right:1px}.checker{border-width:2px}.checker+.checker{margin-top:-9px}.bottom .checker+.checker{margin-bottom:-9px}.top .stack{top:17px}.bottom .stack{bottom:17px}.point-number{font-size:8px}.tray button{min-width:71px;font-size:11px}.die{width:36px;height:36px;font-size:22px}}
+</style>
+</head>
+<body>
+<div class="app">
+ <header><div><h1>BACKGAMMON</h1><div class="sub">THE GAME ROOM · DICE AND STRATEGY</div></div><button class="menu-link" id="menu">GAME ROOM</button></header>
+ <div class="mode"><button id="computer">VS COMPUTER</button><button id="twoPlayer">TWO PLAYERS</button><select id="difficulty" aria-label="Computer difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select><button id="newGame">NEW GAME</button></div>
+ <div class="status" id="status" role="status" aria-live="polite">Choose VS COMPUTER or TWO PLAYERS to start.</div>
+ <div class="hud"><div class="player-card" id="p2"><span class="swatch oxblood"></span><span>BURGUNDY · <span id="p2off">0</span> off</span></div><div class="dice" id="dice"><span class="dice-caption">Roll to begin</span></div><div class="player-card" id="p1"><span class="swatch ivory"></span><span>IVORY · <span id="p1off">0</span> off</span></div></div>
+ <div class="board-shell"><div class="board" id="board"><div class="board-row top" id="top"></div><div class="board-row bottom" id="bottom"></div></div><div class="tray"><div class="tray-side"><button id="bar2">BURGUNDY BAR <span class="count">0</span></button><button id="off2">BURGUNDY OFF <span class="count">0</span></button></div><div class="tray-side"><button id="bar1">IVORY BAR <span class="count">0</span></button><button id="off1">IVORY OFF <span class="count">0</span></button></div></div></div>
+ <div class="controls"><button class="primary" id="roll">ROLL DICE</button><button id="undo">UNDO MOVE</button></div>
+ <p class="help">Tap a checker, then a highlighted point. Hit a lone opponent checker to send it to the bar. Re-enter before moving other checkers. Bear off after all your checkers reach home. Doubles give four moves.</p>
+</div>
+<script>
+"use strict";
+const el=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search),room=params.get("room");
+const online=!!room,myPlayer=params.get("player")==="2"?2:1;
+const clientId=crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random();
+let mode=online?"online":null,socket=null,connected=false,revision=0,selected=null,history=[],computerTimer=null;
+const pointButtons=[];
+function initialState(){
+  const points=Array(24).fill(0);
+  points[23]=2;points[12]=5;points[7]=3;points[5]=5;
+  points[0]=-2;points[11]=-5;points[16]=-3;points[18]=-5;
+  return {points,bar:{1:0,2:0},off:{1:0,2:0},turn:1,dice:[],phase:"opening",winner:0,opening:[]};
+}
+let state=initialState();
+const other=p=>p===1?2:1,sign=p=>p===1?1:-1;
+const own=(s,i,p)=>s.points[i]*sign(p)>0;
+const blocked=(s,i,p)=>s.points[i]*sign(p)<-1;
+const distance=(i,p)=>p===1?i+1:24-i;
+function allHome(s,p){
+  if(s.bar[p])return false;
+  return s.points.every((v,i)=>v*sign(p)<=0||(p===1?i<6:i>=18));
+}
+function possibleMoves(s,die){
+  const p=s.turn,moves=[];
+  if(s.bar[p]){
+    const to=p===1?24-die:die-1;
+    if(!blocked(s,to,p))moves.push({from:"bar",to,die});
+    return moves;
+  }
+  for(let from=0;from<24;from++){
+    if(!own(s,from,p))continue;
+    const to=from+(p===1?-die:die);
+    if(to>=0&&to<24){if(!blocked(s,to,p))moves.push({from,to,die});continue;}
+    if(!allHome(s,p))continue;
+    const need=distance(from,p);
+    if(die===need||die>need&&!s.points.some((v,i)=>v*sign(p)>0&&distance(i,p)>need))
+      moves.push({from,to:"off",die});
+  }
+  return moves;
+}
+function moveState(s,m){
+  const next={...s,points:s.points.slice(),bar:{...s.bar},off:{...s.off},dice:s.dice.slice()};
+  const p=s.turn,k=next.dice.indexOf(m.die);if(k<0)throw Error("Die unavailable");
+  next.dice.splice(k,1);
+  if(m.from==="bar")next.bar[p]--;else next.points[m.from]-=sign(p);
+  if(m.to==="off")next.off[p]++;
+  else{
+    if(next.points[m.to]===-sign(p)){next.points[m.to]=0;next.bar[other(p)]++;}
+    next.points[m.to]+=sign(p);
+  }
+  return next;
+}
+function sequences(s){
+  if(!s.dice.length)return [[]];
+  let out=[];
+  for(const die of new Set(s.dice))for(const move of possibleMoves(s,die))
+    for(const rest of sequences(moveState(s,move)))out.push([move,...rest]);
+  return out.length?out:[[]];
+}
+function legalMoves(s){
+  if(s.phase!=="move")return [];
+  const lines=sequences(s),longest=Math.max(...lines.map(x=>x.length));
+  if(!longest)return [];
+  let best=lines.filter(x=>x.length===longest);
+  if(longest===1&&new Set(s.dice).size>1){
+    const highest=Math.max(...best.map(x=>x[0].die));best=best.filter(x=>x[0].die===highest);
+  }
+  const unique=new Map();for(const line of best){const m=line[0];unique.set(m.from+":"+m.to+":"+m.die,m);}
+  return [...unique.values()];
+}
+function rollDie(){return Math.floor(Math.random()*6)+1;}
+function rollTurn(forComputer=false){
+  if(!(canAct()||forComputer&&mode==="computer"&&state.turn===2)||state.phase!=="roll"&&state.phase!=="opening")return;
+  history=[];selected=null;
+  if(state.phase==="opening"){
+    let a,b;do{a=rollDie();b=rollDie();}while(a===b);
+    state.opening=[a,b];state.turn=a>b?1:2;state.dice=[a,b];
+  }else{
+    const a=rollDie(),b=rollDie();state.opening=[];state.dice=a===b?[a,a,a,a]:[a,b];
+  }
+  state.phase="move";finishIfNoMoves();changed();
+}
+function finishIfNoMoves(){
+  if(state.phase!=="move")return;
+  if(state.off[state.turn]===15){state.winner=state.turn;state.phase="over";return;}
+  if(!legalMoves(state).length){state.turn=other(state.turn);state.dice=[];state.phase="roll";selected=null;history=[];}
+}
+function apply(m){
+  history.push(structuredClone(state));state=moveState(state,m);selected=null;
+  finishIfNoMoves();changed();
+}
+function canAct(){return mode!==null&&(mode==="computer"?state.turn===1:connected&&state.turn===myPlayer);}
+function clicked(from){
+  if(!canAct()||state.phase!=="move")return;
+  const legal=legalMoves(state);
+  if(selected!==null){
+    const choices=legal.filter(m=>m.from===selected&&m.to===from);
+    if(choices.length){apply(choices.sort((a,b)=>b.die-a.die)[0]);return;}
+  }
+  selected=legal.some(m=>m.from===from)?from:null;render();
+}
+function pointLabel(i){return "Point "+(i+1);}
+function createBoard(){
+  const top=[12,13,14,15,16,17,null,18,19,20,21,22,23];
+  const bottom=[11,10,9,8,7,6,null,5,4,3,2,1,0];
+  for(const [id,row] of [["top",top],["bottom",bottom]])for(const index of row){
+    if(index===null){const gap=document.createElement("div");gap.className="bar-gap";el(id).appendChild(gap);continue;}
+    const button=document.createElement("button");button.className="point";button.type="button";
+    button.dataset.point=index;button.setAttribute("aria-label",pointLabel(index));
+    button.addEventListener("click",()=>clicked(index));el(id).appendChild(button);pointButtons[index]=button;
+  }
+}
+function checker(p,text=""){
+  const disc=document.createElement("span");disc.className="checker "+(p===1?"ivory":"oxblood");disc.textContent=text;return disc;
+}
+function render(){
+  const legal=canAct()?legalMoves(state):[];
+  const targets=new Set(selected===null?[]:legal.filter(m=>m.from===selected).map(m=>m.to));
+  const sources=new Set(legal.map(m=>m.from));
+  for(let i=0;i<24;i++){
+    const button=pointButtons[i],v=state.points[i],p=v>0?1:2,count=Math.abs(v);
+    button.className="point"+(i%2?" dark":"")+(selected===i?" selected":"")+(targets.has(i)?" legal":"");
+    button.replaceChildren();
+    const label=document.createElement("span");label.className="point-number";label.textContent=i+1;button.appendChild(label);
+    if(count){const stack=document.createElement("span");stack.className="stack";
+      for(let j=0;j<Math.min(count,7);j++)stack.appendChild(checker(p,j===6&&count>7?"+"+(count-6):""));
+      button.appendChild(stack);
+    }
+    button.setAttribute("aria-label",pointLabel(i)+(count?", "+count+" "+(p===1?"ivory":"burgundy")+" checkers":" empty")+(sources.has(i)?", movable":"")+(targets.has(i)?", legal destination":""));
+  }
+  for(const p of [1,2]){
+    el("bar"+p).querySelector(".count").textContent=state.bar[p];
+    el("off"+p).querySelector(".count").textContent=state.off[p];
+    el("p"+p+"off").textContent=state.off[p];
+    el("p"+p).classList.toggle("active",state.turn===p&&state.phase!=="over");
+    el("bar"+p).classList.toggle("selected",selected==="bar"&&state.turn===p);
+    el("bar"+p).classList.toggle("legal",sources.has("bar")&&state.turn===p);
+    el("off"+p).classList.toggle("legal",targets.has("off")&&state.turn===p);
+  }
+  const dieFaces=["","⚀","⚁","⚂","⚃","⚄","⚅"];
+  el("dice").replaceChildren();
+  if(state.phase==="opening"||state.phase==="roll")el("dice").textContent=state.phase==="opening"?"Opening roll":"Ready to roll";
+  else for(const n of state.dice){const die=document.createElement("span");die.className="die";die.textContent=dieFaces[n];die.setAttribute("aria-label",n);el("dice").appendChild(die);}
+  el("roll").disabled=!canAct()||!(["opening","roll"].includes(state.phase));
+  el("undo").disabled=mode!=="computer"||!history.length||state.turn!==1;
+  el("computer").classList.toggle("active",mode==="computer");
+  el("twoPlayer").classList.toggle("active",mode==="online");
+  const name=p=>p===1?"Ivory":"Burgundy";
+  let message;
+  if(!mode)message="Choose VS COMPUTER or TWO PLAYERS to start.";
+  else if(state.phase==="over")message=name(state.winner)+" wins! All 15 checkers are off.";
+  else if(mode==="online"&&!connected)message="Connecting to the two-player room...";
+  else if(state.phase==="opening")message=(mode==="online"?"Player 1":"You")+" rolls one die for each side. Higher die starts.";
+  else if(state.phase==="roll")message=name(state.turn)+" to roll"+(mode==="online"?(state.turn===myPlayer?" — your turn.":" — waiting for your opponent."):".");
+  else message=name(state.turn)+" to move"+(mode==="online"?(state.turn===myPlayer?" — choose a checker.":" — waiting for your opponent."):" — choose a checker.");
+  if(selected!==null&&legal.length)message+=" Tap a highlighted destination.";
+  el("status").textContent=message;
+}
+function send(message){if(socket&&socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify({game:"backgammon",room,clientId,...message}));}
+function changed(){render();if(mode==="online")send({type:"backgammonState",revision:++revision,state});else maybeComputer();}
+function validState(s){return s&&Array.isArray(s.points)&&s.points.length===24&&s.points.every(x=>Number.isInteger(x)&&Math.abs(x)<=15)&&s.bar&&s.off&&[1,2].includes(s.turn)&&Array.isArray(s.dice)&&s.dice.length<=4&&s.dice.every(x=>Number.isInteger(x)&&x>=1&&x<=6)&&["opening","roll","move","over"].includes(s.phase);}
+function connect(){
+  const protocol=location.protocol==="https:"?"wss:":"ws:";
+  socket=new WebSocket(protocol+"//"+location.host+"/checkers");
+  socket.addEventListener("open",()=>{connected=true;send({type:"backgammonJoin",player:myPlayer});render();});
+  socket.addEventListener("message",event=>{
+    let msg;try{msg=JSON.parse(event.data);}catch{return;}
+    if(msg.game!=="backgammon"||msg.room!==room||msg.clientId===clientId)return;
+    if(msg.type==="backgammonJoin"){
+      if(myPlayer===1)send({type:"backgammonState",revision,state});
+    }else if(msg.type==="backgammonState"&&validState(msg.state)&&msg.revision>=revision){
+      revision=msg.revision;state=msg.state;history=[];selected=null;render();
+    }else if(msg.type==="backgammonResetRequest"&&myPlayer===1){newGame();}
+  });
+  socket.addEventListener("close",()=>{connected=false;render();el("status").textContent="Connection lost. Return to the two-player lobby to reconnect.";});
+  socket.addEventListener("error",()=>{connected=false;render();el("status").textContent="Could not connect to the game room.";});
+}
+function newGame(){
+  if(mode==="online"&&myPlayer===2){send({type:"backgammonResetRequest"});el("status").textContent="New game requested from Player 1.";return;}
+  clearTimeout(computerTimer);computerTimer=null;state=initialState();selected=null;history=[];changed();
+}
+function scoreMove(s,m){
+  const p=s.turn,next=moveState(s,m),hit=m.to!=="off"&&s.points[m.to]===-sign(p);
+  let score=hit?12:0;
+  if(m.to==="off")score+=14;
+  else if(next.points[m.to]*sign(p)===2)score+=7;
+  if(m.to!=="off"&&next.points[m.to]*sign(p)===1)score-=2;
+  score+=Math.random()*(el("difficulty").value==="hard"?2:el("difficulty").value==="medium"?8:25);
+  return score;
+}
+function maybeComputer(){
+  if(mode!=="computer"||state.turn!==2||state.phase==="over"||computerTimer)return;
+  computerTimer=setTimeout(()=>{
+    computerTimer=null;
+    if(mode!=="computer"||state.turn!==2)return;
+    if(state.phase==="roll"||state.phase==="opening"){rollTurn(true);return;}
+    if(state.phase!=="move")return;
+    const moves=legalMoves(state);
+    if(!moves.length){finishIfNoMoves();changed();return;}
+    const chosen=moves.sort((a,b)=>scoreMove(state,b)-scoreMove(state,a))[0];
+    state=moveState(state,chosen);finishIfNoMoves();render();maybeComputer();
+  },650);
+}
+createBoard();
+for(const p of [1,2]){
+  el("bar"+p).addEventListener("click",()=>{if(state.turn===p)clicked("bar");});
+  el("off"+p).addEventListener("click",()=>{if(state.turn===p)clicked("off");});
+}
+el("roll").addEventListener("click",()=>rollTurn());
+el("undo").addEventListener("click",()=>{if(mode!=="computer"||state.turn!==1||!history.length)return;state=history.pop();selected=null;render();});
+el("computer").addEventListener("click",()=>{if(online){location.href="rooms.html?game=backgammon";return;}mode="computer";newGame();});
+el("twoPlayer").addEventListener("click",()=>{location.href="rooms.html?game=backgammon";});
+el("newGame").addEventListener("click",()=>{if(mode)newGame();});
+el("menu").addEventListener("click",()=>{location.href="index.html";});
+render();if(online)connect();
+</script>
+</body>
+</html>
