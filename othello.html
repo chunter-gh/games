@@ -555,7 +555,7 @@ function makeMove(move){
 
 function getSocketUrl(){
     const protocol=location.protocol==="https:"?"wss:":"ws:";
-    return protocol+"//"+location.host+"/othello";
+    return protocol+"//"+location.host+"/checkers";
 }
 
 function sendSocket(data){
