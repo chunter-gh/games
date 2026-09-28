@@ -8,29 +8,29 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#0b1012;color:#f8e9c4}
 body{background:radial-gradient(circle at 50% 0,#33483f,#101b1c 64%,#080d11)}
-.app{max-width:1240px;min-height:100dvh;margin:auto;padding:clamp(8px,1.7vw,20px);display:flex;flex-direction:column;gap:10px}
+.app{max-width:1240px;height:100dvh;min-height:0;margin:auto;padding:clamp(6px,1.4vw,16px);display:flex;flex-direction:column;gap:clamp(4px,1vh,10px)}
 header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 h1{font:900 clamp(27px,5vw,52px) Georgia,serif;letter-spacing:.08em;margin:0;color:#f4d99c;text-shadow:0 2px 2px #261711,0 0 16px #e2ae5888}
 .eyebrow{font-size:11px;letter-spacing:.2em;color:#d9c7a1}
 button{font:inherit;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.48;cursor:default}button:focus-visible{outline:3px solid #fff2b9;outline-offset:2px}
 .back,.mode button,.game-controls button{border:1px solid #d9b879;border-radius:9px;background:linear-gradient(#6b5038,#32241d);color:#fff0d4;font-weight:900;padding:10px 15px;box-shadow:inset 0 1px 1px #fff5,0 3px 8px #0009}
 .mode{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.mode button.active{border-color:#fff2bd;box-shadow:0 0 13px #efcb7a}
-.table-frame{border:clamp(10px,1.6vw,19px) solid #533523;border-radius:clamp(38px,8vw,105px) clamp(38px,8vw,105px) 30px 30px;padding:clamp(9px,1.6vw,20px);background:linear-gradient(135deg,#a4713e,#3b251e 30%,#c29555 68%,#4d2e21);box-shadow:inset 0 0 0 4px #d8b67b,inset 0 0 0 8px #493023,0 20px 32px #000a;flex:1}
-.felt{position:relative;min-height:clamp(440px,61vh,660px);border:3px solid #d2b16e;border-radius:clamp(25px,6vw,80px) clamp(25px,6vw,80px) 18px 18px;padding:clamp(12px,2vw,26px);overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#196849 0%,#115139 54%,#0a3b2d 100%);box-shadow:inset 0 0 0 4px #0b4333,inset 0 0 55px #001e16,0 5px 13px #0008}
+.table-frame{border:clamp(7px,1.4vw,17px) solid #533523;border-radius:clamp(30px,7vw,95px) clamp(30px,7vw,95px) 22px 22px;padding:clamp(5px,1vw,15px);background:linear-gradient(135deg,#a4713e,#3b251e 30%,#c29555 68%,#4d2e21);box-shadow:inset 0 0 0 4px #d8b67b,inset 0 0 0 8px #493023,0 12px 22px #000a;flex:1;min-height:0}
+.felt{position:relative;height:100%;min-height:0;border:3px solid #d2b16e;border-radius:clamp(25px,6vw,80px) clamp(25px,6vw,80px) 18px 18px;padding:clamp(8px,1.5vw,20px);overflow:auto;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(ellipse at 50% 38%,#196849 0%,#115139 54%,#0a3b2d 100%);box-shadow:inset 0 0 0 4px #0b4333,inset 0 0 55px #001e16,0 5px 13px #0008}
 .felt::after{content:"";position:absolute;left:5%;right:5%;top:52%;height:35%;border:2px solid #c8ae6b88;border-top:none;border-radius:0 0 55% 55%;pointer-events:none}
 .felt-title{position:absolute;left:0;right:0;top:48%;text-align:center;color:#dec9919c;font:900 clamp(17px,3.8vw,37px) Georgia,serif;letter-spacing:.13em;pointer-events:none}
 .felt-title small{display:block;font:700 clamp(10px,1.4vw,14px) Arial,sans-serif;letter-spacing:.23em;margin-top:5px}
-.dealer{text-align:center;position:relative;z-index:1;min-height:clamp(160px,24vh,235px)}
+.dealer{text-align:center;position:relative;z-index:1;flex:0 0 auto}
 .seat-name{font-weight:900;letter-spacing:.14em;font-size:clamp(12px,1.8vw,18px);color:#ffebbd;text-shadow:0 2px 3px #07251d}
 .total{display:inline-block;min-width:32px;margin-left:6px;padding:3px 7px;border-radius:12px;background:#071b22ad;color:#fff2cc;font-size:12px}
-.dealer-cards,.hand-cards{display:flex;align-items:flex-start;justify-content:center;gap:clamp(3px,.6vw,9px);min-height:clamp(98px,14vw,150px);padding:8px 0}
-.seats{position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(7px,1.5vw,20px);align-items:end;margin-top:clamp(4px,2vh,20px)}
-.seat{min-width:0;min-height:clamp(160px,25vh,230px);padding:12px 6px 7px;border:2px solid #dfc98577;border-radius:45% 45% 15px 15px / 17% 17% 15px 15px;background:#092f2c66;text-align:center}
+.dealer-cards,.hand-cards{display:flex;align-items:flex-start;justify-content:center;gap:clamp(3px,.6vw,9px);min-height:0;padding:clamp(3px,.7vh,8px) 0}
+.seats{position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(5px,1vw,16px);align-items:end;margin-top:auto}
+.seat{min-width:0;min-height:0;padding:clamp(5px,1vh,12px) 5px 5px;border:2px solid #dfc98577;border-radius:45% 45% 15px 15px / 17% 17% 15px 15px;background:#092f2c66;text-align:center}
 .seat.turn{border-color:#ffe493;box-shadow:0 0 20px #f8dc8199,inset 0 0 18px #ebca4940}
 .seat.empty{opacity:.48}.seat-info{font-size:clamp(10px,1.4vw,13px);color:#eedbaf;margin:4px 0}.hands{display:flex;justify-content:center;gap:10px;overflow-x:auto;padding:3px 4px 7px;scrollbar-width:thin}
 .hand{flex:0 0 auto;min-width:clamp(120px,19vw,230px);border:1px solid transparent;border-radius:12px;padding:3px 5px}.hand.active{border-color:#ffdc83;background:#fff2bb17}
 .hand-label{min-height:19px;font-size:11px;font-weight:900;color:#f5dfa9}.hand-result{font-size:11px;font-weight:800;color:#ffe9a7;min-height:16px}
-.card{position:relative;flex:0 0 auto;width:clamp(48px,7vw,84px);height:clamp(69px,10vw,121px);border:2px solid #f9f4e7;border-radius:7px;background:linear-gradient(145deg,#fffef9,#eee9dc 62%,#d4cbb8);box-shadow:0 4px 8px #001d1899,inset 0 0 0 2px #d1b882;color:#1c2531;overflow:hidden}
+.card{position:relative;flex:0 0 auto;width:clamp(38px,min(7vw,10dvh),84px);aspect-ratio:0.695;border:2px solid #f9f4e7;border-radius:7px;background:linear-gradient(145deg,#fffef9,#eee9dc 62%,#d4cbb8);box-shadow:0 4px 8px #001d1899,inset 0 0 0 2px #d1b882;color:#1c2531;overflow:hidden}
 .card.red{color:#bc2637}.card::after{content:"";position:absolute;inset:5px;border:1px solid #d0b9838c;border-radius:4px;pointer-events:none}
 .card-corner{position:absolute;left:5px;top:4px;z-index:1;text-align:center;line-height:.8;font:900 clamp(14px,2vw,22px) Georgia,serif}.card-corner span{display:block;margin-top:3px;font-size:.8em}
 .card-corner.flip{left:auto;top:auto;right:5px;bottom:4px;transform:rotate(180deg)}
@@ -47,8 +47,9 @@ button{font:inherit;cursor:pointer;touch-action:manipulation}button:disabled{opa
 .game-controls button{min-width:85px}.game-controls button.primary{background:linear-gradient(#f7d98b,#c88a32);color:#321c13;border-color:#fff0ba;box-shadow:0 0 13px #ffdc6f,0 3px 7px #0009}
 .bank{font:900 13px Arial,sans-serif;color:#cfe8cf}.bank strong{font-size:19px;color:#f6e8bd}
 .rules{text-align:center;font-size:11px;color:#c2d2c9;margin:0;line-height:1.5}
-@media(max-width:600px){.felt{min-height:475px;padding:10px 5px}.dealer{min-height:150px}.seats{margin-top:55px;gap:5px}.seat{min-height:173px;padding:8px 3px 4px}.seat-name{letter-spacing:0}.hand{min-width:108px;padding:2px}.hands{justify-content:flex-start}.card{width:clamp(43px,12vw,60px);height:clamp(62px,17vw,85px)}.card-art{font-size:29px}.card.face .card-art{font-size:27px}.card-corner{font-size:14px;left:3px;top:3px}.card-corner.flip{right:3px;bottom:3px}.dealer-cards,.hand-cards{min-height:75px;padding:5px 0}.felt-title{top:42%;font-size:19px}.game-controls button{min-width:68px;padding:9px 11px}.panel{padding:8px}}
-@media(max-height:660px){.app{gap:5px}.table-frame{padding:6px}.felt{min-height:395px}.dealer{min-height:115px}.seats{margin-top:25px}.seat{min-height:140px}.card{width:49px;height:70px}.dealer-cards,.hand-cards{min-height:74px}.panel{gap:5px}.rules{font-size:10px}}
+@media(max-width:600px){.felt{padding:8px 5px}.seats{gap:5px}.seat{padding:5px 3px 3px}.seat-name{letter-spacing:0}.hand{min-width:108px;padding:2px}.hands{justify-content:flex-start}.card{width:clamp(38px,min(12vw,10dvh),60px)}.card-art{font-size:29px}.card-corner{font-size:14px;left:3px;top:3px}.card-corner.flip{right:3px;bottom:3px}.felt-title{top:42%;font-size:19px}.game-controls button{min-width:68px;padding:9px 11px}.panel{padding:8px}}
+@media(max-height:660px){.app{gap:4px}.table-frame{padding:5px}.felt{padding:5px}.card{width:clamp(36px,min(10vw,9dvh),62px)}.panel{gap:4px;padding:5px}.game-controls button{padding:6px 9px}.rules{font-size:10px;line-height:1.15}.felt-title{font-size:clamp(14px,2.4vw,25px)}}
+@media(max-height:500px){.app{height:auto;min-height:100dvh}.table-frame{height:280px;flex:none}}
 </style>
 </head>
 <body>
