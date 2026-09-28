@@ -9,10 +9,11 @@
 html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#09090f;color:#fff2ce}
 body{background:radial-gradient(circle at 50% 5%,#402036,#100d19 60%,#050609)}
 .app{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(6px,1.5vh,18px);gap:clamp(5px,1vh,10px)}
-.topbar{width:min(100%,900px,calc((100dvh - 55px)*1.24));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar{width:min(100%,1000px);display:flex;align-items:center;justify-content:space-between;gap:12px}
 .topbar h1{margin:0;font:900 clamp(20px,4vw,33px) Georgia,serif;letter-spacing:.12em;color:#f9d377;text-shadow:0 0 15px #f2ac5b8c}
 .back{border:1px solid #cba567;border-radius:8px;padding:9px 13px;background:#392221;color:#ffe7b8;font-weight:800;cursor:pointer}
-.cabinet{width:min(100%,900px,calc((100dvh - 55px)*1.24));border:clamp(7px,1.1vw,13px) solid #b6bdc4;border-radius:clamp(20px,3vw,38px);padding:clamp(7px,1.2vw,15px);background:linear-gradient(112deg,#f5f7f8 0%,#aeb6bd 9%,#e5e8e9 18%,#686e78 32%,#d8dde0 48%,#717984 66%,#d7dcdf 85%,#f3f5f5 100%);box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #59606a,inset 0 0 23px #1c212a,0 22px 38px #000c}
+.machine-wrap{flex:0 0 auto;position:relative;align-self:center}
+.cabinet{width:100%;transform-origin:top left;border:clamp(7px,1.1vw,13px) solid #b6bdc4;border-radius:clamp(20px,3vw,38px);padding:clamp(7px,1.2vw,15px);background:linear-gradient(112deg,#f5f7f8 0%,#aeb6bd 9%,#e5e8e9 18%,#686e78 32%,#d8dde0 48%,#717984 66%,#d7dcdf 85%,#f3f5f5 100%);box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #59606a,inset 0 0 23px #1c212a,0 22px 38px #000c}
 .marquee{position:relative;border:4px solid #d7dde2;border-radius:20px 20px 6px 6px;text-align:center;padding:13px 12px 9px;background:linear-gradient(#5e1e2c,#210b1e 55%,#761e35);box-shadow:inset 0 0 18px #fc869067,0 0 12px #ffb64179}
 .marquee::before,.marquee::after{content:"";position:absolute;left:12px;right:12px;height:6px;background:repeating-radial-gradient(circle at 5px 3px,#fff7bf 0 2px,#ed9f42 3px,transparent 5px 15px);filter:drop-shadow(0 0 5px #ffe99b);animation:bulbs 1.7s ease-in-out infinite}
 .marquee::before{top:2px}.marquee::after{bottom:2px;animation-delay:-.85s}
@@ -68,7 +69,7 @@ button:disabled{opacity:.48;cursor:default}
 <body>
 <div class="app">
   <header class="topbar"><h1>VIDEO POKER</h1><button class="back" id="back">← CASINO</button></header>
-  <main class="cabinet">
+  <div class="machine-wrap" id="machineWrap"><main class="cabinet" id="machine">
     <div class="marquee"><div class="small">CLASSIC FIVE-CARD DRAW</div><div class="name">Jacks or Better</div><div class="tag">9 / 6 FULL PAY · FIVE COINS MAX</div></div>
     <div class="screen-frame"><div class="screen">
       <div class="pay-title">WINNING HANDS · PAYOUT IN DOLLARS</div>
@@ -77,7 +78,7 @@ button:disabled{opacity:.48;cursor:default}
       <div class="message" id="message" role="status" aria-live="polite">Choose your bet, then press DEAL.</div>
     </div></div>
     <div class="console"><div class="meter"><span>BALANCE</span><strong id="balance">$1,000</strong></div><div class="buttons"><button id="addCredits">ADD $100</button><button id="betOne">BET ONE</button><button id="maxBet">MAX BET</button><button class="primary" id="deal">DEAL</button></div><div class="meter"><span>BET / LAST WIN</span><strong id="betMeter">$1 / $0</strong></div></div>
-  </main>
+  </main></div>
   <p class="foot">Play money only. Tap a card or its HOLD button after dealing. Unheld cards are replaced on DRAW. A five-coin royal flush pays $4,000.</p>
 </div>
 <script>
@@ -159,6 +160,7 @@ function render(){
   el("addCredits").disabled=phase==="holding"||phase==="animating";
   el("message").textContent=message;el("message").classList.toggle("jackpot",winningId==="royal");
   for(const row of el("payRows").rows){row.classList.toggle("win",row.dataset.hand===winningId);for(const cell of row.cells)cell.classList.toggle("current",cell.dataset.coins==bet);}
+  requestAnimationFrame(fitMachine);
 }
 function deal(){
   if(balance<bet){message="Press ADD $100 to load more play money.";render();return;}
@@ -184,6 +186,30 @@ el("betOne").addEventListener("click",()=>{bet=bet===5?1:bet+1;if(balance<bet)be
 el("addCredits").addEventListener("click",()=>{if(phase==="holding"||phase==="animating")return;balance+=100;saveBalance();message="$100 added. Choose your bet and press DEAL.";tone(840,.1);render();});
 el("maxBet").addEventListener("click",()=>{if(balance<5)return;bet=5;deal();});
 el("back").addEventListener("click",()=>{location.href="casino.html";});
+let lastFitWidth=0;
+function fitMachine(){
+  const app=document.querySelector(".app"),wrap=el("machineWrap"),machine=el("machine");
+  const style=getComputedStyle(app),horizontal=parseFloat(style.paddingLeft)+parseFloat(style.paddingRight);
+  const vertical=parseFloat(style.paddingTop)+parseFloat(style.paddingBottom);
+  const viewportWidth=window.visualViewport?.width||window.innerWidth;
+  const viewportHeight=window.visualViewport?.height||window.innerHeight;
+  const baseWidth=Math.max(280,Math.min(1000,viewportWidth-horizontal));
+  if(baseWidth!==lastFitWidth){
+    machine.style.width=baseWidth+"px";
+    lastFitWidth=baseWidth;
+  }
+  machine.style.transform="none";
+  const naturalHeight=machine.offsetHeight;
+  const gap=parseFloat(style.gap)||0;
+  const availableHeight=viewportHeight-vertical-document.querySelector(".topbar").offsetHeight-document.querySelector(".foot").offsetHeight-gap*2-4;
+  const scale=Math.min(1,Math.max(.35,availableHeight/naturalHeight));
+  machine.style.transform="scale("+scale+")";
+  wrap.style.width=(baseWidth*scale)+"px";
+  wrap.style.height=(naturalHeight*scale)+"px";
+  document.querySelector(".topbar").style.width=Math.min(baseWidth*scale,viewportWidth-horizontal)+"px";
+}
+window.addEventListener("resize",fitMachine);
+window.visualViewport?.addEventListener("resize",fitMachine);
 paytable();render();
 </script>
 </body>
