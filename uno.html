@@ -55,7 +55,7 @@ button:disabled { opacity: .45; cursor: default; }
 <body>
 <main class="game">
   <h1>UNO</h1>
-  <div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
+  <div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
   <div class="status" id="status" role="status" aria-live="polite">Enter the two-player lobby to begin.</div>
   <div class="opponent"><div class="label" id="opponentLabel">OPPONENT</div><div class="backs" id="opponentHand"></div></div>
   <div class="table">
@@ -76,7 +76,8 @@ const me = ["2", "player2", "player 2", "p2"].includes(rawPlayer) ? 2 : 1;
 const online = Boolean(roomId);
 const clientId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
 const el = id => document.getElementById(id);
-let game = null, socket = null, socketOpen = false, reconnectTimer = null, selectedWild = null;
+let game = null, socket = null, socketOpen = false, reconnectTimer = null, selectedWild = null, cpuTimer = null;
+function ready() { return !online || socketOpen; }
 
 function makeDeck() {
   const cards = []; let id = 0;
@@ -117,9 +118,9 @@ function drawCards(player, count) {
   }
 }
 function advance() { game.turn = game.turn === 1 ? 2 : 1; game.drawnId = null; }
-function playCard(id, chosenColor) {
-  if (!game || game.winner || game.turn !== me || !socketOpen) return;
-  const hand = myHand(), index = hand.findIndex(card => card.id === id);
+function playCard(id, chosenColor, actor = me) {
+  if (!game || game.winner || game.turn !== actor || !ready()) return;
+  const hand = game.hands[actor - 1], index = hand.findIndex(card => card.id === id);
   if (index < 0 || (game.drawnId !== null && game.drawnId !== id)) return;
   const card = hand[index];
   if (!canPlay(card, hand)) { game.announcement = card.value === "draw4" ? "Draw Four needs no card of the active color." : "That card does not match."; render(); return; }
@@ -127,36 +128,63 @@ function playCard(id, chosenColor) {
   hand.splice(index, 1); game.discard.push(card);
   game.activeColor = card.color === "wild" ? chosenColor : card.color;
   game.drawnId = null;
-  const opponent = me === 1 ? 2 : 1;
+  const opponent = actor === 1 ? 2 : 1;
   if (card.value === "draw2" || card.value === "draw4") drawCards(opponent, card.value === "draw2" ? 2 : 4);
-  if (!hand.length) { game.winner = me; game.announcement = "Player " + me + " wins this round!"; }
+  if (!hand.length) { game.winner = actor; game.announcement = "Player " + actor + " wins this round!"; }
   else {
     if (!["skip", "reverse", "draw2", "draw4"].includes(card.value)) advance();
-    game.announcement = hand.length === 1 ? "UNO! Player " + me + " has one card!" :
-      (["skip", "reverse", "draw2", "draw4"].includes(card.value) ? "Player " + me + " plays again." : "Player " + game.turn + " is up.");
+    game.announcement = hand.length === 1 ? "UNO! Player " + actor + " has one card!" :
+      (["skip", "reverse", "draw2", "draw4"].includes(card.value) ? "Player " + actor + " plays again." : "Player " + game.turn + " is up.");
   }
-  game.revision++; broadcastState(); render();
+  game.revision++; broadcastState(); render(); queueComputer();
 }
 function drawOne() {
-  if (!game || game.winner || game.turn !== me || !socketOpen || game.drawnId !== null) return;
+  if (!game || game.winner || game.turn !== me || !ready() || game.drawnId !== null) return;
   const before = myHand().length;
   drawCards(me, 1);
   const card = myHand().length > before ? myHand()[myHand().length - 1] : null;
   if (card && canPlay(card)) { game.drawnId = card.id; game.announcement = "Play the drawn card or pass."; }
   else { advance(); game.announcement = "Player " + me + " draws and passes."; }
-  game.revision++; broadcastState(); render();
+  game.revision++; broadcastState(); render(); queueComputer();
 }
 function passTurn() {
-  if (!game || game.turn !== me || game.drawnId === null || !socketOpen) return;
+  if (!game || game.turn !== me || game.drawnId === null || !ready()) return;
   advance(); game.announcement = "Player " + me + " passes.";
-  game.revision++; broadcastState(); render();
+  game.revision++; broadcastState(); render(); queueComputer();
+}
+function bestComputerColor() {
+  const hand = game.hands[1];
+  return COLORS.slice().sort((a, b) => hand.filter(card => card.color === b).length - hand.filter(card => card.color === a).length)[0];
+}
+function queueComputer() {
+  if (online || !game || game.winner || game.turn !== 2 || cpuTimer) return;
+  cpuTimer = setTimeout(() => {
+    cpuTimer = null;
+    if (!game || game.winner || game.turn !== 2) return;
+    const hand = game.hands[1];
+    const playable = hand.filter(card => canPlay(card, hand));
+    if (playable.length) {
+      const card = playable.find(c => c.color === game.activeColor && !["wild", "draw4"].includes(c.value)) || playable[0];
+      playCard(card.id, card.color === "wild" ? bestComputerColor() : undefined, 2);
+      return;
+    }
+    const before = hand.length;
+    drawCards(2, 1);
+    const drawn = hand.length > before ? hand[hand.length - 1] : null;
+    if (drawn && canPlay(drawn, hand)) {
+      playCard(drawn.id, drawn.color === "wild" ? bestComputerColor() : undefined, 2);
+    } else {
+      advance(); game.announcement = "Computer draws and passes.";
+      game.revision++; render();
+    }
+  }, 600);
 }
 function send(message) {
   if (!socketOpen || !socket || socket.readyState !== WebSocket.OPEN) return false;
   try { socket.send(JSON.stringify({game: "uno", room: roomId, clientId, player: me, ...message})); return true; }
   catch { return false; }
 }
-function broadcastState() { send({type: "unoState", state: game}); }
+function broadcastState() { if (online) send({type: "unoState", state: game}); }
 function validState(state) {
   return state && Array.isArray(state.deck) && Array.isArray(state.hands) && state.hands.length === 2 &&
     state.hands.every(Array.isArray) && Array.isArray(state.discard) && state.discard.length &&
@@ -210,9 +238,8 @@ function cardElement(card, clickable) {
 function render() {
   const status = el("status"), backs = el("opponentHand"), hand = el("hand"), discard = el("discard");
   backs.innerHTML = ""; hand.innerHTML = ""; discard.innerHTML = "";
-  el("opponentLabel").textContent = "PLAYER " + (me === 1 ? 2 : 1) + " · OPPONENT";
+  el("opponentLabel").textContent = online ? "PLAYER " + (me === 1 ? 2 : 1) + " · OPPONENT" : "COMPUTER · YELLOW";
   el("myLabel").textContent = "PLAYER " + me + " · YOUR HAND";
-  if (!online) { status.textContent = "Choose 2 PLAYERS to enter the lobby."; el("drawPile").disabled = true; el("deckCount").textContent = ""; el("pass").hidden = true; return; }
   if (!game) { status.textContent = socketOpen ? "Waiting for the deal..." : "Connecting to the room..."; el("drawPile").disabled = true; return; }
   const opponentHand = game.hands[me === 1 ? 1 : 0];
   for (let n = 0; n < Math.min(opponentHand.length, 12); n++) { const back = document.createElement("span"); back.className = "back"; back.textContent = "UNO"; backs.appendChild(back); }
@@ -221,17 +248,19 @@ function render() {
   el("activeColor").className = "color-indicator " + game.activeColor;
   el("activeColor").textContent = game.activeColor.toUpperCase();
   el("deckCount").textContent = game.deck.length + " cards";
-  const myTurn = socketOpen && !game.winner && game.turn === me;
+  const myTurn = ready() && !game.winner && game.turn === me;
   for (const card of myHand()) hand.appendChild(cardElement(card, myTurn && (game.drawnId === null || game.drawnId === card.id) && canPlay(card)));
   el("drawPile").disabled = !myTurn || game.drawnId !== null;
   el("pass").hidden = !myTurn || game.drawnId === null;
-  status.textContent = !socketOpen ? "Connection lost — reconnecting..." : game.winner ?
-    (game.winner === me ? "YOU WIN THIS ROUND!" : "PLAYER " + game.winner + " WINS THIS ROUND!") :
-    (myTurn ? "YOUR TURN. " : "OPPONENT'S TURN. ") + game.announcement;
+  status.textContent = !ready() ? "Connection lost — reconnecting..." : game.winner ?
+    (game.winner === me ? "YOU WIN THIS ROUND!" : (online ? "PLAYER " + game.winner : "COMPUTER") + " WINS THIS ROUND!") :
+    (myTurn ? "YOUR TURN. " : online ? "OPPONENT'S TURN. " : "COMPUTER'S TURN. ") + game.announcement;
 }
 el("twoPlayer").addEventListener("click", () => { location.href = "rooms.html?game=uno"; });
+el("computer").addEventListener("click", () => { if (socket) socket.close(); location.href = "uno.html"; });
 el("newGame").addEventListener("click", () => {
-  if (!online || !socketOpen) return;
+  if (!online) { if (cpuTimer) clearTimeout(cpuTimer); cpuTimer = null; game = deal(); render(); return; }
+  if (!socketOpen) return;
   if (me === 1) { game = deal(); broadcastState(); render(); }
   else { send({type: "unoNewGameRequest"}); el("status").textContent = "Asking Player 1 for a new deal..."; }
 });
@@ -244,6 +273,9 @@ el("colorPicker").addEventListener("click", event => {
   const id = selectedWild; selectedWild = null; el("colorPicker").hidden = true; playCard(id, color);
 });
 el("cancelColor").addEventListener("click", () => { selectedWild = null; el("colorPicker").hidden = true; });
+el("twoPlayer").classList.toggle("active", online);
+el("computer").classList.toggle("active", !online);
+if (!online) game = deal();
 render(); if (online) connect();
 </script>
 </body>
