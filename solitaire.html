@@ -1852,7 +1852,7 @@ function beginDrag(
         moved:false,
         originalParents:[],
         originalNextSiblings:[],
-        originalZIndexes:[]
+        originalStyles:[]
     };
 
     suppressClick=false;
@@ -1893,8 +1893,8 @@ function beginDrag(
             element.nextSibling
         );
 
-        dragged.originalZIndexes.push(
-            element.style.zIndex
+        dragged.originalStyles.push(
+            element.style.cssText
         );
 
         dragLayer.appendChild(element);
@@ -2007,15 +2007,9 @@ function clearDragVisuals() {
             "dragging-sequence"
         );
 
-        element.style.position="";
-        element.style.left="";
-        element.style.top="";
-        element.style.width="";
-        element.style.height="";
-        element.style.transform="";
-        element.style.pointerEvents="";
-        element.style.zIndex=dragged.originalZIndexes[i];
-        element.style.margin="";
+        // Restore the tableau's original top offset as well as
+        // the card's stacking order and any other inline styles.
+        element.style.cssText=dragged.originalStyles[i];
     });
 }
 
