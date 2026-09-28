@@ -1131,116 +1131,27 @@ const gameRoomButton =
 
 
 /* =========================================================
-   ROOM IDENTITY
+   ROOM IDENTITY AND ONLINE STATE
    ========================================================= */
 
-const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
+const urlParams = new URLSearchParams(window.location.search);
+const roomId = urlParams.get("room") || urlParams.get("roomId") || "";
+const rawPlayer = String(urlParams.get("player") || "").trim().toLowerCase();
+const myPlayer = ["2", "player2", "player 2", "p2"].includes(rawPlayer) ? 2 : 1;
+const mySymbol = myPlayer === 1 ? "X" : "O";
+const clientId = window.crypto && typeof window.crypto.randomUUID === "function"
+    ? window.crypto.randomUUID()
+    : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
 
-const roomId =
-    urlParams.get("room") ||
-    urlParams.get("roomId") ||
-    "";
-
-const rawPlayer =
-    String(
-        urlParams.get("player") || ""
-    ).toLowerCase();
-
-let requestedPlayer =
-    null;
-
-if (
-    rawPlayer === "1" ||
-    rawPlayer === "player1"
-) {
-
-    requestedPlayer = 1;
-
-} else if (
-    rawPlayer === "2" ||
-    rawPlayer === "player2"
-) {
-
-    requestedPlayer = 2;
-}
-
-let myPlayer =
-    requestedPlayer;
-
-let mySymbol =
-    requestedPlayer === 1
-        ? "X"
-        : requestedPlayer === 2
-            ? "O"
-            : null;
-
-
-/* =========================================================
-   ONLINE GAME STATE
-   ========================================================= */
-
-let game =
-    Array(9).fill(null);
-
-let confirmedGame =
-    Array(9).fill(null);
-
-let currentPlayer =
-    "X";
-
-let confirmedCurrentPlayer =
-    "X";
-
-let gameOver =
-    false;
-
-let winner =
-    null;
-
-let draw =
-    false;
-
-let mode =
-    roomId
-        ? "2P"
-        : "NONE";
-
-let socket =
-    null;
-
-let reconnectTimer =
-    null;
-
-let reconnectDelay =
-    1500;
-
-let socketGeneration =
-    0;
-
-let waitingForServer =
-    Boolean(roomId);
-
-let localMoveLock =
-    Boolean(roomId);
-
-let serverAssigned =
-    false;
-
-let opponentConnected =
-    false;
-
-let spectator =
-    false;
-
-let lastServerStateKey =
-    "";
-
-let lastLocalMove =
-    null;
-
+let game = Array(9).fill(null);
+let currentPlayer = "X";
+let gameOver = false;
+let winner = null;
+let draw = false;
+let mode = roomId ? "2P" : "NONE";
+let socket = null;
+let socketReady = false;
+let opponentConnected = false;
 
 /* =========================================================
    ANIMATION
@@ -1345,1491 +1256,160 @@ if (window.visualViewport) {
 
 
 /* =========================================================
-   CONNECTION DISPLAY
+   ROOM CONNECTION AND STATE SYNC
    ========================================================= */
 
-function setConnection(
-    text,
-    state
-) {
-
-    connectionText.textContent =
-        text;
-
-    connectionText.className =
-        state || "";
+function setConnection(text, state) {
+    connectionText.textContent = text;
+    connectionText.className = state || "";
 }
 
-
-/* =========================================================
-   SAFE SOCKET SEND
-   ========================================================= */
-
-function sendMessage(
-    message
-) {
-
-    if (
-        !socket ||
-        socket.readyState !==
-        WebSocket.OPEN
-    ) {
+function sendMessage(message) {
+    if (!socketReady || !socket || socket.readyState !== WebSocket.OPEN) {
         return false;
     }
-
     try {
-
-        socket.send(
-            JSON.stringify(message)
-        );
-
+        socket.send(JSON.stringify(message));
         return true;
-
-    } catch (error) {
-
+    } catch {
         return false;
     }
 }
 
-
-/* =========================================================
-   CONNECT TO TTT SERVER
-   ========================================================= */
-
-function connectToServer() {
-
-    if (
-        mode !== "2P"
-    ) {
-        return;
-    }
-
-    if (!roomId) {
-
-        statusText.textContent =
-            "PRESS 2 PLAYERS TO ENTER THE LOBBY";
-
-        setConnection(
-            "NOT CONNECTED",
-            ""
-        );
-
-        return;
-    }
-
-    if (
-        socket &&
-        (
-            socket.readyState ===
-            WebSocket.OPEN ||
-
-            socket.readyState ===
-            WebSocket.CONNECTING
-        )
-    ) {
-        return;
-    }
-
-    const thisGeneration =
-        ++socketGeneration;
-
-    waitingForServer =
-        true;
-
-    localMoveLock =
-        true;
-
-    serverAssigned =
-        false;
-
-    spectator =
-        false;
-
-    opponentConnected =
-        false;
-
-    setConnection(
-        "CONNECTING...",
-        ""
-    );
-
-    statusText.textContent =
-        "CONNECTING TO GAME SERVER...";
-
-    try {
-
-        socket =
-            new WebSocket(
-                "wss://games-z5k2.onrender.com/ttt"
-            );
-
-    } catch (error) {
-
-        setConnection(
-            "CONNECTION ERROR",
-            "error"
-        );
-
-        statusText.textContent =
-            "CONNECTION ERROR";
-
-        scheduleReconnect();
-
-        return;
-    }
-
-    socket.addEventListener(
-        "open",
-        () => {
-
-            if (
-                thisGeneration !==
-                socketGeneration
-            ) {
-                return;
-            }
-
-            reconnectDelay =
-                1500;
-
-            /*
-             * IMPORTANT:
-             *
-             * server 11.js automatically assigns
-             * the first /ttt connection to X,
-             * the second to O, and additional
-             * connections to spectator.
-             *
-             * THERE IS NO JOIN COMMAND.
-             *
-             * Sending one would produce:
-             * "Unknown Tic-Tac-Toe command."
-             */
-
-            waitingForServer =
-                true;
-
-            localMoveLock =
-                true;
-
-            setConnection(
-                "CONNECTED",
-                "connected"
-            );
-
-            statusText.textContent =
-                "WAITING FOR GAME SERVER...";
-        }
-    );
-
-    socket.addEventListener(
-        "message",
-        event => {
-
-            if (
-                thisGeneration !==
-                socketGeneration
-            ) {
-                return;
-            }
-
-            handleServerMessage(
-                event.data
-            );
-        }
-    );
-
-    socket.addEventListener(
-        "close",
-        () => {
-
-            if (
-                thisGeneration !==
-                socketGeneration
-            ) {
-                return;
-            }
-
-            waitingForServer =
-                true;
-
-            localMoveLock =
-                true;
-
-            serverAssigned =
-                false;
-
-            spectator =
-                false;
-
-            opponentConnected =
-                false;
-
-            setConnection(
-                "DISCONNECTED",
-                "error"
-            );
-
-            statusText.textContent =
-                "SERVER CONNECTION LOST";
-
-            scheduleReconnect();
-        }
-    );
-
-    socket.addEventListener(
-        "error",
-        () => {
-
-            if (
-                thisGeneration !==
-                socketGeneration
-            ) {
-                return;
-            }
-
-            setConnection(
-                "CONNECTION ERROR",
-                "error"
-            );
-        }
-    );
+function onlineState() {
+    return {
+        board: game.slice(),
+        currentPlayer,
+        gameOver,
+        winner,
+        draw
+    };
 }
 
-
-/* =========================================================
-   RECONNECT
-   ========================================================= */
-
-function scheduleReconnect() {
-
-    if (
-        mode !== "2P" ||
-        !roomId
-    ) {
-        return;
+function applyOnlineState(state) {
+    if (!state || !Array.isArray(state.board) || state.board.length !== 9 ||
+        !state.board.every(value => value === null || value === "X" || value === "O")) {
+        return false;
     }
-
-    if (reconnectTimer) {
-        return;
-    }
-
-    reconnectTimer =
-        setTimeout(
-            () => {
-
-                reconnectTimer =
-                    null;
-
-                connectToServer();
-
-                reconnectDelay =
-                    Math.min(
-                        reconnectDelay * 1.5,
-                        8000
-                    );
-
-            },
-            reconnectDelay
-        );
-}
-
-
-/* =========================================================
-   ROOM FILTER
-   ========================================================= */
-
-function messageBelongsToThisRoom(
-    data
-) {
-
-    /*
-     * The /ttt server does not actually attach
-     * room IDs to its state messages.
-     *
-     * Only reject a message if the server
-     * explicitly supplies a different room.
-     */
-
-    if (
-        data.room !== undefined &&
-        data.room !== null &&
-        String(data.room) !== ""
-    ) {
-
-        if (
-            roomId &&
-            String(data.room) !==
-            String(roomId)
-        ) {
-            return false;
-        }
-    }
-
-    if (
-        data.roomId !== undefined &&
-        data.roomId !== null &&
-        String(data.roomId) !== ""
-    ) {
-
-        if (
-            roomId &&
-            String(data.roomId) !==
-            String(roomId)
-        ) {
-            return false;
-        }
-    }
-
+    const x = state.board.filter(value => value === "X").length;
+    const o = state.board.filter(value => value === "O").length;
+    if (x < o || x > o + 1) return false;
+    const result = calculateGameResult(state.board);
+    const turn = x === o ? "X" : "O";
+    if (state.currentPlayer !== turn) return false;
+    game = state.board.slice();
+    currentPlayer = turn;
+    gameOver = result.gameOver;
+    winner = result.winner;
+    draw = result.draw;
+    renderBoard();
+    updateStatus();
     return true;
 }
 
-
-/* =========================================================
-   NORMALIZE SYMBOL
-   ========================================================= */
-
-function normalizeSymbol(
-    value
-) {
-
-    if (
-        value === "X" ||
-        value === "x"
-    ) {
-        return "X";
-    }
-
-    if (
-        value === "O" ||
-        value === "o" ||
-        value === "0"
-    ) {
-        return "O";
-    }
-
-    return null;
-}
-
-
-/* =========================================================
-   NORMALIZE PLAYER
-   ========================================================= */
-
-function normalizePlayer(
-    value
-) {
-
-    if (
-        value === 1 ||
-        value === "1" ||
-        String(value).toLowerCase() ===
-            "player1"
-    ) {
-        return 1;
-    }
-
-    if (
-        value === 2 ||
-        value === "2" ||
-        String(value).toLowerCase() ===
-            "player2"
-    ) {
-        return 2;
-    }
-
-    return null;
-}
-
-
-/* =========================================================
-   SERVER MESSAGE HANDLER
-   ========================================================= */
-
-function handleServerMessage(
-    raw
-) {
-
-    let data;
-
-    try {
-
-        data =
-            JSON.parse(raw);
-
-    } catch (error) {
-
-        return;
-    }
-
-    if (
-        !messageBelongsToThisRoom(data)
-    ) {
-        return;
-    }
-
-
-    /* =====================================================
-       ASSIGNMENT
-       ===================================================== */
-
-    if (
-        data.type ===
-        "assign"
-    ) {
-
-        const assignedSymbol =
-            normalizeSymbol(
-                data.symbol ||
-                data.mySymbol ||
-                data.playerSymbol ||
-                data.mark ||
-                data.player
-            );
-
-        const assignedPlayer =
-            normalizePlayer(
-                data.player
-            );
-
-        if (
-            assignedSymbol === "X" ||
-            assignedSymbol === "O" ||
-            assignedPlayer
-        ) {
-
-            spectator =
-                false;
-
-            serverAssigned =
-                true;
-
-            if (assignedSymbol) {
-
-                mySymbol =
-                    assignedSymbol;
-            }
-
-            if (assignedPlayer) {
-
-                myPlayer =
-                    assignedPlayer;
-
-            } else if (mySymbol) {
-
-                myPlayer =
-                    mySymbol === "X"
-                        ? 1
-                        : 2;
-            }
-
-            if (!mySymbol) {
-
-                mySymbol =
-                    myPlayer === 1
-                        ? "X"
-                        : "O";
-            }
-
-            waitingForServer =
-                false;
-
-            localMoveLock =
-                false;
-
-            setConnection(
-                "PLAYER " + mySymbol,
-                "connected"
-            );
-
-            updateStatus();
-
-        } else {
-
-            waitingForServer =
-                true;
-
-            localMoveLock =
-                true;
-
-            statusText.textContent =
-                "WAITING FOR PLAYER ASSIGNMENT";
-        }
-
-        return;
-    }
-
-
-    /* =====================================================
-       TTT CONNECTED
-       ===================================================== */
-
-    if (
-        data.type ===
-        "tttConnected"
-    ) {
-
-        /*
-         * server 11.js sends:
-         *
-         * { type: "tttConnected", player: "X" }
-         * { type: "tttConnected", player: "O" }
-         * { type: "tttConnected", player: "spectator" }
-         *
-         * The original page only understood numeric
-         * player values here. That caused X/O to be
-         * incorrectly put back into WAITING state.
-         */
-
-        const connectedPlayer =
-            String(
-                data.player || ""
-            ).toLowerCase();
-
-        if (
-            connectedPlayer ===
-            "spectator"
-        ) {
-
-            spectator =
-                true;
-
-            serverAssigned =
-                false;
-
-            myPlayer =
-                null;
-
-            mySymbol =
-                null;
-
-            waitingForServer =
-                true;
-
-            localMoveLock =
-                true;
-
-            opponentConnected =
-                true;
-
-            setConnection(
-                "SPECTATOR",
-                "waiting"
-            );
-
-            statusText.textContent =
-                "GAME IS FULL — SPECTATING";
-
-            return;
-        }
-
-        const symbol =
-            normalizeSymbol(
-                data.symbol ||
-                data.mySymbol ||
-                data.playerSymbol ||
-                data.mark ||
-                data.player
-            );
-
-        const assignedPlayer =
-            normalizePlayer(
-                data.player
-            );
-
-        if (
-            symbol === "X" ||
-            symbol === "O" ||
-            assignedPlayer
-        ) {
-
-            spectator =
-                false;
-
-            serverAssigned =
-                true;
-
-            if (symbol) {
-
-                mySymbol =
-                    symbol;
-            }
-
-            if (assignedPlayer) {
-
-                myPlayer =
-                    assignedPlayer;
-
-            } else if (mySymbol) {
-
-                myPlayer =
-                    mySymbol === "X"
-                        ? 1
-                        : 2;
-            }
-
-            if (!mySymbol) {
-
-                mySymbol =
-                    myPlayer === 1
-                        ? "X"
-                        : "O";
-            }
-
-            opponentConnected =
-                true;
-
-            waitingForServer =
-                false;
-
-            localMoveLock =
-                false;
-
-            setConnection(
-                "PLAYER " + mySymbol,
-                "connected"
-            );
-
-            updateStatus();
-
-        } else {
-
-            waitingForServer =
-                true;
-
-            localMoveLock =
-                true;
-
-            setConnection(
-                "CONNECTED",
-                "waiting"
-            );
-
-            statusText.textContent =
-                "WAITING FOR PLAYER ASSIGNMENT";
-        }
-
-        return;
-    }
-
-
-    /* =====================================================
-       PLAYER JOINED
-       ===================================================== */
-
-    if (
-        data.type ===
-        "playerJoined"
-    ) {
-
-        opponentConnected =
-            true;
-
-        updateStatus();
-
-        return;
-    }
-
-
-    /* =====================================================
-       FULL SERVER STATE
-       ===================================================== */
-
-    if (
-        data.type ===
-        "state" ||
-        data.type ===
-        "tttState"
-    ) {
-
-        applyServerState(
-            data
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       INDIVIDUAL MOVE
-       ===================================================== */
-
-    if (
-        data.type ===
-        "move" ||
-        data.type ===
-        "tttMove"
-    ) {
-
-        applyServerMove(
-            data
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       OPPONENT LEFT
-       ===================================================== */
-
-    if (
-        data.type ===
-        "opponentLeft"
-    ) {
-
-        opponentConnected =
-            false;
-
-        localMoveLock =
-            false;
-
-        setConnection(
-            "OPPONENT LEFT",
-            "waiting"
-        );
-
-        statusText.textContent =
-            "OPPONENT LEFT THE GAME";
-
-        return;
-    }
-
-
-    /* =====================================================
-       NEW GAME / RESET STATE
-       ===================================================== */
-
-    if (
-        data.type ===
-        "newGame" ||
-        data.type ===
-        "tttNewGame" ||
-        data.type ===
-        "reset"
-    ) {
-
-        if (
-            Array.isArray(data.board)
-        ) {
-
-            applyServerState(
-                data
-            );
-
-        } else {
-
-            resetOnlineBoard();
-        }
-
-        return;
-    }
-
-
-    /* =====================================================
-       ERROR
-       ===================================================== */
-
-    if (
-        data.type ===
-        "error"
-    ) {
-
-        game =
-            confirmedGame.slice();
-
-        currentPlayer =
-            confirmedCurrentPlayer;
-
-        const result =
-            calculateGameResult(
-                game
-            );
-
-        gameOver =
-            result.gameOver;
-
-        winner =
-            result.winner;
-
-        draw =
-            result.draw;
-
-        localMoveLock =
-            false;
-
-        lastLocalMove =
-            null;
-
-        if (!spectator) {
-
-            waitingForServer =
-                false;
-        }
-
-        renderBoard();
-
-        statusText.textContent =
-            data.message ||
-            "SERVER ERROR";
-
-        return;
-    }
-}
-
-
-/* =========================================================
-   GET BOARD FROM SERVER MESSAGE
-   ========================================================= */
-
-function extractBoard(
-    data
-) {
-
-    if (
-        Array.isArray(data.board) &&
-        data.board.length === 9
-    ) {
-        return data.board;
-    }
-
-    if (
-        Array.isArray(data.game) &&
-        data.game.length === 9
-    ) {
-        return data.game;
-    }
-
-    if (
-        Array.isArray(data.cells) &&
-        data.cells.length === 9
-    ) {
-        return data.cells;
-    }
-
-    return null;
-}
-
-
-/* =========================================================
-   APPLY SERVER STATE
-   ========================================================= */
-
-function applyServerState(
-    data
-) {
-
-    const serverBoard =
-        extractBoard(data);
-
-    if (
-        !serverBoard
-    ) {
-        return;
-    }
-
-    const nextBoard =
-        serverBoard.map(
-            value =>
-                normalizeSymbol(value)
-        );
-
-    const nextCurrent =
-        normalizeSymbol(
-            data.currentPlayer ||
-            data.turn ||
-            data.nextPlayer
-        ) ||
-        calculateNextPlayer(
-            nextBoard
-        );
-
-    const result =
-        calculateGameResult(
-            nextBoard
-        );
-
-    const nextWinner =
-        normalizeSymbol(
-            data.winner
-        ) ||
-        result.winner;
-
-    const nextDraw =
-        data.draw !== undefined
-            ? Boolean(data.draw)
-            : result.draw;
-
-    const nextGameOver =
-        data.gameOver !== undefined
-            ? Boolean(data.gameOver)
-            : result.gameOver;
-
-    const stateKey =
-        JSON.stringify({
-            board: nextBoard,
-            currentPlayer: nextCurrent,
-            gameOver: nextGameOver,
-            winner: nextWinner,
-            draw: nextDraw
+function connectToServer() {
+    if (mode !== "2P" || !roomId || socketReady ||
+        (socket && socket.readyState === WebSocket.CONNECTING)) return;
+
+    setConnection("CONNECTING...", "");
+    statusText.textContent = "CONNECTING TO GAME ROOM...";
+
+    // The Checkers room endpoint relays room-tagged messages. The legacy
+    // /ttt endpoint assigns X/O globally and cannot isolate lobby rooms.
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    socket = new WebSocket(protocol + "//" + location.host + "/checkers");
+
+    socket.addEventListener("open", () => {
+        if (mode !== "2P") return;
+        socketReady = true;
+        opponentConnected = true;
+        setConnection("PLAYER " + mySymbol, "connected");
+        sendMessage({
+            type: "tttJoin", game: "ttt", room: roomId,
+            player: myPlayer, clientId
         });
-
-    lastServerStateKey =
-        stateKey;
-
-    confirmedGame =
-        nextBoard.slice();
-
-    confirmedCurrentPlayer =
-        nextCurrent;
-
-    game =
-        nextBoard.slice();
-
-    currentPlayer =
-        nextCurrent;
-
-    winner =
-        nextWinner;
-
-    draw =
-        nextDraw;
-
-    gameOver =
-        nextGameOver;
-
-    /*
-     * The server state is authoritative.
-     *
-     * Every state broadcast is sent by server 11.js
-     * to BOTH X and O.
-     *
-     * Therefore both screens are rebuilt from exactly
-     * the same board after every move.
-     */
-
-    if (spectator) {
-
-        waitingForServer =
-            true;
-
-        localMoveLock =
-            true;
-
-    } else {
-
-        waitingForServer =
-            false;
-
-        localMoveLock =
-            false;
-    }
-
-    lastLocalMove =
-        null;
-
-    renderBoard();
-
-    updateStatus();
-}
-
-
-/* =========================================================
-   EXTRACT MOVE INDEX
-   ========================================================= */
-
-function extractMoveIndex(
-    data
-) {
-
-    const candidates = [
-        data.index,
-        data.cell,
-        data.position,
-        data.move
-    ];
-
-    for (
-        const value
-        of candidates
-    ) {
-
-        if (
-            value === undefined ||
-            value === null
-        ) {
-            continue;
-        }
-
-        const number =
-            Number(value);
-
-        if (
-            Number.isInteger(number) &&
-            number >= 0 &&
-            number <= 8
-        ) {
-
-            return number;
-        }
-    }
-
-    return -1;
-}
-
-
-/* =========================================================
-   APPLY SERVER MOVE
-   ========================================================= */
-
-function applyServerMove(
-    data
-) {
-
-    /*
-     * server 11.js currently broadcasts "state"
-     * rather than individual "move" messages.
-     *
-     * This handler remains only as compatibility
-     * support for another server implementation.
-     */
-
-    const index =
-        extractMoveIndex(data);
-
-    if (
-        index < 0
-    ) {
-        return;
-    }
-
-    const symbol =
-        normalizeSymbol(
-            data.symbol ||
-            data.playerSymbol ||
-            data.mark ||
-            data.player
-        ) ||
-        symbolFromPlayer(
-            data.player
-        );
-
-    if (!symbol) {
-        return;
-    }
-
-    if (
-        !spectator &&
-        symbol === mySymbol &&
-        lastLocalMove === index
-    ) {
-
-        confirmedGame =
-            game.slice();
-
-        confirmedCurrentPlayer =
-            currentPlayer;
-
-        localMoveLock =
-            false;
-
-        lastLocalMove =
-            null;
-
-        waitingForServer =
-            false;
-
         updateStatus();
+    });
 
-        return;
-    }
+    socket.addEventListener("message", event => {
+        let message;
+        try { message = JSON.parse(event.data); } catch { return; }
+        handleOnlineMessage(message);
+    });
 
-    if (
-        game[index] === symbol
-    ) {
-
-        if (!spectator) {
-
-            localMoveLock =
-                false;
+    socket.addEventListener("close", () => {
+        socketReady = false;
+        opponentConnected = false;
+        if (mode === "2P") {
+            setConnection("DISCONNECTED", "error");
+            statusText.textContent = "CONNECTION LOST";
         }
+    });
 
-        return;
-    }
-
-    if (
-        game[index] !== null
-    ) {
-        return;
-    }
-
-    game[index] =
-        symbol;
-
-    currentPlayer =
-        symbol === "X"
-            ? "O"
-            : "X";
-
-    const result =
-        calculateGameResult(
-            game
-        );
-
-    gameOver =
-        result.gameOver;
-
-    winner =
-        result.winner;
-
-    draw =
-        result.draw;
-
-    confirmedGame =
-        game.slice();
-
-    confirmedCurrentPlayer =
-        currentPlayer;
-
-    if (spectator) {
-
-        waitingForServer =
-            true;
-
-        localMoveLock =
-            true;
-
-    } else {
-
-        localMoveLock =
-            false;
-
-        waitingForServer =
-            false;
-    }
-
-    lastLocalMove =
-        null;
-
-    renderBoard();
-
-    updateStatus();
-}
-
-
-/* =========================================================
-   SYMBOL FROM PLAYER
-   ========================================================= */
-
-function symbolFromPlayer(
-    player
-) {
-
-    const directSymbol =
-        normalizeSymbol(player);
-
-    if (directSymbol) {
-        return directSymbol;
-    }
-
-    const p =
-        normalizePlayer(
-            player
-        );
-
-    if (p === 1) {
-        return "X";
-    }
-
-    if (p === 2) {
-        return "O";
-    }
-
-    return null;
-}
-
-
-/* =========================================================
-   CALCULATE NEXT PLAYER
-   ========================================================= */
-
-function calculateNextPlayer(
-    boardState
-) {
-
-    let x =
-        0;
-
-    let o =
-        0;
-
-    boardState.forEach(
-        value => {
-
-            if (value === "X") {
-                x++;
-            }
-
-            if (value === "O") {
-                o++;
-            }
-        }
-    );
-
-    return x <= o
-        ? "X"
-        : "O";
-}
-
-
-/* =========================================================
-   SEND MOVE
-   ========================================================= */
-
-function sendMove(
-    index
-) {
-
-    if (
-        spectator ||
-        !serverAssigned ||
-        (
-            myPlayer !== 1 &&
-            myPlayer !== 2
-        ) ||
-        !mySymbol
-    ) {
-
-        return false;
-    }
-
-    /*
-     * server 11.js only requires:
-     *
-     * { type: "move", index }
-     *
-     * The additional fields are harmless, but keeping
-     * the message simple makes the protocol explicit.
-     */
-
-    return sendMessage({
-        type: "move",
-        index: index
+    socket.addEventListener("error", () => {
+        if (mode === "2P") setConnection("CONNECTION ERROR", "error");
     });
 }
 
-
-/* =========================================================
-   SEND NEW GAME
-   ========================================================= */
-
-function sendNewGame() {
-
-    if (
-        spectator ||
-        !serverAssigned ||
-        (
-            myPlayer !== 1 &&
-            myPlayer !== 2
-        ) ||
-        !mySymbol
-    ) {
-
-        statusText.textContent =
-            "ONLY PLAYERS CAN START A NEW GAME";
-
-        return false;
+function handleOnlineMessage(message) {
+    if (!message || message.clientId === clientId ||
+        message.game !== "ttt" || String(message.room || "") !== roomId) return;
+    if (message.type === "tttJoin") {
+        opponentConnected = true;
+        updateStatus();
+        return;
     }
+    if (message.type === "tttNewGame") {
+        if (message.player !== 1 && message.player !== 2) return;
+        applyOnlineState(message.state);
+        return;
+    }
+    if (message.type !== "tttMove" || !message.move ||
+        message.player !== (currentPlayer === "X" ? 1 : 2)) return;
 
-    /*
-     * server 11.js explicitly expects new_game.
-     */
+    const index = message.move.index;
+    if (!Number.isInteger(index) || index < 0 || index > 8 ||
+        gameOver || game[index] !== null) return;
 
-    return sendMessage({
-        type: "new_game"
-    });
+    const expected = game.slice();
+    expected[index] = currentPlayer;
+    if (!message.state || JSON.stringify(message.state.board) !== JSON.stringify(expected)) return;
+    applyOnlineState(message.state);
 }
 
-
-/* =========================================================
-   CELL PRESS
-   ========================================================= */
-
-function cellPressed(
-    index
-) {
-
+function cellPressed(index) {
     if (mode === "NONE") {
-
-        statusText.textContent =
-            "SELECT 2 PLAYERS OR VS COMPUTER";
-
+        statusText.textContent = "SELECT 2 PLAYERS OR VS COMPUTER";
         return;
     }
-
     if (mode === "CPU") {
-
         humanComputerMove(index);
-
         return;
     }
-
-    if (spectator) {
-
-        statusText.textContent =
-            "SPECTATORS CANNOT PLAY";
-
+    if (!socketReady) {
+        statusText.textContent = "NOT CONNECTED TO GAME ROOM";
         return;
     }
+    if (!Number.isInteger(index) || index < 0 || index > 8 ||
+        gameOver || currentPlayer !== mySymbol || game[index] !== null) return;
 
-    if (
-        !serverAssigned ||
-        !mySymbol ||
-        (
-            myPlayer !== 1 &&
-            myPlayer !== 2
-        )
-    ) {
-
-        statusText.textContent =
-            "WAITING FOR PLAYER ASSIGNMENT";
-
+    const next = game.slice();
+    next[index] = mySymbol;
+    const result = calculateGameResult(next);
+    const nextState = {
+        board: next,
+        currentPlayer: mySymbol === "X" ? "O" : "X",
+        ...result
+    };
+    if (!sendMessage({
+        type: "tttMove", game: "ttt", room: roomId,
+        player: myPlayer, clientId, move: { index }, state: nextState
+    })) {
+        statusText.textContent = "CONNECTION LOST";
         return;
     }
-
-    if (
-        !socket ||
-        socket.readyState !==
-        WebSocket.OPEN
-    ) {
-
-        statusText.textContent =
-            "NOT CONNECTED TO SERVER";
-
-        return;
-    }
-
-    if (gameOver) {
-        return;
-    }
-
-    if (waitingForServer) {
-        return;
-    }
-
-    if (
-        localMoveLock
-    ) {
-        return;
-    }
-
-    if (
-        currentPlayer !==
-        mySymbol
-    ) {
-
-        return;
-    }
-
-    if (
-        game[index] !== null
-    ) {
-        return;
-    }
-
-    /*
-     * Optimistically display the move immediately.
-     * The authoritative server state will shortly
-     * replace this with the exact same board on
-     * BOTH screens.
-     */
-
-    lastLocalMove =
-        index;
-
-    game[index] =
-        mySymbol;
-
-    currentPlayer =
-        mySymbol === "X"
-            ? "O"
-            : "X";
-
-    const result =
-        calculateGameResult(
-            game
-        );
-
-    gameOver =
-        result.gameOver;
-
-    winner =
-        result.winner;
-
-    draw =
-        result.draw;
-
-    renderBoard();
-
-    updateStatus();
-
-    localMoveLock =
-        true;
-
-    const accepted =
-        sendMove(index);
-
-    if (accepted) {
-
-        /*
-         * Do NOT unlock here.
-         *
-         * Wait for server 11.js to broadcast
-         * the authoritative state.
-         */
-
-        waitingForServer =
-            false;
-
-        return;
-    }
-
-    /*
-     * Send failed.
-     */
-
-    game =
-        confirmedGame.slice();
-
-    currentPlayer =
-        confirmedCurrentPlayer;
-
-    const restored =
-        calculateGameResult(
-            game
-        );
-
-    gameOver =
-        restored.gameOver;
-
-    winner =
-        restored.winner;
-
-    draw =
-        restored.draw;
-
-    localMoveLock =
-        false;
-
-    lastLocalMove =
-        null;
-
-    renderBoard();
-
-    statusText.textContent =
-        "CONNECTION LOST";
+    applyOnlineState(nextState);
 }
-
 
 /* =========================================================
    RENDER BOARD
@@ -3067,162 +1647,19 @@ function calculateGameResult(
    ========================================================= */
 
 function updateStatus() {
-
-    if (
-        mode === "NONE"
-    ) {
-
-        statusText.textContent =
-            "SELECT A GAME MODE";
-
-        return;
-    }
-
-    if (
-        mode !== "2P"
-    ) {
-        return;
-    }
-
-    if (spectator) {
-
-        statusText.textContent =
-            "GAME IS FULL — SPECTATING";
-
-        return;
-    }
-
-    if (
-        !serverAssigned ||
-        !mySymbol ||
-        (
-            myPlayer !== 1 &&
-            myPlayer !== 2
-        )
-    ) {
-
-        if (waitingForServer) {
-
-            statusText.textContent =
-                "WAITING FOR GAME SERVER...";
-
-        } else {
-
-            statusText.textContent =
-                "WAITING FOR PLAYER ASSIGNMENT";
-        }
-
-        return;
-    }
-
-    if (gameOver) {
-
-        if (draw) {
-
-            statusText.textContent =
-                "DRAW — THE BOARD IS COMPLETE";
-
-            return;
-        }
-
-        if (winner) {
-
-            if (
-                winner ===
-                mySymbol
-            ) {
-
-                statusText.textContent =
-                    "PLAYER " +
-                    mySymbol +
-                    " WINS!";
-
-            } else {
-
-                statusText.textContent =
-                    "PLAYER " +
-                    winner +
-                    " WINS!";
-            }
-
-            return;
-        }
-    }
-
-    if (waitingForServer) {
-
-        statusText.textContent =
-            "WAITING FOR GAME SERVER...";
-
-        return;
-    }
-
-    if (
-        currentPlayer ===
-        mySymbol
-    ) {
-
-        statusText.textContent =
-            "PLAYER " +
-            mySymbol +
-            " — YOUR TURN";
-
+    if (mode !== "2P") return;
+    if (!socketReady) {
+        statusText.textContent = "CONNECTING TO GAME ROOM...";
+    } else if (gameOver) {
+        statusText.textContent = draw
+            ? "DRAW — THE BOARD IS COMPLETE"
+            : "PLAYER " + winner + " WINS!";
     } else {
-
-        statusText.textContent =
-            "PLAYER " +
-            currentPlayer +
-            " — OPPONENT'S TURN";
+        statusText.textContent = currentPlayer === mySymbol
+            ? "PLAYER " + mySymbol + " — YOUR TURN"
+            : "PLAYER " + currentPlayer + " — OPPONENT'S TURN";
     }
 }
-
-
-/* =========================================================
-   RESET ONLINE BOARD
-   ========================================================= */
-
-function resetOnlineBoard() {
-
-    game =
-        Array(9).fill(null);
-
-    confirmedGame =
-        Array(9).fill(null);
-
-    currentPlayer =
-        "X";
-
-    confirmedCurrentPlayer =
-        "X";
-
-    gameOver =
-        false;
-
-    winner =
-        null;
-
-    draw =
-        false;
-
-    localMoveLock =
-        spectator ||
-        !serverAssigned;
-
-    waitingForServer =
-        spectator ||
-        !serverAssigned;
-
-    lastLocalMove =
-        null;
-
-    lastServerStateKey =
-        "";
-
-    renderBoard();
-
-    updateStatus();
-}
-
 
 /* =========================================================
    LOCAL CPU MODE
@@ -3683,67 +2120,22 @@ function newGame() {
         return;
     }
 
-    if (spectator) {
-
-        statusText.textContent =
-            "ONLY PLAYERS CAN START A NEW GAME";
-
+    if (!socketReady) {
+        statusText.textContent = "NOT CONNECTED TO GAME ROOM";
         return;
     }
 
-    if (
-        !serverAssigned ||
-        !mySymbol ||
-        (
-            myPlayer !== 1 &&
-            myPlayer !== 2
-        )
-    ) {
-
-        statusText.textContent =
-            "WAITING FOR PLAYER ASSIGNMENT";
-
-        return;
-    }
-
-    if (
-        !socket ||
-        socket.readyState !==
-        WebSocket.OPEN
-    ) {
-
-        statusText.textContent =
-            "NOT CONNECTED TO SERVER";
-
-        return;
-    }
-
-    localMoveLock =
-        true;
-
-    lastLocalMove =
-        null;
-
-    resetOnlineBoard();
-
-    localMoveLock =
-        true;
-
-    const accepted =
-        sendNewGame();
-
-    if (!accepted) {
-
-        localMoveLock =
-            false;
-
-        updateStatus();
-
-        return;
-    }
-
-    statusText.textContent =
-        "STARTING NEW GAME...";
+    const state = {
+        board: Array(9).fill(null),
+        currentPlayer: "X",
+        gameOver: false,
+        winner: null,
+        draw: false
+    };
+    if (sendMessage({
+        type: "tttNewGame", game: "ttt", room: roomId,
+        player: myPlayer, clientId, state
+    })) applyOnlineState(state);
 }
 
 
@@ -3789,48 +2181,12 @@ computerButton.addEventListener(
             .remove("active");
 
         if (socket) {
-
-            socketGeneration++;
-
-            try {
-                socket.close();
-            } catch (error) {
-            }
-
-            socket =
-                null;
+            socketReady = false;
+            try { socket.close(); } catch {}
+            socket = null;
         }
 
-        if (reconnectTimer) {
 
-            clearTimeout(
-                reconnectTimer
-            );
-
-            reconnectTimer =
-                null;
-        }
-
-        waitingForServer =
-            false;
-
-        opponentConnected =
-            false;
-
-        localMoveLock =
-            false;
-
-        serverAssigned =
-            false;
-
-        spectator =
-            false;
-
-        myPlayer =
-            1;
-
-        mySymbol =
-            "X";
 
         if (computerTimer) {
 
@@ -3961,35 +2317,15 @@ fitGame();
 renderBoard();
 
 if (roomId) {
-
-    setConnection(
-        "CONNECTING...",
-        ""
-    );
-
-    waitingForServer =
-        true;
-
-    localMoveLock =
-        true;
-
-    statusText.textContent =
-        "CONNECTING TO GAME SERVER...";
-
     connectToServer();
+
 
 } else {
 
     mode =
         "NONE";
 
-    waitingForServer =
-        false;
-
-    localMoveLock =
-        false;
-
-    statusText.textContent =
+     statusText.textContent =
         "SELECT A GAME MODE";
 
     setConnection(
