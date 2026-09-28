@@ -343,8 +343,8 @@ function missilePosition(flight,progress){
   const p=progress,farX=500+lane*100;
   return {x:lerp(farX,500+lane*(flight.hit?120:170),p),y:lerp(245,flight.hit?585:425,p*p),scale:lerp(.1,1.3,p),angle:lane*18};
 }
-function drawMissile(pos){
-  ctx.save();ctx.translate(pos.x,pos.y);ctx.rotate(pos.angle*Math.PI/180);ctx.scale(pos.scale,pos.scale);
+function drawMissile(pos,incoming=false){
+  ctx.save();ctx.translate(pos.x,pos.y);ctx.rotate((pos.angle+(incoming?180:0))*Math.PI/180);ctx.scale(pos.scale,pos.scale);
   ctx.shadowColor="#fff6b0";ctx.shadowBlur=25;
   const body=ctx.createLinearGradient(-9,0,9,0);body.addColorStop(0,"#60757d");body.addColorStop(.5,"#f2f6ec");body.addColorStop(1,"#627c84");
   polygon([{x:0,y:-40},{x:9,y:-24},{x:9,y:30},{x:-9,y:30},{x:-9,y:-24}],body,"#19323b",2);
@@ -387,7 +387,7 @@ function render(time){
         vx:rand(-20,20),vy:rand(25,80),radius:rand(3,9)*Math.max(.3,pos.scale),life:rand(.35,.75),max:.75,
         color:i===0?"#ffad4d":"#d6e2e0"});
     }
-    drawMissile(pos);
+    drawMissile(pos,flight.kind==="in");
     if(progress>=1){activeFlight=null;flight.done();}
   }
   ctx.restore();
