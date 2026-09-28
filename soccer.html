@@ -30,14 +30,17 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:1000/560;border-radius:
 <body>
 <main class="game">
 <div class="top"><h1>SOCCER</h1><div class="score"><div class="you"><small>YOU</small><span id="homeScore">0</span></div><span>:</span><div class="cpu"><small>COMPUTER</small><span id="awayScore">0</span></div></div></div>
-<div class="controls"><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
+<div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
 <div class="status" id="status" role="status" aria-live="polite">Your kickoff. Take the ball upfield!</div>
 <div class="pitch-wrap"><canvas id="pitch" width="1000" height="560" aria-label="Soccer field, your blue team attacks to the right"></canvas></div>
 <div class="actions"><button id="pass">PASS</button><button id="shoot" class="shoot">SHOOT</button><button id="switch">SWITCH PLAYER</button></div>
-<p class="help">Blue attacks right. On PC, move the mouse to steer, left click to pass, right click to shoot. Click a teammate to select or pass to them. On touch, drag to move and use PASS / SHOOT. First to 3 wins.</p>
+<p class="help">Blue attacks right; red attacks left. Move the mouse to steer, left click to pass, right click to shoot. Tap and drag on touch. Each team has a goalie and two forwards. First to 3 wins.</p>
 </main>
 <script>
 "use strict";
+const params=new URLSearchParams(location.search),room=params.get("room")||"";
+const me=["2","player2","player 2","p2"].includes(String(params.get("player")||"").toLowerCase())?2:1;
+const online=Boolean(room),myTeam=me-1,clientId=crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
 const canvas=document.getElementById("pitch"),ctx=canvas.getContext("2d");
 const statusEl=document.getElementById("status");
 const homeEl=document.getElementById("homeScore"),awayEl=document.getElementById("awayScore");
@@ -45,7 +48,9 @@ const W=1000,H=560,L=34,R=966,T=34,B=526,goalTop=214,goalBottom=346;
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const roles=["GOALIE","FORWARD","FORWARD"];
-let players=[],ball={},selected=1,score=[0,0],pointer=null,dragging=false,frame=0,lastTime=0,freeze=0,matchOver=false,lastTouch=0,messageUntil=0;
+let players=[],ball={},selected=1,remoteSelected=1,remotePointer=null,remoteDragging=false;
+let score=[0,0],pointer=null,dragging=false,frame=0,lastTime=0,freeze=0,matchOver=false,lastTouch=0,messageUntil=0;
+let socket=null,socketOpen=false,reconnectTimer=null,lastSnapshot=0,lastInput=0;
 function announce(text,seconds=2){statusEl.textContent=text;messageUntil=performance.now()+seconds*1000;}
 function makePlayer(team,id,x,y){return {team,id,role:roles[id],x,y,r:19,stepX:x,stepY:y,hasBall:false,stealAt:0,actAt:0};}
 function kickoff(team=0){
@@ -53,13 +58,14 @@ function kickoff(team=0){
     makePlayer(0,0,108,280),makePlayer(0,1,340,218),makePlayer(0,2,290,390),
     makePlayer(1,0,892,280),makePlayer(1,1,670,218),makePlayer(1,2,710,390)
   ];
-  selected=1;
+  selected=1;remoteSelected=1;remotePointer=null;remoteDragging=false;
   const carrier=team===0?players[1]:players[4];
   carrier.hasBall=true;
   ball={x:carrier.x+(team===0?24:-24),y:carrier.y,vx:0,vy:0,owner:carrier,flight:false,from:team,kind:"",power:0,age:0};
   pointer=null;dragging=false;freeze=1.1;
 }
 function newGame(){
+  if(online&&me===2){send({type:"soccerNewGameRequest"});return;}
   score=[0,0];homeEl.textContent="0";awayEl.textContent="0";matchOver=false;
   kickoff(0);announce("Your kickoff. Drag a blue player to move upfield.",3);
 }
@@ -74,32 +80,33 @@ function releaseBall(p,vx,vy,kind){
   ball.x=p.x+(p.team===0?23:-23);ball.y=p.y;ball.vx=vx;ball.vy=vy;ball.age=0;
   p.actAt=frame+24;
 }
-function passTo(target){
+function passTo(target,team=0){
   const p=ball.owner;
-  if(!p||p.team!==0||freeze>0||matchOver||target===p)return;
+  if(!p||p.team!==team||target.team!==team||freeze>0||matchOver||target===p)return;
   const dx=target.x-p.x,dy=target.y-p.y,length=Math.hypot(dx,dy)||1;
   releaseBall(p,dx/length*510,dy/length*510,"pass");
-  selected=target.id;
-  announce("Pass to "+(target.role==="GOALIE"?"your goalie":"your forward")+"!",1.2);
+  if(team===0)selected=target.id;else remoteSelected=target.id;
+  announce("Pass!",1.2);
 }
-function pass(){
+function pass(team=0){
   const p=ball.owner;
-  if(!p||p.team!==0)return;
-  const mates=players.filter(q=>q.team===0&&q!==p);
-  const target=mates.sort((a,b)=>(b.x-p.x)*.35-distance(p,b)*.18-((a.x-p.x)*.35-distance(p,a)*.18))[0];
-  passTo(target);
+  if(!p||p.team!==team)return;
+  const mates=players.filter(q=>q.team===team&&q!==p);
+  const direction=team===0?1:-1;
+  const value=q=>(q.x-p.x)*direction*.35-distance(p,q)*.18;
+  passTo(mates.sort((a,b)=>value(b)-value(a))[0],team);
 }
-function shoot(){
+function shoot(team=0){
   const p=ball.owner;
-  if(!p||p.team!==0||freeze>0||matchOver)return;
+  if(!p||p.team!==team||freeze>0||matchOver)return;
   const aimY=clamp(p.y+(Math.random()-.5)*52,goalTop+22,goalBottom-22);
-  const dx=R-p.x,dy=aimY-p.y,length=Math.hypot(dx,dy)||1;
+  const dx=(team===0?R:L)-p.x,dy=aimY-p.y,length=Math.hypot(dx,dy)||1;
   releaseBall(p,dx/length*750,dy/length*750,"shot");
   announce("SHOT!",1.1);
 }
-function switchPlayer(){
-  selected=(selected+1)%3;
-  announce("Selected "+(current().role==="GOALIE"?"goalie":"forward "+selected)+".",1.3);
+function switchPlayer(team=0){
+  if(team===0)selected=(selected+1)%3;else remoteSelected=(remoteSelected+1)%3;
+  announce("Player selected.",1.2);
 }
 function moveTowards(p,x,y,speed,dt){
   const dx=x-p.x,dy=y-p.y,d=Math.hypot(dx,dy);
@@ -120,6 +127,16 @@ function controlTeam(dt){
       const y=p.id===1?clamp(ball.y-100,105,270):clamp(ball.y+100,290,460);
       moveTowards(p,x,y,85,dt);
     }
+  }
+}
+function onlineOpponent(dt){
+  const side=players.filter(p=>p.team===1),goalie=side[0],forwards=side.slice(1),active=side[remoteSelected];
+  if(remoteDragging&&remotePointer)moveTowards(active,remotePointer.x,remotePointer.y,270,dt);
+  if(goalie!==active)moveTowards(goalie,890,clamp(ball.y,goalTop-45,goalBottom+45),115,dt);
+  for(const p of forwards){
+    if(p===active||p.hasBall)continue;
+    if(ball.owner&&ball.owner.team===0)moveTowards(p,ball.owner.x,ball.owner.y,105,dt);
+    else moveTowards(p,p.id===1?660:710,p.id===1?190:370,80,dt);
   }
 }
 function computerTeam(dt){
@@ -160,10 +177,10 @@ function scoreGoal(team){
   score[team]++;homeEl.textContent=score[0];awayEl.textContent=score[1];
   if(score[team]>=3){
     matchOver=true;freeze=999;
-    announce(team===0?"YOU WIN 3 GOALS!":"COMPUTER WINS. TRY AGAIN!",999);
+    announce(team===0?"BLUE WINS 3 GOALS!":"RED WINS 3 GOALS!",999);
   }else{
     kickoff(1-team);
-    announce(team===0?"GOAL! You scored!":"GOAL! Computer scored.",2.5);
+    announce(team===0?"GOAL FOR BLUE!":"GOAL FOR RED!",2.5);
   }
 }
 function updateBall(dt){
@@ -184,8 +201,8 @@ function updateBall(dt){
     if(intercept&&frame>intercept.actAt){
       ball.owner=intercept;ball.flight=false;intercept.hasBall=true;ball.vx=0;ball.vy=0;
       lastTouch=intercept.team;
-      if(intercept.team===0){selected=intercept.id;announce("Your ball! Move, pass, or shoot.",1.5);}
-      else announce("Computer has the ball! Select a blue player to tackle.",1.5);
+      if(intercept.team===0){selected=intercept.id;announce("Blue has the ball!",1.5);}
+      else {if(online)remoteSelected=intercept.id;announce("Red has the ball!",1.5);}
     }
   }
   if(ball.age>5&&Math.hypot(ball.vx,ball.vy)<30){ball.vx=0;ball.vy=0;}
@@ -199,8 +216,8 @@ function tackles(){
       holder.hasBall=false;p.hasBall=true;ball.owner=p;
       p.stealAt=frame+90;holder.stealAt=frame+90;p.actAt=frame+45;
       ownerBallPosition();
-      if(p.team===0){selected=p.id;announce("Tackle! Your ball.",1.2);}
-      else announce("Computer steals the ball!",1.2);
+      if(p.team===0){selected=p.id;announce("Blue wins the ball!",1.2);}
+      else {if(online)remoteSelected=p.id;announce("Red wins the ball!",1.2);}
       break;
     }
   }
@@ -220,7 +237,7 @@ function drawPitch(){
   ctx.strokeRect(5,goalTop,29,goalBottom-goalTop);ctx.strokeRect(R,goalTop,29,goalBottom-goalTop);
   ctx.fillStyle="#ffffff21";ctx.fillRect(6,goalTop,28,goalBottom-goalTop);ctx.fillRect(R,goalTop,28,goalBottom-goalTop);
   ctx.fillStyle="#ffffffbd";ctx.font="bold 15px Arial";ctx.textAlign="center";
-  ctx.fillText("YOUR GOAL",112,55);ctx.fillText("ATTACK →",850,55);
+  ctx.fillText("BLUE GOAL",112,55);ctx.fillText("RED GOAL",850,55);
 }
 function drawPlayer(p){
   ctx.save();
@@ -229,7 +246,7 @@ function drawPlayer(p){
   ctx.fillStyle=p.team===0?"#1388ce":"#e5483d";ctx.fill();
   ctx.lineWidth=3;ctx.strokeStyle=p.team===0?"#b8edff":"#ffd0b9";ctx.stroke();
   ctx.restore();
-  if(p.team===0&&p.id===selected){
+  if(p.team===myTeam&&p.id===selected){
     ctx.beginPath();ctx.arc(p.x,p.y,p.r+7,0,Math.PI*2);
     ctx.strokeStyle="#ffe36c";ctx.lineWidth=4;ctx.stroke();
   }
@@ -241,6 +258,7 @@ function drawPlayer(p){
 }
 function draw(){
   drawPitch();
+  if(!players.length){ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 30px Arial";ctx.fillText("CONNECTING TO ROOM...",500,280);return;}
   for(const p of players)drawPlayer(p);
   ctx.save();ctx.shadowColor="#0009";ctx.shadowBlur=8;ctx.shadowOffsetY=3;
   ctx.beginPath();ctx.arc(ball.x,ball.y,11,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();
@@ -253,12 +271,15 @@ function draw(){
 }
 function tick(time){
   const dt=Math.min((time-lastTime)/1000||0,.045);lastTime=time;frame++;
-  if(freeze>0)freeze=Math.max(0,freeze-dt);
-  if(!matchOver&&freeze===0){
-    controlTeam(dt);computerTeam(dt);tackles();updateBall(dt);
-  }else if(ball.owner)ownerBallPosition();
-  if(time>messageUntil&&!matchOver&&freeze===0){
-    statusEl.textContent=ball.owner?.team===0?"Your ball: move, pass, or shoot.":ball.owner?.team===1?"Computer has the ball. Intercept it!":"Loose ball: chase it!";
+  if((!online||me===1)&&freeze>0)freeze=Math.max(0,freeze-dt);
+  if((!online||me===1)&&!matchOver&&freeze===0){
+    controlTeam(dt);
+    if(online)onlineOpponent(dt);else computerTeam(dt);
+    tackles();updateBall(dt);
+  }else if((!online||me===1)&&ball.owner)ownerBallPosition();
+  if(online&&me===1&&socketOpen&&time-lastSnapshot>100){sendSnapshot();lastSnapshot=time;}
+  if(time>messageUntil&&!matchOver&&freeze===0&&players.length){
+    statusEl.textContent=ball.owner?.team===myTeam?"Your ball: move, pass, or shoot.":ball.owner?"Opponent has the ball. Intercept it!":"Loose ball: chase it!";
   }
   draw();requestAnimationFrame(tick);
 }
@@ -266,48 +287,125 @@ function point(event){
   const r=canvas.getBoundingClientRect();
   return {x:clamp((event.clientX-r.left)*W/r.width,0,W),y:clamp((event.clientY-r.top)*H/r.height,0,H)};
 }
-canvas.addEventListener("pointerdown",event=>{
-  if(matchOver)return;
-  const pos=point(event),mate=players.filter(p=>p.team===0).find(p=>distance(p,pos)<p.r+13);
-  if(event.pointerType==="mouse"){
-    pointer=pos;dragging=true;
-    if(event.button===2){shoot();event.preventDefault();return;}
-    if(event.button!==0)return;
-    if(mate&&(!ball.owner||ball.owner.team!==0)){
-      selected=mate.id;
-    }else if(mate&&ball.owner&&mate!==ball.owner){
-      passTo(mate);
-    }else{
-      pass();
-    }
-    event.preventDefault();
+function send(message){
+  if(!online||!socketOpen||!socket||socket.readyState!==WebSocket.OPEN)return;
+  socket.send(JSON.stringify({game:"soccer",room,clientId,player:me,...message}));
+}
+function sendSnapshot(){
+  if(me!==1||!players.length)return;
+  const state={players,ball:{x:ball.x,y:ball.y,vx:ball.vx,vy:ball.vy,flight:ball.flight,
+    from:ball.from,kind:ball.kind,power:ball.power,age:ball.age,ownerIndex:players.indexOf(ball.owner)},
+    score,selected,remoteSelected,freeze,matchOver};
+  send({type:"soccerState",state});
+}
+function input(action,extra={}){
+  if(me===2){send({type:"soccerInput",action,...extra});return;}
+  if(action==="pass")pass();
+  if(action==="shoot")shoot();
+  if(action==="switch")switchPlayer();
+  if(action==="select")selected=extra.id;
+  if(action==="passTo")passTo(players.find(p=>p.team===0&&p.id===extra.id));
+}
+function receive(message){
+  if(!message||message.game!=="soccer"||String(message.room||"")!==room||
+      message.clientId===clientId||Number(message.player)===me)return;
+  if(me===1){
+    if(message.type==="soccerJoin"){sendSnapshot();return;}
+    if(message.type==="soccerNewGameRequest"){newGame();sendSnapshot();return;}
+    if(message.type!=="soccerInput")return;
+    const id=Number(message.id);
+    if(message.action==="move"&&Number.isFinite(message.x)&&Number.isFinite(message.y)){
+      remotePointer={x:clamp(message.x,L,R),y:clamp(message.y,T,B)};remoteDragging=true;
+    }else if(message.action==="stop"){remoteDragging=false;remotePointer=null;}
+    else if(message.action==="select"&&[0,1,2].includes(id))remoteSelected=id;
+    else if(message.action==="passTo"&&[0,1,2].includes(id))passTo(players[3+id],1);
+    else if(message.action==="pass")pass(1);
+    else if(message.action==="shoot")shoot(1);
+    else if(message.action==="switch")switchPlayer(1);
+    sendSnapshot();
     return;
   }
+  if(message.type!=="soccerState"||!message.state)return;
+  const state=message.state;
+  if(!Array.isArray(state.players)||state.players.length!==6||
+      !Array.isArray(state.score)||state.score.length!==2||!state.ball)return;
+  players=state.players;score=state.score;ball=state.ball;
+  ball.owner=players[ball.ownerIndex]||null;
+  selected=state.remoteSelected;freeze=state.freeze;matchOver=state.matchOver;
+  homeEl.textContent=score[0];awayEl.textContent=score[1];
+  statusEl.textContent=matchOver?(score[1]>score[0]?"YOU WIN!":"BLUE WINS. TRY AGAIN!"):
+    freeze>0?"KICKOFF":ball.owner?.team===1?"Your ball: move, pass, or shoot.":
+    ball.owner?"Blue has the ball. Intercept it!":"Loose ball: chase it!";
+  messageUntil=performance.now()+.3e3;
+}
+function connect(){
+  if(!online||socketOpen||(socket&&socket.readyState===WebSocket.CONNECTING))return;
+  socket=new WebSocket((location.protocol==="https:"?"wss:":"ws:")+"//"+location.host+"/checkers");
+  socket.addEventListener("open",()=>{socketOpen=true;send({type:"soccerJoin"});if(me===1)sendSnapshot();});
+  socket.addEventListener("message",event=>{try{receive(JSON.parse(event.data));}catch{}});
+  socket.addEventListener("close",()=>{
+    socketOpen=false;
+    if(!reconnectTimer)reconnectTimer=setTimeout(()=>{reconnectTimer=null;connect();},1500);
+  });
+  socket.addEventListener("error",()=>{socketOpen=false;});
+}
+canvas.addEventListener("pointerdown",event=>{
+  if(matchOver||!players.length)return;
+  const pos=point(event),mate=players.filter(p=>p.team===myTeam).find(p=>distance(p,pos)<p.r+13);
+  if(event.pointerType==="mouse"){
+    pointer=pos;dragging=true;
+    if(me===2)send({type:"soccerInput",action:"move",x:pos.x,y:pos.y});
+    if(event.button===2){input("shoot");event.preventDefault();return;}
+    if(event.button!==0)return;
+    if(mate&&(!ball.owner||ball.owner.team!==myTeam))input("select",{id:mate.id});
+    else if(mate&&ball.owner&&mate!==ball.owner)input("passTo",{id:mate.id});
+    else input("pass");
+    event.preventDefault();return;
+  }
   if(mate){
-    if(ball.owner&&ball.owner.team===0&&mate!==ball.owner&&freeze===0){passTo(mate);return;}
-    selected=mate.id;
-  }else if(ball.owner&&ball.owner.team===0&&pos.x>R-60&&pos.y>goalTop-35&&pos.y<goalBottom+35){
-    shoot();return;
+    if(ball.owner&&ball.owner.team===myTeam&&mate!==ball.owner&&freeze===0){
+      input("passTo",{id:mate.id});return;
+    }
+    input("select",{id:mate.id});
+  }else if(ball.owner&&ball.owner.team===myTeam&&
+           (myTeam===0?pos.x>R-60:pos.x<L+60)&&pos.y>goalTop-35&&pos.y<goalBottom+35){
+    input("shoot");return;
   }
   pointer=pos;dragging=true;
-  canvas.setPointerCapture(event.pointerId);
-  event.preventDefault();
+  if(me===2)send({type:"soccerInput",action:"move",x:pos.x,y:pos.y});
+  canvas.setPointerCapture(event.pointerId);event.preventDefault();
 });
 canvas.addEventListener("pointermove",event=>{
   if(event.pointerType==="mouse"&&!matchOver){pointer=point(event);dragging=true;}
   else if(dragging)pointer=point(event);
+  if(online&&me===2&&dragging&&pointer&&performance.now()-lastInput>50){
+    send({type:"soccerInput",action:"move",x:pointer.x,y:pointer.y});
+    lastInput=performance.now();
+  }
 });
 canvas.addEventListener("contextmenu",event=>event.preventDefault());
-function endPointer(){dragging=false;pointer=null;}
+function endPointer(){
+  dragging=false;pointer=null;
+  if(online&&me===2)send({type:"soccerInput",action:"stop"});
+}
 canvas.addEventListener("pointerup",event=>{if(event.pointerType!=="mouse")endPointer();});
 canvas.addEventListener("pointercancel",endPointer);
 canvas.addEventListener("pointerleave",event=>{if(event.pointerType==="mouse")endPointer();});
-document.getElementById("pass").addEventListener("click",pass);
-document.getElementById("shoot").addEventListener("click",shoot);
-document.getElementById("switch").addEventListener("click",switchPlayer);
+document.getElementById("pass").addEventListener("click",()=>input("pass"));
+document.getElementById("shoot").addEventListener("click",()=>input("shoot"));
+document.getElementById("switch").addEventListener("click",()=>input("switch"));
+document.getElementById("twoPlayer").addEventListener("click",()=>{if(socket)socket.close();location.href="rooms.html?game=soccer";});
+document.getElementById("computer").addEventListener("click",()=>{if(socket)socket.close();location.href="soccer.html";});
 document.getElementById("newGame").addEventListener("click",newGame);
-document.getElementById("menu").addEventListener("click",()=>{location.href="index.html";});
-newGame();requestAnimationFrame(tick);
+document.getElementById("menu").addEventListener("click",()=>{if(socket)socket.close();location.href="index.html";});
+if(online){
+  document.querySelector(".you small").textContent="BLUE";
+  document.querySelector(".cpu small").textContent="RED";
+  statusEl.textContent="Connecting to the room...";
+  if(me===1)newGame();
+  connect();
+}else newGame();
+requestAnimationFrame(tick);
 </script>
 </body>
 </html>
