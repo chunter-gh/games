@@ -343,6 +343,50 @@ body {
 .palm-coconuts span:nth-child(4) { left: 43px; top: 31px; }
 
 
+
+/* RADIATING SUN */
+.sun {
+    position: absolute;
+    z-index: 10;
+    right: clamp(24px, 7vw, 100px);
+    top: clamp(100px, 15vh, 165px);
+    width: clamp(64px, 10vw, 106px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fffbd0 0%, #ffe969 35%, #ffbd35 72%, #ec8520 100%);
+    box-shadow: 0 0 18px 9px rgba(255,202,67,.65), 0 0 62px 28px rgba(255,164,36,.22);
+    animation: sunPulse 3s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+.sun::before {
+    content: "";
+    position: absolute;
+    inset: -36%;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgba(255,216,87,.95) 0deg 8deg, transparent 9deg 24deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 48%, #000 53% 76%, transparent 82%);
+    mask: radial-gradient(circle, transparent 0 48%, #000 53% 76%, transparent 82%);
+    animation: sunRays 16s linear infinite;
+}
+.sun::after {
+    content: "";
+    position: absolute;
+    inset: -60%;
+    border-radius: 50%;
+    border: 2px solid rgba(255,206,71,.38);
+    box-shadow: 0 0 24px rgba(255,178,46,.35);
+    animation: sunCorona 3s ease-out infinite;
+}
+@keyframes sunPulse {
+    from { transform: scale(.97); box-shadow: 0 0 14px 6px rgba(255,202,67,.5), 0 0 45px 20px rgba(255,164,36,.16); }
+    to { transform: scale(1.05); box-shadow: 0 0 25px 14px rgba(255,202,67,.8), 0 0 80px 38px rgba(255,164,36,.28); }
+}
+@keyframes sunRays { to { transform: rotate(360deg); } }
+@keyframes sunCorona {
+    from { transform: scale(.75); opacity: .7; }
+    to { transform: scale(1.18); opacity: 0; }
+}
+
 /* GROUND */
 
 .ground {
@@ -1542,6 +1586,7 @@ body {
 <div class="game-room">
 
     <div class="glow"></div>
+    <div class="sun" aria-hidden="true"></div>
 
     <div class="title-area">
         <h1 class="title">GAME ROOM</h1>
