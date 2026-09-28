@@ -383,7 +383,7 @@ function render(time){
     const flight=activeFlight;flight.elapsed+=dt;
     const progress=Math.min(1,flight.elapsed/flight.duration),pos=missilePosition(flight,progress);
     if(progress<.96){
-      for(let i=0;i<3;i++)particles.push({x:pos.x+rand(-5,5),y:pos.y+pos.scale*42,
+      for(let i=0;i<3;i++)particles.push({x:pos.x+rand(-5,5),y:pos.y+(flight.kind==="in"?-1:1)*pos.scale*42,
         vx:rand(-20,20),vy:rand(25,80),radius:rand(3,9)*Math.max(.3,pos.scale),life:rand(.35,.75),max:.75,
         color:i===0?"#ffad4d":"#d6e2e0"});
     }
