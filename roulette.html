@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Game Room - Roulette</title>
+<title>Casino - Roulette</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;font-family:Georgia,"Times New Roman",serif;background:#100d0a;color:#f5e8c9}
@@ -75,7 +75,7 @@ h2{margin:10px 0;font-size:18px;color:#f4d58e;font-weight:normal;letter-spacing:
 </head>
 <body>
 <div class="app">
-<header><div><h1>ROULETTE</h1><p class="sub">THE GAME ROOM · AMERICAN DOUBLE-ZERO WHEEL</p></div><button id="menu">GAME ROOM</button></header>
+<header><div><h1>ROULETTE</h1><p class="sub">THE CASINO · AMERICAN DOUBLE-ZERO WHEEL</p></div><button id="menu">CASINO</button></header>
 <main>
 <section class="wheel-panel"><div class="wheel-frame"><canvas id="wheel" aria-label="American double-zero roulette wheel with spinning ball"></canvas></div><div class="result" id="result" role="status" aria-live="polite">Place your chips, then spin the wheel.</div><div class="actions"><button class="spin" id="spin">SPIN WHEEL</button><button id="clear">CLEAR BETS</button></div><p class="help">Play points only. Odds show profit: red, black, even, odd, and 1–18 or 19–36 pay 1:1; dozens and columns pay 2:1; corners pay 8:1; streets pay 11:1; splits pay 17:1; a single number pays 35:1. Winning bets also return the original chip.</p></section>
 <section class="bet-panel"><div class="balance"><span>POINTS <span id="balance">1,000</span></span><span>ON TABLE <span id="wager">0</span></span></div><h2>CHOOSE A CHIP</h2><div class="chips" id="chips"><button class="chip selected" data-value="5">5</button><button class="chip" data-value="10">10</button><button class="chip" data-value="25">25</button><button class="chip" data-value="100">100</button></div><h2>PLACE YOUR BETS</h2><div class="table-note">Select a chip. Tap a number, a shared line for two numbers, a crossing for four, or the edge above a column for three. Swipe sideways on a narrow screen.</div><div class="table-scroll"><div class="table-felt" id="table"><div class="zeros" id="zeros"></div><div class="number-area" id="numbers"></div><div class="column-bets" id="columnBets"><button data-kind="column3">2 to 1</button><button data-kind="column2">2 to 1</button><button data-kind="column1">2 to 1</button></div><div class="dozens" id="dozens"><button data-kind="dozen1">1st 12</button><button data-kind="dozen2">2nd 12</button><button data-kind="dozen3">3rd 12</button></div><div class="outside" id="betTypes"><button data-kind="low">1 to 18</button><button data-kind="even">EVEN</button><button class="red" data-kind="red" aria-label="RED"><span class="diamond" aria-hidden="true"></span><span class="sr-only">RED</span></button><button class="black" data-kind="black" aria-label="BLACK"><span class="diamond black-diamond" aria-hidden="true"></span><span class="sr-only">BLACK</span></button><button data-kind="odd">ODD</button><button data-kind="high">19 to 36</button></div></div></div><h2>ON THE TABLE</h2><div class="bet-list" id="betList">No bets placed.</div><h2>RECENT SPINS</h2><div class="history" id="history">No spins yet.</div></section>
@@ -365,7 +365,7 @@ el("clear").addEventListener("click",()=>{
   points+=bets.reduce((sum,b)=>sum+b.amount,0);bets=[];
   el("result").textContent="Bets cleared.";renderBets();
 });
-el("menu").addEventListener("click",()=>{location.href="index.html";});
+el("menu").addEventListener("click",()=>{location.href="casino.html";});
 const observer=new ResizeObserver(sizeCanvas);observer.observe(canvas.parentElement);sizeCanvas();
 renderBets();requestAnimationFrame(frame);
 </script>
