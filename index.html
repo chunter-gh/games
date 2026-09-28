@@ -432,7 +432,7 @@ body {
     bottom: calc(clamp(75px, 14vh, 115px) + clamp(68px, 10vw, 94px) - 15px);
     width: 1px;
     height: 1px;
-    --ant-finish-x: calc(-50vw + clamp(25px, 8vw, 105px) + clamp(56px, 7vw, 72px) / 2);
+    --ant-finish-x: calc(0px - clamp(58px, 9vw, 112px));
     pointer-events: none;
 }
 .ant {
@@ -444,7 +444,7 @@ body {
     border-radius: 50%;
     background: #ad2718;
     box-shadow: -5px 0 0 -1px #ad2718, 5px 0 0 1px #ad2718;
-    animation: antWalk 10s linear infinite;
+    animation: antWalk 6s linear infinite;
 }
 .ant::before {
     content: "";
@@ -456,15 +456,15 @@ body {
     background: linear-gradient(65deg, transparent 42%, #ad2718 43% 49%, transparent 50%),
                 linear-gradient(115deg, transparent 42%, #ad2718 43% 49%, transparent 50%);
 }
-.ant:nth-child(2) { animation-delay: -1s; }
-.ant:nth-child(3) { animation-delay: -2s; }
-.ant:nth-child(4) { animation-delay: -3s; }
-.ant:nth-child(5) { animation-delay: -4s; }
-.ant:nth-child(6) { animation-delay: -5s; }
-.ant:nth-child(7) { animation-delay: -6s; }
-.ant:nth-child(8) { animation-delay: -7s; }
-.ant:nth-child(9) { animation-delay: -8s; }
-.ant:nth-child(10) { animation-delay: -9s; }
+.ant:nth-child(2) { animation-delay: -0.28s; }
+.ant:nth-child(3) { animation-delay: -0.56s; }
+.ant:nth-child(4) { animation-delay: -0.84s; }
+.ant:nth-child(5) { animation-delay: -1.12s; }
+.ant:nth-child(6) { animation-delay: -1.40s; }
+.ant:nth-child(7) { animation-delay: -1.68s; }
+.ant:nth-child(8) { animation-delay: -1.96s; }
+.ant:nth-child(9) { animation-delay: -2.24s; }
+.ant:nth-child(10) { animation-delay: -2.52s; }
 @keyframes antWalk {
     0% { transform: translate(0, 0) scale(.7); opacity: 0; }
     6% { opacity: 1; }
