@@ -28,17 +28,21 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 .sign-post{fill:#35405a;stroke:#9babc2;stroke-width:3}
 .sign-panel{fill:#f9f5e8;stroke:#d6a84c;stroke-width:16;filter:url(#signShadow)}
 .sign-inner{fill:none;stroke:#4f8cbe;stroke-width:5}
-.sign-bulb{fill:#ffef9d;filter:url(#bulbGlow);animation:bulbChase 2.4s ease-in-out infinite}
-.sign-star{fill:#e92938;filter:drop-shadow(0 0 9px #ff3d46);animation:starPulse 3.2s ease-in-out infinite}
+.sign-bulb{fill:#fffbe2;filter:url(#bulbGlow) drop-shadow(0 0 9px #ffed91);animation:bulbChase 2.4s ease-in-out infinite}
+.sign-star{fill:#e92938;transform-origin:310px 94px;filter:drop-shadow(0 0 9px #ff3d46);animation:starTwinkle 1.8s ease-in-out infinite}
+.star-glint{fill:#fff8c6;stroke:#fff8c6;stroke-width:2;stroke-linecap:round;transform-origin:center;filter:drop-shadow(0 0 6px #fff);animation:glint 1.8s ease-in-out infinite}
+.star-glint.second{animation-delay:-.9s}
+.star-glint.third{animation-delay:-.45s}
 .sign-welcome circle{fill:#fff;stroke:#3392c5;stroke-width:2}
 .sign-welcome text{fill:#287faf;font:bold 27px Georgia,serif;text-anchor:middle;dominant-baseline:middle}
 .sign-script{fill:#da3039;font:italic 52px "Brush Script MT","Segoe Script",cursive;text-anchor:middle;paint-order:stroke;stroke:#fff4ed;stroke-width:1.5;animation:neonBreath 4s ease-in-out infinite}
 .sign-city{fill:#347cac;font:800 43px Georgia,serif;letter-spacing:5px;text-anchor:middle}
 .sign-state{fill:#347cac;font:800 17px Georgia,serif;letter-spacing:8px;text-anchor:middle}
-@keyframes bulbChase{0%,32%,100%{opacity:1}45%,70%{opacity:.34}}
-@keyframes starPulse{0%,100%{opacity:1}50%{opacity:.72}}
+@keyframes bulbChase{0%,32%,100%{opacity:1}45%,70%{opacity:.55}}
+@keyframes starTwinkle{0%,100%{opacity:.82;transform:scale(.95);filter:drop-shadow(0 0 5px #f43d46)}45%{opacity:1;transform:scale(1.08);filter:drop-shadow(0 0 19px #ff5364)}53%{opacity:.66;transform:scale(.96)}62%{opacity:1;transform:scale(1.06);filter:drop-shadow(0 0 23px #fff0a2)}}
+@keyframes glint{0%,25%,75%,100%{opacity:0;transform:scale(.25)}39%,52%{opacity:1;transform:scale(1.25)}60%{opacity:0;transform:scale(.3)}}
 @keyframes neonBreath{0%,100%{filter:drop-shadow(0 0 7px #f94952)}50%{filter:drop-shadow(0 0 16px #ff4554)}}
-@media(prefers-reduced-motion:reduce){.sign-bulb,.sign-star,.sign-script{animation:none}}
+@media(prefers-reduced-motion:reduce){.sign-bulb,.sign-star,.sign-script,.star-glint{animation:none}.star-glint{opacity:.7}}
 @media(max-width:450px){.game-button{min-height:70px;padding:0 18px}.icon{width:43px;font-size:31px}}
 </style>
 </head>
@@ -51,7 +55,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
       <title id="signTitle">Animated Welcome to Fabulous Las Vegas Nevada sign</title>
       <defs>
         <filter id="signShadow" x="-25%" y="-30%" width="150%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#03020b" flood-opacity=".8"/></filter>
-        <filter id="bulbGlow" x="-250%" y="-250%" width="600%" height="600%"><feGaussianBlur stdDeviation="3" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="bulbGlow" x="-250%" y="-250%" width="600%" height="600%"><feGaussianBlur stdDeviation="5" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
       <path class="sign-post" d="M176 324h18v65h-18zM423 324h18v65h-18z"/>
       <path class="sign-panel" d="M79 146 H541 L582 302 Q585 318 567 327 H53 Q35 318 38 302 Z"/>
@@ -59,6 +63,9 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
       <path id="bulbTrack" d="M79 146 H541 L582 302 Q585 318 567 327 H53 Q35 318 38 302 Z" fill="none" stroke="none"/>
       <g id="signBulbs" aria-hidden="true"></g>
       <path class="sign-star" d="M310 14 L322 79 L370 40 L335 91 L394 94 L335 105 L368 152 L322 117 L310 174 L299 117 L253 152 L286 105 L227 94 L286 91 L251 40 L299 79 Z"/>
+      <path class="star-glint" d="M310 41v25m-12-13h24"/>
+      <path class="star-glint second" d="M353 79v16m-8-8h16"/>
+      <path class="star-glint third" d="M273 99v14m-7-7h14"/>
       <g class="sign-welcome">
         <circle cx="124" cy="190" r="24"/><circle cx="186" cy="190" r="24"/><circle cx="248" cy="190" r="24"/><circle cx="310" cy="190" r="24"/><circle cx="372" cy="190" r="24"/><circle cx="434" cy="190" r="24"/><circle cx="496" cy="190" r="24"/>
         <text x="124" y="191">W</text><text x="186" y="191">E</text><text x="248" y="191">L</text><text x="310" y="191">C</text><text x="372" y="191">O</text><text x="434" y="191">M</text><text x="496" y="191">E</text>
@@ -83,7 +90,7 @@ for(let i=0;i<76;i++){
   bulb.setAttribute("class","sign-bulb");
   bulb.setAttribute("cx",point.x.toFixed(1));
   bulb.setAttribute("cy",point.y.toFixed(1));
-  bulb.setAttribute("r","4.6");
+  bulb.setAttribute("r","6.2");
   bulb.style.animationDelay=(i%12)*-.2+"s";
   bulbs.appendChild(bulb);
 }
