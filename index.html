@@ -395,10 +395,10 @@ body {
 .african-violet {
     position: absolute;
     z-index: 23;
-    right: clamp(48px, 11vw, 150px);
+    right: clamp(65px, 14.5vw, 185px);
     bottom: calc(clamp(75px, 14vh, 115px) - 8px);
-    width: clamp(100px, 13vw, 155px);
-    height: clamp(145px, 27vh, 245px);
+    width: clamp(50px, 6.5vw, 78px);
+    height: clamp(72px, 13.5vh, 123px);
     transform-origin: 50% 100%;
     animation: violetSway 4.8s ease-in-out infinite alternate;
     pointer-events: none;
@@ -448,7 +448,7 @@ body {
     z-index: 60;
 
     bottom: clamp(35px, 6vh, 45px);
-    left: -230px;
+    left: -310px;
     width: 210px;
     height: 250px;
     animation:
@@ -457,11 +457,11 @@ body {
 
 @keyframes giraffeWalk {
     0% {
-        left: -230px;
+        left: -310px;
     }
 
     100% {
-        left: calc(100% + 30px);
+        left: calc(100% + 90px);
     }
 }
 
@@ -469,17 +469,18 @@ body {
     position: relative;
     width: 210px;
     height: 250px;
+    transform-origin: center bottom;
     animation:
         bodyBounce .42s ease-in-out infinite alternate;
 }
 
 @keyframes bodyBounce {
     from {
-        transform: translateY(1px);
+        transform: translateY(1px) scale(1.75);
     }
 
     to {
-        transform: translateY(-4px);
+        transform: translateY(-4px) scale(1.75);
     }
 }
 
