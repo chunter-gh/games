@@ -13,7 +13,8 @@ h1{margin:0;font-size:clamp(20px,4vw,38px);letter-spacing:.08em;color:#d9f7ff;te
 .score{display:flex;align-items:center;gap:clamp(9px,3vw,22px);font-size:clamp(23px,4vw,40px);font-weight:900}
 .score .blue{color:#68d7ff}.score .red{color:#ff9688}.score small{display:block;text-align:center;font-size:10px;letter-spacing:.08em;color:#b7d2d9}
 .controls{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
-button{font:inherit;cursor:pointer;border:1px solid #75c5d6;border-radius:7px;padding:8px 11px;color:white;background:linear-gradient(#275f76,#10394e);font-size:clamp(10px,1.8vw,13px);font-weight:800}
+button,select{font:inherit;cursor:pointer;border:1px solid #75c5d6;border-radius:7px;padding:8px 11px;color:white;background:linear-gradient(#275f76,#10394e);font-size:clamp(10px,1.8vw,13px);font-weight:800}
+#difficulty{border:1px solid #75c5d6;border-radius:7px;padding:8px;color:white;background:#164457;font-weight:800;font-size:clamp(10px,1.8vw,13px)}
 button.active{border-color:#ffe08a;background:#4a634c}
 button:focus-visible{outline:3px solid #ffe08a;outline-offset:2px}
 .status{min-height:26px;display:grid;place-items:center;text-align:center;font-size:clamp(12px,2vw,17px);font-weight:bold;color:#ffe3a0}
@@ -25,7 +26,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 </head>
 <body>
 <main class="app">
-<header><h1>AIR HOCKEY</h1><div class="score"><div class="blue"><small id="blueLabel">YOU</small><span id="blueScore">0</span></div><span>:</span><div class="red"><small id="redLabel">COMPUTER</small><span id="redScore">0</span></div></div><div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div></header>
+<header><h1>AIR HOCKEY</h1><div class="score"><div class="blue"><small id="blueLabel">YOU</small><span id="blueScore">0</span></div><span>:</span><div class="red"><small id="redLabel">COMPUTER</small><span id="redScore">0</span></div></div><div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><select id="difficulty" aria-label="Computer difficulty"><option value="easy" selected>EASY</option><option value="medium">MEDIUM</option><option value="hard">HARD</option></select><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div></header>
 <div class="status" id="status" role="status" aria-live="polite">Move your mallet to strike the puck.</div>
 <div class="arena" id="arena"><canvas id="rink" aria-label="Air hockey rink. Blue defends left, red defends right."></canvas></div>
 <p class="hint">Move the mouse to steer your mallet; left click for a power strike. On touch, drag your mallet and tap STRIKE. First to 7 goals wins.</p>
@@ -39,7 +40,9 @@ const online=Boolean(room),mine=me-1,clientId=crypto.randomUUID?crypto.randomUUI
 const el=id=>document.getElementById(id),canvas=el("rink"),ctx=canvas.getContext("2d");
 let W=800,H=500,r=28,puckR=12,goalHalf=85,players=[],puck={},score=[0,0],paused=0,over=false;
 let target=[null,null],mouseInside=false,last=0,socket=null,socketOpen=false,reconnectTimer=null,lastSend=0,lastInput=0,audio=null;
-let ready=false,messageAt=0,cpuStrikeCooldown=0;
+let ready=false,messageAt=0,cpuStrikeCooldown=0,cpuDecisionTimer=0;
+const CPU_LEVELS={easy:{reaction:.32,speed:.62,power:.64,cooldown:1.05,collision:.55},medium:{reaction:.14,speed:.88,power:.82,cooldown:.7,collision:.78},hard:{reaction:.04,speed:1.18,power:1.08,cooldown:.4,collision:1.05}};
+function difficulty(){return CPU_LEVELS[el("difficulty").value]||CPU_LEVELS.easy;}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function status(text,seconds=1.8){el("status").textContent=text;messageAt=performance.now()+seconds*1000;}
 function audioReady(){try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();}catch{}}
@@ -67,7 +70,7 @@ function resetPuck(toward=0){
 }
 function newGame(){
   if(online&&me===2){send({type:"hockeyNewGameRequest"});return;}
-  score=[0,0];over=false;cpuStrikeCooldown=0;players=[{x:W*.17,y:H/2,vx:0,vy:0},{x:W*.83,y:H/2,vx:0,vy:0}];
+  score=[0,0];over=false;cpuStrikeCooldown=0;cpuDecisionTimer=0;players=[{x:W*.17,y:H/2,vx:0,vy:0},{x:W*.83,y:H/2,vx:0,vy:0}];
   resetPuck(0);ready=true;
   el("blueScore").textContent="0";el("redScore").textContent="0";
   status("Face-off! Blue defends left; red defends right.",2.2);
@@ -80,42 +83,46 @@ function scoreGoal(team){
   else {resetPuck(1-team);status((team===mine?"GOAL!":"Opponent scores.")+" Face-off!",2);}
   snapshot();
 }
-function steer(p,at,team,dt){
+function steer(p,at,team,dt,speedFactor=1){
   if(!at)return;
   const minX=team===0?r+8:W/2+r+6,maxX=team===0?W/2-r-6:W-r-8;
   const x=clamp(at.x,minX,maxX),y=clamp(at.y,r+8,H-r-8);
-  const dx=x-p.x,dy=y-p.y,dist=Math.hypot(dx,dy),step=Math.min(dist,Math.min(W,H)*2.8*dt);
+  const dx=x-p.x,dy=y-p.y,dist=Math.hypot(dx,dy),step=Math.min(dist,Math.min(W,H)*2.8*dt*speedFactor);
   const oldX=p.x,oldY=p.y;
   if(dist>0){p.x+=dx/dist*step;p.y+=dy/dist*step;}
   p.vx=dt?(p.x-oldX)/dt:0;p.vy=dt?(p.y-oldY)/dt:0;
 }
-function strike(team){
+function strike(team,power=1){
   if(!ready||over||paused>0)return;
   const p=players[team],dx=puck.x-p.x,dy=puck.y-p.y,d=Math.hypot(dx,dy);
   if(d>r+puckR+Math.min(W,H)*.12)return;
   const dir=team===0?1:-1;
-  puck.vx=dir*Math.min(W*1.35,Math.max(W*.85,Math.abs(puck.vx)+W*.3));
-  puck.vy=clamp(dy/Math.max(1,d)*H*.7,-H*.8,H*.8);
+  puck.vx=dir*Math.min(W*1.35,Math.max(W*.85,Math.abs(puck.vx)+W*.3))*power;
+  puck.vy=clamp(dy/Math.max(1,d)*H*.7,-H*.8,H*.8)*power;
   puck.x=p.x+dir*(r+puckR+2);ping(330,.15,.18);
 }
 function physics(dt){
   if(paused>0){paused=Math.max(0,paused-dt);return;}
   if(over)return;
-  const cpu=players[1];
+  const cpu=players[1],level=difficulty();
   cpuStrikeCooldown=Math.max(0,cpuStrikeCooldown-dt);
   if(!online){
-    // Approach from the right, behind the puck, before striking left.
-    const chase=puck.x>W*.48;
-    target[1]={
-      x:chase?clamp(puck.x+r+puckR+16,W*.56,W-r-8):W*.81,
-      y:clamp(puck.y+puck.vy*.045,r+8,H-r-8)
-    };
+    cpuDecisionTimer-=dt;
+    if(cpuDecisionTimer<=0){
+      // Defend near the right edge. Only approach when the puck reaches us.
+      const chase=puck.x>W*.70;
+      target[1]={
+        x:chase?clamp(puck.x+r+puckR+12,W*.74,W-r-8):W*.87,
+        y:clamp(puck.y+puck.vy*level.reaction*.15,r+8,H-r-8)
+      };
+      cpuDecisionTimer=level.reaction;
+    }
   }
-  players.forEach((p,i)=>steer(p,target[i],i,dt));
-  if(!online&&cpuStrikeCooldown===0&&puck.x>W*.48&&
-     cpu.x>puck.x+r*.35&&Math.hypot(cpu.x-puck.x,cpu.y-puck.y)<r+puckR+22){
-    strike(1);
-    cpuStrikeCooldown=.55;
+  players.forEach((p,i)=>steer(p,target[i],i,dt,!online&&i===1?level.speed:1));
+  if(!online&&cpuStrikeCooldown===0&&puck.x>W*.70&&
+     cpu.x>puck.x+r*.35&&Math.hypot(cpu.x-puck.x,cpu.y-puck.y)<r+puckR+20){
+    strike(1,level.power);
+    cpuStrikeCooldown=level.cooldown;
   }
   const speed=Math.hypot(puck.vx,puck.vy),steps=Math.max(1,Math.ceil(speed*dt/Math.max(4,puckR)));
   const step=dt/steps;
@@ -135,8 +142,9 @@ function physics(dt){
         const nx=dx/d,ny=dy/d,relative=(puck.vx-p.vx)*nx+(puck.vy-p.vy)*ny;
         puck.x=p.x+nx*(touch+1);puck.y=p.y+ny*(touch+1);
         if(relative<0){
-          puck.vx+=(Math.max(0,-relative)*1.65+Math.min(W,H)*.12)*nx+p.vx*.27;
-          puck.vy+=(Math.max(0,-relative)*1.65+Math.min(W,H)*.12)*ny+p.vy*.27;
+          const strength=!online&&p===cpu?level.collision:1;
+          puck.vx+=((Math.max(0,-relative)*1.65+Math.min(W,H)*.12)*nx+p.vx*.27)*strength;
+          puck.vy+=((Math.max(0,-relative)*1.65+Math.min(W,H)*.12)*ny+p.vy*.27)*strength;
           const v=Math.hypot(puck.vx,puck.vy),cap=Math.min(W,H)*2.15;
           if(v>cap){puck.vx*=cap/v;puck.vy*=cap/v;}
           ping(260+Math.min(350,v*.15),.055,.08);
@@ -244,6 +252,7 @@ el("computer").addEventListener("click",()=>{if(socket)socket.close();location.h
 el("newGame").addEventListener("click",newGame);
 el("menu").addEventListener("click",()=>{if(socket)socket.close();location.href="index.html";});
 el("twoPlayer").classList.toggle("active",online);el("computer").classList.toggle("active",!online);
+el("difficulty").disabled=online;
 if(online){el("blueLabel").textContent="BLUE";el("redLabel").textContent="RED";if(me===2)el("strike").hidden=false;}
 else el("strike").hidden=false;
 const observer=new ResizeObserver(resize);observer.observe(el("arena"));resize();
