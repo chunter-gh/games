@@ -1189,10 +1189,12 @@ function handleServerMessage(
 
 
             gameTitle.textContent =
+                GAME_NAMES[normalizeGame(message.game || requestedGame)] ||
                 message.gameName ||
                 initialGameName;
 
             lobbyGameName.textContent =
+                GAME_NAMES[normalizeGame(message.game || requestedGame)] ||
                 message.gameName ||
                 initialGameName;
 
@@ -1250,6 +1252,7 @@ function handleServerMessage(
 
 
             inviteGame.textContent =
+                GAME_NAMES[normalizeGame(message.game || requestedGame)] ||
                 message.gameName ||
                 initialGameName;
 
