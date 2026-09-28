@@ -7,13 +7,13 @@
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;font-family:Arial,sans-serif}
-body{color:white;background:radial-gradient(circle at 50% 15%,#244b72 0%,#10243c 45%,#06101d 100%)}
+body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f 48%,#080914 100%)}
 .casino-room{position:relative;min-height:100dvh;overflow:hidden;display:flex;flex-direction:column;align-items:center}
 .glow{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);left:50%;top:-130px;transform:translateX(-50%);pointer-events:none}
 .title-area{position:relative;z-index:1;text-align:center;padding-top:clamp(24px,5vh,55px)}
 .title{margin:0;font-size:clamp(34px,8vw,62px);font-weight:900;letter-spacing:4px;text-shadow:0 3px 0 #14283e,0 6px 12px rgba(0,0,0,.8),0 0 20px rgba(120,200,255,.45)}
 .subtitle{margin-top:5px;font-size:clamp(10px,1.7vw,13px);letter-spacing:5px;color:#b9d7ee}
-.menu{position:relative;z-index:1;width:min(82vw,370px);margin:auto;display:flex;flex-direction:column;gap:12px;padding:20px 6px}
+.menu{position:relative;z-index:1;width:min(82vw,370px);margin:clamp(10px,2vh,24px) auto auto;display:flex;flex-direction:column;gap:12px;padding:20px 6px}
 .game-button{width:100%;min-height:82px;border:1px solid rgba(255,255,255,.35);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 45%,rgba(0,0,0,.18)),linear-gradient(135deg,#28699e,#123557);box-shadow:inset 0 2px 2px rgba(255,255,255,.35),inset 0 -7px 12px rgba(0,0,0,.25),0 10px 20px rgba(0,0,0,.45);color:white;cursor:pointer;display:flex;align-items:center;padding:0 25px;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
 .game-button:active{transform:scale(.96);box-shadow:inset 0 5px 12px rgba(0,0,0,.35),0 4px 8px rgba(0,0,0,.4)}
 .game-button:focus-visible,.back:focus-visible{outline:3px solid #f8d78e;outline-offset:4px}
@@ -23,6 +23,22 @@ body{color:white;background:radial-gradient(circle at 50% 15%,#244b72 0%,#10243c
 .button-subtitle{margin-top:3px;font-size:12px;color:#c9e5fa}
 .back{position:relative;z-index:1;margin:0 0 clamp(20px,5vh,48px);padding:11px 18px;border:1px solid #8bb6d0;border-radius:12px;color:#d7eafa;text-decoration:none;font-size:13px;font-weight:bold;letter-spacing:.08em;background:#0c253cbd}
 .back:hover{background:#244b72}
+.sign-stage{position:relative;z-index:1;width:min(84vw,570px);margin-top:clamp(8px,2vh,20px);filter:drop-shadow(0 10px 22px #000b)}
+.vegas-sign{display:block;width:100%;max-height:34vh;min-height:145px;overflow:visible}
+.sign-post{fill:#35405a;stroke:#9babc2;stroke-width:3}
+.sign-panel{fill:#f9f5e8;stroke:#d6a84c;stroke-width:16;filter:url(#signShadow)}
+.sign-inner{fill:none;stroke:#4f8cbe;stroke-width:5}
+.sign-bulb{fill:#ffef9d;filter:url(#bulbGlow);animation:bulbChase 2.4s ease-in-out infinite}
+.sign-star{fill:#e92938;filter:drop-shadow(0 0 9px #ff3d46);animation:starPulse 3.2s ease-in-out infinite}
+.sign-welcome circle{fill:#fff;stroke:#3392c5;stroke-width:2}
+.sign-welcome text{fill:#287faf;font:bold 27px Georgia,serif;text-anchor:middle;dominant-baseline:middle}
+.sign-script{fill:#da3039;font:italic 52px "Brush Script MT","Segoe Script",cursive;text-anchor:middle;paint-order:stroke;stroke:#fff4ed;stroke-width:1.5;animation:neonBreath 4s ease-in-out infinite}
+.sign-city{fill:#347cac;font:800 43px Georgia,serif;letter-spacing:5px;text-anchor:middle}
+.sign-state{fill:#347cac;font:800 17px Georgia,serif;letter-spacing:8px;text-anchor:middle}
+@keyframes bulbChase{0%,32%,100%{opacity:1}45%,70%{opacity:.34}}
+@keyframes starPulse{0%,100%{opacity:1}50%{opacity:.72}}
+@keyframes neonBreath{0%,100%{filter:drop-shadow(0 0 7px #f94952)}50%{filter:drop-shadow(0 0 16px #ff4554)}}
+@media(prefers-reduced-motion:reduce){.sign-bulb,.sign-star,.sign-script{animation:none}}
 @media(max-width:450px){.game-button{min-height:70px;padding:0 18px}.icon{width:43px;font-size:31px}}
 </style>
 </head>
@@ -30,10 +46,47 @@ body{color:white;background:radial-gradient(circle at 50% 15%,#244b72 0%,#10243c
 <div class="casino-room">
   <div class="glow" aria-hidden="true"></div>
   <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
+  <div class="sign-stage">
+    <svg class="vegas-sign" viewBox="0 0 620 390" role="img" aria-labelledby="signTitle">
+      <title id="signTitle">Animated Welcome to Fabulous Las Vegas Nevada sign</title>
+      <defs>
+        <filter id="signShadow" x="-25%" y="-30%" width="150%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#03020b" flood-opacity=".8"/></filter>
+        <filter id="bulbGlow" x="-250%" y="-250%" width="600%" height="600%"><feGaussianBlur stdDeviation="3" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path class="sign-post" d="M176 324h18v65h-18zM423 324h18v65h-18z"/>
+      <path class="sign-panel" d="M79 146 H541 L582 302 Q585 318 567 327 H53 Q35 318 38 302 Z"/>
+      <path class="sign-inner" d="M82 151 H538 L576 302 Q579 312 565 320 H55 Q41 312 44 302 Z"/>
+      <path id="bulbTrack" d="M79 146 H541 L582 302 Q585 318 567 327 H53 Q35 318 38 302 Z" fill="none" stroke="none"/>
+      <g id="signBulbs" aria-hidden="true"></g>
+      <path class="sign-star" d="M310 14 L322 79 L370 40 L335 91 L394 94 L335 105 L368 152 L322 117 L310 174 L299 117 L253 152 L286 105 L227 94 L286 91 L251 40 L299 79 Z"/>
+      <g class="sign-welcome">
+        <circle cx="124" cy="190" r="24"/><circle cx="186" cy="190" r="24"/><circle cx="248" cy="190" r="24"/><circle cx="310" cy="190" r="24"/><circle cx="372" cy="190" r="24"/><circle cx="434" cy="190" r="24"/><circle cx="496" cy="190" r="24"/>
+        <text x="124" y="191">W</text><text x="186" y="191">E</text><text x="248" y="191">L</text><text x="310" y="191">C</text><text x="372" y="191">O</text><text x="434" y="191">M</text><text x="496" y="191">E</text>
+      </g>
+      <text class="sign-script" x="310" y="248">Fabulous</text>
+      <text class="sign-city" x="310" y="291">LAS VEGAS</text>
+      <text class="sign-state" x="310" y="315">NEVADA</text>
+    </svg>
+  </div>
   <nav class="menu" aria-label="Casino games">
     <a class="game-button" href="roulette.html"><span class="icon" aria-hidden="true">🎰</span><span class="button-text"><span class="button-title">ROULETTE</span><span class="button-subtitle">Place • Spin • Win</span></span></a>
   </nav>
   <a class="back" href="index.html">← GAME ROOM</a>
 </div>
+<script>
+const track=document.getElementById("bulbTrack");
+const bulbs=document.getElementById("signBulbs");
+const length=track.getTotalLength();
+for(let i=0;i<76;i++){
+  const point=track.getPointAtLength(length*i/76);
+  const bulb=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  bulb.setAttribute("class","sign-bulb");
+  bulb.setAttribute("cx",point.x.toFixed(1));
+  bulb.setAttribute("cy",point.y.toFixed(1));
+  bulb.setAttribute("r","4.6");
+  bulb.style.animationDelay=(i%12)*-.2+"s";
+  bulbs.appendChild(bulb);
+}
+</script>
 </body>
 </html>
