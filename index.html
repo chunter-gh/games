@@ -391,50 +391,47 @@ body {
 }
 
 
-/* ANTHILL */
+/* ANTHILL AND ANT CONVOY */
 .anthill {
     position: absolute;
     z-index: 22;
     right: clamp(25px, 8vw, 105px);
     bottom: clamp(12px, 2.5vh, 24px);
-    width: clamp(52px, 8vw, 82px);
-    height: clamp(26px, 4vw, 43px);
-    border-radius: 60% 60% 12% 12%;
-    background: radial-gradient(ellipse at 35% 28%, #c58b4e, #956034 60%, #664024 100%);
-    border-bottom: 3px solid #50331f;
-    box-shadow: inset -9px -5px 9px rgba(65,33,14,.3), 4px 4px 7px rgba(0,0,0,.35);
+    width: clamp(72px, 10vw, 100px);
+    height: clamp(50px, 7vw, 72px);
+    border-radius: 48% 48% 8% 8% / 78% 78% 8% 8%;
+    background: radial-gradient(ellipse at 35% 30%, #d0a064, #a16a39 56%, #694123 100%);
+    box-shadow: inset -12px -8px 11px rgba(64,34,17,.35), 4px 5px 7px rgba(0,0,0,.35);
     pointer-events: none;
 }
 .anthill::before {
     content: "";
     position: absolute;
-    left: 40%;
-    top: 42%;
-    width: 22%;
-    height: 25%;
-    border-radius: 50%;
-    background: #342218;
-    box-shadow: inset 2px 2px 3px rgba(0,0,0,.6);
+    left: 39%;
+    bottom: 6px;
+    width: 25%;
+    height: 20%;
+    border-radius: 50% 50% 35% 35%;
+    background: #2b1b12;
+    box-shadow: inset 2px 2px 3px #110c09, 0 0 0 2px rgba(89,52,27,.7);
 }
 .anthill::after {
     content: "";
     position: absolute;
-    left: -12%;
-    bottom: -2px;
-    width: 124%;
-    height: 5px;
+    left: -9%;
+    bottom: -3px;
+    width: 118%;
+    height: 7px;
     border-radius: 50%;
-    background: #59402a;
+    background: #62432a;
 }
-
-
 .ant-trail {
     position: absolute;
     z-index: 23;
-    right: calc(clamp(25px, 8vw, 105px) + clamp(52px, 8vw, 82px) - 8px);
+    right: calc(clamp(25px, 8vw, 105px) + clamp(72px, 10vw, 100px) / 2);
     bottom: clamp(12px, 2.5vh, 24px);
-    width: 76px;
-    height: 38px;
+    width: 95px;
+    height: 36px;
     pointer-events: none;
 }
 .ant {
@@ -446,7 +443,7 @@ body {
     border-radius: 50%;
     background: #ad2718;
     box-shadow: -5px 0 0 -1px #ad2718, 5px 0 0 1px #ad2718;
-    animation: antWalk 6s ease-in-out infinite alternate;
+    animation: antWalk 8s linear infinite;
 }
 .ant::before {
     content: "";
@@ -458,14 +455,18 @@ body {
     background: linear-gradient(65deg, transparent 42%, #ad2718 43% 49%, transparent 50%),
                 linear-gradient(115deg, transparent 42%, #ad2718 43% 49%, transparent 50%);
 }
-.ant:nth-child(2) { animation-delay: -2.3s; animation-direction: alternate-reverse; }
-.ant:nth-child(3) { animation-delay: -4.6s; }
+.ant:nth-child(2) { animation-delay: -1s; }
+.ant:nth-child(3) { animation-delay: -2s; }
+.ant:nth-child(4) { animation-delay: -3s; }
+.ant:nth-child(5) { animation-delay: -4s; }
+.ant:nth-child(6) { animation-delay: -5s; }
+.ant:nth-child(7) { animation-delay: -6s; }
+.ant:nth-child(8) { animation-delay: -7s; }
 @keyframes antWalk {
-    0% { transform: translate(0, -12px) scale(.65); opacity: 0; }
-    12% { opacity: 1; }
-    50% { transform: translate(-33px, 1px) scale(1); }
-    88% { opacity: 1; }
-    100% { transform: translate(-65px, 17px) scale(1.35); opacity: 0; }
+    0% { transform: translate(0, -12px) scale(.7); opacity: 0; }
+    8% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translate(-82px, 18px) scale(1.25); opacity: 0; }
 }
 
 /* GROUND */
@@ -1816,7 +1817,7 @@ body {
 
     <div class="ground"></div>
     <div class="anthill" aria-hidden="true"></div>
-    <div class="ant-trail" aria-hidden="true"><span class="ant"></span><span class="ant"></span><span class="ant"></span></div>
+    <div class="ant-trail" aria-hidden="true"><span class="ant"></span><span class="ant"></span><span class="ant"></span><span class="ant"></span><span class="ant"></span><span class="ant"></span><span class="ant"></span><span class="ant"></span></div>
 
 
 
