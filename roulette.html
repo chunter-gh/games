@@ -48,22 +48,22 @@ h2{margin:10px 0;font-size:18px;color:#f4d58e;font-weight:normal;letter-spacing:
 </head>
 <body>
 <div class="app">
-<header><div><h1>ROULETTE</h1><p class="sub">THE GAME ROOM · EUROPEAN WHEEL</p></div><button id="menu">GAME ROOM</button></header>
+<header><div><h1>ROULETTE</h1><p class="sub">THE GAME ROOM · AMERICAN DOUBLE-ZERO WHEEL</p></div><button id="menu">GAME ROOM</button></header>
 <main>
-<section class="wheel-panel"><div class="wheel-frame"><canvas id="wheel" aria-label="European roulette wheel with spinning ball"></canvas></div><div class="result" id="result" role="status" aria-live="polite">Place your chips, then spin the wheel.</div><div class="actions"><button class="spin" id="spin">SPIN WHEEL</button><button id="clear">CLEAR BETS</button></div><p class="help">Play points only. Red or black and other even bets pay 1:1; a single number pays 35:1.</p></section>
+<section class="wheel-panel"><div class="wheel-frame"><canvas id="wheel" aria-label="American double-zero roulette wheel with spinning ball"></canvas></div><div class="result" id="result" role="status" aria-live="polite">Place your chips, then spin the wheel.</div><div class="actions"><button class="spin" id="spin">SPIN WHEEL</button><button id="clear">CLEAR BETS</button></div><p class="help">Play points only. Red or black and other even bets pay 1:1; a single number pays 35:1.</p></section>
 <section class="bet-panel"><div class="balance"><span>POINTS <span id="balance">1,000</span></span><span>ON TABLE <span id="wager">0</span></span></div><h2>CHOOSE A CHIP</h2><div class="chips" id="chips"><button class="chip selected" data-value="5">5</button><button class="chip" data-value="10">10</button><button class="chip" data-value="25">25</button><button class="chip" data-value="100">100</button></div><h2>PLACE YOUR BETS</h2><div class="bet" id="numbers"></div><div class="bet bet-types" id="betTypes"><button class="red" data-kind="red">RED</button><button class="black" data-kind="black">BLACK</button><button data-kind="odd">ODD</button><button data-kind="even">EVEN</button><button data-kind="low">1–18</button><button data-kind="high">19–36</button></div><h2>ON THE TABLE</h2><div class="bet-list" id="betList">No bets placed.</div><h2>RECENT SPINS</h2><div class="history" id="history">No spins yet.</div></section>
 </main>
 </div>
 <script>
 "use strict";
-const sequence=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const sequence=[0,28,9,26,30,11,7,20,32,17,5,22,34,15,3,24,36,13,1,"00",27,10,25,29,12,8,19,31,18,6,21,33,16,4,23,35,14,2];
 const redNumbers=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 const el=id=>document.getElementById(id),canvas=el("wheel"),ctx=canvas.getContext("2d");
-const sector=Math.PI*2/37;
+const sector=Math.PI*2/sequence.length;
 let size=500,dpr=1,angle=0,ballAngle=-Math.PI/2,ballRadius=.92;
 let spinning=false,spinData=null,lastTime=0,lastTick=0;
 let points=1000,chip=5,bets=[],history=[],audio=null;
-function color(n){return n===0?"green":redNumbers.has(n)?"red":"black";}
+function color(n){return n===0||n==="00"?"green":redNumbers.has(n)?"red":"black";}
 function sizeCanvas(){
   const rect=canvas.getBoundingClientRect();
   size=Math.max(250,Math.min(rect.width,rect.height));
@@ -127,7 +127,7 @@ function place(kind,value,label){
 }
 function winning(b,n){
   if(b.kind==="number")return b.value===n;
-  if(n===0)return false;
+  if(n===0||n==="00")return false;
   if(b.kind==="red"||b.kind==="black")return color(n)===b.kind;
   if(b.kind==="odd")return n%2===1;
   if(b.kind==="even")return n%2===0;
@@ -147,7 +147,7 @@ function settle(n){
 function spin(){
   if(spinning)return;
   soundReady();
-  const winner=sequence[Math.floor(Math.random()*37)];
+  const winner=sequence[Math.floor(Math.random()*sequence.length)];
   const index=sequence.indexOf(winner),duration=7200+Math.random()*700;
   const startWheel=angle,endWheel=angle+Math.PI*2*5+Math.random()*Math.PI*2;
   const startBall=ballAngle;
@@ -179,7 +179,7 @@ function draw(){
   ring(R*.86,"#21130f","#4d2d1b",4);
   ring(R*.79,"#b78642","#f6d58e",3);
   // Pocket ring rotates clockwise beneath the opposite-spinning ball.
-  for(let i=0;i<37;i++){
+  for(let i=0;i<sequence.length;i++){
     const a=-Math.PI/2+angle+i*sector;
     ctx.beginPath();ctx.arc(0,0,R*.765,a-sector/2,a+sector/2);
     ctx.arc(0,0,R*.604,a+sector/2,a-sector/2,true);
@@ -231,8 +231,8 @@ function frame(time){
   }
   draw();requestAnimationFrame(frame);
 }
-for(let n=0;n<=36;n++){
-  const button=document.createElement("button");button.textContent=n;button.className=color(n)+(n===0?" zero":"");
+for(const n of [0,"00",...Array.from({length:36},(_,i)=>i+1)]){
+  const button=document.createElement("button");button.textContent=n;button.className=color(n)+(n===0||n==="00"?" zero":"");
   button.addEventListener("click",()=>place("number",n,"NUMBER "+n));el("numbers").appendChild(button);
 }
 el("betTypes").addEventListener("click",event=>{
