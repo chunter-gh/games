@@ -321,36 +321,26 @@ body {
 .palm-frond:nth-child(6) { transform: rotate(70deg); }
 .palm-frond:nth-child(7) { transform: rotate(115deg); }
 
-.palm-face {
+.palm-coconuts {
     position: absolute;
-    left: 81%;
-    top: calc(10% + 22px);
-    width: 28px;
-    height: 28px;
+    left: 78%;
+    top: calc(10% + 17px);
+    width: 74px;
+    height: 67px;
+}
+.palm-coconuts span {
+    position: absolute;
+    width: 27px;
+    height: 27px;
     border-radius: 50%;
-    background: #e9bd70;
-    border: 2px solid #805022;
-    box-shadow: 2px 3px 4px rgba(0,0,0,.25);
+    background: radial-gradient(circle at 34% 28%, #e9bd70, #a76b35 70%, #774522);
+    border: 2px solid #70401e;
+    box-shadow: 2px 3px 4px rgba(0,0,0,.28);
 }
-.palm-face::before {
-    content: "••";
-    position: absolute;
-    top: 0;
-    left: 3px;
-    color: #49301c;
-    font-size: 13px;
-    letter-spacing: 4px;
-}
-.palm-face::after {
-    content: "";
-    position: absolute;
-    left: 28%;
-    bottom: 4px;
-    width: 40%;
-    height: 6px;
-    border-bottom: 2px solid #49301c;
-    border-radius: 50%;
-}
+.palm-coconuts span:nth-child(1) { left: 8px; top: 1px; }
+.palm-coconuts span:nth-child(2) { left: 34px; top: 7px; }
+.palm-coconuts span:nth-child(3) { left: 20px; top: 25px; }
+.palm-coconuts span:nth-child(4) { left: 43px; top: 31px; }
 
 
 /* GROUND */
@@ -1586,7 +1576,7 @@ body {
             <span class="palm-frond"></span><span class="palm-frond"></span>
             <span class="palm-frond"></span>
         </div>
-        <div class="palm-face"></div>
+        <div class="palm-coconuts"><span></span><span></span><span></span><span></span></div>
     </div>
 
     <!-- GIRAFFE -->
