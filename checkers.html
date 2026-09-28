@@ -302,39 +302,27 @@ select {
     pointer-events: none;
 }
 
-/* Kings remain visibly stacked like the pieces in the reference. */
-.piece.king {
-    transform: translateY(-5%);
+/* Kings use a gold crown on the same single checker piece. */
+.piece.king::before {
+    border-color: #c49a35;
+    box-shadow:
+        0 1px 1px rgba(255,239,163,.65),
+        inset 0 2px 4px rgba(0,0,0,.28),
+        0 0 4px rgba(245,191,54,.35);
 }
 
-.piece.king .king-stack {
-    position: absolute;
-    left: 0;
-    top: 12%;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    z-index: -1;
-}
-
-.piece.red.king .king-stack {
-    background: radial-gradient(circle at 40% 30%, #dc3640, #9c1420 68%, #570611);
-    border: 2px solid #650a13;
-    box-shadow: 0 4px 5px rgba(0,0,0,.7), inset 0 2px 2px rgba(255,255,255,.25);
-}
-
-.piece.black.king .king-stack {
-    background: radial-gradient(circle at 40% 30%, #494a52, #202127 68%, #08090d);
-    border: 2px solid #0a0b0f;
-    box-shadow: 0 4px 5px rgba(0,0,0,.75), inset 0 2px 2px rgba(255,255,255,.18);
-}
-
-.piece.king .king-stack::before {
-    content: "";
-    position: absolute;
-    inset: 9%;
-    border-radius: 50%;
-    border: 2px solid rgba(0,0,0,.25);
+.piece.king::after {
+    content: "♛";
+    inset: 12%;
+    color: #f3c650;
+    font-size: clamp(18px, 5vw, 48px);
+    font-weight: bold;
+    -webkit-text-stroke: .5px #7b4a0b;
+    text-shadow:
+        0 1px 0 #fff2b2,
+        0 2px 2px #6b3b0a,
+        0 0 5px rgba(255,204,69,.55);
+    transform: none;
 }
 
 .legend {
@@ -468,7 +456,7 @@ select {
     <div class="legend">
         <span><i class="dot red"></i>RED</span>
         <span><i class="dot black"></i>BLACK</span>
-        <span>STACKED = KING</span>
+        <span>GOLD CROWN = KING</span>
     </div>
 
     <div class="footer">
@@ -812,17 +800,6 @@ function render() {
 
                 pieceElement.appendChild(rim);
                 pieceElement.appendChild(shine);
-
-                if (king) {
-
-                    const stack =
-                        document.createElement("div");
-
-                    stack.className =
-                        "king-stack";
-
-                    pieceElement.appendChild(stack);
-                }
 
                 square.appendChild(
                     pieceElement
