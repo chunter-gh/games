@@ -438,7 +438,7 @@ function resetGame(){
    MOVE
    ========================================================= */
 
-function makeMove(move){
+function makeMove(move, fromComputer=false){
 
     if(gameOver||flipping||!move)return;
 
@@ -447,7 +447,7 @@ function makeMove(move){
         if(currentPlayer!==myColor)return;
     }
 
-    if(!onlineMode&&computerMode&&currentPlayer===WHITE){
+    if(!onlineMode&&computerMode&&currentPlayer===WHITE&&!fromComputer){
         return;
     }
 
@@ -827,7 +827,7 @@ function computerTurn(){
         }
 
         computerThinking=false;
-        makeMove(selected);
+        makeMove(selected, true);
 
     },300);
 }
