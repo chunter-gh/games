@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Room - Soccer</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
+body{background:linear-gradient(#122948,#0a172d 35%,#105a3d 36%,#08703b);color:white}
+.game{min-height:100dvh;max-width:850px;margin:auto;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px}
+h1{font-size:clamp(34px,7vw,56px);margin:4px 0 0;letter-spacing:.08em;text-shadow:0 4px #042638}
+.controls,.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+button{font:inherit;cursor:pointer;color:white;border:1px solid #c5ebd6;border-radius:10px;background:#176849;padding:10px 15px;font-weight:bold}
+button:disabled{opacity:.45;cursor:default}button:focus-visible{outline:3px solid #ffe17c;outline-offset:2px}
+.controls button{font-size:clamp(11px,2.7vw,14px);background:#143456}
+.controls .active{background:#277c69;border-color:#ffe17c}
+.scoreboard{display:flex;align-items:center;gap:clamp(15px,5vw,50px);font-weight:bold}
+.scoreboard div{text-align:center}.scoreboard strong{display:block;font-size:clamp(36px,8vw,64px);color:#ffe17c}
+.scoreboard span{font-size:12px;letter-spacing:.08em}
+.status{text-align:center;min-height:3em;display:grid;place-items:center;font-size:clamp(16px,4vw,22px);font-weight:bold;color:#fff2b0}
+.field{position:relative;flex:1;width:min(100%,700px);min-height:240px;max-height:440px;border:3px solid #ffffffa8;border-radius:50% 50% 15px 15px / 8% 8% 15px 15px;background:repeating-linear-gradient(0deg,#168849 0 42px,#188044 42px 84px);overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding:26px}
+.field:before{content:"";position:absolute;inset:0 16% auto;height:53%;border:3px solid #ffffff88;border-top:0}
+.goal{position:relative;z-index:1;width:min(95%,500px);height:clamp(125px,26vh,220px);border:9px solid #fff;border-bottom-width:5px;border-radius:7px 7px 0 0;background:repeating-linear-gradient(90deg,#ffffff26 0 2px,transparent 2px 35px),repeating-linear-gradient(0deg,#ffffff26 0 2px,transparent 2px 35px),#071e2c99;box-shadow:0 8px 25px #061d2488}
+.goal .lanes{display:flex;height:100%;align-items:center;justify-content:space-around}
+.target{width:27%;height:72%;border:2px dashed #ffffff77;border-radius:12px;display:grid;place-items:center;color:#fff9;font-size:clamp(20px,5vw,36px)}
+.target.hit{background:#ffe17c88;border-color:#ffe17c}
+.keeper{position:absolute;bottom:13%;left:50%;font-size:clamp(40px,9vw,65px);transform:translateX(-50%);transition:left .35s}
+.keeper.left{left:19%}.keeper.right{left:81%}
+.ball{position:absolute;z-index:2;left:50%;bottom:11%;font-size:clamp(38px,9vw,65px);transform:translateX(-50%);transition:left .45s,bottom .45s}
+.ball.left{left:22%;bottom:53%}.ball.center{bottom:53%}.ball.right{left:78%;bottom:53%}
+.choices{min-height:55px}.choices button{min-width:95px;background:#16543b}
+.hint{text-align:center;color:#d3eed9;font-size:13px;margin:0}
+</style>
+</head>
+<body>
+<main class="game">
+<h1>SOCCER</h1>
+<div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
+<div class="scoreboard"><div><span id="oneLabel">YOU</span><strong id="oneScore">0</strong></div><div><span>SHOTS</span><strong id="shotCount">0 / 10</strong></div><div><span id="twoLabel">COMPUTER</span><strong id="twoScore">0</strong></div></div>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+<div class="field"><div class="goal"><div class="lanes"><div class="target" data-lane="left">←</div><div class="target" data-lane="center">↑</div><div class="target" data-lane="right">→</div></div><div class="keeper" id="keeper">🧤</div></div><div class="ball" id="ball">⚽</div></div>
+<div class="choices" id="choices"></div>
+<p class="hint">Take turns shooting and goalkeeping. Pick left, center, or right. Five shots each, then sudden death if tied.</p>
+</main>
+<script>
+"use strict";
+const params=new URLSearchParams(location.search);
+const room=params.get("room")||"";
+const rawPlayer=String(params.get("player")||"").toLowerCase();
+const me=["2","player2","player 2","p2"].includes(rawPlayer)?2:1;
+const online=Boolean(room), lanes=["left","center","right"];
+const clientId=crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+const el=id=>document.getElementById(id);
+let game=null,socket=null,socketOpen=false,reconnectTimer=null,syncTimer=null,cpuTimer=null,visualTimer=null;
+function newGame(){return {id:clientId+"-"+Date.now()+"-"+Math.random(),revision:0,kick:0,score:[0,0],phase:"shoot",aim:null,winner:0,announcement:"Player 1 shoots first.",last:null};}
+function shooter(){return game.kick%2+1;}
+function keeper(){return shooter()===1?2:1;}
+function ready(){return !online||socketOpen;}
+function send(message){
+  if(!online||!socketOpen||!socket||socket.readyState!==WebSocket.OPEN)return false;
+  try{socket.send(JSON.stringify({game:"soccer",room,clientId,player:me,...message}));return true;}catch{return false;}
+}
+function stopSync(){if(syncTimer)clearTimeout(syncTimer);syncTimer=null;}
+function broadcast(){
+  if(!online||!game)return;
+  send({type:"soccerState",state:game});
+  stopSync();
+  const id=game.id,revision=game.revision;
+  const retry=()=>{
+    if(!game||game.id!==id||game.revision!==revision)return;
+    send({type:"soccerState",state:game});
+    syncTimer=setTimeout(retry,1500);
+  };
+  syncTimer=setTimeout(retry,1500);
+}
+function validState(s){
+  return s&&typeof s.id==="string"&&Number.isInteger(s.revision)&&Number.isInteger(s.kick)&&s.kick>=0&&
+    Array.isArray(s.score)&&s.score.length===2&&s.score.every(n=>Number.isInteger(n)&&n>=0)&&
+    ["shoot","save"].includes(s.phase)&&[0,1,2].includes(s.winner)&&
+    (s.aim===null||lanes.includes(s.aim));
+}
+function receive(m){
+  if(!m||m.clientId===clientId||m.game!=="soccer"||String(m.room||"")!==room||Number(m.player)===me)return;
+  if(m.type==="soccerAck"){
+    if(game&&m.id===game.id&&m.revision>=game.revision)stopSync();
+    return;
+  }
+  if(m.type==="soccerJoin"){if(game)broadcast();return;}
+  if(m.type==="soccerNewGameRequest"){if(me===1){startNewGame();}return;}
+  if(m.type!=="soccerState"||!validState(m.state))return;
+  if(me===1&&game&&m.state.id!==game.id)return;
+  send({type:"soccerAck",id:m.state.id,revision:m.state.revision});
+  if(!game||m.state.id!==game.id||m.state.revision>game.revision){
+    stopSync();game=m.state;render();
+  }
+}
+function connect(){
+  if(!online||socketOpen||(socket&&socket.readyState===WebSocket.CONNECTING))return;
+  socket=new WebSocket((location.protocol==="https:"?"wss:":"ws:")+"//"+location.host+"/checkers");
+  socket.addEventListener("open",()=>{
+    socketOpen=true;
+    if(me===1&&!game)game=newGame();
+    send({type:"soccerJoin"});
+    if(game)broadcast();
+    render();
+  });
+  socket.addEventListener("message",event=>{try{receive(JSON.parse(event.data));}catch{}});
+  socket.addEventListener("close",()=>{
+    socketOpen=false;render();
+    if(!reconnectTimer)reconnectTimer=setTimeout(()=>{reconnectTimer=null;connect();},1500);
+  });
+  socket.addEventListener("error",()=>{socketOpen=false;render();});
+}
+function randomLane(){return lanes[Math.floor(Math.random()*lanes.length)];}
+function choose(lane,actor=me){
+  if(!game||game.winner||!ready()||!lanes.includes(lane))return;
+  if(game.phase==="shoot"){
+    if(actor!==shooter())return;
+    game.aim=lane;game.phase="save";
+    game.announcement=online?"Shot taken. Waiting for goalkeeper.":"Shot taken. Goalkeeper is diving...";
+  }else{
+    if(actor!==keeper()||!game.aim)return;
+    const scoringPlayer=shooter(),goal=game.aim!==lane;
+    if(goal)game.score[scoringPlayer-1]++;
+    game.last={shot:game.aim,save:lane,goal,scorer:scoringPlayer};
+    game.kick++;game.aim=null;game.phase="shoot";
+    const complete=game.kick>=10&&game.kick%2===0&&game.score[0]!==game.score[1];
+    if(complete)game.winner=game.score[0]>game.score[1]?1:2;
+    game.announcement=goal?"GOAL! Player "+scoringPlayer+" scores.":"SAVE! No goal for Player "+scoringPlayer+".";
+    showResult(game.last);
+  }
+  game.revision++;broadcast();render();queueComputer();
+}
+function showResult(result){
+  if(!result)return;
+  if(visualTimer)clearTimeout(visualTimer);
+  el("ball").className="ball "+result.shot;
+  el("keeper").className="keeper "+result.save;
+  document.querySelectorAll(".target").forEach(target=>target.classList.toggle("hit",target.dataset.lane===result.shot));
+  visualTimer=setTimeout(()=>{
+    el("ball").className="ball";el("keeper").className="keeper";
+    document.querySelectorAll(".target").forEach(target=>target.classList.remove("hit"));
+  },1100);
+}
+function queueComputer(){
+  if(online||!game||game.winner||cpuTimer)return;
+  const actor=game.phase==="shoot"?shooter():keeper();
+  if(actor!==2)return;
+  cpuTimer=setTimeout(()=>{cpuTimer=null;if(game&&!game.winner)choose(randomLane(),2);},750);
+}
+function render(){
+  const status=el("status"),choices=el("choices");
+  choices.innerHTML="";
+  el("oneLabel").textContent=online?"PLAYER 1":"YOU";
+  el("twoLabel").textContent=online?"PLAYER 2":"COMPUTER";
+  if(!game){status.textContent="Connecting to the room...";return;}
+  el("oneScore").textContent=game.score[0];
+  el("twoScore").textContent=game.score[1];
+  el("shotCount").textContent=game.kick<10?(game.kick+" / 10"):""+game.kick;
+  if(!ready()){status.textContent="Connection lost — reconnecting...";return;}
+  if(game.winner){status.textContent=(game.winner===me?"YOU WIN!":online?"PLAYER "+game.winner+" WINS!":"COMPUTER WINS!")+" "+game.announcement;return;}
+  const actor=game.phase==="shoot"?shooter():keeper();
+  const myTurn=actor===me;
+  status.textContent=(myTurn?(game.phase==="shoot"?"YOUR SHOT — choose a corner.":"YOU ARE GOALKEEPER — choose a dive."):(online?"WAITING FOR PLAYER "+actor+".":"COMPUTER IS "+(game.phase==="shoot"?"SHOOTING.":"GOALKEEPING.")))+" "+game.announcement;
+  if(myTurn)for(const lane of lanes){
+    const button=document.createElement("button");button.textContent=lane.toUpperCase();button.addEventListener("click",()=>choose(lane));choices.appendChild(button);
+  }
+}
+function startNewGame(){
+  if(cpuTimer)clearTimeout(cpuTimer);cpuTimer=null;
+  if(visualTimer)clearTimeout(visualTimer);visualTimer=null;
+  el("ball").className="ball";el("keeper").className="keeper";
+  game=newGame();broadcast();render();queueComputer();
+}
+el("twoPlayer").addEventListener("click",()=>{if(socket)socket.close();location.href="rooms.html?game=soccer";});
+el("computer").addEventListener("click",()=>{if(socket)socket.close();location.href="soccer.html";});
+el("newGame").addEventListener("click",()=>{
+  if(!online){startNewGame();return;}
+  if(!socketOpen)return;
+  if(me===1)startNewGame();
+  else{send({type:"soccerNewGameRequest"});el("status").textContent="Asking Player 1 for a new game...";}
+});
+el("menu").addEventListener("click",()=>{if(socket)socket.close();location.href="index.html";});
+el("twoPlayer").classList.toggle("active",online);
+el("computer").classList.toggle("active",!online);
+if(!online)game=newGame();
+render();if(online)connect();
+</script>
+</body>
+</html>
