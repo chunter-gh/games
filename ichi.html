@@ -26,9 +26,9 @@ button:disabled { opacity: .45; cursor: default; }
 .pile-label { font-size: 11px; letter-spacing: .13em; color: #d5e9da; }
 .table .back { margin: 0; width: clamp(65px, 15vw, 92px); height: clamp(94px, 22vw, 133px); font-size: clamp(19px, 5vw, 28px); transform: rotate(-8deg); }
 .color-indicator { font-weight: bold; font-size: 12px; letter-spacing: .08em; padding: 4px 9px; border-radius: 15px; background: #152720; }
-.color-indicator.red { color: #ff7179; }.color-indicator.blue { color: #7bb9ff; }.color-indicator.green { color: #8ee18e; }.color-indicator.yellow { color: #ffe48a; }
+.color-indicator.coral { color: #ff8793; }.color-indicator.teal { color: #62d7d2; }.color-indicator.violet { color: #be9aff; }.color-indicator.gold { color: #ffe197; }
 .card { position: relative; flex: none; width: clamp(62px, 14vw, 85px); height: clamp(90px, 20vw, 122px); padding: 0; border-radius: 11px; border: 4px solid #fff; color: white; box-shadow: 0 4px 8px #0008, inset 0 0 0 2px #0002; font-weight: 900; overflow: hidden; }
-.card.red { background: #e93643; }.card.blue { background: #287ce7; }.card.green { background: #29ad5d; }.card.yellow { background: #efb927; }.card.wild { background: conic-gradient(#efb927 0 25%, #29ad5d 25% 50%, #287ce7 50% 75%, #e93643 75%); }
+.card.coral { background: #cf4d62; }.card.teal { background: #128a90; }.card.violet { background: #7653b5; }.card.gold { background: #bd861a; }.card.wild { background: linear-gradient(145deg, #292347 0 47%, #543e78 47% 53%, #181d39 53%); }
 .card::before { content: ""; position: absolute; inset: 18% 17%; background: #ffffff35; border: 2px solid #ffffffe0; border-radius: 12px; }
 .card.wild::before { background: #17142b; }
 .card .middle { position: relative; display: grid; place-items: center; width: 100%; height: 100%; color: white; font-size: clamp(24px, 6vw, 43px); text-shadow: 1px 2px 2px #0007; }
@@ -47,7 +47,7 @@ button:disabled { opacity: .45; cursor: default; }
 .picker-panel { background: #221638; border: 2px solid #e2c8fc; border-radius: 18px; padding: 20px; text-align: center; box-shadow: 0 16px 40px #000b; }
 .choices { display: flex; gap: 9px; margin: 16px 0 12px; }
 .choices button { width: 50px; height: 50px; border: 3px solid white; border-radius: 50%; }
-.choices .red { background: #e93643; }.choices .blue { background: #287ce7; }.choices .green { background: #29ad5d; }.choices .yellow { background: #efb927; }
+.choices .coral { background: #cf4d62; }.choices .teal { background: #128a90; }.choices .violet { background: #7653b5; }.choices .gold { background: #bd861a; }
 .hint { margin: 0; color: #b9afd0; font-size: 11px; text-align: center; }
 @media (max-height: 650px) { .game { gap: 4px; } h1 { font-size: 31px; } .opponent { min-height: 75px; } .backs { min-height: 42px; } .back { width: 31px; height: 45px; } .table { min-height: 110px; } .hint { display: none; } }
 </style>
@@ -63,12 +63,12 @@ button:disabled { opacity: .45; cursor: default; }
     <div class="pile"><div class="pile-label">DISCARD</div><div id="discard"></div><div class="color-indicator" id="activeColor">COLOR</div></div>
   </div>
   <div class="hand-area"><div class="label" id="myLabel">YOUR HAND</div><div class="hand" id="hand"></div><div class="actions"><button class="action" id="pass" hidden>PASS TURN</button></div></div>
-  <p class="hint">Match color, number, or symbol. Reverse and Skip give you another turn with two players.</p>
+  <p class="hint">Match a color or number. Play a number one higher than the discard to take another turn. Pulse makes the other player draw one; Shift rotates the color; Trade swaps a card.</p>
 </main>
-<div class="color-picker" id="colorPicker" hidden><div class="picker-panel"><strong>CHOOSE A COLOR</strong><div class="choices"><button class="red" data-color="red" aria-label="Red"></button><button class="blue" data-color="blue" aria-label="Blue"></button><button class="green" data-color="green" aria-label="Green"></button><button class="yellow" data-color="yellow" aria-label="Yellow"></button></div><button class="action" id="cancelColor">CANCEL</button></div></div>
+<div class="color-picker" id="colorPicker" hidden><div class="picker-panel"><strong>CHOOSE A COLOR</strong><div class="choices"><button class="coral" data-color="coral" aria-label="Coral"></button><button class="teal" data-color="teal" aria-label="Teal"></button><button class="violet" data-color="violet" aria-label="Violet"></button><button class="gold" data-color="gold" aria-label="Gold"></button></div><button class="action" id="cancelColor">CANCEL</button></div></div>
 <script>
 "use strict";
-const COLORS = ["red", "blue", "green", "yellow"];
+const COLORS = ["coral", "teal", "violet", "gold"];
 const params = new URLSearchParams(location.search);
 const roomId = params.get("room") || "";
 const rawPlayer = String(params.get("player") || "").trim().toLowerCase();
@@ -84,10 +84,10 @@ function makeDeck() {
   const add = (color, value) => cards.push({id: id++, color, value});
   for (const color of COLORS) {
     add(color, "0");
-    for (let n = 1; n <= 9; n++) { add(color, String(n)); add(color, String(n)); }
-    for (const action of ["skip", "reverse", "draw2"]) { add(color, action); add(color, action); }
+    for (let n = 1; n <= 7; n++) { add(color, String(n)); add(color, String(n)); }
+    for (let n = 0; n < 2; n++) { add(color, "pulse"); add(color, "shift"); }
   }
-  for (let n = 0; n < 4; n++) { add("wild", "wild"); add("wild", "draw4"); }
+  for (let n = 0; n < 4; n++) { add("wild", "wild"); add("wild", "trade"); }
   for (let i = cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cards[i], cards[j]] = [cards[j], cards[i]]; }
   return cards;
 }
@@ -97,14 +97,18 @@ function deal() {
   const first = deck.findIndex(card => card.color !== "wild" && /^[0-9]$/.test(card.value));
   const [top] = deck.splice(first, 1);
   return {deck, hands, discard: [top], activeColor: top.color, turn: 1, winner: 0, revision: 0,
-    round: clientId + "-" + Date.now() + "-" + Math.random(), drawnId: null, announcement: "RED starts."};
+    round: clientId + "-" + Date.now() + "-" + Math.random(), drawnId: null, announcement: top.color.toUpperCase() + " starts."};
 }
 function topCard() { return game.discard[game.discard.length - 1]; }
 function myHand() { return game.hands[me - 1]; }
-function canPlay(card, hand = myHand()) {
-  if (card.value === "draw4") return !hand.some(other => other.id !== card.id && other.color === game.activeColor);
+function risingNumber(card, top) {
+  return /^[0-7]$/.test(card.value) && /^[0-7]$/.test(top.value) &&
+    Number(card.value) === Number(top.value) + 1;
+}
+function canPlay(card) {
   if (card.color === "wild") return true;
-  return card.color === game.activeColor || card.value === topCard().value;
+  return card.color === game.activeColor || card.value === topCard().value ||
+    risingNumber(card, topCard());
 }
 function drawCards(player, count) {
   for (let i = 0; i < count; i++) {
@@ -122,19 +126,27 @@ function playCard(id, chosenColor, actor = me) {
   if (!game || game.winner || game.turn !== actor || !ready()) return;
   const hand = game.hands[actor - 1], index = hand.findIndex(card => card.id === id);
   if (index < 0 || (game.drawnId !== null && game.drawnId !== id)) return;
-  const card = hand[index];
-  if (!canPlay(card, hand)) { game.announcement = card.value === "draw4" ? "Draw Four needs no card of the active color." : "That card does not match."; render(); return; }
+  const card = hand[index], run = risingNumber(card, topCard());
+  if (!canPlay(card)) { game.announcement = "That card does not match. Try a color, number, or one higher."; render(); return; }
   if (card.color === "wild" && !COLORS.includes(chosenColor)) { selectedWild = id; el("colorPicker").hidden = false; return; }
   hand.splice(index, 1); game.discard.push(card);
   game.activeColor = card.color === "wild" ? chosenColor : card.color;
   game.drawnId = null;
   const opponent = actor === 1 ? 2 : 1;
-  if (card.value === "draw2" || card.value === "draw4") drawCards(opponent, card.value === "draw2" ? 2 : 4);
+  if (card.value === "pulse") drawCards(opponent, 1);
+  if (card.value === "shift") game.activeColor = COLORS[(COLORS.indexOf(card.color) + 1) % COLORS.length];
+  if (card.value === "trade" && hand.length && game.hands[opponent - 1].length) {
+    const theirs = game.hands[opponent - 1], ownIndex = Math.floor(Math.random() * hand.length),
+      theirIndex = Math.floor(Math.random() * theirs.length);
+    [hand[ownIndex], theirs[theirIndex]] = [theirs[theirIndex], hand[ownIndex]];
+  }
   if (!hand.length) { game.winner = actor; game.announcement = "Player " + actor + " wins this round!"; }
-  else {
-    if (!["skip", "reverse", "draw2", "draw4"].includes(card.value)) advance();
-    game.announcement = hand.length === 1 ? "ICHI! Player " + actor + " has one card!" :
-      (["skip", "reverse", "draw2", "draw4"].includes(card.value) ? "Player " + actor + " plays again." : "Player " + game.turn + " is up.");
+  else if (card.value === "pulse" || run) {
+    game.announcement = (run ? "One higher! " : "Pulse! ") + "Player " + actor + " plays again.";
+  } else {
+    advance();
+    game.announcement = (card.value === "trade" ? "Cards traded. " : card.value === "shift" ? "Color shifted. " : "") +
+      "Player " + game.turn + " is up.";
   }
   game.revision++; broadcastState(); render(); queueComputer();
 }
@@ -164,7 +176,7 @@ function queueComputer() {
     const hand = game.hands[1];
     const playable = hand.filter(card => canPlay(card, hand));
     if (playable.length) {
-      const card = playable.find(c => c.color === game.activeColor && !["wild", "draw4"].includes(c.value)) || playable[0];
+      const card = playable.find(c => c.color === game.activeColor && c.color !== "wild") || playable[0];
       playCard(card.id, card.color === "wild" ? bestComputerColor() : undefined, 2);
       return;
     }
@@ -187,12 +199,12 @@ function send(message) {
 function stopSync() { if (syncTimer) clearTimeout(syncTimer); syncTimer = null; }
 function broadcastState() {
   if (!online || !game) return;
-  send({type: "unoState", state: game});
+  send({type: "ichiState", state: game});
   stopSync();
   const round = game.round, revision = game.revision;
   const retry = () => {
     if (!game || game.round !== round || game.revision !== revision) return;
-    send({type: "unoState", state: game});
+    send({type: "ichiState", state: game});
     syncTimer = setTimeout(retry, 1500);
   };
   syncTimer = setTimeout(retry, 1500);
@@ -206,15 +218,15 @@ function validState(state) {
 function receive(message) {
   if (!message || message.clientId === clientId || message.game !== "ichi" ||
       String(message.room || "") !== roomId || String(message.player) === String(me)) return;
-  if (message.type === "unoAck") {
+  if (message.type === "ichiAck") {
     if (game && message.round === game.round && message.revision >= game.revision) stopSync();
     return;
   }
-  if (message.type === "unoJoin") { if (game) broadcastState(); return; }
-  if (message.type === "unoNewGameRequest") { if (me === 1) { game = deal(); broadcastState(); render(); } return; }
-  if (message.type !== "unoState" || !validState(message.state)) return;
+  if (message.type === "ichiJoin") { if (game) broadcastState(); return; }
+  if (message.type === "ichiNewGameRequest") { if (me === 1) { game = deal(); broadcastState(); render(); } return; }
+  if (message.type !== "ichiState" || !validState(message.state)) return;
   if (me === 1 && game && message.state.round !== game.round) return;
-  send({type: "unoAck", round: message.state.round, revision: message.state.revision});
+  send({type: "ichiAck", round: message.state.round, revision: message.state.revision});
   if (!game || message.state.round !== game.round || message.state.revision > game.revision) {
     stopSync();
     game = message.state; selectedWild = null; el("colorPicker").hidden = true; render();
@@ -227,7 +239,7 @@ function connect() {
   socket.addEventListener("open", () => {
     socketOpen = true;
     if (me === 1 && !game) game = deal();
-    send({type: "unoJoin"});
+    send({type: "ichiJoin"});
     if (me === 1) broadcastState();
     render();
   });
@@ -239,8 +251,8 @@ function connect() {
   socket.addEventListener("error", () => { socketOpen = false; render(); });
 }
 function cardLabel(card) {
-  return card.value === "draw2" ? "+2" : card.value === "draw4" ? "+4" :
-    card.value === "skip" ? "⊘" : card.value === "reverse" ? "↔" : card.value === "wild" ? "W" : card.value;
+  return card.value === "pulse" ? "✦" : card.value === "shift" ? "↻" :
+    card.value === "trade" ? "⇄" : card.value === "wild" ? "W" : card.value;
 }
 function cardElement(card, clickable) {
   const button = document.createElement("button");
@@ -256,7 +268,7 @@ function cardElement(card, clickable) {
 function render() {
   const status = el("status"), backs = el("opponentHand"), hand = el("hand"), discard = el("discard");
   backs.innerHTML = ""; hand.innerHTML = ""; discard.innerHTML = "";
-  el("opponentLabel").textContent = online ? "PLAYER " + (me === 1 ? 2 : 1) + " · OPPONENT" : "COMPUTER · YELLOW";
+  el("opponentLabel").textContent = online ? "PLAYER " + (me === 1 ? 2 : 1) + " · OPPONENT" : "COMPUTER";
   el("myLabel").textContent = "PLAYER " + me + " · YOUR HAND";
   if (!game) { status.textContent = socketOpen ? "Waiting for the deal..." : "Connecting to the room..."; el("drawPile").disabled = true; return; }
   const opponentHand = game.hands[me === 1 ? 1 : 0];
@@ -280,7 +292,7 @@ el("newGame").addEventListener("click", () => {
   if (!online) { if (cpuTimer) clearTimeout(cpuTimer); cpuTimer = null; game = deal(); render(); return; }
   if (!socketOpen) return;
   if (me === 1) { game = deal(); broadcastState(); render(); }
-  else { send({type: "unoNewGameRequest"}); el("status").textContent = "Asking Player 1 for a new deal..."; }
+  else { send({type: "ichiNewGameRequest"}); el("status").textContent = "Asking Player 1 for a new deal..."; }
 });
 el("menu").addEventListener("click", () => { if (socket) socket.close(); location.href = "index.html"; });
 el("drawPile").addEventListener("click", drawOne);
