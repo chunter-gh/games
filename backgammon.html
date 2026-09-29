@@ -57,6 +57,41 @@ button:focus-visible,select:focus-visible{outline:3px solid #ffe08b;outline-offs
 .controls button.primary{background:linear-gradient(#c89445,#72501e);border-color:#f2d189;color:white;font-size:17px;padding:12px 24px}
 .help{margin:0;color:#c0cbd0;font-size:12px;line-height:1.5;text-align:center}
 @media(max-width:600px){.board-shell{padding:5px;border-width:5px}.board{min-height:clamp(300px,95vw,430px)}.board::after{left:calc(50% - 10px);width:20px}.board-row{grid-template-columns:repeat(6,minmax(0,1fr)) minmax(15px,.65fr) repeat(6,minmax(0,1fr))}.point::before{left:1px;right:1px}.checker{border-width:2px}.checker+.checker{margin-top:-9px}.bottom .checker+.checker{margin-bottom:-9px}.top .stack{top:17px}.bottom .stack{bottom:17px}.point-number{font-size:8px}.tray button{min-width:71px;font-size:11px}.die{width:36px;height:36px;font-size:22px}}
+
+/* Size the cabinet from the actual viewport after the fixed controls take space. */
+.app{height:100dvh;min-height:620px;gap:clamp(5px,1vh,10px)}
+.app>header,.app>.mode,.app>.status,.app>.hud,.app>.controls,.app>.help{flex-shrink:0}
+.board-shell{display:flex;flex-direction:column;flex:1;min-height:0}
+.board{flex:1;min-height:0}
+.tray{flex-shrink:0;margin-top:8px}
+@media(max-width:600px){
+  .app{padding:8px;gap:6px}
+  header{flex-wrap:nowrap;gap:6px}
+  h1{font-size:clamp(21px,5.7vw,31px);letter-spacing:.04em}
+  .sub{font-size:9px;letter-spacing:.1em}
+  .menu-link{padding:7px 8px;font-size:10px;flex-shrink:0}
+  .mode{gap:5px}
+  .mode button,.mode select{padding:7px 8px;font-size:12px}
+  .status{min-height:38px;padding:6px;font-size:13px}
+  .hud{gap:4px}
+  .player-card{padding:5px 6px;font-size:10px;gap:4px}
+  .swatch{width:14px;height:14px}
+  .dice{min-height:36px;gap:3px;font-size:11px}
+  .die{width:29px;height:29px;font-size:19px}
+  .board{min-height:0}
+  .board-shell{padding:5px;border-width:5px}
+  .tray{gap:5px;margin-top:5px}
+  .tray-side{gap:4px}
+  .tray button{min-width:68px;min-height:35px;padding:3px 5px;font-size:10px}
+  .tray button .count{font-size:14px}
+  .controls button{padding:7px 9px;font-size:12px}
+  .controls button.primary{padding:8px 14px;font-size:14px}
+  .help{font-size:10px;line-height:1.25}
+}
+@media(max-height:700px){
+  .help,.sub{display:none}
+  .app{gap:5px}
+}
 </style>
 </head>
 <body>
