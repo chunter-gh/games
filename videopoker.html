@@ -44,23 +44,24 @@ body{background:radial-gradient(circle at 50% 5%,#402036,#100d19 60%,#050609)}
 .hold{min-height:33px;border:2px solid #82663e;border-radius:7px;background:linear-gradient(#353c4a,#1a1e2a);color:#b5bac7;font-size:clamp(10px,1.7vw,14px);font-weight:900;letter-spacing:.08em;cursor:pointer;touch-action:manipulation}
 .hold.active{color:#231617;background:linear-gradient(#ffec9b,#ce9b3e);border-color:#fff2b0;box-shadow:0 0 12px #ffd460}
 .hold:disabled{opacity:.7;cursor:default}
-.message{text-align:center;min-height:37px;display:grid;place-items:center;color:#ffdf8b;text-shadow:0 0 7px #e48934;font-weight:900;font-size:clamp(13px,2.2vw,19px);letter-spacing:.04em}
+.message{text-align:center;height:42px;overflow:hidden;display:grid;place-items:center;color:#ffdf8b;text-shadow:0 0 7px #e48934;font-weight:900;font-size:clamp(13px,2.2vw,19px);letter-spacing:.04em}
 .message.jackpot{animation:winFlashText .45s infinite alternate}
 @keyframes winFlashText{to{color:#fff;filter:drop-shadow(0 0 12px #ffde6a)}}
-.console{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px;padding:clamp(7px,1vw,11px);border:3px solid #e3e9ec;border-radius:11px;background:linear-gradient(#8f98a2,#434b56 45%,#aab3ba);box-shadow:inset 0 3px 6px #242936,0 2px 8px #0008}
-.meter{min-width:105px;padding:7px 10px;border:2px inset #8f8670;border-radius:5px;background:#0c1521;color:#77f2a0;font-family:monospace;text-shadow:0 0 6px #48e683}
+.console{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"balance last" "bets bets" "buttons buttons";align-items:center;gap:8px;margin-top:9px;padding:clamp(7px,1vw,11px);border:3px solid #e3e9ec;border-radius:11px;background:linear-gradient(#8f98a2,#434b56 45%,#aab3ba);box-shadow:inset 0 3px 6px #242936,0 2px 8px #0008}
+.meter{width:100%;min-width:0;padding:7px 10px;overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums;border:2px inset #8f8670;border-radius:5px;background:#0c1521;color:#77f2a0;font-family:monospace;text-shadow:0 0 6px #48e683}
 .meter span{display:block;font:700 10px Arial,sans-serif;letter-spacing:.14em;color:#ffe5ad;text-shadow:none}
-.meter strong{font-size:clamp(17px,3vw,27px)}
-.bet-controls{flex:1 1 350px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px}
+.meter strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(15px,2.5vw,25px)}
+.console>.meter:first-child{grid-area:balance}.console>.meter:last-child{grid-area:last}
+.bet-controls{grid-area:bets;min-height:88px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px}
 .bet-presets{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
 .bet-presets button,.custom-bet button{border:2px solid #f7d685;border-radius:8px;min-height:38px;padding:5px 9px;background:linear-gradient(#f9e6ae,#c9943d 55%,#895327);color:#38231b;font-weight:900;box-shadow:inset 0 1px #fff8,0 3px 5px #0008;cursor:pointer}
 .bet-presets button.selected{background:linear-gradient(#fffac6,#f7c645,#da7129);box-shadow:0 0 0 2px #fff1ad,0 0 14px #ffce46}
 .custom-bet{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:900;color:#fff5d5;white-space:nowrap}
 .custom-bet input{width:83px;min-height:38px;padding:5px;border:2px solid #e7d49b;border-radius:7px;background:#111d33;color:white;font:900 15px Arial,sans-serif}
 .bet-controls button:disabled,.custom-bet input:disabled{opacity:.5;cursor:default}
-.buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;flex:1 1 280px}
-.buttons button{min-height:51px;border:2px solid #f4d18b;border-radius:10px;padding:7px clamp(9px,1.6vw,19px);background:linear-gradient(#f2d286,#bd863b 50%,#8e522c);color:#322020;font-weight:900;font-size:clamp(11px,1.7vw,16px);box-shadow:inset 0 2px 2px #fff8,inset 0 -4px 4px #693f2f,0 4px 7px #0009;cursor:pointer;touch-action:manipulation}
-.buttons button.primary{min-width:125px;min-height:58px;background:linear-gradient(#ffc6a0,#e85434 46%,#9b2631);color:#fff9e8;border-color:#fff0bb;font-size:clamp(15px,2.1vw,21px);letter-spacing:.07em;text-shadow:0 2px 2px #7e1d1f;box-shadow:inset 0 2px 2px #fff9,inset 0 -5px 6px #70202b,0 0 14px #ff6c4eaa,0 5px 8px #000b}
+.buttons{grid-area:buttons;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.buttons button{min-width:0;width:100%;white-space:nowrap;overflow:hidden;min-height:51px;border:2px solid #f4d18b;border-radius:10px;padding:7px clamp(9px,1.6vw,19px);background:linear-gradient(#f2d286,#bd863b 50%,#8e522c);color:#322020;font-weight:900;font-size:clamp(11px,1.7vw,16px);box-shadow:inset 0 2px 2px #fff8,inset 0 -4px 4px #693f2f,0 4px 7px #0009;cursor:pointer;touch-action:manipulation}
+.buttons button.primary{min-width:0;min-height:58px;background:linear-gradient(#ffc6a0,#e85434 46%,#9b2631);color:#fff9e8;border-color:#fff0bb;font-size:clamp(15px,2.1vw,21px);letter-spacing:.07em;text-shadow:0 2px 2px #7e1d1f;box-shadow:inset 0 2px 2px #fff9,inset 0 -5px 6px #70202b,0 0 14px #ff6c4eaa,0 5px 8px #000b}
 .buttons button.primary.draw-ready{background:linear-gradient(#fffbc8,#ffd657 40%,#e99122 78%,#ae4d1b);color:#4b210f;border-color:white;text-shadow:0 1px #fff9;box-shadow:inset 0 2px 3px #fff,inset 0 -5px 6px #a8561e,0 0 0 3px #ffe08477,0 0 24px #ffca42,0 5px 9px #000a;animation:drawGlow 1.3s ease-in-out infinite}
 @keyframes drawGlow{50%{box-shadow:inset 0 2px 3px #fff,inset 0 -5px 6px #a8561e,0 0 0 4px #fff4a099,0 0 34px #ffdb66,0 5px 9px #000a}}
 .buttons button:active{transform:translateY(3px);box-shadow:inset 0 3px 6px #0007}
@@ -68,8 +69,8 @@ button:focus-visible{outline:3px solid white;outline-offset:3px}
 button:disabled{opacity:.48;cursor:default}
 .foot{max-width:850px;text-align:center;color:#b7a39c;font-size:11px;line-height:1.4}
 @media(max-height:700px){.marquee{padding:8px 10px 6px}.marquee .name{font-size:clamp(26px,4.2vw,45px)}.paytable th,.paytable td{padding:2px 2px}.cards{margin:8px 0 5px}.card{aspect-ratio:.9}.hold{min-height:29px}.message{min-height:27px}.buttons button{min-height:43px}.buttons button.primary{min-height:49px}.foot{margin:0}}
-@media(max-width:650px){.screen{min-height:0}.paytable{border-spacing:1px}.paytable th,.paytable td{padding:3px 1px}.paytable th:first-child,.paytable td:first-child{width:32%;padding-left:3px}.card .corner{left:3px;top:3px}.card .corner.bottom{right:3px;bottom:3px}.console{justify-content:center;padding:8px}.meter{min-width:90px}.buttons{order:3;width:100%}.buttons button{flex:1;min-width:75px}.marquee{padding-top:11px}}
-@media(max-width:380px){.paytable{font-size:8px}.hold{letter-spacing:0}.buttons{gap:5px}.buttons button{min-width:66px;padding:5px}.meter{min-width:80px}.bet-presets button{padding:4px 7px}.custom-bet input{width:72px}}
+@media(max-width:650px){.screen{min-height:0}.paytable{border-spacing:1px}.paytable th,.paytable td{padding:3px 1px}.paytable th:first-child,.paytable td:first-child{width:32%;padding-left:3px}.card .corner{left:3px;top:3px}.card .corner.bottom{right:3px;bottom:3px}.console{padding:8px}.meter{min-width:0}.buttons{width:100%}.buttons button{min-width:0}.buttons button.primary{font-size:clamp(12px,3vw,17px)}.marquee{padding-top:11px}}
+@media(max-width:380px){.paytable{font-size:8px}.hold{letter-spacing:0}.buttons{gap:5px}.buttons button{min-width:66px;padding:5px}.meter{min-width:0}.bet-presets button{padding:4px 7px}.custom-bet input{width:72px}}
 @media(prefers-reduced-motion:reduce){.marquee::before,.marquee::after,.paytable tr.win td,.message.jackpot,.buttons button.primary.draw-ready{animation:none}}
 </style>
 </head>
@@ -193,7 +194,6 @@ function render(){
   el("soundToggle").textContent=soundOn?"SOUND ON":"SOUND OFF";el("soundToggle").setAttribute("aria-pressed",String(soundOn));
   el("message").textContent=message;el("message").classList.toggle("jackpot",winningId==="royal");
   for(const row of el("payRows").rows){row.classList.toggle("win",row.dataset.hand===winningId);for(const cell of row.cells)cell.classList.toggle("current",Number(cell.dataset.bet)===bet);}
-  requestAnimationFrame(fitMachine);
 }
 function deal(){
   if(bet<5||balance<bet){message="Choose a bet of at least $5 within your balance.";render();return;}
@@ -254,7 +254,7 @@ function fitMachine(){
 }
 window.addEventListener("resize",fitMachine);
 window.visualViewport?.addEventListener("resize",fitMachine);
-paytable();render();
+paytable();render();requestAnimationFrame(fitMachine);
 </script>
 </body>
 </html>
