@@ -52,7 +52,7 @@ let players=[],ball={},selected=1,remoteSelected=1,remotePointer=null,remoteDrag
 let score=[0,0],pointer=null,dragging=false,frame=0,lastTime=0,freeze=0,matchOver=false,lastTouch=0,messageUntil=0;
 let socket=null,socketOpen=false,reconnectTimer=null,lastSnapshot=0,lastInput=0;
 function announce(text,seconds=2){statusEl.textContent=text;messageUntil=performance.now()+seconds*1000;}
-function makePlayer(team,id,x,y){return {team,id,role:roles[id],x,y,r:19,stepX:x,stepY:y,hasBall:false,stealAt:0,actAt:0};}
+function makePlayer(team,id,x,y){return {team,id,role:roles[id],x,y,r:19,stepX:x,stepY:y,hasBall:false,stealAt:0,actAt:0,tackleTime:0};}
 function kickoff(team=0){
   players=[
     makePlayer(0,0,108,280),makePlayer(0,1,340,218),makePlayer(0,2,290,390),
@@ -61,7 +61,7 @@ function kickoff(team=0){
   selected=1;remoteSelected=1;remotePointer=null;remoteDragging=false;
   const carrier=team===0?players[1]:players[4];
   carrier.hasBall=true;
-  ball={x:carrier.x+(team===0?24:-24),y:carrier.y,vx:0,vy:0,owner:carrier,flight:false,from:team,kind:"",power:0,age:0};
+  ball={x:carrier.x+(team===0?24:-24),y:carrier.y,vx:0,vy:0,owner:carrier,flight:false,from:team,kind:"",power:0,age:0,possessionTime:0,passTarget:-1};
   pointer=null;dragging=false;freeze=1.1;
 }
 function newGame(){
@@ -78,13 +78,15 @@ function ownerBallPosition(){
 function releaseBall(p,vx,vy,kind){
   p.hasBall=false;ball.owner=null;ball.flight=true;ball.from=p.team;ball.kind=kind;
   ball.x=p.x+(p.team===0?23:-23);ball.y=p.y;ball.vx=vx;ball.vy=vy;ball.age=0;
+  ball.possessionTime=0;ball.passTarget=-1;players.forEach(q=>q.tackleTime=0);
   p.actAt=frame+24;
 }
 function passTo(target,team=0){
   const p=ball.owner;
-  if(!p||p.team!==team||target.team!==team||freeze>0||matchOver||target===p)return;
+  if(!p||!target||p.team!==team||target.team!==team||freeze>0||matchOver||target===p)return;
   const dx=target.x-p.x,dy=target.y-p.y,length=Math.hypot(dx,dy)||1;
   releaseBall(p,dx/length*510,dy/length*510,"pass");
+  ball.passTarget=players.indexOf(target);
   if(team===0)selected=target.id;else remoteSelected=target.id;
   announce("Pass!",1.2);
 }
@@ -115,6 +117,13 @@ function moveTowards(p,x,y,speed,dt){
   p.x=clamp(p.x+dx/d*step,L+22,R-22);
   p.y=clamp(p.y+dy/d*step,T+22,B-22);
 }
+function supportForward(p,holder,dt){
+  const direction=p.team===0?1:-1;
+  const lane=p.id===1?-1:1;
+  const x=clamp(holder.x+direction*155,L+45,R-45);
+  const y=clamp(holder.y+lane*105,T+45,B-45);
+  moveTowards(p,x,y,245,dt);
+}
 function controlTeam(dt){
   const selectedPlayer=current();
   if(dragging&&pointer)moveTowards(selectedPlayer,pointer.x,pointer.y,270,dt);
@@ -123,9 +132,14 @@ function controlTeam(dt){
       const track=ball.owner&&ball.owner.team===1?ball.owner.y:ball.y;
       moveTowards(p,110,clamp(track,goalTop-50,goalBottom+50),115,dt);
     }else if(!p.hasBall){
-      const x=ball.owner&&ball.owner.team===1?clamp(ball.x-110,200,560):(p.id===1?355:295);
-      const y=p.id===1?clamp(ball.y-100,105,270):clamp(ball.y+100,290,460);
-      moveTowards(p,x,y,85,dt);
+      const holder=ball.owner?.team===0?ball.owner:
+        ball.kind==="pass"&&ball.from===0?players[ball.passTarget]:null;
+      if(holder&&holder.id!==0&&holder!==p)supportForward(p,holder,dt);
+      else{
+        const x=ball.owner&&ball.owner.team===1?clamp(ball.x-110,200,560):(p.id===1?355:295);
+        const y=p.id===1?clamp(ball.y-100,105,270):clamp(ball.y+100,290,460);
+        moveTowards(p,x,y,85,dt);
+      }
     }
   }
 }
@@ -136,7 +150,12 @@ function onlineOpponent(dt){
   for(const p of forwards){
     if(p===active||p.hasBall)continue;
     if(ball.owner&&ball.owner.team===0)moveTowards(p,ball.owner.x,ball.owner.y,105,dt);
-    else moveTowards(p,p.id===1?660:710,p.id===1?190:370,80,dt);
+    else{
+      const holder=ball.owner?.team===1?ball.owner:
+        ball.kind==="pass"&&ball.from===1?players[ball.passTarget]:null;
+      if(holder&&holder.id!==0&&holder!==p)supportForward(p,holder,dt);
+      else moveTowards(p,p.id===1?660:710,p.id===1?190:370,80,dt);
+    }
   }
 }
 function computerTeam(dt){
@@ -167,9 +186,13 @@ function computerTeam(dt){
       if(chase)moveTowards(p,holder.x,holder.y,165,dt);
       else moveTowards(p,clamp(holder.x+110,490,800),i?390:185,100,dt);
     }else if(!holder){
-      moveTowards(p,ball.x,ball.y,155,dt);
+      const receiver=ball.kind==="pass"&&ball.from===1?players[ball.passTarget]:null;
+      if(receiver&&receiver.id!==0&&receiver!==p)supportForward(p,receiver,dt);
+      else moveTowards(p,ball.x,ball.y,155,dt);
+    }else if(holder.id!==0){
+      supportForward(p,holder,dt);
     }else{
-      moveTowards(p,clamp(holder.x+145,330,800),i?385:180,120,dt);
+      moveTowards(p,clamp(holder.x-145,330,800),i?385:180,120,dt);
     }
   });
 }
@@ -200,6 +223,7 @@ function updateBall(dt){
     const intercept=players.filter(p=>distance(p,ball)<p.r+12).sort((a,b)=>distance(a,ball)-distance(b,ball))[0];
     if(intercept&&frame>intercept.actAt){
       ball.owner=intercept;ball.flight=false;intercept.hasBall=true;ball.vx=0;ball.vy=0;
+      ball.possessionTime=0;ball.passTarget=-1;players.forEach(q=>q.tackleTime=0);
       lastTouch=intercept.team;
       if(intercept.team===0){selected=intercept.id;announce("Blue has the ball!",1.5);}
       else {if(online)remoteSelected=intercept.id;announce("Red has the ball!",1.5);}
@@ -207,19 +231,23 @@ function updateBall(dt){
   }
   if(ball.age>5&&Math.hypot(ball.vx,ball.vy)<30){ball.vx=0;ball.vy=0;}
 }
-function tackles(){
+function tackles(dt){
   const holder=ball.owner;
   if(!holder||freeze>0)return;
+  ball.possessionTime=(ball.possessionTime||0)+dt;
   for(const p of players){
-    if(p.team===holder.team||frame<p.stealAt||frame<holder.actAt)continue;
-    if(distance(p,holder)<p.r+holder.r-5){
-      holder.hasBall=false;p.hasBall=true;ball.owner=p;
-      p.stealAt=frame+90;holder.stealAt=frame+90;p.actAt=frame+45;
-      ownerBallPosition();
-      if(p.team===0){selected=p.id;announce("Blue wins the ball!",1.2);}
-      else {if(online)remoteSelected=p.id;announce("Red wins the ball!",1.2);}
-      break;
-    }
+    if(p.team===holder.team)continue;
+    const inRange=distance(p,holder)<p.r+holder.r-12;
+    p.tackleTime=inRange?(p.tackleTime||0)+dt:0;
+    if(!inRange||ball.possessionTime<.55||frame<p.stealAt||frame<holder.actAt)continue;
+    if(p.tackleTime<(p.team===1&&!online?.48:.32))continue;
+    holder.hasBall=false;p.hasBall=true;ball.owner=p;
+    ball.possessionTime=0;ball.passTarget=-1;players.forEach(q=>q.tackleTime=0);
+    p.stealAt=frame+90;holder.stealAt=frame+90;p.actAt=frame+45;
+    ownerBallPosition();
+    if(p.team===0){selected=p.id;announce("Blue wins the ball!",1.2);}
+    else {if(online)remoteSelected=p.id;announce("Red wins the ball!",1.2);}
+    break;
   }
 }
 function line(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
@@ -275,7 +303,7 @@ function tick(time){
   if((!online||me===1)&&!matchOver&&freeze===0){
     controlTeam(dt);
     if(online)onlineOpponent(dt);else computerTeam(dt);
-    tackles();updateBall(dt);
+    tackles(dt);updateBall(dt);
   }else if((!online||me===1)&&ball.owner)ownerBallPosition();
   if(online&&me===1&&socketOpen&&time-lastSnapshot>100){sendSnapshot();lastSnapshot=time;}
   if(time>messageUntil&&!matchOver&&freeze===0&&players.length){
@@ -294,7 +322,7 @@ function send(message){
 function sendSnapshot(){
   if(me!==1||!players.length)return;
   const state={players,ball:{x:ball.x,y:ball.y,vx:ball.vx,vy:ball.vy,flight:ball.flight,
-    from:ball.from,kind:ball.kind,power:ball.power,age:ball.age,ownerIndex:players.indexOf(ball.owner)},
+    from:ball.from,kind:ball.kind,power:ball.power,age:ball.age,possessionTime:ball.possessionTime,passTarget:ball.passTarget,ownerIndex:players.indexOf(ball.owner)},
     score,selected,remoteSelected,freeze,matchOver};
   send({type:"soccerState",state});
 }
