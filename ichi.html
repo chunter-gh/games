@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Game Room - UNO</title>
+<title>Game Room - ICHI</title>
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; min-height: 100%; }
 body { color: #fff; font-family: Arial, Helvetica, sans-serif; background: radial-gradient(circle at 50% 38%, #3c2060, #17112c 62%, #0a0c19); }
 .game { width: 100%; min-height: 100dvh; padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: clamp(7px, 1.4vh, 14px); }
-h1 { margin: 0; font-size: clamp(34px, 6vw, 56px); font-style: italic; letter-spacing: .08em; color: #fff4a4; transform: rotate(-5deg); text-shadow: 3px 4px 0 #ae172e, 0 8px 20px #000; }
+h1 { margin: 0; font-size: clamp(34px, 6vw, 56px); font-style: normal; letter-spacing: .12em; color: #e7f8ff; text-shadow: 0 3px 0 #36556e, 0 8px 20px #000; }
 .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
 button { cursor: pointer; font: inherit; }
 .controls button, .action { border: 1px solid #bba9df; border-radius: 9px; padding: 8px 12px; color: white; background: linear-gradient(#694c95, #372557); font-size: clamp(11px, 2.7vw, 14px); font-weight: bold; box-shadow: 0 4px 10px #0008; }
@@ -19,7 +19,7 @@ button:disabled { opacity: .45; cursor: default; }
 .opponent { min-height: 105px; text-align: center; }
 .label { font-weight: bold; color: #cfc7e9; font-size: 13px; margin-bottom: 9px; }
 .backs { display: flex; justify-content: center; padding-left: 23px; min-height: 65px; }
-.back { width: 46px; height: 66px; margin-left: -23px; border-radius: 8px; border: 3px solid white; background: #ba243b; box-shadow: 0 3px 9px #0008; transform: rotate(-5deg); display: grid; place-items: center; font-size: 16px; font-weight: 900; font-style: italic; }
+.back { width: 46px; height: 66px; margin-left: -23px; border-radius: 8px; border: 3px solid white; background: linear-gradient(140deg, #573d87, #292253); box-shadow: 0 3px 9px #0008; transform: rotate(-5deg); display: grid; place-items: center; font-size: 16px; font-weight: 900; font-style: italic; }
 .back:nth-child(even) { transform: rotate(5deg); }
 .table { flex: 1; min-height: 155px; display: flex; justify-content: center; align-items: center; gap: clamp(15px, 7vw, 80px); width: min(100%, 800px); padding: 14px; border-radius: 22px; background: radial-gradient(ellipse, #224e3d, #13372e 70%, #0b221f); border: 3px solid #6d506a; box-shadow: inset 0 0 30px #0008, 0 12px 24px #0007; }
 .pile { display: flex; flex-direction: column; align-items: center; gap: 7px; }
@@ -29,9 +29,9 @@ button:disabled { opacity: .45; cursor: default; }
 .color-indicator.red { color: #ff7179; }.color-indicator.blue { color: #7bb9ff; }.color-indicator.green { color: #8ee18e; }.color-indicator.yellow { color: #ffe48a; }
 .card { position: relative; flex: none; width: clamp(62px, 14vw, 85px); height: clamp(90px, 20vw, 122px); padding: 0; border-radius: 11px; border: 4px solid #fff; color: white; box-shadow: 0 4px 8px #0008, inset 0 0 0 2px #0002; font-weight: 900; overflow: hidden; }
 .card.red { background: #e93643; }.card.blue { background: #287ce7; }.card.green { background: #29ad5d; }.card.yellow { background: #efb927; }.card.wild { background: conic-gradient(#efb927 0 25%, #29ad5d 25% 50%, #287ce7 50% 75%, #e93643 75%); }
-.card::before { content: ""; position: absolute; inset: 21% 8%; background: #ffffffed; border-radius: 50%; transform: rotate(-28deg); }
+.card::before { content: ""; position: absolute; inset: 18% 17%; background: #ffffff35; border: 2px solid #ffffffe0; border-radius: 12px; }
 .card.wild::before { background: #17142b; }
-.card .middle { position: relative; display: grid; place-items: center; width: 100%; height: 100%; color: white; font-size: clamp(24px, 6vw, 43px); text-shadow: 1px 2px 2px #0007; transform: rotate(-18deg); }
+.card .middle { position: relative; display: grid; place-items: center; width: 100%; height: 100%; color: white; font-size: clamp(24px, 6vw, 43px); text-shadow: 1px 2px 2px #0007; }
 .card:not(.wild) .middle { color: inherit; -webkit-text-stroke: 1px #0003; }
 .card .corner { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 14px; }.card .corner.bottom { top: auto; left: auto; right: 5px; bottom: 3px; transform: rotate(180deg); }
 .card.playable { cursor: pointer; transition: transform .15s, box-shadow .15s; }
@@ -54,12 +54,12 @@ button:disabled { opacity: .45; cursor: default; }
 </head>
 <body>
 <main class="game">
-  <h1>UNO</h1>
+  <h1>ICHI</h1>
   <div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
   <div class="status" id="status" role="status" aria-live="polite">Enter the two-player lobby to begin.</div>
   <div class="opponent"><div class="label" id="opponentLabel">OPPONENT</div><div class="backs" id="opponentHand"></div></div>
   <div class="table">
-    <div class="pile"><div class="pile-label">DRAW PILE</div><button class="back" id="drawPile" aria-label="Draw one card">UNO</button><div class="pile-label" id="deckCount"></div></div>
+    <div class="pile"><div class="pile-label">DRAW PILE</div><button class="back" id="drawPile" aria-label="Draw one card">ICHI</button><div class="pile-label" id="deckCount"></div></div>
     <div class="pile"><div class="pile-label">DISCARD</div><div id="discard"></div><div class="color-indicator" id="activeColor">COLOR</div></div>
   </div>
   <div class="hand-area"><div class="label" id="myLabel">YOUR HAND</div><div class="hand" id="hand"></div><div class="actions"><button class="action" id="pass" hidden>PASS TURN</button></div></div>
@@ -133,7 +133,7 @@ function playCard(id, chosenColor, actor = me) {
   if (!hand.length) { game.winner = actor; game.announcement = "Player " + actor + " wins this round!"; }
   else {
     if (!["skip", "reverse", "draw2", "draw4"].includes(card.value)) advance();
-    game.announcement = hand.length === 1 ? "UNO! Player " + actor + " has one card!" :
+    game.announcement = hand.length === 1 ? "ICHI! Player " + actor + " has one card!" :
       (["skip", "reverse", "draw2", "draw4"].includes(card.value) ? "Player " + actor + " plays again." : "Player " + game.turn + " is up.");
   }
   game.revision++; broadcastState(); render(); queueComputer();
@@ -181,7 +181,7 @@ function queueComputer() {
 }
 function send(message) {
   if (!socketOpen || !socket || socket.readyState !== WebSocket.OPEN) return false;
-  try { socket.send(JSON.stringify({game: "uno", room: roomId, clientId, player: me, ...message})); return true; }
+  try { socket.send(JSON.stringify({game: "ichi", room: roomId, clientId, player: me, ...message})); return true; }
   catch { return false; }
 }
 function stopSync() { if (syncTimer) clearTimeout(syncTimer); syncTimer = null; }
@@ -204,7 +204,7 @@ function validState(state) {
     Number.isInteger(state.revision) && typeof state.round === "string";
 }
 function receive(message) {
-  if (!message || message.clientId === clientId || message.game !== "uno" ||
+  if (!message || message.clientId === clientId || message.game !== "ichi" ||
       String(message.room || "") !== roomId || String(message.player) === String(me)) return;
   if (message.type === "unoAck") {
     if (game && message.round === game.round && message.revision >= game.revision) stopSync();
@@ -260,7 +260,7 @@ function render() {
   el("myLabel").textContent = "PLAYER " + me + " · YOUR HAND";
   if (!game) { status.textContent = socketOpen ? "Waiting for the deal..." : "Connecting to the room..."; el("drawPile").disabled = true; return; }
   const opponentHand = game.hands[me === 1 ? 1 : 0];
-  for (let n = 0; n < Math.min(opponentHand.length, 12); n++) { const back = document.createElement("span"); back.className = "back"; back.textContent = "UNO"; backs.appendChild(back); }
+  for (let n = 0; n < Math.min(opponentHand.length, 12); n++) { const back = document.createElement("span"); back.className = "back"; back.textContent = "ICHI"; backs.appendChild(back); }
   el("opponentLabel").textContent += " · " + opponentHand.length + " cards";
   discard.appendChild(cardElement(topCard(), false));
   el("activeColor").className = "color-indicator " + game.activeColor;
@@ -274,8 +274,8 @@ function render() {
     (game.winner === me ? "YOU WIN THIS ROUND!" : (online ? "PLAYER " + game.winner : "COMPUTER") + " WINS THIS ROUND!") :
     (myTurn ? "YOUR TURN. " : online ? "OPPONENT'S TURN. " : "COMPUTER'S TURN. ") + game.announcement;
 }
-el("twoPlayer").addEventListener("click", () => { location.href = "rooms.html?game=uno"; });
-el("computer").addEventListener("click", () => { if (socket) socket.close(); location.href = "uno.html"; });
+el("twoPlayer").addEventListener("click", () => { location.href = "rooms.html?game=ichi"; });
+el("computer").addEventListener("click", () => { if (socket) socket.close(); location.href = "ichi.html"; });
 el("newGame").addEventListener("click", () => {
   if (!online) { if (cpuTimer) clearTimeout(cpuTimer); cpuTimer = null; game = deal(); render(); return; }
   if (!socketOpen) return;
