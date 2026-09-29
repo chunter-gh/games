@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Five Dice • Game Room</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:#f9f4e9;background:#0b1724}
+body{background:radial-gradient(circle at 50% -10%,#31547a,#132940 43%,#091724 90%)}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #ffe58c;outline-offset:3px}
+.app{max-width:1120px;min-height:100dvh;margin:auto;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font:900 clamp(30px,6vw,58px) Georgia,serif;letter-spacing:.08em;color:#fff0bd;text-shadow:0 3px 0 #574023,0 7px 18px #0009}
+.tag{margin:2px 0 0;color:#9dc9d4;font-size:11px;font-weight:800;letter-spacing:.25em}
+.top-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px}
+.top-actions button,.player-choice button,.primary,.ghost{border:1px solid #82a9b1;border-radius:10px;background:linear-gradient(#2c5b66,#173c4d);color:#f7f3dc;padding:9px 12px;font-weight:850;box-shadow:inset 0 1px #fff3,0 4px 9px #0005}
+.top-actions button:hover,.player-choice button:hover,.primary:hover,.ghost:hover{filter:brightness(1.15)}
+.top-actions button.active{border-color:#ffdc7d;background:linear-gradient(#ab7536,#704821)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border:2px solid #bb945b;border-radius:16px;background:linear-gradient(135deg,#183f4c,#10303e);padding:13px 17px;box-shadow:inset 0 0 28px #0005,0 9px 20px #0004}
+.turn-label{font-size:11px;letter-spacing:.18em;color:#a9c9c9;font-weight:800}
+.turn-name{font-size:clamp(20px,4vw,30px);font-weight:900;color:#ffe49b;margin:3px 0}
+.status{font-size:13px;line-height:1.4;color:#d2e5df;min-height:1.4em}
+.round-pill{border:1px solid #9cb9ac;border-radius:99px;padding:9px 12px;text-align:center;min-width:92px;color:#fbe4a0;font-weight:900;background:#0a2731}
+.round-pill small{display:block;font-size:10px;color:#9fc3c0;letter-spacing:.15em;margin-bottom:3px}
+.play{border:3px solid #8a5839;border-radius:24px;padding:18px 15px;background:radial-gradient(ellipse at 50% 32%,#27856e,#155440 72%,#0a352f);box-shadow:inset 0 0 0 3px #cead73,inset 0 0 45px #071f20,0 12px 24px #0007;text-align:center}
+.tray-label{font-size:11px;letter-spacing:.24em;color:#d4eee3;font-weight:900}
+.dice{display:flex;justify-content:center;flex-wrap:wrap;gap:clamp(7px,2.5vw,20px);padding:20px 0 12px;min-height:126px;align-items:center}
+.die{width:clamp(53px,12vw,88px);height:clamp(53px,12vw,88px);position:relative;border:3px solid #f7f2df;border-radius:15px;background:linear-gradient(145deg,#fffefa,#d8e7e1);box-shadow:inset -5px -6px 7px #92a9a455,inset 2px 2px 5px #fff,0 7px 9px #001c17a8;transition:transform .16s,box-shadow .16s,border-color .16s;touch-action:manipulation}
+.die:not(:disabled):hover{transform:translateY(-5px)}
+.die.held{border-color:#ffcb68;transform:translateY(-10px);box-shadow:0 0 0 3px #714526,0 9px 15px #001c17a8,0 0 20px #ffd36888}
+.die.held:hover{transform:translateY(-10px)}
+.die.rolling{animation:tumble .34s ease-in-out}
+@keyframes tumble{0%{transform:translateY(-9px) rotate(-20deg) scale(.9)}50%{transform:translateY(-21px) rotate(23deg) scale(1.08)}100%{transform:translateY(0) rotate(0)}}
+.pip{position:absolute;width:15%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 30% 25%,#344c58,#071a29 75%);box-shadow:inset 1px 2px 2px #0009,0 1px 1px #fff}
+.pip.tl{top:18%;left:18%}.pip.tc{top:18%;left:42.5%}.pip.tr{top:18%;right:18%}.pip.ml{top:42.5%;left:18%}.pip.mc{top:42.5%;left:42.5%}.pip.mr{top:42.5%;right:18%}.pip.bl{bottom:18%;left:18%}.pip.bc{bottom:18%;left:42.5%}.pip.br{bottom:18%;right:18%}
+.die.empty{opacity:.55;display:grid;place-items:center}.die.empty:after{content:'?';font-size:36px;font-weight:900;color:#55707b}
+.held-note{min-height:20px;font-size:12px;color:#d4f1e4}
+.roll-row{display:flex;align-items:center;justify-content:center;gap:13px;flex-wrap:wrap}
+.primary{min-width:175px;background:linear-gradient(#ffd882,#bb7331);border-color:#ffe2a3;color:#342015;font-size:17px;padding:13px 20px}
+.primary:disabled{opacity:.48;cursor:default;filter:grayscale(.4)}
+.roll-count{font-size:13px;color:#e6eee1;font-weight:800;min-width:100px;text-align:left}
+.score-section{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.score-title{display:flex;justify-content:space-between;align-items:end;gap:10px}
+.score-title h2{margin:0;font:900 20px Georgia,serif;color:#fbe2a0}
+.score-title span{font-size:11px;color:#a4c0c8}
+.sheet{border:2px solid #896b48;border-radius:14px;overflow:hidden;background:#f5eedc;color:#1a2b31;box-shadow:0 10px 22px #0006}
+.sheet-head,.score-row,.subtotal,.total-row{display:grid;grid-template-columns:minmax(145px,1fr) 64px 64px;align-items:center}
+.sheet-head{background:#173d4b;color:#fff2c9;font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.sheet-head>*{padding:10px 8px;text-align:center}.sheet-head>*:first-child{text-align:left;padding-left:16px}
+.score-row{min-height:39px;border-top:1px solid #d6c8a9}
+.score-row:nth-child(even){background:#eee5d1}
+.score-row .name{padding:7px 10px 7px 16px;font-size:13px;font-weight:800;line-height:1.1}
+.score-row .name small{display:block;font-weight:500;color:#627074;font-size:10px;margin-top:3px}
+.score-row button,.score-row .value{min-height:38px;display:grid;place-items:center;border:0;border-left:1px solid #d0c3a8;background:transparent;color:#173c48;font-size:15px;font-weight:900}
+.score-row button.available{background:#e7f7e9;color:#126047;box-shadow:inset 0 0 0 2px #67b77b;cursor:pointer}
+.score-row button.available:hover{background:#c9f0d5}
+.score-row button.zero{color:#8e5e4e}
+.score-row button:disabled{cursor:default}
+.score-row .value.taken{background:#e7dcbe}
+.subtotal,.total-row{min-height:36px;border-top:2px solid #a89572;background:#e4d4b0;font-weight:900;font-size:13px}
+.subtotal>*:first-child,.total-row>*:first-child{padding-left:16px}
+.subtotal>*:not(:first-child),.total-row>*:not(:first-child){text-align:center;border-left:1px solid #bca883;padding:8px 0}
+.total-row{background:#173d4b;color:#fff3c9;font-size:18px;min-height:47px}
+.rules{font-size:12px;color:#bfd5d6;line-height:1.5;padding:2px 5px}
+.rules summary{cursor:pointer;font-weight:900;color:#ffe19a}
+.rules p{margin:8px 0}
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#06131ddd;padding:18px}
+.overlay[hidden]{display:none}
+.modal{width:min(440px,100%);border:2px solid #d0a967;border-radius:20px;background:linear-gradient(150deg,#1e4957,#102735);padding:24px;text-align:center;box-shadow:0 22px 55px #000b}
+.modal h2{margin:0 0 8px;font:900 32px Georgia,serif;color:#ffe3a0}
+.modal p{line-height:1.5;color:#d8e8e1}
+.player-choice{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:18px 0 0}
+.player-choice button{min-width:135px}
+.final-scores{font-weight:900;color:#ffe4a0;font-size:20px;white-space:pre-line}
+@media(max-width:520px){.app{padding-left:8px;padding-right:8px;gap:8px}header{align-items:flex-start}h1{font-size:32px}.top-actions button{padding:7px 8px;font-size:11px}.hero{padding:10px}.play{padding:14px 5px}.dice{min-height:92px;padding:15px 0 7px;gap:6px}.die{border-radius:11px}.sheet-head,.score-row,.subtotal,.total-row{grid-template-columns:minmax(112px,1fr) 51px 51px}.score-row .name{padding-left:9px}.sheet-head>*:first-child,.subtotal>*:first-child,.total-row>*:first-child{padding-left:9px}}
+@media(prefers-reduced-motion:reduce){.die.rolling{animation:none}.die{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><div><h1>FIVE DICE</h1><p class="tag">ROLL • HOLD • SCORE</p></div><div class="top-actions"><button id="newGame">NEW GAME</button><button id="mode">2 PLAYERS</button><button id="menu">MENU</button></div></header>
+  <section class="hero" aria-live="polite"><div><div class="turn-label">NOW ROLLING</div><div class="turn-name" id="turnName">PLAYER 1</div><div class="status" id="status">Roll all five dice to begin.</div></div><div class="round-pill"><small>ROUND</small><span id="round">1 / 13</span></div></section>
+  <section class="play" aria-label="Five dice tray"><div class="tray-label">THE DICE</div><div class="dice" id="dice"></div><div class="held-note" id="heldNote">Tap a die after rolling to hold it.</div><div class="roll-row"><button class="primary" id="roll">ROLL DICE</button><span class="roll-count" id="rollCount">3 rolls left</span></div></section>
+  <section class="score-section"><div class="score-title"><h2>Scorecard</h2><span>Choose one open box after a roll</span></div><div class="sheet" id="sheet"></div></section>
+  <details class="rules"><summary>HOW TO PLAY</summary><p>Roll five dice up to three times. Tap dice to hold or release them between rolls. After any roll, choose one empty scoring box, even if that box scores zero. Each player fills all 13 boxes. The top section earns 35 extra points at 63 or more. An extra five-of-a-kind after scoring 50 in its box adds 100 and follows the matching upper-box rule; straights and full house then act as wild scores. Highest total wins.</p></details>
+</div>
+<div class="overlay" id="finish" hidden><div class="modal"><h2 id="finishTitle">GAME OVER</h2><p class="final-scores" id="finishScores"></p><div class="player-choice"><button id="again">PLAY AGAIN</button><button id="finishMenu">GAME ROOM</button></div></div></div>
+<script>
+const CATEGORIES=[
+  {id:'ones',label:'Ones',hint:'Sum of all ones'},
+  {id:'twos',label:'Twos',hint:'Sum of all twos'},
+  {id:'threes',label:'Threes',hint:'Sum of all threes'},
+  {id:'fours',label:'Fours',hint:'Sum of all fours'},
+  {id:'fives',label:'Fives',hint:'Sum of all fives'},
+  {id:'sixes',label:'Sixes',hint:'Sum of all sixes'},
+  {id:'three',label:'Three of a Kind',hint:'Total of all dice'},
+  {id:'four',label:'Four of a Kind',hint:'Total of all dice'},
+  {id:'house',label:'Full House',hint:'25 points'},
+  {id:'small',label:'Small Straight',hint:'Four in a row • 30'},
+  {id:'large',label:'Large Straight',hint:'Five in a row • 40'},
+  {id:'fivekind',label:'Five of a Kind',hint:'All five match • 50'},
+  {id:'chance',label:'Chance',hint:'Total of all dice'}
+];
+const UPPER=['ones','twos','threes','fours','fives','sixes'];
+const PIPS={1:['mc'],2:['tl','br'],3:['tl','mc','br'],4:['tl','tr','bl','br'],5:['tl','tr','mc','bl','br'],6:['tl','ml','bl','tr','mr','br']};
+const $=id=>document.getElementById(id);
+let count=1,players=[],current=0,dice=[null,null,null,null,null],held=[false,false,false,false,false],rolls=0,finished=false,animTimer=0,audio;
+function newPlayer(){return {scores:{},bonus:0};}
+function randomDie(){const a=new Uint32Array(1);if(window.crypto&&crypto.getRandomValues){crypto.getRandomValues(a);return Math.floor(a[0]/4294967296*6)+1;}return Math.floor(Math.random()*6)+1;}
+function tone(freq,duration,volume){try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;o.type='sine';o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*.65,t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+duration);}catch(e){}}
+function startGame(n){count=n;players=Array.from({length:n},newPlayer);current=0;dice=[null,null,null,null,null];held=[false,false,false,false,false];rolls=0;finished=false;$('finish').hidden=true;clearTimeout(animTimer);$('mode').textContent=n===1?'SOLO':'2 PLAYERS';render();}
+function upperTotal(p){return UPPER.reduce((sum,key)=>sum+(p.scores[key]||0),0);}
+function total(p){return CATEGORIES.reduce((sum,c)=>sum+(p.scores[c.id]||0),0)+(upperTotal(p)>=63?35:0)+p.bonus;}
+function isFive(){return dice.every(v=>v!==null&&v===dice[0]);}
+function bonusRoll(){return isFive()&&players[current].scores.fivekind===50;}
+function forcedCategory(){if(!bonusRoll())return null;const face=UPPER[dice[0]-1],s=players[current].scores;if(s[face]===undefined)return face;const lower=CATEGORIES.slice(6).filter(c=>s[c.id]===undefined);return lower.length?'lower':'upper';}
+function eligible(id){if(rolls===0||players[current].scores[id]!==undefined||finished)return false;const forced=forcedCategory();if(!forced)return true;if(forced==='lower')return !UPPER.includes(id);if(forced==='upper')return UPPER.includes(id);return id===forced;}
+function scoreFor(id){const counts=Array(7).fill(0);dice.forEach(v=>counts[v]++);const sum=dice.reduce((a,b)=>a+b,0),max=Math.max(...counts),unique=new Set(dice),joker=bonusRoll()&&players[current].scores[UPPER[dice[0]-1]]!==undefined;
+  const faceIndex=UPPER.indexOf(id);if(faceIndex>=0)return counts[faceIndex+1]*(faceIndex+1);
+  switch(id){case 'three':return max>=3?sum:0;case 'four':return max>=4?sum:0;case 'house':return joker||counts.includes(3)&&counts.includes(2)?25:0;case 'small':return joker||[1,2,3,4].every(v=>unique.has(v))||[2,3,4,5].every(v=>unique.has(v))||[3,4,5,6].every(v=>unique.has(v))?30:0;case 'large':return joker||[1,2,3,4,5].every(v=>unique.has(v))||[2,3,4,5,6].every(v=>unique.has(v))?40:0;case 'fivekind':return max===5?50:0;case 'chance':return sum;default:return 0;}
+}
+function renderDie(value,i){const button=document.createElement('button');button.className='die'+(held[i]?' held':'')+(value===null?' empty':'');button.type='button';button.setAttribute('aria-label',value===null?'Die '+(i+1)+' not rolled':'Die '+(i+1)+': '+value+(held[i]?', held':''));button.setAttribute('aria-pressed',String(held[i]));button.disabled=rolls===0||rolls>=3||finished;button.addEventListener('click',()=>{held[i]=!held[i];tone(held[i]?620:410,.09,.045);render();});if(value!==null)PIPS[value].forEach(pos=>{const pip=document.createElement('span');pip.className='pip '+pos;button.appendChild(pip);});return button;}
+function cell(id,p){if(p.scores[id]!==undefined){const v=document.createElement('div');v.className='value taken';v.textContent=p.scores[id];return v;}const b=document.createElement('button');b.type='button';const active=p===players[current]&&eligible(id);b.className=active?'available'+(scoreFor(id)===0?' zero':''):'';b.textContent=active?scoreFor(id):'—';b.disabled=!active;b.title=active?'Score '+scoreFor(id)+' points':'Not available';b.addEventListener('click',()=>commit(id));return b;}
+function metric(label,fn,cls){const row=document.createElement('div');row.className=cls;const name=document.createElement('div');name.textContent=label;row.appendChild(name);players.forEach(p=>{const el=document.createElement('div');el.textContent=fn(p);row.appendChild(el);});return row;}
+function renderSheet(){const sheet=$('sheet');sheet.replaceChildren();const head=document.createElement('div');head.className='sheet-head';['CATEGORY',...players.map((_,i)=>'P'+(i+1))].forEach(t=>{const el=document.createElement('div');el.textContent=t;head.appendChild(el);});sheet.appendChild(head);
+  CATEGORIES.forEach((c,i)=>{if(i===6){sheet.appendChild(metric('UPPER TOTAL',upperTotal,'subtotal'));sheet.appendChild(metric('UPPER BONUS (63+)',p=>upperTotal(p)>=63?35:'—','subtotal'));}const row=document.createElement('div');row.className='score-row';const name=document.createElement('div');name.className='name';name.textContent=c.label;const hint=document.createElement('small');hint.textContent=c.hint;name.appendChild(hint);row.appendChild(name);players.forEach(p=>row.appendChild(cell(c.id,p)));sheet.appendChild(row);});sheet.appendChild(metric('EXTRA FIVE-DICE BONUS',p=>p.bonus||'—','subtotal'));sheet.appendChild(metric('GRAND TOTAL',total,'total-row'));}
+function render(){const p=players[current];$('turnName').textContent=count===1?'SOLO GAME':'PLAYER '+(current+1);$('round').textContent=Math.min(13,Object.keys(p.scores).length+1)+' / 13';$('rollCount').textContent=(3-rolls)+' roll'+(3-rolls===1?'':'s')+' left';$('roll').textContent=rolls===0?'ROLL DICE':'ROLL AGAIN';$('roll').disabled=rolls>=3||finished;$('heldNote').textContent=rolls===0?'Tap a die after rolling to hold it.':rolls===3?'Choose a score box below.':held.some(Boolean)?held.filter(Boolean).length+' held • Tap to release':'Tap dice to hold them, then roll again.';
+  const forced=forcedCategory();$('status').textContent=finished?'Game complete.':rolls===0?'Roll all five dice to begin.':forced&&forced!=='lower'&&forced!=='upper'?'Five-dice bonus! Score the matching upper box.':forced==='lower'?'Five-dice bonus! Choose an open lower box.':forced==='upper'?'Five-dice bonus! Choose an open upper box.':rolls>=3?'Choose an open score box to finish your turn.':'Hold any dice, roll again, or score now.';
+  const tray=$('dice');tray.replaceChildren(...dice.map(renderDie));renderSheet();}
+function roll(){if(rolls>=3||finished)return;for(let i=0;i<5;i++)if(!held[i])dice[i]=randomDie();rolls++;tone(170,.17,.08);setTimeout(()=>tone(320,.12,.06),80);render();const buttons=$('dice').children;for(let i=0;i<buttons.length;i++)if(!held[i])buttons[i].classList.add('rolling');clearTimeout(animTimer);animTimer=setTimeout(()=>{for(const b of $('dice').children)b.classList.remove('rolling');},380);}
+function commit(id){if(!eligible(id))return;const p=players[current],points=scoreFor(id);if(bonusRoll())p.bonus+=100;p.scores[id]=points;tone(points>0?650:260,.22,.08);
+  if(players.every(player=>Object.keys(player.scores).length===13)){finished=true;render();endGame();return;}
+  current=(current+1)%count;dice=[null,null,null,null,null];held=[false,false,false,false,false];rolls=0;render();}
+function endGame(){const scores=players.map(total),best=Math.max(...scores);$('finishTitle').textContent=count===1?'SCORECARD COMPLETE':scores[0]===scores[1]?'IT’S A TIE!':'PLAYER '+(scores.indexOf(best)+1)+' WINS!';$('finishScores').textContent=scores.map((v,i)=>(count===1?'YOUR SCORE':'PLAYER '+(i+1))+': '+v).join('\n');$('finish').hidden=false;tone(660,.32,.09);setTimeout(()=>tone(880,.45,.08),160);}
+$('roll').addEventListener('click',roll);$('newGame').addEventListener('click',()=>startGame(count));$('mode').addEventListener('click',()=>startGame(count===1?2:1));$('menu').addEventListener('click',()=>location.href='index.html');$('again').addEventListener('click',()=>startGame(count));$('finishMenu').addEventListener('click',()=>location.href='index.html');startGame(1);
+</script>
+</body>
+</html>
