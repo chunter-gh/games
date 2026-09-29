@@ -45,7 +45,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 @media(prefers-reduced-motion:reduce){.sign-bulb,.sign-star,.sign-script,.star-glint{animation:none}.star-glint{opacity:.7}}
 @media(max-width:450px){.game-button{min-height:70px;padding:0 18px}.icon{width:43px;font-size:31px}}
 
-/* Fit the sign, four game tiles, and return link inside the usable viewport. */
+/* Fit the sign, game tiles, and return link inside the usable viewport. */
 .casino-room{
   height:100dvh;min-height:0;overflow-y:auto;
   display:grid;grid-template-rows:auto minmax(75px,1fr) auto auto;
@@ -61,9 +61,9 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 .vegas-sign{width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
 .menu{
   width:min(86vw,370px);min-height:0;max-height:100%;margin:0;
-  padding:3px 6px;gap:clamp(4px,1vh,10px);overflow-y:auto;
+  padding:3px 6px;gap:clamp(3px,.7dvh,8px);overflow-y:auto;
 }
-.game-button{min-height:0;height:clamp(48px,8dvh,72px);flex:0 0 auto}
+.game-button{min-height:0;height:clamp(44px,7dvh,62px);flex:0 0 auto}
 .back{margin:0;padding:8px 16px}
 @media(max-height:650px){
   .title{font-size:clamp(27px,6vh,42px)}
@@ -117,6 +117,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   </div>
   <nav class="menu" aria-label="Casino games">
     <a class="game-button" href="roulette.html"><span class="icon" aria-hidden="true">🎰</span><span class="button-text"><span class="button-title">ROULETTE</span><span class="button-subtitle">Place • Spin • Win</span></span></a>
+    <a class="game-button" href="slots.html"><span class="icon" aria-hidden="true">🎰</span><span class="button-text"><span class="button-title">LUCKY LIGHTS SLOTS</span><span class="button-subtitle">Five Reels • Pull • Win</span></span></a>
     <a class="game-button" href="videopoker.html"><span class="icon" aria-hidden="true">🃏</span><span class="button-text"><span class="button-title">VIDEO POKER</span><span class="button-subtitle">Jacks or Better • Draw Five</span></span></a>
     <a class="game-button" href="blackjack.html"><span class="icon" aria-hidden="true">♠️</span><span class="button-text"><span class="button-title">BLACKJACK</span><span class="button-subtitle">Classic cards • Dealer • 3:2</span></span></a>
     <a class="game-button" href="craps.html"><span class="icon" aria-hidden="true">🎲</span><span class="button-text"><span class="button-title">CRAPS</span><span class="button-subtitle">Pass Line • Point • Field</span></span></a>
