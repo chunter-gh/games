@@ -51,7 +51,14 @@ body{background:radial-gradient(circle at 50% 5%,#402036,#100d19 60%,#050609)}
 .meter{min-width:105px;padding:7px 10px;border:2px inset #8f8670;border-radius:5px;background:#0c1521;color:#77f2a0;font-family:monospace;text-shadow:0 0 6px #48e683}
 .meter span{display:block;font:700 10px Arial,sans-serif;letter-spacing:.14em;color:#ffe5ad;text-shadow:none}
 .meter strong{font-size:clamp(17px,3vw,27px)}
-.buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;flex:1}
+.bet-controls{flex:1 1 350px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px}
+.bet-presets{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
+.bet-presets button,.custom-bet button{border:2px solid #f7d685;border-radius:8px;min-height:38px;padding:5px 9px;background:linear-gradient(#f9e6ae,#c9943d 55%,#895327);color:#38231b;font-weight:900;box-shadow:inset 0 1px #fff8,0 3px 5px #0008;cursor:pointer}
+.bet-presets button.selected{background:linear-gradient(#fffac6,#f7c645,#da7129);box-shadow:0 0 0 2px #fff1ad,0 0 14px #ffce46}
+.custom-bet{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:900;color:#fff5d5;white-space:nowrap}
+.custom-bet input{width:83px;min-height:38px;padding:5px;border:2px solid #e7d49b;border-radius:7px;background:#111d33;color:white;font:900 15px Arial,sans-serif}
+.bet-controls button:disabled,.custom-bet input:disabled{opacity:.5;cursor:default}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;flex:1 1 280px}
 .buttons button{min-height:51px;border:2px solid #f4d18b;border-radius:10px;padding:7px clamp(9px,1.6vw,19px);background:linear-gradient(#f2d286,#bd863b 50%,#8e522c);color:#322020;font-weight:900;font-size:clamp(11px,1.7vw,16px);box-shadow:inset 0 2px 2px #fff8,inset 0 -4px 4px #693f2f,0 4px 7px #0009;cursor:pointer;touch-action:manipulation}
 .buttons button.primary{min-width:125px;min-height:58px;background:linear-gradient(#ffc6a0,#e85434 46%,#9b2631);color:#fff9e8;border-color:#fff0bb;font-size:clamp(15px,2.1vw,21px);letter-spacing:.07em;text-shadow:0 2px 2px #7e1d1f;box-shadow:inset 0 2px 2px #fff9,inset 0 -5px 6px #70202b,0 0 14px #ff6c4eaa,0 5px 8px #000b}
 .buttons button.primary.draw-ready{background:linear-gradient(#fffbc8,#ffd657 40%,#e99122 78%,#ae4d1b);color:#4b210f;border-color:white;text-shadow:0 1px #fff9;box-shadow:inset 0 2px 3px #fff,inset 0 -5px 6px #a8561e,0 0 0 3px #ffe08477,0 0 24px #ffca42,0 5px 9px #000a;animation:drawGlow 1.3s ease-in-out infinite}
@@ -62,7 +69,7 @@ button:disabled{opacity:.48;cursor:default}
 .foot{max-width:850px;text-align:center;color:#b7a39c;font-size:11px;line-height:1.4}
 @media(max-height:700px){.marquee{padding:8px 10px 6px}.marquee .name{font-size:clamp(26px,4.2vw,45px)}.paytable th,.paytable td{padding:2px 2px}.cards{margin:8px 0 5px}.card{aspect-ratio:.9}.hold{min-height:29px}.message{min-height:27px}.buttons button{min-height:43px}.buttons button.primary{min-height:49px}.foot{margin:0}}
 @media(max-width:650px){.screen{min-height:0}.paytable{border-spacing:1px}.paytable th,.paytable td{padding:3px 1px}.paytable th:first-child,.paytable td:first-child{width:32%;padding-left:3px}.card .corner{left:3px;top:3px}.card .corner.bottom{right:3px;bottom:3px}.console{justify-content:center;padding:8px}.meter{min-width:90px}.buttons{order:3;width:100%}.buttons button{flex:1;min-width:75px}.marquee{padding-top:11px}}
-@media(max-width:380px){.paytable{font-size:8px}.hold{letter-spacing:0}.buttons{gap:5px}.buttons button{min-width:66px;padding:5px}.meter{min-width:80px}}
+@media(max-width:380px){.paytable{font-size:8px}.hold{letter-spacing:0}.buttons{gap:5px}.buttons button{min-width:66px;padding:5px}.meter{min-width:80px}.bet-presets button{padding:4px 7px}.custom-bet input{width:72px}}
 @media(prefers-reduced-motion:reduce){.marquee::before,.marquee::after,.paytable tr.win td,.message.jackpot,.buttons button.primary.draw-ready{animation:none}}
 </style>
 </head>
@@ -70,16 +77,16 @@ button:disabled{opacity:.48;cursor:default}
 <div class="app">
   <header class="topbar"><h1>VIDEO POKER</h1><button class="back" id="back">← CASINO</button></header>
   <div class="machine-wrap" id="machineWrap"><main class="cabinet" id="machine">
-    <div class="marquee"><div class="small">CLASSIC FIVE-CARD DRAW</div><div class="name">Jacks or Better</div><div class="tag">9 / 6 FULL PAY · FIVE COINS MAX</div></div>
+    <div class="marquee"><div class="small">CLASSIC FIVE-CARD DRAW</div><div class="name">Jacks or Better</div><div class="tag">9 / 6 FULL PAY · ROYAL FLUSH 800× BET</div></div>
     <div class="screen-frame"><div class="screen">
       <div class="pay-title">WINNING HANDS · PAYOUT IN DOLLARS</div>
-      <table class="paytable" aria-label="Jacks or Better payout table"><thead><tr><th>HAND</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody id="payRows"></tbody></table>
+      <table class="paytable" aria-label="Jacks or Better payout table"><thead><tr><th>HAND</th><th>$5</th><th>$10</th><th>$25</th><th>$50</th><th>$100</th></tr></thead><tbody id="payRows"></tbody></table>
       <div class="cards" id="cards" aria-label="Five playing cards"></div>
       <div class="message" id="message" role="status" aria-live="polite">Choose your bet, then press DEAL.</div>
     </div></div>
-    <div class="console"><div class="meter"><span>BALANCE</span><strong id="balance">$1,000</strong></div><div class="buttons"><button id="addCredits">ADD $100</button><button id="betOne">BET ONE</button><button id="maxBet">MAX BET</button><button class="primary" id="deal">DEAL</button></div><div class="meter"><span>BET / LAST WIN</span><strong id="betMeter">$1 / $0</strong></div></div>
+    <div class="console"><div class="meter"><span>BALANCE</span><strong id="balance">$1,000</strong></div><div class="bet-controls" aria-label="Choose a bet"><div class="bet-presets"><button type="button" data-bet="5">$5</button><button type="button" data-bet="10">$10</button><button type="button" data-bet="25">$25</button><button type="button" data-bet="50">$50</button><button type="button" data-bet="100">$100</button></div><label class="custom-bet">CUSTOM $ <input id="customBet" type="number" inputmode="decimal" min="5" step="0.01" placeholder="Amount" aria-label="Custom bet amount"><button type="button" id="setBet">SET</button></label></div><div class="buttons"><button id="addCredits">ADD $100</button><button id="soundToggle" type="button" aria-pressed="true">SOUND ON</button><button class="primary" id="deal">DEAL</button></div><div class="meter"><span>BET / LAST WIN</span><strong id="betMeter">$5 / $0</strong></div></div>
   </main></div>
-  <p class="foot">Play money only. Tap a card or its HOLD button after dealing. Unheld cards are replaced on DRAW. A five-coin royal flush pays $4,000.</p>
+  <p class="foot">Play money only. Minimum bet $5. Choose a preset or enter any bet of $5 or more, up to your balance. Tap cards to HOLD, then DRAW. A royal flush pays 800 times your bet.</p>
 </div>
 <script>
 "use strict";
@@ -95,11 +102,35 @@ const hands=[
   {id:"twoPair",label:"TWO PAIR",pay:2},
   {id:"jacks",label:"JACKS OR BETTER",pay:1}
 ];
-let balance=1000,bet=1,lastWin=0,phase="ready",deck=[],cards=[],held=new Set(),revealed=0,winningId="",message="Choose your bet, then press DEAL.",audio=null;
-try{const saved=Number(localStorage.getItem("casinoVideoPokerBalance"));if(Number.isFinite(saved)&&saved>=0)balance=saved;}catch{}
-const money=n=>"$"+n.toLocaleString();
+let balance=1000,bet=5,lastWin=0,phase="ready",deck=[],cards=[],held=new Set(),revealed=0,winningId="",message="Choose your bet, then press DEAL.",audio=null,soundOn=true;
+try{const stored=localStorage.getItem("casinoVideoPokerBalance");if(stored!==null){const saved=Number(stored);if(Number.isFinite(saved)&&saved>=0)balance=cents(saved);}}catch{}
+const cents=n=>Math.round(n*100)/100;
+const money=n=>"$"+n.toLocaleString(undefined,{minimumFractionDigits:Number.isInteger(cents(n))?0:2,maximumFractionDigits:2});
 function saveBalance(){try{localStorage.setItem("casinoVideoPokerBalance",String(balance));}catch{}}
-function tone(f,d=.07,volume=.055){try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;o.type="triangle";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.72,t+d);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(audio.destination);o.start(t);o.stop(t+d+.01);}catch{}}
+function sound(kind,level=0){
+  if(!soundOn)return;
+  try{
+    audio??=new (window.AudioContext||window.webkitAudioContext)();
+    if(audio.state==="suspended")audio.resume();
+    const start=audio.currentTime,notes=[];
+    const add=(frequencies,spacing=.09,duration=.13,type="triangle",volume=.07)=>frequencies.forEach((f,i)=>notes.push({f,t:i*spacing,d:duration,type,volume}));
+    if(kind==="bet")add([520,780],.07,.105,"sine",.08);
+    else if(kind==="credits")add([660,940,720,1080,1360],.085,.14,"sine",.065);
+    else if(kind==="deal")add([220,330,440,550,660],.065,.10,"square",.035);
+    else if(kind==="card")notes.push({f:460+level*75,t:0,d:.065,type:"square",volume:.045},{f:920+level*90,t:.025,d:.055,type:"sine",volume:.055});
+    else if(kind==="hold")add(level?[820,1120]:[720,480],.06,.12,"sine",.075);
+    else if(kind==="draw")add([720,620,520,820],.075,.11,"square",.034);
+    else if(kind==="lose")add([330,230],.13,.20,"triangle",.05);
+    else if(kind==="win")add(level>=2?[523,659,784,1047,1319,1568,2093,1568,2093,2637]:level===1?[523,659,784,1047,1319,1568]:[523,659,784,1047],level>=2?.105:.115,.21,"triangle",level>=2?.075:.065);
+    for(const n of notes){
+      const o=audio.createOscillator(),g=audio.createGain(),t=start+n.t;
+      o.type=n.type;o.frequency.setValueAtTime(n.f,t);o.frequency.exponentialRampToValueAtTime(n.f*.9,t+n.d);
+      g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(n.volume,t+.012);
+      g.gain.exponentialRampToValueAtTime(.001,t+n.d);
+      o.connect(g).connect(audio.destination);o.start(t);o.stop(t+n.d+.015);
+    }
+  }catch{}
+}
 function rankLabel(n){return n===14?"A":n===13?"K":n===12?"Q":n===11?"J":String(n);}
 function freshDeck(){const result=[];for(let suit=0;suit<4;suit++)for(let rank=2;rank<=14;rank++)result.push({rank,suit});for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}
 function evaluate(five){
@@ -118,16 +149,16 @@ function evaluate(five){
   if(counts[0]===2&&unique.some(n=>n>=11&&ranks.filter(r=>r===n).length===2))return "jacks";
   return "";
 }
-function payout(id,coins){if(!id)return 0;if(id==="royal"&&coins===5)return 4000;return hands.find(h=>h.id===id).pay*coins;}
+function payout(id,amount){if(!id)return 0;return cents((id==="royal"?800:hands.find(h=>h.id===id).pay)*amount);}
 function paytable(){
   const body=el("payRows");body.replaceChildren();
   for(const hand of hands){const row=document.createElement("tr");row.dataset.hand=hand.id;
     const name=document.createElement("td");name.textContent=hand.label;row.appendChild(name);
-    for(let coins=1;coins<=5;coins++){const cell=document.createElement("td");cell.textContent=payout(hand.id,coins).toLocaleString();cell.dataset.coins=coins;row.appendChild(cell);}
+    for(const amount of [5,10,25,50,100]){const cell=document.createElement("td");cell.textContent=money(payout(hand.id,amount));cell.dataset.bet=amount;row.appendChild(cell);}
     body.appendChild(row);
   }
 }
-function toggleHold(i){if(phase!=="holding")return;held.has(i)?held.delete(i):held.add(i);tone(660,.045,.025);render();}
+function toggleHold(i){if(phase!=="holding")return;held.has(i)?held.delete(i):held.add(i);sound("hold",held.has(i)?1:0);render();}
 function drawCards(){
   const area=el("cards");area.replaceChildren();
   for(let i=0;i<5;i++){
@@ -155,36 +186,49 @@ function render(){
   el("deal").textContent=phase==="holding"?"DRAW CARDS":"DEAL";
   el("deal").classList.toggle("draw-ready",phase==="holding");
   el("deal").disabled=phase==="animating"||(phase!=="holding"&&balance<bet);
-  el("betOne").disabled=phase==="holding"||phase==="animating";
-  el("maxBet").disabled=phase==="holding"||phase==="animating"||balance<5;
-  el("addCredits").disabled=phase==="holding"||phase==="animating";
+  const locked=phase==="holding"||phase==="animating";
+  for(const button of document.querySelectorAll("[data-bet]")){button.disabled=locked;button.classList.toggle("selected",Number(button.dataset.bet)===bet);}
+  el("customBet").disabled=locked;el("setBet").disabled=locked;
+  el("addCredits").disabled=locked;
+  el("soundToggle").textContent=soundOn?"SOUND ON":"SOUND OFF";el("soundToggle").setAttribute("aria-pressed",String(soundOn));
   el("message").textContent=message;el("message").classList.toggle("jackpot",winningId==="royal");
-  for(const row of el("payRows").rows){row.classList.toggle("win",row.dataset.hand===winningId);for(const cell of row.cells)cell.classList.toggle("current",cell.dataset.coins==bet);}
+  for(const row of el("payRows").rows){row.classList.toggle("win",row.dataset.hand===winningId);for(const cell of row.cells)cell.classList.toggle("current",Number(cell.dataset.bet)===bet);}
   requestAnimationFrame(fitMachine);
 }
 function deal(){
-  if(balance<bet){message="Press ADD $100 to load more play money.";render();return;}
-  balance-=bet;saveBalance();lastWin=0;winningId="";deck=freshDeck();cards=deck.splice(0,5);held.clear();revealed=0;phase="animating";message="Dealing five cards...";tone(530);render();
-  for(let i=1;i<=5;i++)setTimeout(()=>{revealed=i;tone(400+i*60,.045,.027);if(i===5){phase="holding";message="Tap cards to HOLD, then press DRAW.";}render();},i*125);
+  if(bet<5||balance<bet){message="Choose a bet of at least $5 within your balance.";render();return;}
+  balance=cents(balance-bet);saveBalance();lastWin=0;winningId="";deck=freshDeck();cards=deck.splice(0,5);held.clear();revealed=0;phase="animating";message="Dealing five cards...";sound("deal");render();
+  for(let i=1;i<=5;i++)setTimeout(()=>{revealed=i;sound("card",i);if(i===5){phase="holding";message="Tap cards to HOLD, then press DRAW.";}render();},i*125);
 }
 function finishDraw(){
-  winningId=evaluate(cards);lastWin=payout(winningId,bet);balance+=lastWin;saveBalance();phase="finished";held.clear();
+  winningId=evaluate(cards);lastWin=payout(winningId,bet);balance=cents(balance+lastWin);saveBalance();phase="finished";held.clear();
   const result=hands.find(h=>h.id===winningId);
   message=result?result.label+" · YOU WIN "+money(lastWin)+"!":"NO WIN · PRESS DEAL TO PLAY AGAIN";
-  if(lastWin){for(let i=0;i<4;i++)setTimeout(()=>tone(470+i*115,.13,.07),i*110);}else tone(160,.18,.035);
+  sound(lastWin?"win":"lose",winningId==="royal"?2:lastWin>=bet*9?1:0);
   render();
 }
 function draw(){
-  phase="animating";revealed=5;const replacements=[];
+  phase="animating";revealed=5;const replacements=[];sound("draw");
   for(let i=0;i<5;i++)if(!held.has(i))replacements.push(i);
   message=replacements.length?"Drawing replacement cards...":"Holding all five cards...";render();
   if(!replacements.length){setTimeout(finishDraw,380);return;}
-  replacements.forEach((index,k)=>setTimeout(()=>{cards[index]=deck.pop();tone(580+k*35,.055,.035);render();if(k===replacements.length-1)setTimeout(finishDraw,260);},(k+1)*155));
+  replacements.forEach((index,k)=>setTimeout(()=>{cards[index]=deck.pop();sound("card",k);render();if(k===replacements.length-1)setTimeout(finishDraw,260);},(k+1)*155));
 }
 el("deal").addEventListener("click",()=>{if(phase==="holding")draw();else if(phase!=="animating")deal();});
-el("betOne").addEventListener("click",()=>{bet=bet===5?1:bet+1;if(balance<bet)bet=1;winningId="";message="Bet set to "+money(bet)+". Press DEAL.";tone(700,.05);render();});
-el("addCredits").addEventListener("click",()=>{if(phase==="holding"||phase==="animating")return;balance+=100;saveBalance();message="$100 added. Choose your bet and press DEAL.";tone(840,.1);render();});
-el("maxBet").addEventListener("click",()=>{if(balance<5)return;bet=5;deal();});
+function setBet(value){
+  if(phase==="holding"||phase==="animating")return;
+  const raw=String(value).trim(),amount=Number(raw);
+  if(!/^\d+(?:\.\d{1,2})?$/.test(raw)||!Number.isFinite(amount)||amount<5||amount>balance){
+    message=amount>balance?"That bet is above your balance. Add play dollars first.":"Enter a bet of at least $5 (up to two decimal places).";
+    sound("lose");render();return;
+  }
+  bet=cents(amount);winningId="";message="Bet set to "+money(bet)+". Press DEAL.";sound("bet");render();
+}
+for(const button of document.querySelectorAll("[data-bet]"))button.addEventListener("click",()=>setBet(button.dataset.bet));
+el("setBet").addEventListener("click",()=>setBet(el("customBet").value));
+el("customBet").addEventListener("keydown",event=>{if(event.key==="Enter")setBet(event.currentTarget.value);});
+el("addCredits").addEventListener("click",()=>{if(phase==="holding"||phase==="animating")return;balance=cents(balance+100);saveBalance();message="$100 added. Choose your bet and press DEAL.";sound("credits");render();});
+el("soundToggle").addEventListener("click",()=>{soundOn=!soundOn;render();if(soundOn)sound("bet");});
 el("back").addEventListener("click",()=>{location.href="casino.html";});
 let lastFitWidth=0;
 function fitMachine(){
