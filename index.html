@@ -419,8 +419,25 @@ body {
     from { transform: rotate(-3deg); }
     to { transform: rotate(4deg); }
 }
+/* PINK TULIP */
+.pink-tulip {
+    position: absolute;
+    z-index: 23;
+    right: clamp(125px, 23vw, 300px);
+    bottom: calc(clamp(75px, 14vh, 115px) - 8px);
+    width: clamp(46px, 6.3vw, 76px);
+    height: clamp(78px, 15vh, 140px);
+    transform-origin: 50% 100%;
+    animation: tulipSway 5.2s ease-in-out -1.4s infinite alternate;
+    pointer-events: none;
+    filter: drop-shadow(4px 7px 5px rgba(0,0,0,.3));
+}
+@keyframes tulipSway {
+    from { transform: rotate(3deg); }
+    to { transform: rotate(-4deg); }
+}
 @media (prefers-reduced-motion: reduce) {
-    .african-violet { animation: none; }
+    .african-violet, .pink-tulip { animation: none; }
 }
 
 /* GROUND */
@@ -1868,6 +1885,21 @@ body {
         <circle cx="77" cy="79" r="3" fill="#fff2a2"/>
         <circle cx="87" cy="80" r="2.5" fill="#fff2a2"/>
         <circle cx="82" cy="89" r="2.5" fill="#fff2a2"/>
+    </svg>
+    <svg class="pink-tulip" viewBox="0 0 140 270" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+            <linearGradient id="tulipStem" x1="0" x2="1"><stop stop-color="#255c32"/><stop offset=".5" stop-color="#70bd58"/><stop offset="1" stop-color="#22542d"/></linearGradient>
+            <linearGradient id="tulipLeaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a4d879"/><stop offset=".5" stop-color="#4eaa51"/><stop offset="1" stop-color="#246b38"/></linearGradient>
+            <linearGradient id="tulipPetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd1e0"/><stop offset=".48" stop-color="#f36fa8"/><stop offset="1" stop-color="#b72e72"/></linearGradient>
+            <linearGradient id="tulipCenter" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe2e9"/><stop offset=".5" stop-color="#fb91bc"/><stop offset="1" stop-color="#cc4486"/></linearGradient>
+        </defs>
+        <path d="M72 267 C68 213 77 165 70 111" fill="none" stroke="url(#tulipStem)" stroke-width="9" stroke-linecap="round"/>
+        <path d="M70 240 C34 230 19 190 19 152 C47 168 66 193 73 230 Z" fill="url(#tulipLeaf)" stroke="#286a38" stroke-width="3"/>
+        <path d="M74 231 C87 187 105 172 130 164 C122 201 103 227 75 241 Z" fill="url(#tulipLeaf)" stroke="#286a38" stroke-width="3"/>
+        <path d="M68 224 Q46 179 25 159 M78 224 Q101 185 124 170" fill="none" stroke="#b8e49a" stroke-width="2" opacity=".55"/>
+        <path d="M70 132 C38 124 20 91 29 41 C43 58 55 65 70 68 C82 62 99 51 112 34 C122 82 103 122 70 132 Z" fill="url(#tulipPetal)" stroke="#9f2b68" stroke-width="3"/>
+        <path d="M70 129 C48 112 42 79 48 33 C59 48 65 52 70 54 C77 49 83 42 92 28 C103 73 95 111 70 129 Z" fill="url(#tulipCenter)" stroke="#b83d79" stroke-width="2"/>
+        <path d="M56 53 C56 76 60 96 66 109 M85 50 C87 75 84 96 77 111" fill="none" stroke="#ffe2eb" stroke-width="2" opacity=".58"/>
     </svg>
 
 
