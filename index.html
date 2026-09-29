@@ -436,8 +436,25 @@ body {
     from { transform: rotate(3deg); }
     to { transform: rotate(-4deg); }
 }
+/* GOLDEN DAISY */
+.golden-daisy {
+    position: absolute;
+    z-index: 23;
+    right: clamp(185px, 30vw, 390px);
+    bottom: calc(clamp(75px, 14vh, 115px) - 8px);
+    width: clamp(43px, 5.8vw, 69px);
+    height: clamp(69px, 12vh, 112px);
+    transform-origin: 50% 100%;
+    animation: daisySway 5.6s ease-in-out -.8s infinite alternate;
+    pointer-events: none;
+    filter: drop-shadow(4px 7px 5px rgba(0,0,0,.3));
+}
+@keyframes daisySway {
+    from { transform: rotate(-4deg); }
+    to { transform: rotate(3deg); }
+}
 @media (prefers-reduced-motion: reduce) {
-    .african-violet, .pink-tulip { animation: none; }
+    .african-violet, .pink-tulip, .golden-daisy { animation: none; }
 }
 
 /* GROUND */
@@ -1901,6 +1918,32 @@ body {
         <path d="M70 132 C38 124 20 91 29 41 C43 58 55 65 70 68 C82 62 99 51 112 34 C122 82 103 122 70 132 Z" fill="url(#tulipPetal)" stroke="#9f2b68" stroke-width="3"/>
         <path d="M70 129 C48 112 42 79 48 33 C59 48 65 52 70 54 C77 49 83 42 92 28 C103 73 95 111 70 129 Z" fill="url(#tulipCenter)" stroke="#b83d79" stroke-width="2"/>
         <path d="M56 53 C56 76 60 96 66 109 M85 50 C87 75 84 96 77 111" fill="none" stroke="#ffe2eb" stroke-width="2" opacity=".58"/>
+    </svg>
+    <svg class="golden-daisy" viewBox="0 0 150 270" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+            <linearGradient id="daisyStem" x1="0" x2="1"><stop stop-color="#235329"/><stop offset=".5" stop-color="#73b44d"/><stop offset="1" stop-color="#285c31"/></linearGradient>
+            <radialGradient id="daisyPetal"><stop stop-color="#fff2a5"/><stop offset=".55" stop-color="#ffc943"/><stop offset="1" stop-color="#e69024"/></radialGradient>
+            <radialGradient id="daisyCenter"><stop stop-color="#7a4a20"/><stop offset=".7" stop-color="#ad6525"/><stop offset="1" stop-color="#6c3c1b"/></radialGradient>
+            <linearGradient id="daisyLeaf" x1="0" x2="1"><stop stop-color="#86c85c"/><stop offset="1" stop-color="#28723b"/></linearGradient>
+        </defs>
+        <path d="M75 268 C81 218 68 168 76 99" fill="none" stroke="url(#daisyStem)" stroke-width="9" stroke-linecap="round"/>
+        <path d="M75 220 C44 190 24 193 13 203 C25 228 49 240 77 231 Z" fill="url(#daisyLeaf)" stroke="#28663a" stroke-width="3"/>
+        <path d="M77 206 C99 179 120 177 139 185 C131 211 108 226 77 218 Z" fill="url(#daisyLeaf)" stroke="#28663a" stroke-width="3"/>
+        <path d="M72 225 Q42 203 21 207 M81 213 Q111 185 133 190" fill="none" stroke="#b6df87" stroke-width="2" opacity=".55"/>
+        <g transform="translate(76 87)" fill="url(#daisyPetal)" stroke="#d98320" stroke-width="2">
+            <ellipse cy="-42" rx="13" ry="39"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(45)"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(90)"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(135)"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(180)"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(225)"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(270)"/>
+            <ellipse cy="-42" rx="13" ry="39" transform="rotate(315)"/>
+        </g>
+        <circle cx="76" cy="87" r="19" fill="url(#daisyCenter)" stroke="#653818" stroke-width="3"/>
+        <circle cx="69" cy="80" r="2.5" fill="#d99437" opacity=".75"/>
+        <circle cx="83" cy="83" r="2" fill="#d99437" opacity=".75"/>
+        <circle cx="76" cy="95" r="2.5" fill="#d99437" opacity=".75"/>
     </svg>
 
 
