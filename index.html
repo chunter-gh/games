@@ -1908,10 +1908,10 @@ const gameInfo = {
         subtitle: "Jump • Capture • King"
     },
 
-    "connectfour.html": {
-        icon: "🔴",
-        title: "CONNECT FOUR",
-        subtitle: "Drop • Line Up • Win"
+    "fourforthemoney.html": {
+        icon: "🪙",
+        title: "FOUR FOR THE MONEY",
+        subtitle: "Silver • Gold • Four in a Row"
     },
 
     "backgammon.html": {
@@ -2061,6 +2061,7 @@ async function loadGames() {
                     /\.html$/i.test(game) &&
                     game.toLowerCase() !== "index.html" &&
                     game.toLowerCase() !== "rooms.html" &&
+                    game.toLowerCase() !== "connectfour.html" &&
                     game.toLowerCase() !== "roulette.html" &&
                     game.toLowerCase() !== "videopoker.html" &&
                     game.toLowerCase() !== "blackjack.html"
@@ -2070,7 +2071,7 @@ async function loadGames() {
                     const order = [
                         "tictactoe.html",
                         "checkers.html",
-                        "connectfour.html",
+                        "fourforthemoney.html",
                         "backgammon.html",
                         "ichi.html",
                         "casino.html",
