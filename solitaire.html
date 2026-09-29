@@ -1482,6 +1482,10 @@ function canPlaceOnFoundation(card,foundationIndex) {
 
     const pile=foundations[foundationIndex];
 
+    if (card.suit!==SUITS[foundationIndex]) {
+        return false;
+    }
+
     if (!pile.length) {
         return card.rank==="A";
     }
@@ -1498,6 +1502,19 @@ function canPlaceOnFoundation(card,foundationIndex) {
 /* =========================================================
    REMOVE SELECTED
    ========================================================= */
+
+function isSafeAutoFoundation(card) {
+    if (card.value<=2) return true;
+
+    // Wait until both opposite-color foundations have reached
+    // the rank immediately below this card.
+    return foundations.every((pile,index)=>{
+        const oppositeColor=isRed(card)!==(
+            SUITS[index]==="♥" || SUITS[index]==="♦"
+        );
+        return !oppositeColor || pile.length>=card.value-1;
+    });
+}
 
 function removeSelectedCards() {
 
@@ -2538,7 +2555,8 @@ function autoMove() {
                 canPlaceOnFoundation(
                     card,
                     foundationIndex
-                )
+                ) &&
+                isSafeAutoFoundation(card)
             ) {
 
                 selectedCards={
@@ -2578,7 +2596,8 @@ function autoMove() {
                 canPlaceOnFoundation(
                     card,
                     foundationIndex
-                )
+                ) &&
+                isSafeAutoFoundation(card)
             ) {
 
                 selectedCards={
@@ -2644,7 +2663,8 @@ function showHint() {
                 canPlaceOnFoundation(
                     card,
                     f
-                )
+                ) &&
+                isSafeAutoFoundation(card)
             ) {
 
                 candidates.push({id:card.id});
@@ -2668,7 +2688,8 @@ function showHint() {
                 canPlaceOnFoundation(
                     card,
                     f
-                )
+                ) &&
+                isSafeAutoFoundation(card)
             ) {
 
                 candidates.push({id:card.id});
