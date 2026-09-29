@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Othello</title>
+<title>Reversi</title>
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -54,7 +54,7 @@ select{color:#211f1b;background:linear-gradient(180deg,#f0e9d9,#c9bea8)}
 
 <body>
 <div class="game" id="game">
-<h1 class="title">Othello</h1>
+<h1 class="title">Reversi</h1>
 <div class="subtitle">Onyx &amp; Ivory Edition</div>
 
 <div class="table">
@@ -500,8 +500,8 @@ function makeMove(move, fromComputer=false){
      */
     if(onlineMode&&socketOpen){
         sendSocket({
-            type:"othelloMove",
-            game:"othello",
+            type:"reversiMove",
+            game:"reversi",
             room:roomId,
             player:playerNumber,
             clientId,
@@ -590,8 +590,8 @@ function connectToRoom(){
         opponentConnected=true;
 
         sendSocket({
-            type:"othelloJoin",
-            game:"othello",
+            type:"reversiJoin",
+            game:"reversi",
             room:roomId,
             player:playerNumber,
             color:myColor===BLACK?"black":"white",
@@ -651,7 +651,7 @@ function handleOnlineMessage(message){
     }
 
     if(message.game&&
-       String(message.game).toLowerCase()!=="othello"){
+       String(message.game).toLowerCase()!=="reversi"){
         return;
     }
 
@@ -662,9 +662,9 @@ function handleOnlineMessage(message){
     }
 
     if(onlineMode&&
-       (message.type==="othelloMove"||
-        message.type==="othelloJoin"||
-        message.type==="othelloNewGame")&&
+       (message.type==="reversiMove"||
+        message.type==="reversiJoin"||
+        message.type==="reversiNewGame")&&
        !message.room){
         return;
     }
@@ -689,7 +689,7 @@ function handleOnlineMessage(message){
      * This is important. Sending state here was one of
      * the things capable of overwriting the next move.
      */
-    if(message.type==="othelloJoin"){
+    if(message.type==="reversiJoin"){
         opponentConnected=true;
         updateOnlineStatus();
         return;
@@ -698,7 +698,7 @@ function handleOnlineMessage(message){
     /*
      * NEW GAME
      */
-    if(message.type==="othelloNewGame"){
+    if(message.type==="reversiNewGame"){
 
         if(message.state&&applyBoardState(message.state)){
             opponentConnected=true;
@@ -724,7 +724,7 @@ function handleOnlineMessage(message){
      * Just install the complete state produced by
      * the other player.
      */
-    if(message.type==="othelloMove"){
+    if(message.type==="reversiMove"){
 
         if(!message.state){
             return;
@@ -1025,7 +1025,7 @@ twoPlayerButton.addEventListener("click",()=>{
         try{socket.close();}catch(e){}
     }
 
-    window.location.href="rooms.html?game=othello";
+    window.location.href="rooms.html?game=reversi";
 });
 
 computerButton.addEventListener("click",()=>{
@@ -1034,7 +1034,7 @@ computerButton.addEventListener("click",()=>{
         if(socket){
             try{socket.close();}catch(e){}
         }
-        window.location.href="othello.html";
+        window.location.href="reversi.html";
         return;
     }
 
@@ -1051,8 +1051,8 @@ newGameButton.addEventListener("click",()=>{
     if(onlineMode&&socketOpen){
 
         sendSocket({
-            type:"othelloNewGame",
-            game:"othello",
+            type:"reversiNewGame",
+            game:"reversi",
             room:roomId,
             player:playerNumber,
             clientId,
