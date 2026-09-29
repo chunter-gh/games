@@ -51,6 +51,63 @@ h1{margin:0;font:900 clamp(36px,7vw,64px) Georgia,serif;letter-spacing:.12em;col
 .rules{color:#cdbb9a;font-size:12px;line-height:1.5}.rules summary{cursor:pointer;font-weight:900;color:#f4d68e}.rules p{margin:7px 0}
 @media(max-width:650px){.app{padding-left:7px;padding-right:7px;gap:8px}.hud{grid-template-columns:repeat(2,1fr)}.table{padding:13px 8px 16px;border-width:5px}.sum{right:2%;width:50px;height:50px;font-size:24px}.sum small{font-size:7px;top:2px}.zone{padding:6px 3px;min-height:88px}.zone small{font-size:9px}.zone strong{font-size:12px}.zone .stake{font-size:11px}.bet-zones{gap:5px}.table-head{font-size:16px}.dice-area{height:122px}.bet-panel{gap:8px}}
 @media(prefers-reduced-motion:reduce){.die.rolling{animation:none}.zone{transition:none}}
+
+/* Keep the felt and betting controls within the phone's usable viewport. */
+@media(max-width:650px){
+  .app{
+    height:100dvh;min-height:0;overflow-y:auto;
+    display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto auto;
+    gap:clamp(4px,.8dvh,8px);
+    padding:max(6px,env(safe-area-inset-top)) 7px max(6px,env(safe-area-inset-bottom));
+  }
+  header{min-width:0;gap:5px}
+  h1{font-size:clamp(28px,8vw,36px);letter-spacing:.05em}
+  .tag{font-size:8px;letter-spacing:.18em}
+  .top-actions{gap:4px}
+  .top-actions button{font-size:10px;padding:6px 7px}
+  .hud{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;min-width:0}
+  .meter{min-height:0;padding:5px 4px;text-align:center}
+  .meter small{font-size:8px;letter-spacing:0;margin-bottom:3px}
+  .meter strong{font-size:clamp(12px,3.4vw,17px)}
+  .table{
+    min-height:0;display:grid;
+    grid-template-rows:auto auto minmax(62px,1fr) auto auto auto auto;
+    gap:clamp(2px,.5dvh,6px);
+    padding:clamp(6px,1.2dvh,12px) 6px;
+    border-width:5px;border-radius:22px;
+  }
+  .table:before{inset:6px;border-radius:14px}
+  .table-head{font-size:clamp(13px,2.3dvh,17px)}
+  .phase{margin:0 auto;padding:3px 9px;font-size:10px}
+  .dice-area{height:auto;min-height:0;gap:clamp(12px,4vw,25px)}
+  .die{width:clamp(49px,10dvh,72px);height:clamp(49px,10dvh,72px);border-radius:11px;border-width:3px}
+  .sum{right:1%;width:clamp(40px,7dvh,50px);height:clamp(40px,7dvh,50px);font-size:23px}
+  .point-row{gap:3px;margin:0}
+  .point-box{width:clamp(34px,9vw,45px);height:clamp(27px,4.4dvh,36px);font-size:16px}
+  .bet-zones{gap:4px}
+  .zone{height:clamp(48px,8dvh,70px);min-height:0;padding:3px 2px;gap:2px;border-radius:8px}
+  .zone strong{font-size:clamp(10px,2.7vw,13px)}
+  .zone small{font-size:8px;line-height:1.1}
+  .zone .stake{font-size:10px}
+  .zone.field{height:clamp(36px,5.8dvh,48px);min-height:0;gap:3px}
+  .zone.field strong{font-size:14px}
+  .table-controls{margin:0;gap:5px}
+  .table-controls button{padding:6px 9px;font-size:10px}
+  .table-controls .roll{min-width:120px;padding:7px 12px;font-size:14px}
+  .message{min-height:0;padding:2px 3px 0;font-size:11px;line-height:1.2}
+  .bet-panel{justify-content:center;padding:5px;gap:4px;min-height:0}
+  .bet-panel label,.bet-help{display:none}
+  .chips{gap:clamp(8px,4vw,18px)}
+  .chip{width:clamp(39px,6dvh,48px);height:clamp(39px,6dvh,48px);font-size:11px}
+  .history{min-height:0;max-height:32px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:6px 9px;font-size:10px}
+  .rules{font-size:10px;line-height:1.2}
+  .rules p{line-height:1.45}
+}
+@media(max-height:570px){
+  .app{height:auto;min-height:100dvh;overflow-y:auto}
+  .table{min-height:340px}
+  .dice-area{min-height:68px}
+}
 </style>
 </head>
 <body>
