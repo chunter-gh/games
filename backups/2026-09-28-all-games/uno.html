@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Room - UNO</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; min-height: 100%; }
+body { color: #fff; font-family: Arial, Helvetica, sans-serif; background: radial-gradient(circle at 50% 38%, #3c2060, #17112c 62%, #0a0c19); }
+.game { width: 100%; min-height: 100dvh; padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: clamp(7px, 1.4vh, 14px); }
+h1 { margin: 0; font-size: clamp(34px, 6vw, 56px); font-style: italic; letter-spacing: .08em; color: #fff4a4; transform: rotate(-5deg); text-shadow: 3px 4px 0 #ae172e, 0 8px 20px #000; }
+.controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+button { cursor: pointer; font: inherit; }
+.controls button, .action { border: 1px solid #bba9df; border-radius: 9px; padding: 8px 12px; color: white; background: linear-gradient(#694c95, #372557); font-size: clamp(11px, 2.7vw, 14px); font-weight: bold; box-shadow: 0 4px 10px #0008; }
+button:focus-visible { outline: 3px solid #ffe28a; outline-offset: 2px; }
+button:disabled { opacity: .45; cursor: default; }
+.status { min-height: 2.6em; max-width: 650px; display: grid; place-items: center; text-align: center; color: #ffeba5; font-size: clamp(14px, 3.3vw, 19px); font-weight: bold; }
+.opponent { min-height: 105px; text-align: center; }
+.label { font-weight: bold; color: #cfc7e9; font-size: 13px; margin-bottom: 9px; }
+.backs { display: flex; justify-content: center; padding-left: 23px; min-height: 65px; }
+.back { width: 46px; height: 66px; margin-left: -23px; border-radius: 8px; border: 3px solid white; background: #ba243b; box-shadow: 0 3px 9px #0008; transform: rotate(-5deg); display: grid; place-items: center; font-size: 16px; font-weight: 900; font-style: italic; }
+.back:nth-child(even) { transform: rotate(5deg); }
+.table { flex: 1; min-height: 155px; display: flex; justify-content: center; align-items: center; gap: clamp(15px, 7vw, 80px); width: min(100%, 800px); padding: 14px; border-radius: 22px; background: radial-gradient(ellipse, #224e3d, #13372e 70%, #0b221f); border: 3px solid #6d506a; box-shadow: inset 0 0 30px #0008, 0 12px 24px #0007; }
+.pile { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.pile-label { font-size: 11px; letter-spacing: .13em; color: #d5e9da; }
+.table .back { margin: 0; width: clamp(65px, 15vw, 92px); height: clamp(94px, 22vw, 133px); font-size: clamp(19px, 5vw, 28px); transform: rotate(-8deg); }
+.color-indicator { font-weight: bold; font-size: 12px; letter-spacing: .08em; padding: 4px 9px; border-radius: 15px; background: #152720; }
+.color-indicator.red { color: #ff7179; }.color-indicator.blue { color: #7bb9ff; }.color-indicator.green { color: #8ee18e; }.color-indicator.yellow { color: #ffe48a; }
+.card { position: relative; flex: none; width: clamp(62px, 14vw, 85px); height: clamp(90px, 20vw, 122px); padding: 0; border-radius: 11px; border: 4px solid #fff; color: white; box-shadow: 0 4px 8px #0008, inset 0 0 0 2px #0002; font-weight: 900; overflow: hidden; }
+.card.red { background: #e93643; }.card.blue { background: #287ce7; }.card.green { background: #29ad5d; }.card.yellow { background: #efb927; }.card.wild { background: conic-gradient(#efb927 0 25%, #29ad5d 25% 50%, #287ce7 50% 75%, #e93643 75%); }
+.card::before { content: ""; position: absolute; inset: 21% 8%; background: #ffffffed; border-radius: 50%; transform: rotate(-28deg); }
+.card.wild::before { background: #17142b; }
+.card .middle { position: relative; display: grid; place-items: center; width: 100%; height: 100%; color: white; font-size: clamp(24px, 6vw, 43px); text-shadow: 1px 2px 2px #0007; transform: rotate(-18deg); }
+.card:not(.wild) .middle { color: inherit; -webkit-text-stroke: 1px #0003; }
+.card .corner { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 14px; }.card .corner.bottom { top: auto; left: auto; right: 5px; bottom: 3px; transform: rotate(180deg); }
+.card.playable { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.card.playable:hover { transform: translateY(-10px); box-shadow: 0 12px 15px #0009; }
+.card.unplayable { opacity: .75; }
+.hand-area { width: 100%; max-width: 850px; text-align: center; }
+.hand { display: flex; justify-content: center; align-items: flex-end; gap: 3px; min-height: clamp(110px, 22vw, 138px); overflow-x: auto; overflow-y: hidden; padding: 5px 5px 12px; scrollbar-color: #a87ad7 #1b1533; }
+.hand .card { margin: 0 -3px; }
+.hand .card:last-child { margin-right: 0; }
+.actions { display: flex; justify-content: center; gap: 8px; margin-bottom: 2px; }
+.color-picker { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; background: #050713c9; }
+.color-picker[hidden] { display: none; }
+.picker-panel { background: #221638; border: 2px solid #e2c8fc; border-radius: 18px; padding: 20px; text-align: center; box-shadow: 0 16px 40px #000b; }
+.choices { display: flex; gap: 9px; margin: 16px 0 12px; }
+.choices button { width: 50px; height: 50px; border: 3px solid white; border-radius: 50%; }
+.choices .red { background: #e93643; }.choices .blue { background: #287ce7; }.choices .green { background: #29ad5d; }.choices .yellow { background: #efb927; }
+.hint { margin: 0; color: #b9afd0; font-size: 11px; text-align: center; }
+@media (max-height: 650px) { .game { gap: 4px; } h1 { font-size: 31px; } .opponent { min-height: 75px; } .backs { min-height: 42px; } .back { width: 31px; height: 45px; } .table { min-height: 110px; } .hint { display: none; } }
+</style>
+</head>
+<body>
+<main class="game">
+  <h1>UNO</h1>
+  <div class="controls"><button id="twoPlayer">2 PLAYERS</button><button id="computer">VS COMPUTER</button><button id="newGame">NEW GAME</button><button id="menu">GAME ROOM</button></div>
+  <div class="status" id="status" role="status" aria-live="polite">Enter the two-player lobby to begin.</div>
+  <div class="opponent"><div class="label" id="opponentLabel">OPPONENT</div><div class="backs" id="opponentHand"></div></div>
+  <div class="table">
+    <div class="pile"><div class="pile-label">DRAW PILE</div><button class="back" id="drawPile" aria-label="Draw one card">UNO</button><div class="pile-label" id="deckCount"></div></div>
+    <div class="pile"><div class="pile-label">DISCARD</div><div id="discard"></div><div class="color-indicator" id="activeColor">COLOR</div></div>
+  </div>
+  <div class="hand-area"><div class="label" id="myLabel">YOUR HAND</div><div class="hand" id="hand"></div><div class="actions"><button class="action" id="pass" hidden>PASS TURN</button></div></div>
+  <p class="hint">Match color, number, or symbol. Reverse and Skip give you another turn with two players.</p>
+</main>
+<div class="color-picker" id="colorPicker" hidden><div class="picker-panel"><strong>CHOOSE A COLOR</strong><div class="choices"><button class="red" data-color="red" aria-label="Red"></button><button class="blue" data-color="blue" aria-label="Blue"></button><button class="green" data-color="green" aria-label="Green"></button><button class="yellow" data-color="yellow" aria-label="Yellow"></button></div><button class="action" id="cancelColor">CANCEL</button></div></div>
+<script>
+"use strict";
+const COLORS = ["red", "blue", "green", "yellow"];
+const params = new URLSearchParams(location.search);
+const roomId = params.get("room") || "";
+const rawPlayer = String(params.get("player") || "").trim().toLowerCase();
+const me = ["2", "player2", "player 2", "p2"].includes(rawPlayer) ? 2 : 1;
+const online = Boolean(roomId);
+const clientId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+const el = id => document.getElementById(id);
+let game = null, socket = null, socketOpen = false, reconnectTimer = null, syncTimer = null, selectedWild = null, cpuTimer = null;
+function ready() { return !online || socketOpen; }
+
+function makeDeck() {
+  const cards = []; let id = 0;
+  const add = (color, value) => cards.push({id: id++, color, value});
+  for (const color of COLORS) {
+    add(color, "0");
+    for (let n = 1; n <= 9; n++) { add(color, String(n)); add(color, String(n)); }
+    for (const action of ["skip", "reverse", "draw2"]) { add(color, action); add(color, action); }
+  }
+  for (let n = 0; n < 4; n++) { add("wild", "wild"); add("wild", "draw4"); }
+  for (let i = cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cards[i], cards[j]] = [cards[j], cards[i]]; }
+  return cards;
+}
+function deal() {
+  const deck = makeDeck(), hands = [[], []];
+  for (let i = 0; i < 7; i++) { hands[0].push(deck.pop()); hands[1].push(deck.pop()); }
+  const first = deck.findIndex(card => card.color !== "wild" && /^[0-9]$/.test(card.value));
+  const [top] = deck.splice(first, 1);
+  return {deck, hands, discard: [top], activeColor: top.color, turn: 1, winner: 0, revision: 0,
+    round: clientId + "-" + Date.now() + "-" + Math.random(), drawnId: null, announcement: "RED starts."};
+}
+function topCard() { return game.discard[game.discard.length - 1]; }
+function myHand() { return game.hands[me - 1]; }
+function canPlay(card, hand = myHand()) {
+  if (card.value === "draw4") return !hand.some(other => other.id !== card.id && other.color === game.activeColor);
+  if (card.color === "wild") return true;
+  return card.color === game.activeColor || card.value === topCard().value;
+}
+function drawCards(player, count) {
+  for (let i = 0; i < count; i++) {
+    if (!game.deck.length) {
+      if (game.discard.length < 2) break;
+      const top = game.discard.pop(); game.deck = game.discard;
+      game.discard = [top];
+      for (let j = game.deck.length - 1; j > 0; j--) { const k = Math.floor(Math.random() * (j + 1)); [game.deck[j], game.deck[k]] = [game.deck[k], game.deck[j]]; }
+    }
+    game.hands[player - 1].push(game.deck.pop());
+  }
+}
+function advance() { game.turn = game.turn === 1 ? 2 : 1; game.drawnId = null; }
+function playCard(id, chosenColor, actor = me) {
+  if (!game || game.winner || game.turn !== actor || !ready()) return;
+  const hand = game.hands[actor - 1], index = hand.findIndex(card => card.id === id);
+  if (index < 0 || (game.drawnId !== null && game.drawnId !== id)) return;
+  const card = hand[index];
+  if (!canPlay(card, hand)) { game.announcement = card.value === "draw4" ? "Draw Four needs no card of the active color." : "That card does not match."; render(); return; }
+  if (card.color === "wild" && !COLORS.includes(chosenColor)) { selectedWild = id; el("colorPicker").hidden = false; return; }
+  hand.splice(index, 1); game.discard.push(card);
+  game.activeColor = card.color === "wild" ? chosenColor : card.color;
+  game.drawnId = null;
+  const opponent = actor === 1 ? 2 : 1;
+  if (card.value === "draw2" || card.value === "draw4") drawCards(opponent, card.value === "draw2" ? 2 : 4);
+  if (!hand.length) { game.winner = actor; game.announcement = "Player " + actor + " wins this round!"; }
+  else {
+    if (!["skip", "reverse", "draw2", "draw4"].includes(card.value)) advance();
+    game.announcement = hand.length === 1 ? "UNO! Player " + actor + " has one card!" :
+      (["skip", "reverse", "draw2", "draw4"].includes(card.value) ? "Player " + actor + " plays again." : "Player " + game.turn + " is up.");
+  }
+  game.revision++; broadcastState(); render(); queueComputer();
+}
+function drawOne() {
+  if (!game || game.winner || game.turn !== me || !ready() || game.drawnId !== null) return;
+  const before = myHand().length;
+  drawCards(me, 1);
+  const card = myHand().length > before ? myHand()[myHand().length - 1] : null;
+  if (card && canPlay(card)) { game.drawnId = card.id; game.announcement = "Play the drawn card or pass."; }
+  else { advance(); game.announcement = "Player " + me + " draws and passes."; }
+  game.revision++; broadcastState(); render(); queueComputer();
+}
+function passTurn() {
+  if (!game || game.turn !== me || game.drawnId === null || !ready()) return;
+  advance(); game.announcement = "Player " + me + " passes.";
+  game.revision++; broadcastState(); render(); queueComputer();
+}
+function bestComputerColor() {
+  const hand = game.hands[1];
+  return COLORS.slice().sort((a, b) => hand.filter(card => card.color === b).length - hand.filter(card => card.color === a).length)[0];
+}
+function queueComputer() {
+  if (online || !game || game.winner || game.turn !== 2 || cpuTimer) return;
+  cpuTimer = setTimeout(() => {
+    cpuTimer = null;
+    if (!game || game.winner || game.turn !== 2) return;
+    const hand = game.hands[1];
+    const playable = hand.filter(card => canPlay(card, hand));
+    if (playable.length) {
+      const card = playable.find(c => c.color === game.activeColor && !["wild", "draw4"].includes(c.value)) || playable[0];
+      playCard(card.id, card.color === "wild" ? bestComputerColor() : undefined, 2);
+      return;
+    }
+    const before = hand.length;
+    drawCards(2, 1);
+    const drawn = hand.length > before ? hand[hand.length - 1] : null;
+    if (drawn && canPlay(drawn, hand)) {
+      playCard(drawn.id, drawn.color === "wild" ? bestComputerColor() : undefined, 2);
+    } else {
+      advance(); game.announcement = "Computer draws and passes.";
+      game.revision++; render();
+    }
+  }, 600);
+}
+function send(message) {
+  if (!socketOpen || !socket || socket.readyState !== WebSocket.OPEN) return false;
+  try { socket.send(JSON.stringify({game: "uno", room: roomId, clientId, player: me, ...message})); return true; }
+  catch { return false; }
+}
+function stopSync() { if (syncTimer) clearTimeout(syncTimer); syncTimer = null; }
+function broadcastState() {
+  if (!online || !game) return;
+  send({type: "unoState", state: game});
+  stopSync();
+  const round = game.round, revision = game.revision;
+  const retry = () => {
+    if (!game || game.round !== round || game.revision !== revision) return;
+    send({type: "unoState", state: game});
+    syncTimer = setTimeout(retry, 1500);
+  };
+  syncTimer = setTimeout(retry, 1500);
+}
+function validState(state) {
+  return state && Array.isArray(state.deck) && Array.isArray(state.hands) && state.hands.length === 2 &&
+    state.hands.every(Array.isArray) && Array.isArray(state.discard) && state.discard.length &&
+    COLORS.includes(state.activeColor) && [1,2].includes(state.turn) && [0,1,2].includes(state.winner) &&
+    Number.isInteger(state.revision) && typeof state.round === "string";
+}
+function receive(message) {
+  if (!message || message.clientId === clientId || message.game !== "uno" ||
+      String(message.room || "") !== roomId || String(message.player) === String(me)) return;
+  if (message.type === "unoAck") {
+    if (game && message.round === game.round && message.revision >= game.revision) stopSync();
+    return;
+  }
+  if (message.type === "unoJoin") { if (game) broadcastState(); return; }
+  if (message.type === "unoNewGameRequest") { if (me === 1) { game = deal(); broadcastState(); render(); } return; }
+  if (message.type !== "unoState" || !validState(message.state)) return;
+  if (me === 1 && game && message.state.round !== game.round) return;
+  send({type: "unoAck", round: message.state.round, revision: message.state.revision});
+  if (!game || message.state.round !== game.round || message.state.revision > game.revision) {
+    stopSync();
+    game = message.state; selectedWild = null; el("colorPicker").hidden = true; render();
+  }
+}
+function connect() {
+  if (!online || socketOpen || (socket && socket.readyState === WebSocket.CONNECTING)) return;
+  const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+  socket = new WebSocket(protocol + "//" + location.host + "/checkers");
+  socket.addEventListener("open", () => {
+    socketOpen = true;
+    if (me === 1 && !game) game = deal();
+    send({type: "unoJoin"});
+    if (me === 1) broadcastState();
+    render();
+  });
+  socket.addEventListener("message", event => { try { receive(JSON.parse(event.data)); } catch {} });
+  socket.addEventListener("close", () => {
+    socketOpen = false; render();
+    if (!reconnectTimer) reconnectTimer = setTimeout(() => { reconnectTimer = null; connect(); }, 1500);
+  });
+  socket.addEventListener("error", () => { socketOpen = false; render(); });
+}
+function cardLabel(card) {
+  return card.value === "draw2" ? "+2" : card.value === "draw4" ? "+4" :
+    card.value === "skip" ? "⊘" : card.value === "reverse" ? "↔" : card.value === "wild" ? "W" : card.value;
+}
+function cardElement(card, clickable) {
+  const button = document.createElement("button");
+  button.type = "button"; button.className = "card " + card.color + (clickable ? " playable" : " unplayable");
+  button.setAttribute("aria-label", card.color + " " + card.value);
+  const symbol = cardLabel(card);
+  button.innerHTML = '<span class="corner"></span><span class="middle"></span><span class="corner bottom"></span>';
+  button.querySelectorAll("span").forEach(span => { span.textContent = symbol; });
+  button.disabled = !clickable;
+  if (clickable) button.addEventListener("click", () => playCard(card.id));
+  return button;
+}
+function render() {
+  const status = el("status"), backs = el("opponentHand"), hand = el("hand"), discard = el("discard");
+  backs.innerHTML = ""; hand.innerHTML = ""; discard.innerHTML = "";
+  el("opponentLabel").textContent = online ? "PLAYER " + (me === 1 ? 2 : 1) + " · OPPONENT" : "COMPUTER · YELLOW";
+  el("myLabel").textContent = "PLAYER " + me + " · YOUR HAND";
+  if (!game) { status.textContent = socketOpen ? "Waiting for the deal..." : "Connecting to the room..."; el("drawPile").disabled = true; return; }
+  const opponentHand = game.hands[me === 1 ? 1 : 0];
+  for (let n = 0; n < Math.min(opponentHand.length, 12); n++) { const back = document.createElement("span"); back.className = "back"; back.textContent = "UNO"; backs.appendChild(back); }
+  el("opponentLabel").textContent += " · " + opponentHand.length + " cards";
+  discard.appendChild(cardElement(topCard(), false));
+  el("activeColor").className = "color-indicator " + game.activeColor;
+  el("activeColor").textContent = game.activeColor.toUpperCase();
+  el("deckCount").textContent = game.deck.length + " cards";
+  const myTurn = ready() && !game.winner && game.turn === me;
+  for (const card of myHand()) hand.appendChild(cardElement(card, myTurn && (game.drawnId === null || game.drawnId === card.id) && canPlay(card)));
+  el("drawPile").disabled = !myTurn || game.drawnId !== null;
+  el("pass").hidden = !myTurn || game.drawnId === null;
+  status.textContent = !ready() ? "Connection lost — reconnecting..." : game.winner ?
+    (game.winner === me ? "YOU WIN THIS ROUND!" : (online ? "PLAYER " + game.winner : "COMPUTER") + " WINS THIS ROUND!") :
+    (myTurn ? "YOUR TURN. " : online ? "OPPONENT'S TURN. " : "COMPUTER'S TURN. ") + game.announcement;
+}
+el("twoPlayer").addEventListener("click", () => { location.href = "rooms.html?game=uno"; });
+el("computer").addEventListener("click", () => { if (socket) socket.close(); location.href = "uno.html"; });
+el("newGame").addEventListener("click", () => {
+  if (!online) { if (cpuTimer) clearTimeout(cpuTimer); cpuTimer = null; game = deal(); render(); return; }
+  if (!socketOpen) return;
+  if (me === 1) { game = deal(); broadcastState(); render(); }
+  else { send({type: "unoNewGameRequest"}); el("status").textContent = "Asking Player 1 for a new deal..."; }
+});
+el("menu").addEventListener("click", () => { if (socket) socket.close(); location.href = "index.html"; });
+el("drawPile").addEventListener("click", drawOne);
+el("pass").addEventListener("click", passTurn);
+el("colorPicker").addEventListener("click", event => {
+  const color = event.target.dataset.color;
+  if (!COLORS.includes(color) || selectedWild === null) return;
+  const id = selectedWild; selectedWild = null; el("colorPicker").hidden = true; playCard(id, color);
+});
+el("cancelColor").addEventListener("click", () => { selectedWild = null; el("colorPicker").hidden = true; });
+el("twoPlayer").classList.toggle("active", online);
+el("computer").classList.toggle("active", !online);
+if (!online) game = deal();
+render(); if (online) connect();
+</script>
+</body>
+</html>
