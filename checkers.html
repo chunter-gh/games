@@ -425,8 +425,8 @@ select {
 
     <h1>CHECKERS</h1>
 
-    <div class="subtitle">
-        CLASSIC • GLOSSY • TWO PLAYER
+    <div class="subtitle" id="modeSubtitle">
+        CLASSIC • GLOSSY • TWO PLAYERS
     </div>
 
     <div class="controls">
@@ -879,6 +879,10 @@ new ResizeObserver(
    ========================================================= */
 
 function startGame() {
+
+    document.getElementById("modeSubtitle").textContent =
+        "CLASSIC • GLOSSY • " +
+        (gameMode === "computer" ? "VS COMPUTER" : "TWO PLAYERS");
 
     createInitialBoard();
 
