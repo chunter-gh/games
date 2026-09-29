@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Room - Four for the Money</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; width: 100%; min-height: 100%; }
+body { font-family: Georgia, "Times New Roman", serif; color: #f6e7c2; background: radial-gradient(circle at 50% 8%, #72512f, #302018 55%, #170e0c); }
+.game { min-height: 100dvh; padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 9px; overflow: hidden; }
+h1 { margin: 0; font-size: clamp(24px, 5vw, 46px); letter-spacing: .065em; text-align: center; color: #f7dc9b; text-shadow: 0 2px 1px #25110b, 0 6px 12px #090604; }
+.subtitle { margin-top: -7px; font: 700 10px Arial, sans-serif; letter-spacing: .27em; color: #d9b77a; }
+.controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+button { font: inherit; cursor: pointer; }
+.controls button { border: 1px solid #ad8756; border-radius: 8px; padding: 8px 10px; color: #fceac4; font: bold clamp(11px, 2.5vw, 14px) Arial, sans-serif; background: linear-gradient(#704526, #382112); box-shadow: inset 0 1px #ecc28b66, 0 3px 8px #100705; }
+.controls button:hover, .controls button:focus-visible { background: linear-gradient(#8d6035, #4d2c17); outline: 2px solid #f5d281; outline-offset: 2px; }
+.controls .active { border-color: #f3ce80; color: #ffe9af; }
+.scoreboard { display: flex; justify-content: center; align-items: center; gap: clamp(10px, 4vw, 42px); width: 100%; max-width: 650px; }
+.player { display: flex; align-items: center; gap: 7px; font: bold clamp(11px, 2.6vw, 15px) Arial, sans-serif; opacity: .64; }
+.player.turn { opacity: 1; text-shadow: 0 0 12px #fff8bb; }
+.sample { display: inline-block; width: 23px; height: 23px; border-radius: 50%; border: 2px ridge #eee; box-shadow: inset 0 0 0 2px #ffffff44, 0 2px 5px #000a; }
+.sample.silver { background: radial-gradient(circle at 32% 24%, #fff, #b6bfca 48%, #57616f 92%); }
+.sample.gold { border-color: #e9bd62; background: radial-gradient(circle at 32% 24%, #fff2bd, #cc963a 52%, #694113 92%); }
+.status { min-height: 2em; display: flex; align-items: center; justify-content: center; text-align: center; font: bold clamp(14px, 3vw, 19px) Arial, sans-serif; color: #ffe6a7; }
+.stage { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.board { width: min(95vw, 74dvh, 700px); aspect-ratio: 7 / 6; display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr); gap: clamp(3px, .8vw, 7px); padding: clamp(7px, 1.4vw, 13px); border: 5px ridge #a46c38; border-radius: 17px;
+ background: repeating-linear-gradient(96deg, transparent 0 12px, #180c0720 14px 16px, transparent 19px 37px), repeating-linear-gradient(0deg, #6c3d1e 0 29px, #784727 30px 56px, #5a3018 57px 59px, #85512b 60px 94px);
+ box-shadow: inset 0 2px 3px #e7b67b80, inset 0 -9px 16px #1a0b05b0, 0 16px 27px #0b0505b5, 0 0 0 3px #28150b; }
+.cell { display: grid; place-items: center; min-width: 0; min-height: 0; border: 0; border-radius: 50%; padding: 5%; background: radial-gradient(circle at 45% 40%, #26150d, #160c09 70%, #0c0706); box-shadow: inset 1px 3px 7px #000d, 0 1px 1px #f2c28077; touch-action: manipulation; }
+.cell:focus-visible { outline: 3px solid #fff4c6; outline-offset: -2px; }
+.board:not(.locked) .cell:not(.filled):hover { box-shadow: inset 0 0 0 4px #fce2a966, inset 1px 3px 7px #000b; }
+.disc { position: relative; display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; border: max(2px, .45vw) ridge; box-shadow: inset 2px 3px 4px #fff8, inset -4px -5px 7px #0007, 0 3px 4px #0009; overflow: hidden; }
+.disc::before { content: ""; position: absolute; inset: 7%; border-radius: 50%; border: 1px solid currentColor; box-shadow: inset 0 0 0 2px #fff5, 0 0 0 1px #0003; opacity: .75; }
+.disc::after { content: ""; position: absolute; inset: 2%; border-radius: 50%; border: 1px dashed currentColor; opacity: .45; }
+.disc.R { color: #4f5b6b; border-color: #d5dce2; background: radial-gradient(circle at 35% 25%, #fff, #d2d8dc 32%, #9da9b3 66%, #596471 97%); }
+.disc.Y { color: #754b18; border-color: #eec970; background: radial-gradient(circle at 35% 25%, #fff5c9, #dfbb64 32%, #b98531 66%, #684014 97%); }
+.coin-face { position: absolute; z-index: 1; inset: 12%; display: grid; place-items: center; backface-visibility: hidden; }
+.coin-face.tail { transform: rotateY(180deg); }
+.coin-art { width: 80%; height: 80%; fill: currentColor; filter: drop-shadow(1px 1px 0 #fff9) drop-shadow(-1px -1px 0 #0005); opacity: .83; }
+.coin-face small { position: absolute; bottom: 0; font: 700 clamp(3px, .85vw, 8px) Georgia, serif; letter-spacing: .08em; color: currentColor; opacity: .75; }
+.disc { transform-style: preserve-3d; }
+.disc.show-tail { transform: rotateY(180deg); }
+.disc.fresh { animation: coinDrop .65s cubic-bezier(.2,.7,.3,1.1) both; }
+.disc.show-tail.fresh { animation-name: coinDropTail; }
+.disc.winning { box-shadow: 0 0 0 3px #fff6cf, 0 0 18px 7px #fadd72, inset -4px -5px 7px #0006; animation: winPulse .8s ease-in-out infinite alternate; }
+@keyframes coinDrop { from { transform: translateY(-90px) rotateY(0deg) scale(.82); opacity: .35; } 55% { opacity: 1; } to { transform: translateY(0) rotateY(360deg) scale(1); opacity: 1; } }
+@keyframes coinDropTail { from { transform: translateY(-90px) rotateY(0deg) scale(.82); opacity: .35; } 55% { opacity: 1; } to { transform: translateY(0) rotateY(540deg) scale(1); opacity: 1; } }
+@keyframes winPulse { to { filter: brightness(1.3); } }
+.hint { margin: 0; font: 11px Arial, sans-serif; color: #d7bd91; text-align: center; }
+@media (max-height: 600px) { .game { gap: 5px; } .subtitle, .hint { display: none; } .controls button { padding: 5px 8px; } .board { width: min(90vw, 69dvh, 700px); } }
+@media (prefers-reduced-motion: reduce) { .disc { animation: none !important; } }
+</style>
+</head>
+<body>
+<main class="game">
+  <h1>FOUR FOR THE MONEY</h1>
+  <div class="subtitle">GAME ROOM</div>
+  <div class="controls">
+    <button id="twoPlayer" type="button">2 PLAYERS</button>
+    <button id="computer" type="button">VS COMPUTER</button>
+    <button id="newGame" type="button">NEW GAME</button>
+    <button id="menu" type="button">GAME ROOM</button>
+  </div>
+  <div class="scoreboard">
+    <div class="player turn" id="redLabel"><span class="sample silver"></span><span id="redName">SILVER</span></div>
+    <div class="player" id="yellowLabel"><span class="sample gold"></span><span id="yellowName">GOLD</span></div>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+  <div class="stage"><div class="board" id="board" role="grid" aria-label="Four for the Money board"></div></div>
+  <p class="hint">Drop a coin. Line up four to win.</p>
+</main>
+<script>
+"use strict";
+const ROWS = 6, COLS = 7, RED = "R", YELLOW = "Y", EMPTY = "";
+const params = new URLSearchParams(location.search);
+const roomId = params.get("room") || "";
+const onlineMode = Boolean(roomId);
+const rawPlayer = String(params.get("player") || "").trim().toLowerCase();
+const playerNumber = ["2", "player2", "player 2", "p2"].includes(rawPlayer) ? 2 : 1;
+const myColor = playerNumber === 1 ? RED : YELLOW;
+const clientId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+const boardElement = document.getElementById("board");
+const statusElement = document.getElementById("status");
+const redLabel = document.getElementById("redLabel"), yellowLabel = document.getElementById("yellowLabel");
+const newGameButton = document.getElementById("newGame");
+let board = emptyBoard(), faces = emptyBoard(), currentPlayer = RED, gameOver = false, winner = EMPTY, winningCells = [];
+let revision = 0, socket = null, socketOpen = false, reconnectTimer = null, cpuTimer = null;
+let lastDrop = null;
+
+function emptyBoard() { return Array.from({length: ROWS}, () => Array(COLS).fill(EMPTY)); }
+function other(color) { return color === RED ? YELLOW : RED; }
+function colorName(color) { return color === RED ? "SILVER" : "GOLD"; }
+function copyBoard(position) { return position.map(row => row.slice()); }
+function drop(position, column, color) {
+  if (!Number.isInteger(column) || column < 0 || column >= COLS) return -1;
+  for (let row = ROWS - 1; row >= 0; row--) {
+    if (position[row][column] === EMPTY) { position[row][column] = color; return row; }
+  }
+  return -1;
+}
+function winningLine(position, row, col, color) {
+  for (const [dr, dc] of [[0,1],[1,0],[1,1],[1,-1]]) {
+    const line = [[row,col]];
+    for (const sign of [-1,1]) {
+      let r = row + dr * sign, c = col + dc * sign;
+      while (r >= 0 && r < ROWS && c >= 0 && c < COLS && position[r][c] === color) {
+        line.push([r,c]); r += dr * sign; c += dc * sign;
+      }
+    }
+    if (line.length >= 4) return line;
+  }
+  return [];
+}
+function state() { return {board: copyBoard(board), faces: copyBoard(faces), currentPlayer, gameOver, winner, revision}; }
+function setStatus(message) { statusElement.textContent = message; }
+function updateStatus() {
+  redLabel.classList.toggle("turn", !gameOver && currentPlayer === RED);
+  yellowLabel.classList.toggle("turn", !gameOver && currentPlayer === YELLOW);
+  boardElement.classList.toggle("locked", gameOver || (onlineMode && (!socketOpen || currentPlayer !== myColor)));
+  if (gameOver) { setStatus(winner ? colorName(winner) + " WINS!" : "DRAW GAME"); return; }
+  if (onlineMode && !socketOpen) { setStatus("CONNECTING TO ROOM..."); return; }
+  if (onlineMode) { setStatus(currentPlayer === myColor ? "YOUR TURN — " + colorName(myColor) : "OPPONENT'S TURN — " + colorName(currentPlayer)); return; }
+  setStatus(currentPlayer === YELLOW ? "COMPUTER IS THINKING..." : "YOUR TURN — SILVER");
+}
+function render() {
+  boardElement.innerHTML = "";
+  const wins = new Set(winningCells.map(([r,c]) => r + "," + c));
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    const cell = document.createElement("button");
+    cell.type = "button"; cell.className = "cell" + (board[r][c] ? " filled" : "");
+    cell.dataset.column = c;
+    cell.setAttribute("role", "gridcell");
+    cell.setAttribute("aria-label", "Column " + (c + 1) + ", row " + (r + 1) + ", " + (board[r][c] ? colorName(board[r][c]) : "empty"));
+    if (board[r][c]) {
+      const disc = document.createElement("span");
+      disc.className = "disc " + board[r][c] + (faces[r][c] === "T" ? " show-tail" : "") + (lastDrop && lastDrop[0] === r && lastDrop[1] === c ? " fresh" : "") + (wins.has(r + "," + c) ? " winning" : "");
+      const liberty = '<svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><path d="M49 11 54 25 62 13 63 29 72 22 67 36 76 44 65 48 65 55 72 61 69 66 59 64 58 75 65 81 65 87 34 87 38 77 34 67 31 59 28 49 33 40 30 33 39 31 42 21 46 29Z"/><path d="M34 48 25 46 33 41 41 40 43 43 38 46ZM36 67 24 70 34 75 41 72Z"/></svg>';
+      const eagle = '<svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 39 45 30 39 35 34 29 27 37 13 28 22 48 33 54 38 63 43 65 43 72 35 79 39 82 50 75 61 82 65 79 57 72 57 65 62 63 67 54 78 48 87 28 73 37 66 29 61 35 55 30Z"/><path d="M45 43 50 35 55 43 52 55 50 59 48 55Z"/><path d="M32 59 42 66 34 68 25 64ZM68 59 58 66 66 68 75 64Z"/></svg>';
+      disc.innerHTML = '<span class="coin-face head">' + liberty + '<small>LIBERTY</small></span>' +
+        '<span class="coin-face tail">' + eagle + '<small>ONE DOLLAR</small></span>';
+      cell.appendChild(disc);
+    }
+    boardElement.appendChild(cell);
+  }
+  updateStatus();
+}
+function play(column, color) {
+  if (gameOver || color !== currentPlayer) return false;
+  const row = drop(board, column, color);
+  if (row < 0) return false;
+  faces[row][column] = Math.random() < .5 ? "H" : "T";
+  lastDrop = [row, column]; winningCells = winningLine(board, row, column, color);
+  winner = winningCells.length ? color : EMPTY;
+  gameOver = Boolean(winner) || board[0].every(value => value !== EMPTY);
+  currentPlayer = other(color); revision++;
+  render(); return true;
+}
+function reset() {
+  if (cpuTimer) clearTimeout(cpuTimer);
+  cpuTimer = null; board = emptyBoard(); faces = emptyBoard(); currentPlayer = RED;
+  gameOver = false; winner = EMPTY; winningCells = []; revision = 0; lastDrop = null;
+  render();
+}
+function send(message) {
+  if (!socketOpen || !socket || socket.readyState !== WebSocket.OPEN) return false;
+  try { socket.send(JSON.stringify({game: "connectfour", room: roomId, clientId, player: playerNumber, ...message})); return true; }
+  catch { return false; }
+}
+function validBoard(position) {
+  return Array.isArray(position) && position.length === ROWS && position.every(row =>
+    Array.isArray(row) && row.length === COLS && row.every(v => v === EMPTY || v === RED || v === YELLOW));
+}
+function validFaces(nextFaces, nextBoard) {
+  return Array.isArray(nextFaces) && nextFaces.length === ROWS && nextFaces.every((row, r) =>
+    Array.isArray(row) && row.length === COLS && row.every((v, c) =>
+      nextBoard[r][c] === EMPTY ? v === EMPTY : v === "H" || v === "T"));
+}
+function installState(next) {
+  if (!next || !validBoard(next.board) || !validFaces(next.faces, next.board) || !Number.isInteger(next.revision) || next.revision < 0 ||
+      (next.currentPlayer !== RED && next.currentPlayer !== YELLOW) || typeof next.gameOver !== "boolean" ||
+      ![EMPTY, RED, YELLOW].includes(next.winner)) return false;
+  board = copyBoard(next.board); faces = copyBoard(next.faces); currentPlayer = next.currentPlayer;
+  gameOver = next.gameOver; winner = next.winner; revision = next.revision;
+  winningCells = []; lastDrop = null;
+  if (winner) {
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (board[r][c] === winner) { const line = winningLine(board, r, c, winner); if (line.length) { winningCells = line; break; } }
+    }
+  }
+  render(); return true;
+}
+function onMessage(message) {
+  if (!message || message.clientId === clientId || message.game !== "connectfour" ||
+      String(message.room || "") !== roomId || String(message.player) === String(playerNumber)) return;
+  if (message.type === "connectfourJoin") { send({type: "connectfourState", state: state()}); return; }
+  if (message.type === "connectfourState") {
+    if (message.state && message.state.revision > revision) installState(message.state);
+    return;
+  }
+  if (message.type === "connectfourReset") { reset(); return; }
+  if (message.type !== "connectfourMove" || !Number.isInteger(message.column) ||
+      message.column < 0 || message.column >= COLS || gameOver ||
+      currentPlayer !== (message.player === 1 ? RED : YELLOW) ||
+      !message.state || message.state.revision !== revision + 1) return;
+  const expected = copyBoard(board);
+  if (drop(expected, message.column, currentPlayer) < 0 ||
+      JSON.stringify(expected) !== JSON.stringify(message.state.board)) return;
+  if (!validFaces(message.state.faces, expected)) return;
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    if (board[r][c] !== EMPTY && faces[r][c] !== message.state.faces[r][c]) return;
+  }
+  installState(message.state);
+}
+function connect() {
+  if (!onlineMode || socketOpen || (socket && socket.readyState === WebSocket.CONNECTING)) return;
+  const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+  socket = new WebSocket(protocol + "//" + location.host + "/checkers");
+  socket.addEventListener("open", () => { socketOpen = true; send({type: "connectfourJoin"}); updateStatus(); });
+  socket.addEventListener("message", event => { try { onMessage(JSON.parse(event.data)); } catch {} });
+  socket.addEventListener("close", () => { socketOpen = false; setStatus("CONNECTION LOST — RECONNECTING..."); if (!reconnectTimer) reconnectTimer = setTimeout(() => { reconnectTimer = null; connect(); }, 1500); });
+  socket.addEventListener("error", () => { socketOpen = false; setStatus("CONNECTION ERROR"); });
+}
+function bestComputerColumn() {
+  const choices = [3,2,4,1,5,0,6].filter(c => board[0][c] === EMPTY);
+  for (const color of [YELLOW, RED]) for (const c of choices) {
+    const trial = copyBoard(board), row = drop(trial, c, color);
+    if (winningLine(trial, row, c, color).length) return c;
+  }
+  return choices[Math.floor(Math.random() * Math.min(3, choices.length))];
+}
+boardElement.addEventListener("click", event => {
+  const cell = event.target.closest(".cell"); if (!cell) return;
+  if (onlineMode && (!socketOpen || currentPlayer !== myColor)) return;
+  if (!onlineMode && currentPlayer !== RED) return;
+  const column = Number(cell.dataset.column), color = onlineMode ? myColor : RED;
+  if (!play(column, color)) return;
+  if (onlineMode) send({type: "connectfourMove", column, state: state()});
+  else if (!gameOver) cpuTimer = setTimeout(() => { cpuTimer = null; const choice = bestComputerColumn(); if (choice !== undefined) play(choice, YELLOW); }, 420);
+});
+document.getElementById("twoPlayer").addEventListener("click", () => { location.href = "rooms.html?game=fourforthemoney"; });
+document.getElementById("computer").addEventListener("click", () => { if (socket) socket.close(); location.href = "fourforthemoney.html"; });
+newGameButton.addEventListener("click", () => { if (onlineMode && !socketOpen) return; reset(); if (onlineMode) send({type: "connectfourReset"}); });
+document.getElementById("menu").addEventListener("click", () => { if (socket) socket.close(); location.href = "index.html"; });
+document.getElementById("twoPlayer").classList.toggle("active", onlineMode);
+document.getElementById("computer").classList.toggle("active", !onlineMode);
+document.getElementById("redName").textContent = onlineMode ? "PLAYER 1 · SILVER" : "YOU · SILVER";
+document.getElementById("yellowName").textContent = onlineMode ? "PLAYER 2 · GOLD" : "COMPUTER · GOLD";
+render(); if (onlineMode) connect();
+</script>
+</body>
+</html>
