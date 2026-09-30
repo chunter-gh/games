@@ -2072,13 +2072,29 @@ const gameMenu = document.getElementById("gameMenu");
 const wheelStage = document.getElementById("wheelStage");
 
 function setWheelMotion(direction) {
-    const moving = direction === "up" || direction === "down";
-    wheelStage.dataset.wheelMotion = moving ? "running" : "paused";
-    wheelStage.style.setProperty("--wheel-duration", moving ? "7s" : "32s");
-    wheelStage.style.setProperty(
-        "--wheel-direction",
-        direction === "down" ? "reverse" : "normal"
-    );
+    const animations = [
+        ...gameMenu.getAnimations(),
+        ...[...gameMenu.querySelectorAll(".game-button")]
+            .flatMap(button => button.getAnimations())
+    ];
+
+    if (direction !== "up" && direction !== "down") {
+        wheelStage.dataset.wheelMotion = "paused";
+        animations.forEach(animation => animation.pause());
+        return;
+    }
+
+    wheelStage.dataset.wheelMotion = "running";
+    const playbackRate = direction === "down" ? -4.5 : 4.5;
+
+    animations.forEach(animation => {
+        if (typeof animation.updatePlaybackRate === "function") {
+            animation.updatePlaybackRate(playbackRate);
+        } else {
+            animation.playbackRate = playbackRate;
+        }
+        animation.play();
+    });
 }
 
 wheelStage.addEventListener("pointermove", event => {
