@@ -2070,8 +2070,9 @@ body {
 
 const gameMenu = document.getElementById("gameMenu");
 const wheelStage = document.getElementById("wheelStage");
+let lastWheelDirection = "up";
 
-function setWheelMotion(direction) {
+function setWheelMotion(direction, fast = false) {
     const animations = [
         ...gameMenu.getAnimations(),
         ...[...gameMenu.querySelectorAll(".game-button")]
@@ -2084,8 +2085,10 @@ function setWheelMotion(direction) {
         return;
     }
 
+    lastWheelDirection = direction;
     wheelStage.dataset.wheelMotion = "running";
-    const playbackRate = direction === "down" ? -4.5 : 4.5;
+    const speed = fast ? 4.5 : 1;
+    const playbackRate = direction === "down" ? -speed : speed;
 
     animations.forEach(animation => {
         if (typeof animation.updatePlaybackRate === "function") {
@@ -2104,16 +2107,15 @@ wheelStage.addEventListener("pointermove", event => {
     const verticalPosition = (event.clientY - bounds.top) / bounds.height;
 
     if (verticalPosition < 0.32) {
-        setWheelMotion("up");
+        setWheelMotion("up", true);
     } else if (verticalPosition > 0.68) {
-        setWheelMotion("down");
+        setWheelMotion("down", true);
     } else {
         setWheelMotion("center");
     }
 });
 
-wheelStage.addEventListener("pointerleave", () => setWheelMotion("center"));
-wheelStage.addEventListener("focusin", () => setWheelMotion("center"));
+wheelStage.addEventListener("pointerleave", () => setWheelMotion(lastWheelDirection, false));
 
 
 const gameInfo = {
