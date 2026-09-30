@@ -1,0 +1,238 @@
+name: One-shot PC and Android wheel control fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-wheel-pc-android.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace fragile CSS animation with direct wheel controller
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text()
+
+          # The wheel is now driven by requestAnimationFrame rather than pausing,
+          # reversing and changing playbackRate on CSS animations.  That removes
+          # the browser animation state that could strand the PC wheel paused.
+          s = s.replace('''    perspective-origin: 50% 50%;
+          }
+          .game-wheel {
+              position: absolute;
+              inset: 0;
+              transform-style: preserve-3d;
+              animation: wheelTurn var(--wheel-duration, 32s) linear infinite;
+              animation-direction: var(--wheel-direction, normal);
+          }
+          .wheel-stage[data-wheel-motion="paused"] .game-wheel,
+          .wheel-stage[data-wheel-motion="paused"] .game-wheel * {
+              animation-play-state: paused;
+          }''', '''    perspective-origin: 50% 50%;
+              touch-action: none;
+              user-select: none;
+              -webkit-user-select: none;
+          }
+          .game-wheel {
+              position: absolute;
+              inset: 0;
+              transform-style: preserve-3d;
+              will-change: transform;
+          }''', 1)
+
+          s = s.replace('''    animation: keepTileUpright var(--wheel-duration, 32s) linear infinite;
+              animation-direction: var(--wheel-direction, normal);''', '''    animation: none;
+              will-change: transform;''', 1)
+
+          old_js = re.compile(r'''const gameMenu = document\.getElementById\("gameMenu"\);\nconst wheelStage = document\.getElementById\("wheelStage"\);\nlet lastWheelDirection = "up";.*?wheelStage\.addEventListener\("pointerleave", \(\) => setWheelMotion\(lastWheelDirection, false\)\);''', re.S)
+
+          new_js = '''const gameMenu = document.getElementById("gameMenu");
+          const wheelStage = document.getElementById("wheelStage");
+
+          const BASE_WHEEL_SPEED = 360 / 32;
+          const FAST_WHEEL_MULTIPLIER = 4.5;
+          const TOUCH_DEAD_ZONE = 0.12;
+
+          let wheelAngle = 0;
+          let wheelVelocity = BASE_WHEEL_SPEED;
+          let lastWheelDirection = "up";
+          let lastWheelFrame = performance.now();
+          let activeTouchId = null;
+          let touchStartX = 0;
+          let touchStartY = 0;
+          let touchMoved = false;
+          let suppressWheelClickUntil = 0;
+
+          function setWheelVelocity(velocity) {
+              wheelVelocity = velocity;
+              if (velocity > 0.01) lastWheelDirection = "up";
+              if (velocity < -0.01) lastWheelDirection = "down";
+              wheelStage.dataset.wheelMotion = Math.abs(velocity) < 0.01 ? "paused" : "running";
+          }
+
+          function setWheelMotion(direction, fast = false) {
+              if (direction !== "up" && direction !== "down") {
+                  setWheelVelocity(0);
+                  return;
+              }
+
+              const speed = BASE_WHEEL_SPEED * (fast ? FAST_WHEEL_MULTIPLIER : 1);
+              setWheelVelocity(direction === "down" ? -speed : speed);
+          }
+
+          function renderWheel() {
+              gameMenu.style.transform = `rotateX(${wheelAngle}deg)`;
+              gameMenu.querySelectorAll(".game-button").forEach(button => {
+                  button.style.transform = `rotateX(${-wheelAngle}deg)`;
+              });
+          }
+
+          function runWheelFrame(now) {
+              const elapsed = Math.min(Math.max((now - lastWheelFrame) / 1000, 0), 0.05);
+              lastWheelFrame = now;
+
+              if (Math.abs(wheelVelocity) > 0.01) {
+                  wheelAngle = (wheelAngle + wheelVelocity * elapsed) % 360;
+              }
+
+              renderWheel();
+              requestAnimationFrame(runWheelFrame);
+          }
+
+          requestAnimationFrame(runWheelFrame);
+
+          function desktopWheelControl(event) {
+              const bounds = wheelStage.getBoundingClientRect();
+              const verticalPosition = (event.clientY - bounds.top) / bounds.height;
+
+              if (verticalPosition < 0.32) {
+                  setWheelMotion("up", true);
+              } else if (verticalPosition > 0.68) {
+                  setWheelMotion("down", true);
+              } else {
+                  setWheelMotion("center");
+              }
+          }
+
+          function touchWheelControl(event) {
+              const bounds = wheelStage.getBoundingClientRect();
+              const verticalPosition = Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height));
+              const signedPosition = (verticalPosition - 0.5) * 2;
+              const distanceFromCenter = Math.abs(signedPosition);
+
+              if (distanceFromCenter <= TOUCH_DEAD_ZONE) {
+                  setWheelMotion("center");
+                  return;
+              }
+
+              // Android: center pauses; moving toward either edge smoothly
+              // increases speed. Crossing center reverses the wheel.
+              const amount = (distanceFromCenter - TOUCH_DEAD_ZONE) / (1 - TOUCH_DEAD_ZONE);
+              const speedMultiplier = 0.2 + (FAST_WHEEL_MULTIPLIER - 0.2) * amount;
+              const velocity = BASE_WHEEL_SPEED * speedMultiplier * (signedPosition < 0 ? 1 : -1);
+              setWheelVelocity(velocity);
+          }
+
+          wheelStage.addEventListener("pointerdown", event => {
+              if (event.pointerType !== "touch") return;
+
+              activeTouchId = event.pointerId;
+              touchStartX = event.clientX;
+              touchStartY = event.clientY;
+              touchMoved = false;
+
+              try { wheelStage.setPointerCapture(event.pointerId); } catch (_) {}
+              touchWheelControl(event);
+          });
+
+          wheelStage.addEventListener("pointermove", event => {
+              if (event.pointerType === "touch") {
+                  if (event.pointerId !== activeTouchId) return;
+
+                  if (Math.hypot(event.clientX - touchStartX, event.clientY - touchStartY) > 8) {
+                      touchMoved = true;
+                  }
+
+                  touchWheelControl(event);
+                  if (touchMoved) event.preventDefault();
+                  return;
+              }
+
+              desktopWheelControl(event);
+          });
+
+          function releaseTouchWheel(event) {
+              if (event.pointerId !== activeTouchId) return;
+
+              if (touchMoved) {
+                  suppressWheelClickUntil = Date.now() + 400;
+              }
+
+              activeTouchId = null;
+              setWheelMotion(lastWheelDirection, false);
+          }
+
+          wheelStage.addEventListener("pointerup", releaseTouchWheel);
+          wheelStage.addEventListener("pointercancel", releaseTouchWheel);
+
+          wheelStage.addEventListener("pointerleave", event => {
+              if (event.pointerType === "touch" && activeTouchId !== null) return;
+              setWheelMotion(lastWheelDirection, false);
+          });
+
+          // If the pointer leaves the browser entirely, do not leave the wheel
+          // stranded in the desktop hover-pause state.
+          window.addEventListener("blur", () => {
+              if (activeTouchId === null) setWheelMotion(lastWheelDirection, false);
+          });
+
+          window.addEventListener("pointerout", event => {
+              if (event.pointerType !== "touch" && !event.relatedTarget) {
+                  setWheelMotion(lastWheelDirection, false);
+              }
+          });
+
+          document.addEventListener("visibilitychange", () => {
+              lastWheelFrame = performance.now();
+              if (!document.hidden && activeTouchId === null) {
+                  setWheelMotion(lastWheelDirection, false);
+              }
+          });'''
+
+          s, count = old_js.subn(new_js, s, count=1)
+          if count != 1:
+              raise SystemExit(f'Expected current wheel JS block once, found {count}; refusing to change index.html')
+
+          old_click = '''    button.onclick = () => {
+                  location.href = filename;
+              };'''
+          new_click = '''    button.onclick = event => {
+                  if (Date.now() < suppressWheelClickUntil) {
+                      event.preventDefault();
+                      return;
+                  }
+                  location.href = filename;
+              };'''
+          if old_click not in s:
+              raise SystemExit('Expected game button click handler not found; refusing to change index.html')
+          s = s.replace(old_click, new_click, 1)
+
+          p.write_text(s)
+          PY
+      - name: Commit fix and remove one-shot workflow
+        run: |
+          rm .github/workflows/fix-wheel-pc-android.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/fix-wheel-pc-android.yml
+          git commit -m "Fix PC wheel freeze and add Android touch control"
+          git push
