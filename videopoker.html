@@ -47,7 +47,7 @@ body{background:radial-gradient(ellipse at 50% -15%,#523055 0%,#1b1936 55%,#080b
 .hold{flex:0 0 auto;min-height:clamp(29px,4.3dvh,39px);border:2px solid #a98a55;border-radius:8px;background:linear-gradient(#3c4352,#1a1e2a);color:#c9c3b3;font-size:clamp(10px,1.5vw,14px);font-weight:900;letter-spacing:.09em;cursor:pointer;touch-action:manipulation}
 .hold.active{color:#25160d;background:linear-gradient(#fff4aa,#e1ad42);border-color:#fff4bc;box-shadow:0 0 14px #ffd460}
 .hold:disabled{opacity:.62;cursor:default}
-.result{flex:0 0 auto;height:clamp(31px,4.8dvh,45px);display:grid;place-items:center;text-align:center;border:1px solid #755d55;border-radius:8px;background:linear-gradient(#111729,#090d19);color:#ffdf8b;font:900 clamp(12px,1.8vw,18px) Georgia,serif;letter-spacing:.08em;text-shadow:0 0 8px #e48934;box-shadow:inset 0 0 12px #000;opacity:.35}
+.result{flex:0 0 auto;min-height:clamp(34px,5.2dvh,48px);display:grid;place-items:center;padding:3px 5px;text-align:center;border:1px solid #755d55;border-radius:8px;background:linear-gradient(#111729,#090d19);color:#ffdf8b;font:900 clamp(9px,1.4vw,14px) Georgia,serif;line-height:1.12;letter-spacing:.045em;text-shadow:0 0 8px #e48934;box-shadow:inset 0 0 12px #000;opacity:.35}
 .result.show{opacity:1}.result.jackpot{animation:resultFlash .45s infinite alternate}
 @keyframes resultFlash{to{color:#fff;box-shadow:inset 0 0 12px #000,0 0 18px #ffcf53}}
 .console{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"balance last" "bets bets" "buttons buttons";align-items:center;gap:clamp(4px,.7dvh,7px);margin:0 clamp(10px,2vw,26px) clamp(8px,1.5dvh,15px);padding:clamp(6px,1vw,10px);border:5px ridge #d6b47b;border-radius:14px;background:linear-gradient(125deg,#734a65,#2b233d 55%,#64415e);box-shadow:inset 0 4px 9px #000a}
@@ -155,6 +155,28 @@ function evaluate(five){
   return "";
 }
 function payout(id,amount){if(!id)return 0;return cents((id==="royal"?800:hands.find(h=>h.id===id).pay)*amount);}
+function rankWord(rank,plural=false){
+  const names={11:"Jack",12:"Queen",13:"King",14:"Ace"};
+  const name=names[rank]||String(rank);
+  return plural?(names[rank]?name+"s":name+"s"):name;
+}
+function winningHandLabel(id){
+  const counts=new Map();
+  for(const card of cards)counts.set(card.rank,(counts.get(card.rank)||0)+1);
+  const grouped=[...counts.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0]);
+  if(id==="jacks")return "PAIR OF "+rankWord(grouped.find(([,count])=>count===2)[0],true).toUpperCase();
+  if(id==="twoPair"){
+    const pairs=grouped.filter(([,count])=>count===2).map(([rank])=>rankWord(rank,true).toUpperCase());
+    return "TWO PAIR · "+pairs.join(" AND ");
+  }
+  if(id==="three")return "THREE "+rankWord(grouped.find(([,count])=>count===3)[0],true).toUpperCase();
+  if(id==="four")return "FOUR "+rankWord(grouped.find(([,count])=>count===4)[0],true).toUpperCase();
+  if(id==="full"){
+    const trips=grouped.find(([,count])=>count===3)[0],pair=grouped.find(([,count])=>count===2)[0];
+    return "FULL HOUSE · "+rankWord(trips,true).toUpperCase()+" OVER "+rankWord(pair,true).toUpperCase();
+  }
+  return hands.find(hand=>hand.id===id)?.label||"WINNING HAND";
+}
 function pipPositions(rank){
   const map={
     2:[[1,0],[1,4]],3:[[1,0],[1,2],[1,4]],4:[[0,0],[2,0],[0,4],[2,4]],5:[[0,0],[2,0],[1,2],[0,4],[2,4]],
@@ -217,7 +239,7 @@ function deal(){
 }
 function finishDraw(){
   winningId=evaluate(cards);lastWin=payout(winningId,bet);balance=cents(balance+lastWin);saveBalance();phase="finished";held.clear();
-  const hand=hands.find(h=>h.id===winningId);resultText=hand?hand.label+" · WIN "+money(lastWin):"NO WIN";
+  resultText=winningId?winningHandLabel(winningId)+" · BET "+money(bet)+" · PAYS "+money(lastWin):"NO WIN";
   sound(lastWin?"win":"lose",winningId==="royal"?2:lastWin>=bet*9?1:0);render();
 }
 function draw(){
