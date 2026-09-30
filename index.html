@@ -1751,6 +1751,92 @@ body {
     }
     .footer { display: none; }
 }
+
+
+/* ROTATING GAME SELECTION WHEEL */
+.wheel-stage {
+    position: absolute;
+    z-index: 45;
+    left: 50%;
+    top: 51%;
+    width: min(88vw, 880px);
+    height: min(48vh, 420px);
+    transform: translate(-50%, -50%);
+    perspective: 1100px;
+    perspective-origin: 50% 50%;
+}
+.game-wheel {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    animation: wheelTurn 32s linear infinite;
+}
+.game-wheel.paused,
+.wheel-stage:hover .game-wheel {
+    animation-play-state: paused;
+}
+@keyframes wheelTurn {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
+.game-wheel .game-button {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(190px, 27vw, 300px);
+    height: clamp(68px, 10vh, 88px);
+    flex-shrink: 0;
+    padding: 0 14px;
+    border-radius: 18px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: filter .18s ease, box-shadow .18s ease;
+}
+.game-wheel .game-button:hover,
+.game-wheel .game-button:focus-visible {
+    filter: brightness(1.28);
+    box-shadow: 0 0 26px rgba(113,220,255,.75), inset 0 2px 2px rgba(255,255,255,.4);
+    outline: 2px solid rgba(193,244,255,.9);
+}
+.wheel-controls {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    bottom: 2px;
+    transform: translateX(-50%);
+}
+.wheel-controls button {
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 999px;
+    padding: 8px 18px;
+    color: white;
+    background: rgba(5,18,32,.82);
+    font-weight: 700;
+    cursor: pointer;
+}
+.wheel-hint {
+    position: absolute;
+    left: 50%;
+    bottom: -27px;
+    transform: translateX(-50%);
+    margin: 0;
+    white-space: nowrap;
+    color: #d6eaff;
+    font-size: clamp(10px, 1.5vw, 13px);
+    text-shadow: 0 2px 5px #06101d;
+}
+@media (max-width: 560px) {
+    .wheel-stage { top: 47%; width: 94vw; height: min(43vh, 330px); }
+    .game-wheel .game-button { width: min(68vw, 250px); height: 62px; }
+    .game-wheel .button-title { font-size: clamp(14px, 4.3vw, 19px); }
+    .game-wheel .button-subtitle { display: none; }
+    .wheel-hint { bottom: -23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .game-wheel { animation-duration: 90s; }
+}
+
 </style>
 </head>
 
@@ -1766,7 +1852,13 @@ body {
         <div class="subtitle">CHOOSE YOUR GAME</div>
     </div>
 
-    <div class="menu" id="gameMenu"></div>
+    <div class="wheel-stage" id="wheelStage" aria-label="Rotating game selection wheel">
+        <div class="game-wheel" id="gameMenu" aria-live="polite"></div>
+        <div class="wheel-controls">
+            <button type="button" id="wheelPause" aria-pressed="false">Pause wheel</button>
+        </div>
+        <p class="wheel-hint">Hover to pause • Choose a tile to play</p>
+    </div>
 
 
     <!-- PALM TREE -->
@@ -1994,6 +2086,15 @@ body {
 ========================================================= */
 
 const gameMenu = document.getElementById("gameMenu");
+const wheelPause = document.getElementById("wheelPause");
+const wheelStage = document.getElementById("wheelStage");
+
+wheelPause.addEventListener("click", () => {
+    const paused = gameMenu.classList.toggle("paused");
+    wheelPause.textContent = paused ? "Resume wheel" : "Pause wheel";
+    wheelPause.setAttribute("aria-pressed", String(paused));
+});
+
 
 const gameInfo = {
 
@@ -2098,6 +2199,19 @@ function makeGameTitle(filename) {
     name = name.replace(/\b\w/g, c => c.toUpperCase());
 
     return name;
+}
+
+function arrangeWheelTiles() {
+    const tiles = [...gameMenu.querySelectorAll(".game-button")];
+    const count = tiles.length;
+    if (!count) return;
+    gameMenu.style.setProperty("--wheel-radius", count > 10 ? "220px" : "190px");
+    tiles.forEach((tile, index) => {
+        const angle = (360 / count) * index;
+        tile.style.transform =
+            `translate(-50%, -50%) rotateY(${angle}deg) translateZ(var(--wheel-radius))`;
+        tile.setAttribute("aria-label", tile.querySelector(".button-title")?.textContent || "Open game");
+    });
 }
 
 function createGameButton(filename) {
@@ -2224,40 +2338,10 @@ async function loadGames() {
                     return a.localeCompare(b);
                 });
 
-        gameMenu.classList.remove(
-            "many-games",
-            "lots-of-games",
-            "huge-game-list"
-        );
-
-        gameMenu.classList.add("two-columns");
-        gameMenu.style.setProperty(
-            "--menu-rows",
-            Math.max(1, Math.ceil(htmlGames.length / 2))
-        );
-
-        if (htmlGames.length >= 5 &&
-            htmlGames.length < 8) {
-
-            gameMenu.classList.add(
-                "many-games"
-            );
-        }
-
-        if (htmlGames.length >= 8 &&
-            htmlGames.length < 12) {
-
-            gameMenu.classList.add(
-                "lots-of-games"
-            );
-        }
-
-        if (htmlGames.length >= 12) {
-
-            gameMenu.classList.add(
-                "huge-game-list"
-            );
-        }
+        gameMenu.innerHTML = "";
+        gameMenu.classList.remove("paused");
+        wheelPause.textContent = "Pause wheel";
+        wheelPause.setAttribute("aria-pressed", "false");
 
         if (!htmlGames.some(filename => filename.toLowerCase() === "casino.html")) {
             htmlGames.unshift("casino.html");
@@ -2270,6 +2354,8 @@ async function loadGames() {
             );
 
         });
+
+        arrangeWheelTiles();
 
         if (htmlGames.length === 0) {
 
@@ -2302,6 +2388,8 @@ async function loadGames() {
             );
 
         });
+
+        arrangeWheelTiles();
 
         gameMenu.classList.remove(
             "many-games",
