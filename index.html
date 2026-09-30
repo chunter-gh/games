@@ -1792,17 +1792,32 @@ body {
     pointer-events: none;
 }
 .game-wheel.paused,
-.wheel-stage:hover .game-wheel {
+.wheel-stage:hover .game-wheel,
+.game-wheel.paused *,
+.wheel-stage:hover .game-wheel * {
     animation-play-state: paused;
 }
 @keyframes wheelTurn {
-    from { transform: rotateY(0deg); }
-    to { transform: rotateY(360deg); }
+    from { transform: rotateX(0deg); }
+    to { transform: rotateX(360deg); }
 }
-.game-wheel .game-button {
+@keyframes keepTileUpright {
+    from { transform: rotateX(0deg); }
+    to { transform: rotateX(-360deg); }
+}
+.wheel-tile {
     position: absolute;
     left: 50%;
     top: 50%;
+    transform-style: preserve-3d;
+}
+.game-wheel .game-button {
+    position: relative;
+    left: 0;
+    top: 0;
+    translate: -50% -50%;
+    transform-origin: center center;
+    animation: keepTileUpright 32s linear infinite;
     width: clamp(190px, 27vw, 300px);
     height: clamp(68px, 10vh, 88px);
     flex-shrink: 0;
@@ -1848,7 +1863,7 @@ body {
 }
 @media (max-width: 560px) {
     .wheel-stage { top: 47%; width: 94vw; height: min(43vh, 330px); }
-    .game-wheel .game-button { width: min(68vw, 250px); height: 62px; }
+    .game-wheel .game-button { width: min(68vw, 250px); height: 58px; }
     .game-wheel .button-title { font-size: clamp(14px, 4.3vw, 19px); }
     .game-wheel .button-subtitle { display: none; }
     .wheel-hint { bottom: -23px; }
@@ -2225,11 +2240,19 @@ function arrangeWheelTiles() {
     const tiles = [...gameMenu.querySelectorAll(".game-button")];
     const count = tiles.length;
     if (!count) return;
-    gameMenu.style.setProperty("--wheel-radius", count > 10 ? "220px" : "190px");
+
+    // Keep tile centers about 72px apart around the vertical loop.
+    const radius = Math.max(165, (count * 72) / (2 * Math.PI));
+    gameMenu.style.setProperty("--wheel-radius", `${radius}px`);
+
     tiles.forEach((tile, index) => {
         const angle = (360 / count) * index;
-        tile.style.transform =
-            `translate(-50%, -50%) rotateY(${angle}deg) translateZ(var(--wheel-radius))`;
+        const holder = document.createElement("div");
+        holder.className = "wheel-tile";
+        tile.replaceWith(holder);
+        holder.appendChild(tile);
+        holder.style.transform =
+            `rotateX(${angle}deg) translateZ(var(--wheel-radius)) rotateX(-${angle}deg)`;
         tile.setAttribute("aria-label", tile.querySelector(".button-title")?.textContent || "Open game");
     });
 }
