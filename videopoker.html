@@ -132,7 +132,16 @@ function sound(kind,level=0){
     else if(kind==="hold")add(level?[820,1120]:[720,480],.06,.12,"sine",.075);
     else if(kind==="draw")add([720,620,520,820],.075,.11,"square",.034);
     else if(kind==="lose")add([330,230],.13,.20,"triangle",.05);
-    else if(kind==="win")add(level>=2?[523,659,784,1047,1319,1568,2093,1568,2093,2637]:level===1?[523,659,784,1047,1319,1568]:[523,659,784,1047],level>=2?.105:.115,.21,"triangle",level>=2?.075:.065);
+    else if(kind==="win"){
+      const melody=level>=2?[784,988,1175,1568,1760,2093,2637]:level===1?[659,784,988,1175,1568]:[523,659,784,1047];
+      const spacing=level>=2?.085:.105,volume=level>=2?.075:.065;
+      melody.forEach((f,i)=>{
+        const t=i*spacing;
+        notes.push({f,t,d:.25,type:"sine",volume});
+        notes.push({f:f*2,t,d:.16,type:"triangle",volume:volume*.32});
+      });
+      [1760,2093,2637,3136,2637,3136].forEach((f,i)=>notes.push({f,t:melody.length*spacing+i*.055,d:.09,type:"sine",volume:.035}));
+    }
     for(const n of notes){const o=audio.createOscillator(),g=audio.createGain(),t=start+n.t;o.type=n.type;o.frequency.setValueAtTime(n.f,t);o.frequency.exponentialRampToValueAtTime(n.f*.9,t+n.d);g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(n.volume,t+.012);g.gain.exponentialRampToValueAtTime(.001,t+n.d);o.connect(g).connect(audio.destination);o.start(t);o.stop(t+n.d+.015);}
   }catch{}
 }
