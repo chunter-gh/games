@@ -1771,9 +1771,7 @@ body {
     transform-style: preserve-3d;
     animation: wheelTurn 32s linear infinite;
 }
-.game-wheel.paused,
 .wheel-stage:hover .game-wheel,
-.game-wheel.paused *,
 .wheel-stage:hover .game-wheel * {
     animation-play-state: paused;
 }
@@ -1814,39 +1812,11 @@ body {
     box-shadow: 0 0 26px rgba(113,220,255,.75), inset 0 2px 2px rgba(255,255,255,.4);
     outline: 2px solid rgba(193,244,255,.9);
 }
-.wheel-controls {
-    position: absolute;
-    z-index: 3;
-    left: 50%;
-    bottom: 2px;
-    transform: translateX(-50%);
-}
-.wheel-controls button {
-    border: 1px solid rgba(255,255,255,.65);
-    border-radius: 999px;
-    padding: 8px 18px;
-    color: white;
-    background: rgba(5,18,32,.82);
-    font-weight: 700;
-    cursor: pointer;
-}
-.wheel-hint {
-    position: absolute;
-    left: 50%;
-    bottom: -27px;
-    transform: translateX(-50%);
-    margin: 0;
-    white-space: nowrap;
-    color: #d6eaff;
-    font-size: clamp(10px, 1.5vw, 13px);
-    text-shadow: 0 2px 5px #06101d;
-}
 @media (max-width: 560px) {
     .wheel-stage { top: 47%; width: 94vw; height: min(43vh, 330px); }
     .game-wheel .game-button { width: min(68vw, 250px); height: 58px; }
     .game-wheel .button-title { font-size: clamp(14px, 4.3vw, 19px); }
     .game-wheel .button-subtitle { display: none; }
-    .wheel-hint { bottom: -23px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .game-wheel { animation: none; }
@@ -1869,10 +1839,6 @@ body {
 
     <div class="wheel-stage" id="wheelStage" aria-label="Rotating game selection wheel">
         <div class="game-wheel" id="gameMenu" aria-live="polite"></div>
-        <div class="wheel-controls">
-            <button type="button" id="wheelPause" aria-pressed="false">Pause wheel</button>
-        </div>
-        <p class="wheel-hint">Hover to pause • Choose a tile to play</p>
     </div>
 
 
@@ -2101,14 +2067,6 @@ body {
 ========================================================= */
 
 const gameMenu = document.getElementById("gameMenu");
-const wheelPause = document.getElementById("wheelPause");
-const wheelStage = document.getElementById("wheelStage");
-
-wheelPause.addEventListener("click", () => {
-    const paused = gameMenu.classList.toggle("paused");
-    wheelPause.textContent = paused ? "Resume wheel" : "Pause wheel";
-    wheelPause.setAttribute("aria-pressed", String(paused));
-});
 
 
 const gameInfo = {
@@ -2362,9 +2320,6 @@ async function loadGames() {
                 });
 
         gameMenu.innerHTML = "";
-        gameMenu.classList.remove("paused");
-        wheelPause.textContent = "Pause wheel";
-        wheelPause.setAttribute("aria-pressed", "false");
 
         if (!htmlGames.some(filename => filename.toLowerCase() === "casino.html")) {
             htmlGames.unshift("casino.html");
