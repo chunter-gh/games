@@ -1769,10 +1769,11 @@ body {
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
-    animation: wheelTurn 32s linear infinite;
+    animation: wheelTurn var(--wheel-duration, 32s) linear infinite;
+    animation-direction: var(--wheel-direction, normal);
 }
-.wheel-stage:hover .game-wheel,
-.wheel-stage:hover .game-wheel * {
+.wheel-stage[data-wheel-motion="paused"] .game-wheel,
+.wheel-stage[data-wheel-motion="paused"] .game-wheel * {
     animation-play-state: paused;
 }
 @keyframes wheelTurn {
@@ -1795,7 +1796,8 @@ body {
     top: 0;
     translate: -50% -50%;
     transform-origin: center center;
-    animation: keepTileUpright 32s linear infinite;
+    animation: keepTileUpright var(--wheel-duration, 32s) linear infinite;
+    animation-direction: var(--wheel-direction, normal);
     width: clamp(225px, 31vw, 350px);
     height: clamp(68px, 10vh, 88px);
     flex-shrink: 0;
@@ -2067,6 +2069,35 @@ body {
 ========================================================= */
 
 const gameMenu = document.getElementById("gameMenu");
+const wheelStage = document.getElementById("wheelStage");
+
+function setWheelMotion(direction) {
+    const moving = direction === "up" || direction === "down";
+    wheelStage.dataset.wheelMotion = moving ? "running" : "paused";
+    wheelStage.style.setProperty("--wheel-duration", moving ? "7s" : "32s");
+    wheelStage.style.setProperty(
+        "--wheel-direction",
+        direction === "down" ? "reverse" : "normal"
+    );
+}
+
+wheelStage.addEventListener("pointermove", event => {
+    if (event.pointerType === "touch") return;
+
+    const bounds = wheelStage.getBoundingClientRect();
+    const verticalPosition = (event.clientY - bounds.top) / bounds.height;
+
+    if (verticalPosition < 0.32) {
+        setWheelMotion("up");
+    } else if (verticalPosition > 0.68) {
+        setWheelMotion("down");
+    } else {
+        setWheelMotion("center");
+    }
+});
+
+wheelStage.addEventListener("pointerleave", () => setWheelMotion("center"));
+wheelStage.addEventListener("focusin", () => setWheelMotion("center"));
 
 
 const gameInfo = {
