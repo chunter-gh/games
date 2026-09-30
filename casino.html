@@ -161,6 +161,26 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   .tumbleweed-track{width:100vw;right:0;bottom:6%}
   .tumbleweed{width:52px}
 }
+
+.i15-marker{
+  position:absolute;z-index:1;left:calc(22vw + 4px);top:15vh;width:clamp(62px,6vw,78px);
+  height:clamp(76px,9vh,96px);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:3px solid #f7f4e9;border-radius:14px 14px 18px 18px;
+  background:linear-gradient(180deg,#c9363a 0 25%,#174c84 25% 100%);
+  color:#fff;text-shadow:0 2px 2px #001a34;box-shadow:0 3px 10px #0009;
+  font-family:Arial,sans-serif;line-height:1;pointer-events:none;
+  clip-path:polygon(10% 0,90% 0,100% 15%,100% 80%,82% 100%,18% 100%,0 80%,0 15%);
+}
+.i15-marker::after{
+  content:"";position:absolute;z-index:-1;top:87%;left:calc(50% - 2px);width:4px;height:45px;
+  background:linear-gradient(90deg,#8e8777,#ddd3b6,#777164);
+}
+.i15-marker span{font-size:clamp(7px,.8vw,9px);font-weight:900;letter-spacing:.03em}
+.i15-marker strong{margin-top:4px;font-size:clamp(29px,3.2vw,38px);font-weight:900}
+@media(max-width:560px){
+  .i15-marker{left:calc(22vw + 4px);top:14vh;width:58px;height:72px}
+  .i15-marker span{font-size:7px}.i15-marker strong{font-size:28px}
+}
 </style>
 </head>
 <body>
@@ -175,19 +195,20 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
         <feGaussianBlur stdDeviation="7"/>
       </filter>
     </defs>
-    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C42 705 136 649 165 575 C192 506 146 453 140 382 C133 302 169 242 115 187 C76 147 20 153 -26 142"
+    <path d="M465 820 C300 820 80 530 20 80"
       fill="none" stroke="#111719" stroke-width="170" opacity=".72" filter="url(#roadEdgeGlow)" vector-effect="non-scaling-stroke"/>
-    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C42 705 136 649 165 575 C192 506 146 453 140 382 C133 302 169 242 115 187 C76 147 20 153 -26 142"
+    <path d="M465 820 C300 820 80 530 20 80"
       fill="none" stroke="#90866e" stroke-width="154" vector-effect="non-scaling-stroke"/>
-    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C42 705 136 649 165 575 C192 506 146 453 140 382 C133 302 169 242 115 187 C76 147 20 153 -26 142"
+    <path d="M465 820 C300 820 80 530 20 80"
       fill="none" stroke="url(#interstateAsphalt)" stroke-width="138" vector-effect="non-scaling-stroke"/>
-    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C42 705 136 649 165 575 C192 506 146 453 140 382 C133 302 169 242 115 187 C76 147 20 153 -26 142"
-      fill="none" stroke="#f1d983" stroke-width="3" stroke-dasharray="3 18" stroke-linecap="round" opacity=".9" vector-effect="non-scaling-stroke"/>
-    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C42 705 136 649 165 575 C192 506 146 453 140 382 C133 302 169 242 115 187 C76 147 20 153 -26 142"
-      fill="none" stroke="#f7edc8" stroke-width="2" stroke-dasharray="18 17" opacity=".78" vector-effect="non-scaling-stroke" transform="translate(0,-38)"/>
-    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C42 705 136 649 165 575 C192 506 146 453 140 382 C133 302 169 242 115 187 C76 147 20 153 -26 142"
-      fill="none" stroke="#f7edc8" stroke-width="2" stroke-dasharray="18 17" opacity=".78" vector-effect="non-scaling-stroke" transform="translate(0,38)"/>
+    <path d="M465 820 C300 820 80 530 20 80"
+      fill="none" stroke="#f1d983" stroke-width="4" stroke-linecap="round" opacity=".98" vector-effect="non-scaling-stroke"/>
+
+
   </svg>
+  <div class="i15-marker" aria-label="Interstate 15 roadside marker">
+    <span>INTERSTATE</span><strong>15</strong>
+  </div>
   <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
   <div class="floor-scene">
   <div class="sign-stage">
