@@ -1,0 +1,55 @@
+name: Remove wheel instructions
+
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-wheel-instructions.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove wheel controls and instructions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          # Remove the visible pause control and instructional hint.
+          text, n_html = re.subn(
+              r'\n\s*<div class="wheel-controls">\s*<button type="button" id="wheelPause" aria-pressed="false">Pause wheel</button>\s*</div>\s*<p class="wheel-hint">Hover to pause • Choose a tile to play</p>',
+              '', text, count=1, flags=re.S)
+
+          # Remove CSS that existed only for those two visible UI elements.
+          text = re.sub(r'\n\.wheel-controls\s*\{.*?\n\}\s*\.wheel-controls button\s*\{.*?\n\}\s*\.wheel-hint\s*\{.*?\n\}', '', text, count=1, flags=re.S)
+          text = re.sub(r'\n\s*\.wheel-hint\s*\{\s*bottom:\s*-23px;\s*\}', '', text, count=1)
+
+          # Keep hover-to-pause behavior, but remove the obsolete button-driven paused state.
+          text = text.replace('.game-wheel.paused,\n.wheel-stage:hover .game-wheel,\n.game-wheel.paused *,\n.wheel-stage:hover .game-wheel * {', '.wheel-stage:hover .game-wheel,\n.wheel-stage:hover .game-wheel * {')
+
+          # Remove JS for the deleted pause button.
+          text = re.sub(r'\nconst wheelPause = document\.getElementById\("wheelPause"\);', '', text, count=1)
+          text = re.sub(r'\nconst wheelStage = document\.getElementById\("wheelStage"\);', '', text, count=1)
+          text = re.sub(r'\n\s*wheelPause\.addEventListener\("click", \(\) => \{.*?\n\}\);\n', '\n', text, count=1, flags=re.S)
+          text = re.sub(r'\n\s*gameMenu\.classList\.remove\("paused"\);\n\s*wheelPause\.textContent = "Pause wheel";\n\s*wheelPause\.setAttribute\("aria-pressed", "false"\);', '', text, count=1)
+
+          if n_html != 1:
+              raise SystemExit('Expected wheel control/hint markup was not found exactly once')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Remove wheel controls and instructions"
+          git push
