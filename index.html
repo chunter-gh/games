@@ -345,6 +345,15 @@ body {
     z-index: 2;
     animation: coconutDrop 2.8s ease-in forwards;
 }
+#fallingCoconut.falling {
+    pointer-events: auto;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+#fallingCoconut:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 3px;
+}
 @keyframes coconutDrop {
     0% { transform: translateY(0) rotate(0); opacity: 1; }
     42% { transform: translateY(var(--drop-distance)) rotate(75deg); opacity: 1; }
@@ -1769,7 +1778,7 @@ body {
             <span class="palm-frond"></span><span class="palm-frond"></span>
             <span class="palm-frond"></span>
         </div>
-        <div class="palm-coconuts"><span></span><span></span><span></span><span id="fallingCoconut"></span></div>
+        <div class="palm-coconuts"><span></span><span></span><span></span><span id="fallingCoconut" role="link" aria-label="Open Castle Walk" aria-hidden="true" tabindex="-1"></span></div>
     </div>
 
     <!-- GIRAFFE -->
@@ -2308,6 +2317,19 @@ const sniff = document.getElementById("sniff");
 let interactionRunning = false;
 const fallingCoconut = document.getElementById("fallingCoconut");
 
+function launchCastleWalk() {
+    if (!fallingCoconut.classList.contains("falling")) return;
+    window.location.href = "/castlewalk.html";
+}
+fallingCoconut.addEventListener("click", launchCastleWalk);
+fallingCoconut.addEventListener("keydown", event => {
+    if ((event.key === "Enter" || event.key === " ") &&
+        fallingCoconut.classList.contains("falling")) {
+        event.preventDefault();
+        launchCastleWalk();
+    }
+});
+
 function dropCoconut() {
     const palm = document.querySelector(".palm-tree");
     const nut = fallingCoconut.getBoundingClientRect();
@@ -2315,8 +2337,14 @@ function dropCoconut() {
     fallingCoconut.classList.remove("falling");
     fallingCoconut.style.setProperty("--drop-distance", Math.max(0, ground - nut.bottom - 4) + "px");
     void fallingCoconut.offsetWidth;
+    fallingCoconut.setAttribute("aria-hidden", "false");
+    fallingCoconut.setAttribute("tabindex", "0");
     fallingCoconut.classList.add("falling");
-    setTimeout(() => fallingCoconut.classList.remove("falling"), 2900);
+    setTimeout(() => {
+        fallingCoconut.classList.remove("falling");
+        fallingCoconut.setAttribute("aria-hidden", "true");
+        fallingCoconut.setAttribute("tabindex", "-1");
+    }, 2900);
 }
 
 
