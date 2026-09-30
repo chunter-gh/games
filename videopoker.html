@@ -72,22 +72,65 @@ button:disabled{opacity:.48;cursor:default}
 @media(max-width:650px){.screen{min-height:0}.paytable{border-spacing:1px}.paytable th,.paytable td{padding:3px 1px}.paytable th:first-child,.paytable td:first-child{width:32%;padding-left:3px}.card .corner{left:3px;top:3px}.card .corner.bottom{right:3px;bottom:3px}.console{padding:8px}.meter{min-width:0}.buttons{width:100%}.buttons button{min-width:0}.buttons button.primary{font-size:clamp(12px,3vw,17px)}.marquee{padding-top:11px}}
 @media(max-width:380px){.paytable{font-size:8px}.hold{letter-spacing:0}.buttons{gap:5px}.buttons button{min-width:66px;padding:5px}.meter{min-width:0}.bet-presets button{padding:4px 7px}.custom-bet input{width:72px}}
 @media(prefers-reduced-motion:reduce){.marquee::before,.marquee::after,.paytable tr.win td,.message.jackpot,.buttons button.primary.draw-ready{animation:none}}
+
+/* Slot-inspired wide cabinet and compact play layout */
+html,body{height:100%;overflow:hidden;background:#080b16}
+.app{height:100dvh;min-height:0;padding:max(6px,env(safe-area-inset-top)) clamp(7px,1.5vw,18px) max(6px,env(safe-area-inset-bottom));gap:6px;overflow:hidden;background:radial-gradient(ellipse at 50% -15%,#523055 0%,#1b1936 55%,#080b16 100%)}
+.topbar{flex:0 0 38px;width:min(100%,1040px)}
+.topbar h1{font:900 clamp(15px,2.5vw,20px) Georgia,serif;letter-spacing:.12em;color:#ffd980;text-shadow:0 0 14px #ffc44c}
+.back{background:#171d34;border:1px solid #c7975f;color:#f8e2b8;border-radius:9px;padding:7px 11px;font-size:12px}
+.machine-wrap{flex:1 1 auto;min-height:0;width:min(100%,1020px);height:auto;align-self:center;display:flex;justify-content:center}
+.cabinet{position:relative;width:100%;height:100%;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden;padding:clamp(7px,1vw,12px);border:clamp(5px,1vw,10px) solid #c5a05a;border-radius:clamp(20px,3vw,34px);background:linear-gradient(100deg,#652238,#a53544 14%,#5d1931 47%,#a83748 87%,#4c192e);box-shadow:0 0 0 3px #39202a,0 0 28px #fb8a573a,0 22px 45px #000b,inset 0 0 0 3px #ffe1a1,inset 0 0 35px #130a26}
+.cabinet::before{content:"";position:absolute;inset:5px;border:2px solid #fbd78088;border-radius:24px;pointer-events:none;z-index:3}
+.marquee{flex:0 0 auto;min-height:clamp(70px,11dvh,102px);display:flex;flex-direction:column;justify-content:center;padding:8px 28px 5px;border:0;border-radius:18px;text-shadow:0 3px 2px #5d1738,0 0 15px #fcd352;background:radial-gradient(ellipse at 50% 10%,#ffd77566,transparent 65%);box-shadow:none}
+.marquee::before,.marquee::after{display:none}
+.marquee .name{font:900 clamp(30px,5.5vw,62px) Georgia,serif;line-height:.97;letter-spacing:.07em;color:#fff2bc;-webkit-text-stroke:1px #b97946;text-shadow:0 3px 2px #5d1738,0 0 15px #fcd352}
+.marquee .small,.marquee .tag{font-size:clamp(9px,1.2vw,12px);font-weight:900;letter-spacing:.12em;color:#ffeab5}
+.screen-frame{flex:1 1 auto;min-height:0;margin:0 clamp(10px,2vw,26px);display:flex;border:clamp(5px,1vw,10px) ridge #e0c887;border-radius:16px;padding:clamp(5px,.9vw,10px);background:linear-gradient(135deg,#2b1b38,#151c33 48%,#421e40);box-shadow:inset 0 0 25px #000,0 5px 12px #1c071e}
+.screen{width:100%;min-height:0;display:flex;flex-direction:column;gap:clamp(3px,.5dvh,6px);padding:clamp(5px,.8vw,9px);border:0;border-radius:8px;background:linear-gradient(135deg,#2b1b38,#151c33 48%,#421e40);box-shadow:inset 0 0 20px #000}
+.pay-title{flex:0 0 auto;margin:0;color:#ffde82;font-size:clamp(10px,1.4vw,13px);letter-spacing:.13em}
+.paytable{flex:0 0 auto;border-spacing:1px;font-size:clamp(8px,1.1vw,11px)}
+.paytable th,.paytable td{padding:clamp(1px,.3vh,3px) 2px}
+.paytable th:first-child,.paytable td:first-child{width:35%}
+.cards{flex:1 1 auto;min-height:0;gap:clamp(4px,.8vw,8px);margin:clamp(3px,.6vh,7px) 0}
+.card-slot{min-height:0;gap:3px}
+.card{height:100%;min-height:0;aspect-ratio:auto;border-radius:8px}
+.card .corner{font-size:clamp(12px,2vw,20px)}
+.card .suit{font-size:clamp(27px,5vw,60px)}
+.hold{flex:0 0 auto;min-height:clamp(26px,4dvh,34px);border-color:#c7975f;color:#f8e2b8;background:linear-gradient(#353c4a,#1a1e2a)}
+.message{flex:0 0 auto;height:clamp(29px,4.5dvh,42px);font-size:clamp(11px,1.7vw,16px)}
+.console{flex:0 0 auto;grid-template-columns:1fr 1fr;grid-template-areas:"balance last" "bets bets" "buttons buttons";gap:clamp(4px,.7dvh,7px);margin:0 clamp(10px,2vw,26px) clamp(8px,1.5dvh,15px);padding:clamp(6px,1vw,10px);border:5px ridge #d6b47b;border-radius:14px;background:linear-gradient(125deg,#734a65,#2b233d 55%,#64415e);box-shadow:inset 0 4px 9px #000a}
+.meter{padding:4px 8px;border:2px inset #bda66f;border-radius:7px;background:linear-gradient(#090e20,#182b32);color:#66ffc1;text-shadow:0 0 10px #27fe9c}
+.meter span{font-size:clamp(8px,1vw,10px);color:#e9dba9;letter-spacing:.12em}
+.meter strong{font-size:clamp(15px,2.3vw,24px)}
+.bet-controls{min-height:0;gap:clamp(3px,.6vw,7px)}
+.bet-presets{gap:clamp(3px,.5vw,6px)}
+.bet-presets button,.custom-bet button{min-height:clamp(30px,4.5dvh,39px);padding:4px clamp(5px,.8vw,9px);font-size:clamp(10px,1.4vw,14px)}
+.custom-bet{font-size:clamp(9px,1vw,11px);gap:4px}
+.custom-bet input{width:clamp(58px,8vw,83px);min-height:clamp(30px,4.5dvh,39px);font-size:clamp(12px,1.5vw,15px)}
+.buttons{gap:clamp(4px,.8vw,9px)}
+.buttons button{min-height:clamp(36px,5.5dvh,48px);border-radius:9px;padding:5px clamp(6px,1vw,12px);font-size:clamp(10px,1.5vw,15px)}
+.buttons button.primary{min-height:clamp(42px,6.5dvh,56px);border-radius:999px;background:linear-gradient(#fb7567,#ae1b39 50%,#6a1531);font-size:clamp(14px,2vw,21px)}
+.foot{display:none}
+@media(max-width:600px){.app{gap:4px}.topbar{flex-basis:34px}.machine-wrap{width:100%}.cabinet{padding:6px;gap:4px}.marquee{min-height:68px}.screen-frame{margin:0 8px;padding:4px}.screen{padding:4px;gap:3px}.console{margin:0 8px 7px;padding:5px;border-width:3px}.bet-controls{flex-wrap:nowrap}.bet-presets{flex-wrap:nowrap}.custom-bet{gap:3px}.buttons{gap:4px}}
+@media(max-height:560px){.app{gap:3px;padding-top:3px;padding-bottom:3px}.topbar{flex-basis:29px}.cabinet{padding:4px;gap:3px}.marquee{min-height:48px;padding:3px}.marquee .name{font-size:clamp(24px,5vh,34px)}.marquee .small,.marquee .tag{font-size:8px}.screen-frame{padding:3px}.screen{padding:3px;gap:2px}.pay-title{font-size:9px}.paytable{font-size:7px}.paytable th,.paytable td{padding:0 1px}.cards{margin:2px 0}.message{height:23px;font-size:10px}.hold{min-height:22px;font-size:9px}.console{margin-bottom:4px;padding:3px;gap:3px}.meter{padding:2px 4px}.bet-presets button,.custom-bet button,.custom-bet input{min-height:24px;padding-top:2px;padding-bottom:2px}.buttons button{min-height:28px}.buttons button.primary{min-height:32px}}
+@media(max-width:380px){.bet-presets button{padding-left:4px;padding-right:4px}.custom-bet input{width:54px}.buttons{gap:3px}.buttons button{padding-left:3px;padding-right:3px}}
 </style>
 </head>
 <body>
 <div class="app">
   <header class="topbar"><h1>VIDEO POKER</h1><button class="back" id="back">← CASINO</button></header>
   <div class="machine-wrap" id="machineWrap"><main class="cabinet" id="machine">
-    <div class="marquee"><div class="small">CLASSIC FIVE-CARD DRAW</div><div class="name">Jacks or Better</div><div class="tag">9 / 6 FULL PAY · ROYAL FLUSH 800× BET</div></div>
+    <div class="marquee"><div class="small">FIVE-CARD DRAW</div><div class="name">Jacks or Better</div><div class="tag">9 / 6 PAY · ROYAL 800×</div></div>
     <div class="screen-frame"><div class="screen">
-      <div class="pay-title">WINNING HANDS · PAYOUT IN DOLLARS</div>
+      <div class="pay-title">PAYOUT</div>
       <table class="paytable" aria-label="Jacks or Better payout table"><thead><tr><th>HAND</th><th>$5</th><th>$10</th><th>$25</th><th>$50</th><th>$100</th></tr></thead><tbody id="payRows"></tbody></table>
       <div class="cards" id="cards" aria-label="Five playing cards"></div>
       <div class="message" id="message" role="status" aria-live="polite">Choose your bet, then press DEAL.</div>
     </div></div>
     <div class="console"><div class="meter"><span>BALANCE</span><strong id="balance">$1,000</strong></div><div class="bet-controls" aria-label="Choose a bet"><div class="bet-presets"><button type="button" data-bet="5">$5</button><button type="button" data-bet="10">$10</button><button type="button" data-bet="25">$25</button><button type="button" data-bet="50">$50</button><button type="button" data-bet="100">$100</button></div><label class="custom-bet">CUSTOM $ <input id="customBet" type="number" inputmode="decimal" min="5" step="0.01" placeholder="Amount" aria-label="Custom bet amount"><button type="button" id="setBet">SET</button></label></div><div class="buttons"><button id="addCredits">ADD $100</button><button id="soundToggle" type="button" aria-pressed="true">SOUND ON</button><button class="primary" id="deal">DEAL</button></div><div class="meter"><span>BET / LAST WIN</span><strong id="betMeter">$5 / $0</strong></div></div>
   </main></div>
-  <p class="foot">Play money only. Minimum bet $5. Choose a preset or enter any bet of $5 or more, up to your balance. Tap cards to HOLD, then DRAW. A royal flush pays 800 times your bet.</p>
+  
 </div>
 <script>
 "use strict";
@@ -230,31 +273,7 @@ el("customBet").addEventListener("keydown",event=>{if(event.key==="Enter")setBet
 el("addCredits").addEventListener("click",()=>{if(phase==="holding"||phase==="animating")return;balance=cents(balance+100);saveBalance();message="$100 added. Choose your bet and press DEAL.";sound("credits");render();});
 el("soundToggle").addEventListener("click",()=>{soundOn=!soundOn;render();if(soundOn)sound("bet");});
 el("back").addEventListener("click",()=>{location.href="casino.html";});
-let lastFitWidth=0;
-function fitMachine(){
-  const app=document.querySelector(".app"),wrap=el("machineWrap"),machine=el("machine");
-  const style=getComputedStyle(app),horizontal=parseFloat(style.paddingLeft)+parseFloat(style.paddingRight);
-  const vertical=parseFloat(style.paddingTop)+parseFloat(style.paddingBottom);
-  const viewportWidth=window.visualViewport?.width||window.innerWidth;
-  const viewportHeight=window.visualViewport?.height||window.innerHeight;
-  const baseWidth=Math.max(280,Math.min(1000,viewportWidth-horizontal));
-  if(baseWidth!==lastFitWidth){
-    machine.style.width=baseWidth+"px";
-    lastFitWidth=baseWidth;
-  }
-  machine.style.transform="none";
-  const naturalHeight=machine.offsetHeight;
-  const gap=parseFloat(style.gap)||0;
-  const availableHeight=viewportHeight-vertical-document.querySelector(".topbar").offsetHeight-document.querySelector(".foot").offsetHeight-gap*2-4;
-  const scale=Math.min(1,Math.max(.35,availableHeight/naturalHeight));
-  machine.style.transform="scale("+scale+")";
-  wrap.style.width=(baseWidth*scale)+"px";
-  wrap.style.height=(naturalHeight*scale)+"px";
-  document.querySelector(".topbar").style.width=Math.min(baseWidth*scale,viewportWidth-horizontal)+"px";
-}
-window.addEventListener("resize",fitMachine);
-window.visualViewport?.addEventListener("resize",fitMachine);
-paytable();render();requestAnimationFrame(fitMachine);
+paytable();render();
 </script>
 </body>
 </html>
