@@ -33,6 +33,9 @@ body {
     height: 100%;
     position: relative;
     overflow: hidden;
+    --sun-right: clamp(48px, 11vw, 150px);
+    --sun-size: clamp(90px, 14vw, 145px);
+    --flower-center-right: calc(var(--sun-right) + clamp(18px, 3vw, 36px));
 }
 
 /* ATMOSPHERE */
@@ -368,9 +371,9 @@ body {
 .sun {
     position: absolute;
     z-index: 10;
-    right: clamp(48px, 11vw, 150px);
+    right: var(--sun-right);
     top: clamp(100px, 15vh, 165px);
-    width: clamp(90px, 14vw, 145px);
+    width: var(--sun-size);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #fffbd0 0%, #ffe969 35%, #ffbd35 72%, #ec8520 100%);
@@ -415,7 +418,7 @@ body {
 .african-violet {
     position: absolute;
     z-index: 23;
-    right: clamp(65px, 14.5vw, 185px);
+    right: calc(var(--flower-center-right) + 38px);
     bottom: calc(clamp(75px, 14vh, 115px) - 8px);
     width: clamp(50px, 6.5vw, 78px);
     height: clamp(72px, 13.5vh, 123px);
@@ -432,7 +435,7 @@ body {
 .pink-tulip {
     position: absolute;
     z-index: 23;
-    right: clamp(125px, 23vw, 300px);
+    right: var(--flower-center-right);
     bottom: calc(clamp(75px, 14vh, 115px) - 8px);
     width: clamp(46px, 6.3vw, 76px);
     height: clamp(78px, 15vh, 140px);
@@ -449,7 +452,7 @@ body {
 .golden-daisy {
     position: absolute;
     z-index: 23;
-    right: clamp(185px, 30vw, 390px);
+    right: calc(var(--flower-center-right) - 38px);
     bottom: calc(clamp(75px, 14vh, 115px) - 8px);
     width: clamp(43px, 5.8vw, 69px);
     height: clamp(69px, 12vh, 112px);
