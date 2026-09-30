@@ -21,8 +21,8 @@ body{background:radial-gradient(ellipse at 50% -15%,#523055 0%,#1b1936 55%,#080b
 .screen-frame{flex:1 1 auto;min-height:0;margin:0 clamp(10px,2vw,26px);display:flex;border:clamp(5px,1vw,10px) ridge #e0c887;border-radius:16px;padding:clamp(5px,.9vw,10px);background:linear-gradient(135deg,#2b1b38,#151c33 48%,#421e40);box-shadow:inset 0 0 25px #000,0 5px 12px #1c071e}
 .screen{width:100%;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(5px,.8dvh,9px);padding:clamp(7px,1vw,12px);border-radius:8px;background:radial-gradient(ellipse at 50% 45%,#263b67 0%,#141d3c 55%,#0a1028 100%);box-shadow:inset 0 0 28px #000}
 .cards{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;gap:clamp(6px,1.1vw,13px);margin:0}
-.card-slot{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:stretch;gap:clamp(4px,.6dvh,7px)}
-.card{position:relative;flex:1 1 auto;min-height:0;width:100%;border:clamp(2px,.35vw,4px) solid #d6b76e;border-radius:clamp(9px,1.3vw,15px);overflow:hidden;background:linear-gradient(145deg,#fffef8 0%,#f8f0d8 50%,#e8dcc0 100%);color:#171927;box-shadow:0 8px 15px #0009,inset 0 0 0 2px #fff,inset 0 0 0 5px #e6d6a8,inset 0 0 22px #9f7e3a2b;cursor:pointer;touch-action:manipulation}
+.card-slot{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:clamp(4px,.6dvh,7px)}
+.card{position:relative;flex:0 0 auto;min-height:0;width:100%;aspect-ratio:5/7;border:clamp(2px,.35vw,4px) solid #d6b76e;border-radius:clamp(9px,1.3vw,15px);overflow:hidden;background:linear-gradient(145deg,#fffef8 0%,#f8f0d8 50%,#e8dcc0 100%);color:#171927;box-shadow:0 8px 15px #0009,inset 0 0 0 2px #fff,inset 0 0 0 5px #e6d6a8,inset 0 0 22px #9f7e3a2b;cursor:pointer;touch-action:manipulation}
 .card::before{content:"";position:absolute;inset:7px;border:1px solid #b9964c88;border-radius:8px;pointer-events:none}
 .card.red{color:#a5102b}
 .card.held{box-shadow:0 0 0 4px #ffe071,0 0 26px #ffcb3e,0 8px 15px #0009,inset 0 0 0 2px #fff,inset 0 0 0 5px #e6d6a8}
