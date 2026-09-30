@@ -704,6 +704,19 @@ body {
 
     transition: transform .15s;
 }
+.eye .lash {
+    position: absolute;
+    top: -6px;
+    width: 2px;
+    height: 6px;
+    border-radius: 2px;
+    background: #2b1a0d;
+    box-shadow: 0 0 1px rgba(0,0,0,.45);
+    transform-origin: bottom center;
+}
+.eye .lash.left { left: 0; transform: rotate(-32deg); }
+.eye .lash.center { left: 3px; top: -7px; transform: rotate(-5deg); }
+.eye .lash.right { left: 6px; transform: rotate(30deg); }
 
 .ear {
     position: absolute;
@@ -1815,7 +1828,7 @@ body {
                 <div class="horn one"></div>
                 <div class="horn two"></div>
 
-                <div class="eye"></div>
+                <div class="eye"><span class="lash left"></span><span class="lash center"></span><span class="lash right"></span></div>
 
                 <div class="muzzle"></div>
 
