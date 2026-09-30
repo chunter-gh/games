@@ -58,6 +58,10 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   position:relative;isolation:isolate;width:min(100%,1120px);height:100%;min-height:0;
   justify-self:center;display:flex;align-items:center;justify-content:center;overflow:visible;
 }
+.interstate-scene{
+  position:absolute;z-index:0;inset:0;width:100%;height:100%;pointer-events:none;
+  opacity:.93;
+}
 .floor-scene::after{
   content:"";position:absolute;z-index:0;left:4%;right:4%;bottom:1.5%;height:clamp(14px,3vh,28px);
   border-radius:50%;background:radial-gradient(ellipse,rgba(106,91,63,.42),rgba(37,34,30,.18) 46%,transparent 75%);
@@ -141,9 +145,9 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 
 
 @media(max-width:560px){
-  .sign-stage{left:-2px;width:clamp(74px,18vw,105px);height:clamp(104px,25vh,158px);bottom:5%}
-  .tumbleweed-track{width:clamp(68px,22vw,104px);height:72px;right:-2px;bottom:8%}
-  .tumbleweed{width:42px}
+  .sign-stage{left:clamp(5px,2.2vw,32px);width:clamp(82px,14vw,176px);height:clamp(126px,28vh,245px);bottom:24%}
+  .tumbleweed-track{width:min(100vw,640px);height:clamp(58px,13vh,100px);right:0;bottom:7%}
+  .tumbleweed{width:clamp(52px,6.8vw,76px)}
 }
 @media(max-height:600px){
   .floor-scene{min-height:180px}
@@ -151,11 +155,39 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   .tumbleweed-track{bottom:6%;height:68px}
 }
 @media(prefers-reduced-motion:reduce){.tumbleweed{animation:none;transform:rotate(-20deg);opacity:1}}
+
+@media(max-width:560px){
+  .sign-stage{left:5px;width:clamp(78px,17vw,112px);height:clamp(116px,26vh,170px);bottom:24%}
+  .tumbleweed-track{width:100vw;right:0;bottom:6%}
+  .tumbleweed{width:52px}
+}
 </style>
 </head>
 <body>
 <div class="casino-room">
   <div class="glow" aria-hidden="true"></div>
+  <svg class="interstate-scene" viewBox="0 0 430 932" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="interstateAsphalt" x1="0" y1="0" x2="1" y2=".25">
+        <stop offset="0" stop-color="#353a3b"/><stop offset=".5" stop-color="#24292c"/><stop offset="1" stop-color="#343535"/>
+      </linearGradient>
+      <filter id="roadEdgeGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="7"/>
+      </filter>
+    </defs>
+    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C47 692 111 631 111 555 C111 476 47 416 35 349 C20 265 37 203 -26 142"
+      fill="none" stroke="#111719" stroke-width="170" opacity=".72" filter="url(#roadEdgeGlow)" vector-effect="non-scaling-stroke"/>
+    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C47 692 111 631 111 555 C111 476 47 416 35 349 C20 265 37 203 -26 142"
+      fill="none" stroke="#90866e" stroke-width="154" vector-effect="non-scaling-stroke"/>
+    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C47 692 111 631 111 555 C111 476 47 416 35 349 C20 265 37 203 -26 142"
+      fill="none" stroke="url(#interstateAsphalt)" stroke-width="138" vector-effect="non-scaling-stroke"/>
+    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C47 692 111 631 111 555 C111 476 47 416 35 349 C20 265 37 203 -26 142"
+      fill="none" stroke="#f1d983" stroke-width="3" stroke-dasharray="3 18" stroke-linecap="round" opacity=".9" vector-effect="non-scaling-stroke"/>
+    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C47 692 111 631 111 555 C111 476 47 416 35 349 C20 265 37 203 -26 142"
+      fill="none" stroke="#f7edc8" stroke-width="2" stroke-dasharray="18 17" opacity=".78" vector-effect="non-scaling-stroke" transform="translate(0,-38)"/>
+    <path d="M465 830 C382 796 326 795 249 834 C168 875 94 839 73 774 C47 692 111 631 111 555 C111 476 47 416 35 349 C20 265 37 203 -26 142"
+      fill="none" stroke="#f7edc8" stroke-width="2" stroke-dasharray="18 17" opacity=".78" vector-effect="non-scaling-stroke" transform="translate(0,38)"/>
+  </svg>
   <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
   <div class="floor-scene">
   <div class="sign-stage">
@@ -193,18 +225,25 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   </div>
   <div class="tumbleweed-track" aria-hidden="true">
     <svg class="tumbleweed" viewBox="0 0 100 100">
-      <g fill="none" stroke="#b17b43" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M50 50 C33 38 23 24 31 14 C39 4 54 13 51 27 C49 36 48 43 50 50"/>
-        <path d="M50 50 C65 34 78 26 87 34 C97 43 86 56 73 52 C64 49 57 49 50 50"/>
-        <path d="M50 50 C65 64 76 78 67 87 C58 97 45 86 49 73 C52 64 51 57 50 50"/>
-        <path d="M50 50 C36 65 23 76 14 67 C4 58 14 45 27 49 C36 52 43 51 50 50"/>
-        <path d="M50 50 C39 31 38 17 47 12 C58 6 65 20 58 31 C54 39 51 45 50 50"/>
-        <path d="M50 50 C70 40 84 40 89 49 C95 60 81 66 70 58 C62 54 56 51 50 50"/>
-        <path d="M50 50 C61 70 61 84 51 89 C40 95 34 81 42 70 C46 62 49 56 50 50"/>
-        <path d="M50 50 C30 60 16 60 11 50 C6 39 20 34 31 42 C39 46 45 49 50 50"/>
-        <path d="M27 31 C39 39 61 62 73 70 M71 28 C59 40 39 61 28 73 M34 18 C45 31 63 57 81 66 M18 65 C34 55 61 36 81 34"/>
+      <defs>
+        <radialGradient id="tumbleTone" cx="38%" cy="31%" r="75%">
+          <stop offset="0" stop-color="#d6a66b"/><stop offset=".55" stop-color="#a86f3d"/><stop offset="1" stop-color="#684126"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="39" fill="url(#tumbleTone)" opacity=".18"/>
+      <g fill="none" stroke="#794d2b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity=".96">
+        <path d="M50 8 C68 8 87 23 91 41 C97 61 81 82 63 90 C45 98 22 87 13 70 C4 52 10 28 27 16 C34 11 42 8 50 8Z"/>
+        <path d="M50 13 C73 11 87 34 82 55 C79 72 59 88 42 82 C25 78 14 60 18 42 C22 25 36 14 50 13Z" transform="rotate(27 50 50)"/>
+        <path d="M50 11 C29 13 13 33 18 53 C22 74 42 87 61 81 C80 75 89 55 82 36 C76 20 64 12 50 11Z" transform="rotate(-23 50 50)"/>
+        <g transform="rotate(-3 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(26.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(42 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(71.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(87 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(116.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(132 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(161.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(177 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(206.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(222 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(251.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(267 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(296.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(312 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(341.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g>
+        <path d="M19 43 C35 28 62 25 79 45 C91 60 70 77 51 67 C32 57 27 40 42 34 C59 28 74 42 67 55 C61 67 42 68 35 56 C28 44 38 36 48 41 C58 47 57 58 49 60"/>
+        <path d="M22 65 C33 50 54 37 76 31 M25 28 C42 43 61 63 77 76 M15 52 C35 56 65 49 86 51 M40 16 C44 36 57 66 62 85"/>
       </g>
-      <circle cx="50" cy="50" r="7" fill="#8b5a31"/>
+      <g fill="#c4935d" opacity=".9">
+        <circle cx="18" cy="37" r="2.2"/><circle cx="80" cy="26" r="2"/><circle cx="83" cy="63" r="2.4"/>
+        <circle cx="31" cy="82" r="2"/><circle cx="62" cy="13" r="1.8"/><circle cx="12" cy="59" r="1.8"/>
+      </g>
+      <circle cx="50" cy="50" r="4" fill="#734827"/>
     </svg>
   </div>
 </div>
