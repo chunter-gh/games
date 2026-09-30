@@ -1,0 +1,17 @@
+name: Widen wheel tiles
+on: [push]
+permissions:
+  contents: write
+jobs:
+  widen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sed -i 's/width: clamp(190px, 27vw, 300px);/width: clamp(225px, 31vw, 350px);/' index.html
+      - run: sed -i 's/width: min(68vw, 250px); height: 58px;/width: min(78vw, 290px); height: 58px;/' index.html
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git commit -m 'Widen rotating game tiles'
+          git push
