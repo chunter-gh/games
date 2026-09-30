@@ -68,24 +68,14 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   filter:blur(3px);pointer-events:none;
 }
 .sign-stage{
-  position:absolute;z-index:1;left:clamp(0px,1.2vw,14px);bottom:4%;
-  width:clamp(92px,16vw,190px);height:clamp(118px,27vh,250px);min-height:0;margin:0;
+  position:absolute;z-index:1;left:clamp(0px,calc(22vw - 60px),250px);bottom:clamp(110px,25vh,230px);
+  width:clamp(82px,14vw,176px);height:clamp(126px,28vh,245px);min-height:0;margin:0;
   display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 7px 8px #000a);
 }
 .vegas-sign{width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
-.tumbleweed-track{
-  position:absolute;z-index:3;right:0;bottom:8%;width:clamp(82px,25vw,285px);
-  height:clamp(58px,13vh,100px);overflow:hidden;pointer-events:none;
-}
 .tumbleweed{
-  position:absolute;left:0;bottom:0;width:clamp(42px,7.5vw,82px);height:auto;
-  filter:drop-shadow(0 4px 3px #0009);animation:tumbleAcross 7s linear infinite;
-}
-@keyframes tumbleAcross{
-  0%{transform:translate(130%,-4px) rotate(0deg);opacity:0}
-  8%{opacity:1}
-  90%{opacity:1}
-  100%{transform:translate(-190%,2px) rotate(-720deg);opacity:0}
+  position:absolute;z-index:1;left:0;top:0;width:clamp(52px,5.6vw,78px);height:auto;
+  filter:drop-shadow(0 4px 3px #0009);pointer-events:none;transform-origin:50% 50%;
 }
 .menu{
   width:min(86vw,370px);min-height:0;max-height:100%;margin:0;
@@ -146,15 +136,14 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 
 @media(max-width:560px){
   .sign-stage{left:clamp(5px,2.2vw,32px);width:clamp(82px,14vw,176px);height:clamp(126px,28vh,245px);bottom:24%}
-  .tumbleweed-track{width:min(100vw,640px);height:clamp(58px,13vh,100px);right:0;bottom:7%}
-  .tumbleweed{width:clamp(52px,6.8vw,76px)}
+  .tumbleweed{width:52px}
 }
 @media(max-height:600px){
   .floor-scene{min-height:180px}
-  .sign-stage{height:clamp(94px,30vh,180px);bottom:3%}
+  .sign-stage{height:clamp(100px,28vh,190px);bottom:24vh}
   .tumbleweed-track{bottom:6%;height:68px}
 }
-@media(prefers-reduced-motion:reduce){.tumbleweed{animation:none;transform:rotate(-20deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.tumbleweed{display:none}}
 
 @media(max-width:560px){
   .sign-stage{left:5px;width:clamp(78px,17vw,112px);height:clamp(116px,26vh,170px);bottom:24%}
@@ -163,7 +152,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 }
 
 .i15-marker{
-  position:absolute;z-index:1;left:calc(22vw + 4px);top:15vh;width:clamp(62px,6vw,78px);
+  position:absolute;z-index:1;left:clamp(48px,5vw,70px);top:15vh;width:clamp(62px,6vw,78px);
   height:clamp(76px,9vh,96px);display:flex;flex-direction:column;align-items:center;justify-content:center;
   border:3px solid #f7f4e9;border-radius:14px 14px 18px 18px;
   background:linear-gradient(180deg,#c9363a 0 25%,#174c84 25% 100%);
@@ -178,9 +167,13 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 .i15-marker span{font-size:clamp(7px,.8vw,9px);font-weight:900;letter-spacing:.03em}
 .i15-marker strong{margin-top:4px;font-size:clamp(29px,3.2vw,38px);font-weight:900}
 @media(max-width:560px){
-  .i15-marker{left:calc(22vw + 4px);top:14vh;width:58px;height:72px}
+  .i15-marker{left:48px;top:14vh;width:58px;height:72px}
   .i15-marker span{font-size:7px}.i15-marker strong{font-size:28px}
 }
+
+.floor-scene{z-index:2}
+.tumbleweed{will-change:left,top,transform}
+@media(prefers-reduced-motion:reduce){.tumbleweed{display:none}}
 </style>
 </head>
 <body>
@@ -195,23 +188,42 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
         <feGaussianBlur stdDeviation="7"/>
       </filter>
     </defs>
-    <path d="M465 820 C300 820 80 530 20 80"
+    <path d="M465 820 C300 820 80 530 -55 -80"
       fill="none" stroke="#111719" stroke-width="170" opacity=".72" filter="url(#roadEdgeGlow)" vector-effect="non-scaling-stroke"/>
-    <path d="M465 820 C300 820 80 530 20 80"
+    <path d="M465 820 C300 820 80 530 -55 -80"
       fill="none" stroke="#90866e" stroke-width="154" vector-effect="non-scaling-stroke"/>
-    <path d="M465 820 C300 820 80 530 20 80"
+    <path d="M465 820 C300 820 80 530 -55 -80"
       fill="none" stroke="url(#interstateAsphalt)" stroke-width="138" vector-effect="non-scaling-stroke"/>
-    <path d="M465 820 C300 820 80 530 20 80"
+    <path id="interstateCenter" d="M465 820 C300 820 80 530 -55 -80"
       fill="none" stroke="#f1d983" stroke-width="4" stroke-linecap="round" opacity=".98" vector-effect="non-scaling-stroke"/>
 
 
   </svg>
+  <svg class="tumbleweed" viewBox="0 0 100 100">
+      <defs>
+        <radialGradient id="tumbleTone" cx="38%" cy="31%" r="75%">
+          <stop offset="0" stop-color="#d6a66b"/><stop offset=".55" stop-color="#a86f3d"/><stop offset="1" stop-color="#684126"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="39" fill="url(#tumbleTone)" opacity=".18"/>
+      <g fill="none" stroke="#794d2b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity=".96">
+        <path d="M50 8 C68 8 87 23 91 41 C97 61 81 82 63 90 C45 98 22 87 13 70 C4 52 10 28 27 16 C34 11 42 8 50 8Z"/>
+        <path d="M50 13 C73 11 87 34 82 55 C79 72 59 88 42 82 C25 78 14 60 18 42 C22 25 36 14 50 13Z" transform="rotate(27 50 50)"/>
+        <path d="M50 11 C29 13 13 33 18 53 C22 74 42 87 61 81 C80 75 89 55 82 36 C76 20 64 12 50 11Z" transform="rotate(-23 50 50)"/>
+        <g transform="rotate(-3 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(26.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(42 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(71.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(87 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(116.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(132 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(161.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(177 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(206.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(222 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(251.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(267 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(296.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(312 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(341.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g>
+        <path d="M19 43 C35 28 62 25 79 45 C91 60 70 77 51 67 C32 57 27 40 42 34 C59 28 74 42 67 55 C61 67 42 68 35 56 C28 44 38 36 48 41 C58 47 57 58 49 60"/>
+        <path d="M22 65 C33 50 54 37 76 31 M25 28 C42 43 61 63 77 76 M15 52 C35 56 65 49 86 51 M40 16 C44 36 57 66 62 85"/>
+      </g>
+      <g fill="#c4935d" opacity=".9">
+        <circle cx="18" cy="37" r="2.2"/><circle cx="80" cy="26" r="2"/><circle cx="83" cy="63" r="2.4"/>
+        <circle cx="31" cy="82" r="2"/><circle cx="62" cy="13" r="1.8"/><circle cx="12" cy="59" r="1.8"/>
+      </g>
+      <circle cx="50" cy="50" r="4" fill="#734827"/>
+    </svg>
   <div class="i15-marker" aria-label="Interstate 15 roadside marker">
     <span>INTERSTATE</span><strong>15</strong>
   </div>
-  <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
-  <div class="floor-scene">
-  <div class="sign-stage">
+<div class="sign-stage">
     <svg class="vegas-sign" viewBox="0 0 620 390" role="img" aria-labelledby="signTitle">
       <title id="signTitle">Animated Welcome to Fabulous Casino sign</title>
       <defs>
@@ -235,7 +247,9 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
       <text class="sign-city" x="310" y="291">CASINO</text>
     </svg>
   </div>
-  <div class="wheel-stage" id="wheelStage" aria-label="Rotating casino game selection wheel">
+  <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
+  <div class="floor-scene">
+    <div class="wheel-stage" id="wheelStage" aria-label="Rotating casino game selection wheel">
     <nav class="game-wheel" id="casinoMenu" aria-label="Casino games">
       <a class="game-button" href="roulette.html"><span class="icon" aria-hidden="true">🎡</span><span class="button-text"><span class="button-title">ROULETTE</span><span class="button-subtitle">Place • Spin • Win</span></span></a>
       <a class="game-button" href="slots.html"><span class="icon" aria-hidden="true">🎰</span><span class="button-text"><span class="button-title">LUCKY LIGHTS SLOTS</span><span class="button-subtitle">Five Reels • Pull • Win</span></span></a>
@@ -244,29 +258,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
       <a class="game-button" href="craps.html"><span class="icon" aria-hidden="true">🎲</span><span class="button-text"><span class="button-title">CRAPS</span><span class="button-subtitle">Pass Line • Point • Field</span></span></a>
     </nav>
   </div>
-  <div class="tumbleweed-track" aria-hidden="true">
-    <svg class="tumbleweed" viewBox="0 0 100 100">
-      <defs>
-        <radialGradient id="tumbleTone" cx="38%" cy="31%" r="75%">
-          <stop offset="0" stop-color="#d6a66b"/><stop offset=".55" stop-color="#a86f3d"/><stop offset="1" stop-color="#684126"/>
-        </radialGradient>
-      </defs>
-      <circle cx="50" cy="50" r="39" fill="url(#tumbleTone)" opacity=".18"/>
-      <g fill="none" stroke="#794d2b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity=".96">
-        <path d="M50 8 C68 8 87 23 91 41 C97 61 81 82 63 90 C45 98 22 87 13 70 C4 52 10 28 27 16 C34 11 42 8 50 8Z"/>
-        <path d="M50 13 C73 11 87 34 82 55 C79 72 59 88 42 82 C25 78 14 60 18 42 C22 25 36 14 50 13Z" transform="rotate(27 50 50)"/>
-        <path d="M50 11 C29 13 13 33 18 53 C22 74 42 87 61 81 C80 75 89 55 82 36 C76 20 64 12 50 11Z" transform="rotate(-23 50 50)"/>
-        <g transform="rotate(-3 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(26.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(42 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(71.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(87 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(116.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(132 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(161.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(177 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(206.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(222 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(251.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(267 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(296.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(312 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(341.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g>
-        <path d="M19 43 C35 28 62 25 79 45 C91 60 70 77 51 67 C32 57 27 40 42 34 C59 28 74 42 67 55 C61 67 42 68 35 56 C28 44 38 36 48 41 C58 47 57 58 49 60"/>
-        <path d="M22 65 C33 50 54 37 76 31 M25 28 C42 43 61 63 77 76 M15 52 C35 56 65 49 86 51 M40 16 C44 36 57 66 62 85"/>
-      </g>
-      <g fill="#c4935d" opacity=".9">
-        <circle cx="18" cy="37" r="2.2"/><circle cx="80" cy="26" r="2"/><circle cx="83" cy="63" r="2.4"/>
-        <circle cx="31" cy="82" r="2"/><circle cx="62" cy="13" r="1.8"/><circle cx="12" cy="59" r="1.8"/>
-      </g>
-      <circle cx="50" cy="50" r="4" fill="#734827"/>
-    </svg>
-  </div>
+  
 </div>
   <a class="back" href="index.html">← GAME ROOM</a>
 </div>
@@ -326,11 +318,28 @@ function renderWheel(){
   casinoMenu.style.transform=`rotateX(${wheelAngle}deg)`;
   casinoMenu.querySelectorAll(".game-button").forEach(tile=>tile.style.transform=`rotateX(${-wheelAngle}deg)`);
 }
+function animateTumbleweed(now){
+  const center=document.getElementById("interstateCenter");
+  const weed=document.getElementById("tumbleweed");
+  const room=document.querySelector(".casino-room");
+  if(!center||!weed||!room)return;
+  const duration=16000,progress=(now%duration)/duration;
+  const point=center.getPointAtLength(center.getTotalLength()*progress);
+  const matrix=center.getScreenCTM();
+  if(!matrix)return;
+  const screenPoint=new DOMPoint(point.x,point.y).matrixTransform(matrix);
+  const bounds=room.getBoundingClientRect();
+  weed.style.left=(screenPoint.x-bounds.left)+"px";
+  weed.style.top=(screenPoint.y-bounds.top)+"px";
+  weed.style.transform="translate(-50%,-50%) rotate("+Math.round(progress*1440)+"deg)";
+  weed.style.opacity=String(Math.min(1,progress*9,(1-progress)*9));
+}
 function runWheelFrame(now){
   const elapsed=Math.min(Math.max((now-lastWheelFrame)/1000,0),.05);
   lastWheelFrame=now;
   if(Math.abs(wheelVelocity)>.01)wheelAngle=(wheelAngle+wheelVelocity*elapsed)%360;
   renderWheel();
+  animateTumbleweed(now);
   requestAnimationFrame(runWheelFrame);
 }
 function desktopWheelControl(event){
