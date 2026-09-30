@@ -68,7 +68,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   filter:blur(3px);pointer-events:none;
 }
 .sign-stage{
-  position:absolute;z-index:1;left:clamp(0px,calc(22vw - 60px),250px);bottom:clamp(110px,25vh,230px);
+  position:absolute;z-index:1;left:clamp(0px,calc(35.4vw - 251px),245px);bottom:clamp(15px,4vh,40px);
   width:clamp(82px,14vw,176px);height:clamp(126px,28vh,245px);min-height:0;margin:0;
   display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 7px 8px #000a);
 }
@@ -135,12 +135,12 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 
 
 @media(max-width:560px){
-  .sign-stage{left:clamp(5px,2.2vw,32px);width:clamp(82px,14vw,176px);height:clamp(126px,28vh,245px);bottom:24%}
+  .sign-stage{left:0;width:clamp(72px,17vw,88px);height:clamp(115px,20vh,178px);bottom:clamp(15px,4vh,40px)}
   .tumbleweed{width:52px}
 }
 @media(max-height:600px){
   .floor-scene{min-height:180px}
-  .sign-stage{height:clamp(100px,28vh,190px);bottom:24vh}
+  .sign-stage{height:clamp(105px,21vh,155px);bottom:clamp(12px,4vh,24px)}
   .tumbleweed-track{bottom:6%;height:68px}
 }
 @media(prefers-reduced-motion:reduce){.tumbleweed{display:none}}
@@ -152,7 +152,7 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 }
 
 .i15-marker{
-  position:absolute;z-index:1;left:clamp(48px,5vw,70px);top:15vh;width:clamp(62px,6vw,78px);
+  position:absolute;z-index:1;left:calc(37.6vw + 75px);top:15vh;width:clamp(62px,6vw,78px);
   height:clamp(76px,9vh,96px);display:flex;flex-direction:column;align-items:center;justify-content:center;
   border:3px solid #f7f4e9;border-radius:14px 14px 18px 18px;
   background:linear-gradient(180deg,#c9363a 0 25%,#174c84 25% 100%);
@@ -167,13 +167,18 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 .i15-marker span{font-size:clamp(7px,.8vw,9px);font-weight:900;letter-spacing:.03em}
 .i15-marker strong{margin-top:4px;font-size:clamp(29px,3.2vw,38px);font-weight:900}
 @media(max-width:560px){
-  .i15-marker{left:48px;top:14vh;width:58px;height:72px}
+  .i15-marker{left:calc(37.6vw + 75px);top:14vh;width:58px;height:72px}
   .i15-marker span{font-size:7px}.i15-marker strong{font-size:28px}
 }
 
 .floor-scene{z-index:2}
 .tumbleweed{will-change:left,top,transform}
 @media(prefers-reduced-motion:reduce){.tumbleweed{display:none}}
+.union-plaza-art{
+  display:block;width:min(82vw,470px);height:clamp(64px,10vh,100px);margin:clamp(5px,.8vh,10px) auto 0;
+  filter:drop-shadow(0 5px 12px #000b);
+}
+@media(max-width:560px){.union-plaza-art{width:min(84vw,380px);height:clamp(62px,9vh,82px)}}
 </style>
 </head>
 <body>
@@ -188,14 +193,14 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
         <feGaussianBlur stdDeviation="7"/>
       </filter>
     </defs>
-    <path d="M465 820 C300 820 80 530 -55 -80"
-      fill="none" stroke="#111719" stroke-width="170" opacity=".72" filter="url(#roadEdgeGlow)" vector-effect="non-scaling-stroke"/>
-    <path d="M465 820 C300 820 80 530 -55 -80"
-      fill="none" stroke="#90866e" stroke-width="154" vector-effect="non-scaling-stroke"/>
-    <path d="M465 820 C300 820 80 530 -55 -80"
-      fill="none" stroke="url(#interstateAsphalt)" stroke-width="138" vector-effect="non-scaling-stroke"/>
-    <path id="interstateCenter" d="M465 820 C300 820 80 530 -55 -80"
-      fill="none" stroke="#f1d983" stroke-width="4" stroke-linecap="round" opacity=".98" vector-effect="non-scaling-stroke"/>
+    <path d="M190 970 L-8 -8"
+      fill="none" stroke="#111719" stroke-width="136" opacity=".72" filter="url(#roadEdgeGlow)" vector-effect="non-scaling-stroke"/>
+    <path d="M190 970 L-8 -8"
+      fill="none" stroke="#90866e" stroke-width="120" vector-effect="non-scaling-stroke"/>
+    <path d="M190 970 L-8 -8"
+      fill="none" stroke="url(#interstateAsphalt)" stroke-width="104" vector-effect="non-scaling-stroke"/>
+    <path id="interstateCenter" d="M190 970 L-8 -8"
+      fill="none" stroke="#f1d983" stroke-width="3.5" stroke-linecap="round" opacity=".98" vector-effect="non-scaling-stroke"/>
 
 
   </svg>
@@ -247,7 +252,28 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
       <text class="sign-city" x="310" y="291">CASINO</text>
     </svg>
   </div>
-  <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div></header>
+  <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div>
+    <svg class="union-plaza-art" viewBox="0 0 640 160" role="img" aria-labelledby="unionPlazaTitle">
+      <title id="unionPlazaTitle">Union Plaza hotel and neon sign</title>
+      <defs>
+        <linearGradient id="plazaNight" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1b1d4b"/><stop offset="1" stop-color="#090d1a"/></linearGradient>
+        <linearGradient id="plazaNeon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff3435"/><stop offset=".5" stop-color="#fa5a35"/><stop offset="1" stop-color="#d91d39"/></linearGradient>
+        <filter id="plazaGlow" x="-30%" y="-40%" width="160%" height="180%"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <rect x="4" y="8" width="632" height="144" rx="14" fill="url(#plazaNight)" stroke="#526686" stroke-width="2"/>
+      <path d="M15 145V84Q15 33 77 47Q115 55 146 92V145M494 145V92Q525 55 563 47Q625 33 625 84V145" fill="#111629" stroke="#f2d796" stroke-width="5" opacity=".9"/>
+      <path d="M62 147V88M105 148V74M151 148V94M489 148V94M535 148V74M578 148V88" stroke="#ffd77d" stroke-width="4" filter="url(#plazaGlow)"/>
+      <path d="M180 148V35M214 148V19M248 148V9M392 148V9M426 148V19M460 148V35" stroke="#ffdc85" stroke-width="4" stroke-dasharray="4 5" opacity=".9"/>
+      <g fill="#f5d681">
+        <circle cx="180" cy="31" r="4"/><circle cx="214" cy="15" r="4"/><circle cx="248" cy="7" r="4"/>
+        <circle cx="392" cy="7" r="4"/><circle cx="426" cy="15" r="4"/><circle cx="460" cy="31" r="4"/>
+      </g>
+      <rect x="154" y="48" width="332" height="88" rx="9" fill="#090d1c" stroke="#ffdc85" stroke-width="3" filter="url(#plazaGlow)"/>
+      <text x="320" y="75" text-anchor="middle" fill="#ffe95c" font-family="Arial,sans-serif" font-size="20" font-weight="900" letter-spacing="6">UNION</text>
+      <text x="320" y="122" text-anchor="middle" fill="url(#plazaNeon)" stroke="#ffd6b3" stroke-width="1.3" paint-order="stroke" font-family="cursive" font-size="54" font-style="italic" font-weight="900" filter="url(#plazaGlow)">Plaza</text>
+      <g fill="#ffedbd" filter="url(#plazaGlow)"><circle cx="170" cy="52" r="3"/><circle cx="470" cy="52" r="3"/><circle cx="170" cy="132" r="3"/><circle cx="470" cy="132" r="3"/></g>
+    </svg>
+  </header>
   <div class="floor-scene">
     <div class="wheel-stage" id="wheelStage" aria-label="Rotating casino game selection wheel">
     <nav class="game-wheel" id="casinoMenu" aria-label="Casino games">
