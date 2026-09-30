@@ -1764,17 +1764,15 @@ body {
     transform: translate(-50%, -50%);
     perspective: 1100px;
     perspective-origin: 50% 50%;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 .game-wheel {
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
-    animation: wheelTurn var(--wheel-duration, 32s) linear infinite;
-    animation-direction: var(--wheel-direction, normal);
-}
-.wheel-stage[data-wheel-motion="paused"] .game-wheel,
-.wheel-stage[data-wheel-motion="paused"] .game-wheel * {
-    animation-play-state: paused;
+    will-change: transform;
 }
 @keyframes wheelTurn {
     from { transform: rotateX(0deg); }
@@ -1796,8 +1794,8 @@ body {
     top: 0;
     translate: -50% -50%;
     transform-origin: center center;
-    animation: keepTileUpright var(--wheel-duration, 32s) linear infinite;
-    animation-direction: var(--wheel-direction, normal);
+    animation: none;
+    will-change: transform;
     width: clamp(225px, 31vw, 350px);
     height: clamp(68px, 10vh, 88px);
     flex-shrink: 0;
@@ -2070,39 +2068,60 @@ body {
 
 const gameMenu = document.getElementById("gameMenu");
 const wheelStage = document.getElementById("wheelStage");
+
+const BASE_WHEEL_SPEED = 360 / 32;
+const FAST_WHEEL_MULTIPLIER = 4.5;
+const TOUCH_DEAD_ZONE = 0.12;
+
+let wheelAngle = 0;
+let wheelVelocity = BASE_WHEEL_SPEED;
 let lastWheelDirection = "up";
+let lastWheelFrame = performance.now();
+let activeTouchId = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchMoved = false;
+let suppressWheelClickUntil = 0;
+
+function setWheelVelocity(velocity) {
+    wheelVelocity = velocity;
+    if (velocity > 0.01) lastWheelDirection = "up";
+    if (velocity < -0.01) lastWheelDirection = "down";
+    wheelStage.dataset.wheelMotion = Math.abs(velocity) < 0.01 ? "paused" : "running";
+}
 
 function setWheelMotion(direction, fast = false) {
-    const animations = [
-        ...gameMenu.getAnimations(),
-        ...[...gameMenu.querySelectorAll(".game-button")]
-            .flatMap(button => button.getAnimations())
-    ];
-
     if (direction !== "up" && direction !== "down") {
-        wheelStage.dataset.wheelMotion = "paused";
-        animations.forEach(animation => animation.pause());
+        setWheelVelocity(0);
         return;
     }
 
-    lastWheelDirection = direction;
-    wheelStage.dataset.wheelMotion = "running";
-    const speed = fast ? 4.5 : 1;
-    const playbackRate = direction === "down" ? -speed : speed;
+    const speed = BASE_WHEEL_SPEED * (fast ? FAST_WHEEL_MULTIPLIER : 1);
+    setWheelVelocity(direction === "down" ? -speed : speed);
+}
 
-    animations.forEach(animation => {
-        if (typeof animation.updatePlaybackRate === "function") {
-            animation.updatePlaybackRate(playbackRate);
-        } else {
-            animation.playbackRate = playbackRate;
-        }
-        animation.play();
+function renderWheel() {
+    gameMenu.style.transform = `rotateX(${wheelAngle}deg)`;
+    gameMenu.querySelectorAll(".game-button").forEach(button => {
+        button.style.transform = `rotateX(${-wheelAngle}deg)`;
     });
 }
 
-wheelStage.addEventListener("pointermove", event => {
-    if (event.pointerType === "touch") return;
+function runWheelFrame(now) {
+    const elapsed = Math.min(Math.max((now - lastWheelFrame) / 1000, 0), 0.05);
+    lastWheelFrame = now;
 
+    if (Math.abs(wheelVelocity) > 0.01) {
+        wheelAngle = (wheelAngle + wheelVelocity * elapsed) % 360;
+    }
+
+    renderWheel();
+    requestAnimationFrame(runWheelFrame);
+}
+
+requestAnimationFrame(runWheelFrame);
+
+function desktopWheelControl(event) {
     const bounds = wheelStage.getBoundingClientRect();
     const verticalPosition = (event.clientY - bounds.top) / bounds.height;
 
@@ -2113,9 +2132,92 @@ wheelStage.addEventListener("pointermove", event => {
     } else {
         setWheelMotion("center");
     }
+}
+
+function touchWheelControl(event) {
+    const bounds = wheelStage.getBoundingClientRect();
+    const verticalPosition = Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height));
+    const signedPosition = (verticalPosition - 0.5) * 2;
+    const distanceFromCenter = Math.abs(signedPosition);
+
+    if (distanceFromCenter <= TOUCH_DEAD_ZONE) {
+        setWheelMotion("center");
+        return;
+    }
+
+    // Android: center pauses; moving toward either edge smoothly
+    // increases speed. Crossing center reverses the wheel.
+    const amount = (distanceFromCenter - TOUCH_DEAD_ZONE) / (1 - TOUCH_DEAD_ZONE);
+    const speedMultiplier = 0.2 + (FAST_WHEEL_MULTIPLIER - 0.2) * amount;
+    const velocity = BASE_WHEEL_SPEED * speedMultiplier * (signedPosition < 0 ? 1 : -1);
+    setWheelVelocity(velocity);
+}
+
+wheelStage.addEventListener("pointerdown", event => {
+    if (event.pointerType !== "touch") return;
+
+    activeTouchId = event.pointerId;
+    touchStartX = event.clientX;
+    touchStartY = event.clientY;
+    touchMoved = false;
+
+    try { wheelStage.setPointerCapture(event.pointerId); } catch (_) {}
+    touchWheelControl(event);
 });
 
-wheelStage.addEventListener("pointerleave", () => setWheelMotion(lastWheelDirection, false));
+wheelStage.addEventListener("pointermove", event => {
+    if (event.pointerType === "touch") {
+        if (event.pointerId !== activeTouchId) return;
+
+        if (Math.hypot(event.clientX - touchStartX, event.clientY - touchStartY) > 8) {
+            touchMoved = true;
+        }
+
+        touchWheelControl(event);
+        if (touchMoved) event.preventDefault();
+        return;
+    }
+
+    desktopWheelControl(event);
+});
+
+function releaseTouchWheel(event) {
+    if (event.pointerId !== activeTouchId) return;
+
+    if (touchMoved) {
+        suppressWheelClickUntil = Date.now() + 400;
+    }
+
+    activeTouchId = null;
+    setWheelMotion(lastWheelDirection, false);
+}
+
+wheelStage.addEventListener("pointerup", releaseTouchWheel);
+wheelStage.addEventListener("pointercancel", releaseTouchWheel);
+
+wheelStage.addEventListener("pointerleave", event => {
+    if (event.pointerType === "touch" && activeTouchId !== null) return;
+    setWheelMotion(lastWheelDirection, false);
+});
+
+// If the pointer leaves the browser entirely, do not leave the wheel
+// stranded in the desktop hover-pause state.
+window.addEventListener("blur", () => {
+    if (activeTouchId === null) setWheelMotion(lastWheelDirection, false);
+});
+
+window.addEventListener("pointerout", event => {
+    if (event.pointerType !== "touch" && !event.relatedTarget) {
+        setWheelMotion(lastWheelDirection, false);
+    }
+});
+
+document.addEventListener("visibilitychange", () => {
+    lastWheelFrame = performance.now();
+    if (!document.hidden && activeTouchId === null) {
+        setWheelMotion(lastWheelDirection, false);
+    }
+});
 
 
 const gameInfo = {
@@ -2263,7 +2365,11 @@ function createGameButton(filename) {
 
     button.className = "game-button";
 
-    button.onclick = () => {
+    button.onclick = event => {
+        if (Date.now() < suppressWheelClickUntil) {
+            event.preventDefault();
+            return;
+        }
         location.href = filename;
     };
 
