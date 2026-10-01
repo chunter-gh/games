@@ -58,25 +58,12 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
   position:relative;isolation:isolate;width:min(100%,1120px);height:100%;min-height:0;
   justify-self:center;display:flex;align-items:center;justify-content:center;overflow:visible;
 }
-.interstate-scene{
-  position:absolute;z-index:0;inset:0;width:100%;height:100%;pointer-events:none;
-  opacity:.93;
-}
-.floor-scene::after{
-  content:"";position:absolute;z-index:0;left:4%;right:4%;bottom:1.5%;height:clamp(14px,3vh,28px);
-  border-radius:50%;background:radial-gradient(ellipse,rgba(106,91,63,.42),rgba(37,34,30,.18) 46%,transparent 75%);
-  filter:blur(3px);pointer-events:none;
-}
 .sign-stage{
-  position:absolute;z-index:1;left:clamp(0px,calc(35.4vw - 251px),245px);bottom:clamp(15px,4vh,40px);
-  width:clamp(82px,14vw,176px);height:clamp(126px,28vh,245px);min-height:0;margin:0;
-  display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 7px 8px #000a);
+  position:absolute;z-index:3;left:clamp(12px,5vw,76px);top:50%;transform:translateY(-50%);
+  width:clamp(190px,22vw,230px);height:clamp(145px,22vh,190px);min-height:0;margin:0;
+  display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 8px 12px #000b);
 }
 .vegas-sign{width:100%;height:100%;min-height:0;max-height:100%;object-fit:contain}
-.tumbleweed{
-  position:absolute;z-index:1;left:0;top:0;width:clamp(52px,5.6vw,78px);height:auto;
-  filter:drop-shadow(0 4px 3px #0009);pointer-events:none;transform-origin:50% 50%;
-}
 .menu{
   width:min(86vw,370px);min-height:0;max-height:100%;margin:0;
   padding:3px 6px;gap:clamp(3px,.7dvh,8px);overflow-y:auto;
@@ -134,100 +121,20 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
 }
 
 
-@media(max-width:560px){
-  .sign-stage{left:0;width:clamp(72px,17vw,88px);height:clamp(115px,20vh,178px);bottom:clamp(15px,4vh,40px)}
-  .tumbleweed{width:52px}
-}
-@media(max-height:600px){
-  .floor-scene{min-height:180px}
-  .sign-stage{height:clamp(105px,21vh,155px);bottom:clamp(12px,4vh,24px)}
-  .tumbleweed-track{bottom:6%;height:68px}
-}
-@media(prefers-reduced-motion:reduce){.tumbleweed{display:none}}
-
-@media(max-width:560px){
-  .sign-stage{left:5px;width:clamp(78px,17vw,112px);height:clamp(116px,26vh,170px);bottom:24%}
-  .tumbleweed-track{width:100vw;right:0;bottom:6%}
-  .tumbleweed{width:52px}
-}
-
-.i15-marker{
-  position:absolute;z-index:1;left:calc(37.6vw + 75px);top:15vh;width:clamp(62px,6vw,78px);
-  height:clamp(76px,9vh,96px);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border:3px solid #f7f4e9;border-radius:14px 14px 18px 18px;
-  background:linear-gradient(180deg,#c9363a 0 25%,#174c84 25% 100%);
-  color:#fff;text-shadow:0 2px 2px #001a34;box-shadow:0 3px 10px #0009;
-  font-family:Arial,sans-serif;line-height:1;pointer-events:none;
-  clip-path:polygon(10% 0,90% 0,100% 15%,100% 80%,82% 100%,18% 100%,0 80%,0 15%);
-}
-.i15-marker::after{
-  content:"";position:absolute;z-index:-1;top:87%;left:calc(50% - 2px);width:4px;height:45px;
-  background:linear-gradient(90deg,#8e8777,#ddd3b6,#777164);
-}
-.i15-marker span{font-size:clamp(7px,.8vw,9px);font-weight:900;letter-spacing:.03em}
-.i15-marker strong{margin-top:4px;font-size:clamp(29px,3.2vw,38px);font-weight:900}
-@media(max-width:560px){
-  .i15-marker{left:calc(37.6vw + 75px);top:14vh;width:58px;height:72px}
-  .i15-marker span{font-size:7px}.i15-marker strong{font-size:28px}
-}
-
-.floor-scene{z-index:2}
-.tumbleweed{will-change:left,top,transform}
-@media(prefers-reduced-motion:reduce){.tumbleweed{display:none}}
 .union-plaza-art{
-  display:block;width:min(82vw,470px);height:clamp(64px,10vh,100px);margin:clamp(5px,.8vh,10px) auto 0;
-  filter:drop-shadow(0 5px 12px #000b);
+  display:block;width:min(38vw,320px);height:clamp(190px,31vh,330px);margin:clamp(4px,.7vh,9px) auto 0;
+  filter:drop-shadow(0 5px 14px #000b);
 }
-@media(max-width:560px){.union-plaza-art{width:min(84vw,380px);height:clamp(62px,9vh,82px)}}
+@media(max-width:560px){.union-plaza-art{width:min(70vw,300px);height:clamp(165px,27vh,250px)}}
+@media(max-height:500px){.union-plaza-art{height:118px;width:auto}}
 </style>
 </head>
 <body>
 <div class="casino-room">
   <div class="glow" aria-hidden="true"></div>
-  <svg class="interstate-scene" viewBox="0 0 430 932" preserveAspectRatio="none" aria-hidden="true">
-    <defs>
-      <linearGradient id="interstateAsphalt" x1="0" y1="0" x2="1" y2=".25">
-        <stop offset="0" stop-color="#353a3b"/><stop offset=".5" stop-color="#24292c"/><stop offset="1" stop-color="#343535"/>
-      </linearGradient>
-      <filter id="roadEdgeGlow" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="7"/>
-      </filter>
-    </defs>
-    <path d="M190 970 L-8 -8"
-      fill="none" stroke="#111719" stroke-width="136" opacity=".72" filter="url(#roadEdgeGlow)" vector-effect="non-scaling-stroke"/>
-    <path d="M190 970 L-8 -8"
-      fill="none" stroke="#90866e" stroke-width="120" vector-effect="non-scaling-stroke"/>
-    <path d="M190 970 L-8 -8"
-      fill="none" stroke="url(#interstateAsphalt)" stroke-width="104" vector-effect="non-scaling-stroke"/>
-    <path id="interstateCenter" d="M190 970 L-8 -8"
-      fill="none" stroke="#f1d983" stroke-width="3.5" stroke-linecap="round" opacity=".98" vector-effect="non-scaling-stroke"/>
-
-
-  </svg>
-  <svg id="tumbleweed" class="tumbleweed" viewBox="0 0 100 100" aria-hidden="true">
-      <defs>
-        <radialGradient id="tumbleTone" cx="38%" cy="31%" r="75%">
-          <stop offset="0" stop-color="#d6a66b"/><stop offset=".55" stop-color="#a86f3d"/><stop offset="1" stop-color="#684126"/>
-        </radialGradient>
-      </defs>
-      <circle cx="50" cy="50" r="39" fill="url(#tumbleTone)" opacity=".18"/>
-      <g fill="none" stroke="#794d2b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity=".96">
-        <path d="M50 8 C68 8 87 23 91 41 C97 61 81 82 63 90 C45 98 22 87 13 70 C4 52 10 28 27 16 C34 11 42 8 50 8Z"/>
-        <path d="M50 13 C73 11 87 34 82 55 C79 72 59 88 42 82 C25 78 14 60 18 42 C22 25 36 14 50 13Z" transform="rotate(27 50 50)"/>
-        <path d="M50 11 C29 13 13 33 18 53 C22 74 42 87 61 81 C80 75 89 55 82 36 C76 20 64 12 50 11Z" transform="rotate(-23 50 50)"/>
-        <g transform="rotate(-3 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(26.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(42 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(71.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(87 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(116.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(132 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(161.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(177 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(206.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(222 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(251.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g><g transform="rotate(267 50 50)"><path d="M50 50 C43 41 39 35 44 17 C47 10 55 9 57 16 C59 23 51 26 48 20 M44 31 C35 30 31 24 33 18 M45 35 C53 34 61 29 61 22" /></g><g transform="rotate(296.5 50 50)"><path d="M50 50 C43 41 39 37 44 19 C47 12 55 11 57 18 C59 25 51 28 48 22 M44 33 C35 32 31 26 33 20 M45 37 C53 36 61 31 61 24" /></g><g transform="rotate(312 50 50)"><path d="M50 50 C43 41 39 39 44 21 C47 14 55 13 57 20 C59 27 51 30 48 24 M44 35 C35 34 31 28 33 22 M45 39 C53 38 61 33 61 26" /></g><g transform="rotate(341.5 50 50)"><path d="M50 50 C43 41 39 41 44 23 C47 16 55 15 57 22 C59 29 51 32 48 26 M44 37 C35 36 31 30 33 24 M45 41 C53 40 61 35 61 28" /></g>
-        <path d="M19 43 C35 28 62 25 79 45 C91 60 70 77 51 67 C32 57 27 40 42 34 C59 28 74 42 67 55 C61 67 42 68 35 56 C28 44 38 36 48 41 C58 47 57 58 49 60"/>
-        <path d="M22 65 C33 50 54 37 76 31 M25 28 C42 43 61 63 77 76 M15 52 C35 56 65 49 86 51 M40 16 C44 36 57 66 62 85"/>
-      </g>
-      <g fill="#c4935d" opacity=".9">
-        <circle cx="18" cy="37" r="2.2"/><circle cx="80" cy="26" r="2"/><circle cx="83" cy="63" r="2.4"/>
-        <circle cx="31" cy="82" r="2"/><circle cx="62" cy="13" r="1.8"/><circle cx="12" cy="59" r="1.8"/>
-      </g>
-      <circle cx="50" cy="50" r="4" fill="#734827"/>
-    </svg>
-  <div class="i15-marker" aria-label="Interstate 15 roadside marker">
-    <span>INTERSTATE</span><strong>15</strong>
-  </div>
+  
+  
+  
 <div class="sign-stage">
     <svg class="vegas-sign" viewBox="0 0 620 390" role="img" aria-labelledby="signTitle">
       <title id="signTitle">Animated Welcome to Fabulous Casino sign</title>
@@ -253,25 +160,45 @@ body{color:white;background:radial-gradient(circle at 50% 17%,#32365f 0%,#15182f
     </svg>
   </div>
   <header class="title-area"><h1 class="title">CASINO</h1><div class="subtitle">CHOOSE YOUR GAME</div>
-    <svg class="union-plaza-art" viewBox="0 0 640 160" role="img" aria-labelledby="unionPlazaTitle">
-      <title id="unionPlazaTitle">Union Plaza hotel and neon sign</title>
+    <svg class="union-plaza-art" viewBox="0 0 400 520" role="img" aria-labelledby="buildingTitle">
+      <title id="buildingTitle">Nighttime hotel with a tall central tower, illuminated roof spires, and arched wings</title>
       <defs>
-        <linearGradient id="plazaNight" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1b1d4b"/><stop offset="1" stop-color="#090d1a"/></linearGradient>
-        <linearGradient id="plazaNeon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff3435"/><stop offset=".5" stop-color="#fa5a35"/><stop offset="1" stop-color="#d91d39"/></linearGradient>
-        <filter id="plazaGlow" x="-30%" y="-40%" width="160%" height="180%"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="buildingSky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#101844" stop-opacity=".7"/><stop offset="1" stop-color="#080b18" stop-opacity="0"/></linearGradient>
+        <linearGradient id="buildingFace" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#141a2e"/><stop offset=".5" stop-color="#090e1d"/><stop offset="1" stop-color="#171a2c"/></linearGradient>
+        <filter id="buildingGlow" x="-50%" y="-20%" width="200%" height="140%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-      <rect x="4" y="8" width="632" height="144" rx="14" fill="url(#plazaNight)" stroke="#526686" stroke-width="2"/>
-      <path d="M15 145V84Q15 33 77 47Q115 55 146 92V145M494 145V92Q525 55 563 47Q625 33 625 84V145" fill="#111629" stroke="#f2d796" stroke-width="5" opacity=".9"/>
-      <path d="M62 147V88M105 148V74M151 148V94M489 148V94M535 148V74M578 148V88" stroke="#ffd77d" stroke-width="4" filter="url(#plazaGlow)"/>
-      <path d="M180 148V35M214 148V19M248 148V9M392 148V9M426 148V19M460 148V35" stroke="#ffdc85" stroke-width="4" stroke-dasharray="4 5" opacity=".9"/>
-      <g fill="#f5d681">
-        <circle cx="180" cy="31" r="4"/><circle cx="214" cy="15" r="4"/><circle cx="248" cy="7" r="4"/>
-        <circle cx="392" cy="7" r="4"/><circle cx="426" cy="15" r="4"/><circle cx="460" cy="31" r="4"/>
+      <path d="M0 0H400V520H0Z" fill="url(#buildingSky)"/>
+      <g fill="none" stroke="#ffe1a0" stroke-width="4" filter="url(#buildingGlow)" opacity=".96">
+        <path d="M14 520V238Q14 168 79 180Q122 188 153 232"/>
+        <path d="M386 520V238Q386 168 321 180Q278 188 247 232"/>
+        <path d="M48 520V258Q48 198 92 208Q121 215 151 248"/>
+        <path d="M352 520V258Q352 198 308 208Q279 215 249 248"/>
       </g>
-      <rect x="154" y="48" width="332" height="88" rx="9" fill="#090d1c" stroke="#ffdc85" stroke-width="3" filter="url(#plazaGlow)"/>
-      <text x="320" y="75" text-anchor="middle" fill="#ffe95c" font-family="Arial,sans-serif" font-size="20" font-weight="900" letter-spacing="6">UNION</text>
-      <text x="320" y="122" text-anchor="middle" fill="url(#plazaNeon)" stroke="#ffd6b3" stroke-width="1.3" paint-order="stroke" font-family="cursive" font-size="54" font-style="italic" font-weight="900" filter="url(#plazaGlow)">Plaza</text>
-      <g fill="#ffedbd" filter="url(#plazaGlow)"><circle cx="170" cy="52" r="3"/><circle cx="470" cy="52" r="3"/><circle cx="170" cy="132" r="3"/><circle cx="470" cy="132" r="3"/></g>
+      <g fill="#080d1b" stroke="#46506a" stroke-width="3">
+        <path d="M0 520V246Q0 197 39 211V520Z"/>
+        <path d="M400 520V246Q400 197 361 211V520Z"/>
+        <path d="M42 520V263Q42 221 77 231V520Z"/>
+        <path d="M358 520V263Q358 221 323 231V520Z"/>
+        <path d="M79 520V284H155V520ZM321 520V284H245V520Z"/>
+        <path d="M120 520V224L145 202H255L280 224V520Z" fill="url(#buildingFace)" stroke="#5d5362" stroke-width="4"/>
+      </g>
+      <g fill="none" stroke="#e8bd73" stroke-width="4" filter="url(#buildingGlow)">
+        <path d="M25 520V253M62 520V260M95 520V288M145 520V213M255 520V213M305 520V288M338 520V260M375 520V253"/>
+        <path d="M172 520V206M190 520V202M210 520V202M228 520V206"/>
+      </g>
+      <g fill="#f3d48c" opacity=".94">
+        <circle cx="145" cy="202" r="4"/><circle cx="162" cy="166" r="4"/><circle cx="180" cy="139" r="4"/>
+        <circle cx="200" cy="122" r="4"/><circle cx="220" cy="139" r="4"/><circle cx="238" cy="166" r="4"/><circle cx="255" cy="202" r="4"/>
+      </g>
+      <g fill="none" stroke="#7f8ca5" stroke-width="2.5" opacity=".72">
+        <path d="M0 307H120M0 351H120M0 395H120M0 439H120M0 483H120M280 307H400M280 351H400M280 395H400M280 439H400M280 483H400"/>
+        <path d="M121 255H279M121 299H279M121 343H279M121 387H279M121 431H279M121 475H279"/>
+      </g>
+      <g fill="#b7c9df" opacity=".45">
+        <path d="M15 292h12v23H15zM48 299h12v24H48zM84 322h12v22H84zM151 270h15v21h-15zM174 270h15v21h-15zM211 270h15v21h-15zM235 270h15v21h-15zM151 314h15v21h-15zM211 314h15v21h-15zM235 314h15v21h-15z"/>
+        <path d="M348 299h12v24h-12zM340 350h12v22h-12zM290 322h12v22h-12zM151 358h15v21h-15zM174 358h15v21h-15zM211 358h15v21h-15zM235 358h15v21h-15zM151 402h15v21h-15zM174 402h15v21h-15zM211 402h15v21h-15zM235 402h15v21h-15zM151 446h15v21h-15zM174 446h15v21h-15zM211 446h15v21h-15zM235 446h15v21h-15z"/>
+      </g>
+      <path d="M0 518H400" stroke="#f1d38d" stroke-width="4" opacity=".8" filter="url(#buildingGlow)"/>
     </svg>
   </header>
   <div class="floor-scene">
@@ -320,7 +247,7 @@ function arrangeCasinoWheel(){
   const tiles=[...casinoMenu.querySelectorAll(".game-button")];
   const count=tiles.length;
   if(!count)return;
-  const radius=150;
+  const radius=108;
   tiles.forEach((tile,index)=>{
     const angle=(360/count)*index;
     const holder=document.createElement("div");
@@ -344,28 +271,11 @@ function renderWheel(){
   casinoMenu.style.transform=`rotateX(${wheelAngle}deg)`;
   casinoMenu.querySelectorAll(".game-button").forEach(tile=>tile.style.transform=`rotateX(${-wheelAngle}deg)`);
 }
-function animateTumbleweed(now){
-  const center=document.getElementById("interstateCenter");
-  const weed=document.getElementById("tumbleweed");
-  const room=document.querySelector(".casino-room");
-  if(!center||!weed||!room)return;
-  const duration=16000,progress=(now%duration)/duration;
-  const point=center.getPointAtLength(center.getTotalLength()*progress);
-  const matrix=center.getScreenCTM();
-  if(!matrix)return;
-  const screenPoint=new DOMPoint(point.x,point.y).matrixTransform(matrix);
-  const bounds=room.getBoundingClientRect();
-  weed.style.left=(screenPoint.x-bounds.left)+"px";
-  weed.style.top=(screenPoint.y-bounds.top)+"px";
-  weed.style.transform="translate(-50%,-50%) rotate("+Math.round(progress*1440)+"deg)";
-  weed.style.opacity=String(Math.min(1,progress*9,(1-progress)*9));
-}
 function runWheelFrame(now){
   const elapsed=Math.min(Math.max((now-lastWheelFrame)/1000,0),.05);
   lastWheelFrame=now;
   if(Math.abs(wheelVelocity)>.01)wheelAngle=(wheelAngle+wheelVelocity*elapsed)%360;
   renderWheel();
-  animateTumbleweed(now);
   requestAnimationFrame(runWheelFrame);
 }
 function desktopWheelControl(event){
